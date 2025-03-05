@@ -1,0 +1,13 @@
+# Node.js related (if you use npm in the future)
+node_modules/
+
+# IDE and editor specific files
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store  # For MacOS
+Thumbs.db  # For Windows
+
+# Log files (if any)
+*.log
