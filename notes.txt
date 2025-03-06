@@ -1,0 +1,35 @@
+git version--
+
+git init
+
+git add .
+
+git commit -m "initial commit  - this is a comment"
+
+   Link Your Local Repository to GitHub 
+Add repo Link
+
+git remote add origin [ insert link]
+
+  to push code :
+git push -u origin main
+
+-------------------------
+
+->>> How to Update GitHub After Modifications
+
+1. Check What’s Changed
+         git status
+This will show all the changes that are not yet committed.
+
+2. Add the Changes to Git
+         git add .
+The . means you are adding all modified files.
+
+3. Commit the Changes
+         git commit -m "Updated UI styles and fixed navbar responsiveness"
+(Change the message based on what you did.)
+
+4. Push the Changes to GitHub
+         git push origin main
+
