@@ -27,9 +27,6 @@ menuBar.addEventListener('click', function () {
 
 
 
-
-
-
 const searchButton = document.querySelector('#content nav form .search-form-input button');
 const searchButtonIcon = document.querySelector('#content nav form .search-form-input button .bx');
 const searchForm = document.querySelector('#content nav form');
@@ -66,13 +63,3 @@ window.addEventListener('resize', function () {
 })
 
 
-
-const switchMode = document.getElementById('switch-mode');
-
-switchMode.addEventListener('change', function () {
-	if(this.checked) {
-		document.body.classList.add('dark');
-	} else {
-		document.body.classList.remove('dark');
-	}
-})

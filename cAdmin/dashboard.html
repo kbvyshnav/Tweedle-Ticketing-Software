@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <!-- My CSS -->
+    <link rel="stylesheet" href="dashboard-style.css">
+
+    <title>Dashboard Content</title>
+</head>
+<body>
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main>
+        <div class="head-title">
+            <div class="left">
+                <h1>Dashboard</h1>
+                <ul class="breadcrumb">
+                    <li>
+                        <a href="#">Dashboard</a>
+                    </li>
+                    <li><i class='bx bx-chevron-right'></i></li>
+                    <li>
+                        <a class="active" href="#">In Progress</a>
+                    </li>
+                </ul>
+            </div>
+            <a href="#" class="btn-download">
+                <i class='bx bxs-cloud-download'></i>
+                <span class="text">Download PDF</span>
+            </a>
+        </div>
+
+        <ul class="box-info">
+            <li>
+                <i class='bx bxs-envelope'></i>
+                <span class="text">
+                    <h3>10</h3>
+                    <p>Inbox</p>
+                </span>
+            </li>
+            <li>
+                <i class='bx bxs-hourglass'></i>
+                <span class="text">
+                    <h3>28</h3>
+                    <p>In Progress</p>
+                </span>
+            </li>
+            <li>
+                <i class='bx bx-send'></i>
+                <span class="text">
+                    <h3>34</h3>
+                    <p>Forwarded</p>
+                </span>
+            </li>
+            <li>
+                <i class='bx bx-check-circle'></i>
+                <span class="text">
+                    <h3>243</h3>
+                    <p>Closed</p>
+                </span>
+            </li>
+        </ul>
+
+        <div class="table-data">
+            <div class="order">
+                <div class="head">
+                    <h3>Tickets <span class="highlight-status">INPROGRESS</span></h3>
+                    <div class="search-container">
+                        <i class='bx bx-search search-icon'></i>
+                        <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search..." title="Type to search">
+                    </div>                    
+                    <i class='bx bx-search'></i>
+                    <i class='bx bx-filter'></i>
+                    <i class='bx bx-dots-vertical-rounded'></i>
+                    <i class='bx bx-plus'></i>
+                </div>
+                <table id="myUL">
+                    <thead>
+                        <tr>
+                            <th>Ticket ID</th>
+                            <th>Subject</th>
+                            <th>Issue Date</th>
+                            <th>Client</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><i class='bx bx-star star-icon'></i> GMEC25010001</td>
+                            <td>Wallet Option Agents </td>
+                            <td>01-10-2021</td>                       
+                            <td>GMEC</td>
+                            <td><span class="status completed">Testing</span></td>
+                            <td class="actions">
+                                <i class='bx bx-time-five timeline-icon'></i>
+                                <i class='bx bx-chat chat-icon'></i>
+                                <i class='bx bx-dots-vertical-rounded more-icon'></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><i class='bx bx-star star-icon'></i> GMEC25010002</td>
+                            <td>Terra pay</td>
+                            <td>01-10-2021</td>                          
+                            <td>GMEC</td>
+                            <td><span class="status pending">Development</span></td>
+                            <td class="actions">
+                                <i class='bx bx-time-five timeline-icon'></i>
+                                <i class='bx bx-chat chat-icon'></i>
+                                <i class='bx bx-dots-vertical-rounded more-icon'></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><i class='bx bx-star star-icon'></i> GMEC25010003</td>
+                            <td>Recon issue</td>
+                            <td>01-10-2021</td>                           
+                            <td>GMEC</td>
+                            <td><span class="status pending">Development</span></td>
+                            <td class="actions">
+                                <i class='bx bx-time-five timeline-icon'></i>
+                                <i class='bx bx-chat chat-icon'></i>
+                                <i class='bx bx-dots-vertical-rounded more-icon'></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><i class='bx bx-star star-icon'></i> GMEC25010004</td>
+                            <td>Kumari API Intergration</td>
+                            <td>01-10-2023</td>
+                            <td>GMEC</td>
+                            <td><span class="status completed">Testing</span></td>
+                            <td class="actions">
+                                <i class='bx bx-time-five timeline-icon'></i>
+                                <i class='bx bx-chat chat-icon'></i>
+                                <i class='bx bx-dots-vertical-rounded more-icon'></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><i class='bx bx-star star-icon'></i> GMEC25010005</td>
+                            <td>Missing March Data</td>
+                            <td>01-10-2021</td>
+                            <td>BGEX</td>
+                            <td><span class="status process">UAT</span></td>
+                            <td class="actions">
+                                <i class='bx bx-time-five timeline-icon'></i>
+                                <i class='bx bx-chat chat-icon'></i>
+                                <i class='bx bx-dots-vertical-rounded more-icon'></i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function myFunction() {
+            var input, filter, table, tr, td, i, j, txtValue, match;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            table = document.querySelector("table");
+            tr = table.getElementsByTagName("tr");
+        
+            for (i = 1; i < tr.length; i++) { // start from 1 to skip the header row
+                td = tr[i].getElementsByTagName("td");
+                match = false;
+                for (j = 0; j < td.length; j++) {
+                    if (td[j]) {
+                        txtValue = td[j].textContent || td[j].innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            match = true;
+                            break;
+                        }
+                    }
+                }
+                tr[i].style.display = match ? "" : "none";
+            }
+        }
+        </script>
+        
+</body>
+</html>
+

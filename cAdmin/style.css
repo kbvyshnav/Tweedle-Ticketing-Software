@@ -26,10 +26,15 @@
 		--dark-grey: #AAAAAA;
 		--dark: #342E37;
 		--red: #DB504A;
-		--yellow: #FFCE26;
+		--yellow: #ecbe25;
 		--light-yellow: #FFF2C6;
 		--orange: #FD7238;
 		--light-orange: #FFE0D3;
+		--green: #28c742;
+		--light-green: #d3f9df;
+		--text-primary: #262a39;
+		--primary-color: #4270f4;
+
 	}
 
 	html {
@@ -56,7 +61,7 @@
 		position: fixed;
 		top: 0;
 		left: 0;
-		width: 280px;
+		width: 209px;
 		height: 100%;
 		background: var(--light);
 		z-index: 2000;
@@ -77,7 +82,7 @@
 		height: 56px;
 		display: flex;
 		align-items: center;
-		color: var(--blue);
+		color: var(--primary-color);
 		position: sticky;
 		top: 0;
 		left: 0;
@@ -86,6 +91,14 @@
 		padding-bottom: 20px;
 		box-sizing: content-box;
 	}
+	.brand .text {
+		background: linear-gradient(90deg, var(--text-primary), var(--primary-color));
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+		-webkit-text-fill-color: transparent;
+	}
+	
 	#sidebar .brand .bx {
 		min-width: 60px;
 		display: flex;
@@ -164,8 +177,8 @@
 /* CONTENT */
 	#content {
 		position: relative;
-		width: calc(100% - 280px);
-		left: 280px;
+		width: calc(100% - 209px);
+		left: 209px;
 		transition: .3s ease;
 	}
 	#sidebar.hide ~ #content {
@@ -277,31 +290,8 @@
 		object-fit: cover;
 		border-radius: 50%;
 	}
-	#content nav .switch-mode {
-		display: block;
-		min-width: 50px;
-		height: 25px;
-		border-radius: 25px;
-		background: var(--grey);
-		cursor: pointer;
-		position: relative;
-	}
-	#content nav .switch-mode::before {
-		content: '';
-		position: absolute;
-		top: 2px;
-		left: 2px;
-		bottom: 2px;
-		width: calc(25px - 4px);
-		background: var(--blue);
-		border-radius: 50%;
-		transition: all .3s ease;
-	}
-	#content nav #switch-mode:checked + .switch-mode::before {
-		left: calc(100% - (25px - 4px) - 2px);
-	}
+	
 /* NAVBAR */
-
 
 
 
@@ -393,6 +383,10 @@
 	#content main .box-info li:nth-child(3) .bx {
 		background: var(--light-orange);
 		color: var(--orange);
+	}
+	#content main .box-info li:nth-child(4) .bx {
+		background: var(--light-green);
+		color: var(--green);
 	}
 	#content main .box-info li .text h3 {
 		font-size: 24px;
