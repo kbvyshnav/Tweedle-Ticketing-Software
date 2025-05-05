@@ -36,9 +36,6 @@ li {
     --text-primary: #262a39;
     --primary-color: #4270f4;
     --dark-blue: #1677d7;
-    --star-gold: #FFD700;
-    --hover-bg: #f5f5f5;
-    --row-border: #e5e5e5;
 }
 
 html {
@@ -215,10 +212,154 @@ main .table-data .head .bx {
     cursor: pointer;
 }
 
-/* search bar - table head */
+main .table-data .order {
+    flex-grow: 1;
+    flex-basis: 500px;
+}
+
+main .table-data .order table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+main .table-data .order table th {
+    padding: 12px 15px;
+    font-size: 13px;
+    text-align: left;
+    border-bottom: 1px solid var(--grey);
+    background-color: var(--light-yellow);
+    color: var(--dark-yellow);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: sticky;
+    top: 0;
+}
+
+main .table-data .order table td {
+    padding: 16px 15px;
+    border-bottom: 1px solid rgba(238, 238, 238, 0.5);
+}
+
+main .table-data .order table tr td:first-child {
+    display: flex;
+    align-items: center;
+    grid-gap: 12px;
+    color: var(--dark);
+}
+
+main .table-data .order table tbody tr {
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+main .table-data .order table tbody tr:hover {
+    background: var(--grey);
+}
+
+main .table-data .order table tr td .status {
+    font-size: 11px;
+    padding: 6px 16px;
+    color: var(--light);
+    border-radius: 20px;
+    font-weight: 700;
+    display: inline-block;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+main .table-data .order table tr td .status.completed {
+    background: var(--blue);
+}
+
+main .table-data .order table tr td .status.process {
+    background: var(--yellow);
+}
+
+main .table-data .order table tr td .status.pending {
+    background: var(--orange);
+}
+
+/* Star icon styling */
+.star-icon {
+    font-size: 18px;
+    color: #ccc;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.star-icon:hover, .star-icon.active {
+    color: #FFD700;
+}
+
+.star-icon.active {
+    font-weight: 900;
+}
+
+/* Action icons styling */
+.actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 15px;
+    white-space: nowrap;
+}
+
+.timeline-icon, .chat-icon, .more-icon {
+    font-size: 18px;
+    color: var(--dark-grey);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.timeline-icon:hover {
+    color: var(--blue);
+    background-color: rgba(60, 145, 230, 0.1);
+}
+
+.chat-icon:hover {
+    color: var(--green);
+    background-color: rgba(40, 199, 66, 0.1);
+}
+
+.more-icon:hover {
+    color: var(--dark);
+    background-color: rgba(52, 46, 55, 0.1);
+}
+
+/* Make sure actions column stays in position */
+main .table-data .order table th:last-child, 
+main .table-data .order table td:last-child {
+    position: sticky;
+    right: 0;
+    min-width: 120px;
+    text-align: right;
+}
+
+/* RESPONSIVE DESIGN */
+@media screen and (max-width: 768px) {
+    main .table-data .head {
+        min-width: 420px;
+    }
+    
+    main .table-data .order table {
+        min-width: 420px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    main .box-info {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* search bar header---- */
 .search-container {
     position: relative;
-    width: 300px;
+    width: 300px; 
+   
 }
 
 .search-container .search-icon {
@@ -245,226 +386,3 @@ main .table-data .head .bx {
     border-color: #666;
     background-color: #f2f2f2;
 }
-
-main .table-data .order {
-    flex-grow: 1;
-    flex-basis: 500px;
-}
-
-main .table-data .order table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-main .table-data .order table th {
-    padding: 12px 15px;
-    font-size: 13px;
-    text-align: left;
-    border-bottom: 1px solid var(--grey);
-    background-color: var(--light-yellow);
-    color: var(--dark-yellow);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    position: sticky;
-    top: 0;
-}
-
-main .table-data .order table td {
-    padding: 16px 15px;
-    border-bottom: none;
-}
-
-main .table-data .order table tr td:first-child {
-    display: flex;
-    align-items: center;
-    grid-gap: 12px;
-    color: var(--dark);
-}
-
-main .table-data .order table tbody tr {
-    cursor: pointer;
-    transition: all 0.25s ease;
-    position: relative;
-    border-bottom: 1px solid var(--row-border);
-}
-
-main .table-data .order table tbody tr:not(:last-child) {
-    box-shadow: 0 1px 0 rgba(0,0,0,0.05);
-}
-
-main .table-data .order table tbody tr:hover {
-    background: var(--hover-bg);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-    transform: translateY(-1px);
-}
-
-main .table-data .order table tbody tr td {
-    position: relative;
-}
-
-main .table-data .order table tbody tr td:before {
-    display: none;
-}
-
-main .table-data .order table tr td .status {
-    font-size: 11px;
-    padding: 6px 16px;
-    color: var(--light);
-    border-radius: 20px;
-    font-weight: 700;
-    display: inline-block;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-main .table-data .order table tr td .status.completed {
-    background: var(--blue);
-}
-
-main .table-data .order table tr td .status.process {
-    background: var(--yellow);
-}
-
-main .table-data .order table tr td .status.pending {
-    background: var(--orange);
-}
-
-/* Star icon styling with active state */
-.star-icon {
-    font-size: 18px;
-    color: #ccc;
-    margin-right: 10px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.star-icon:hover {
-    color: var(--star-gold);
-    filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.3));
-}
-
-.star-icon.active {
-    color: var(--star-gold);
-    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
-}
-
-/* Enhanced action icons styling */
-.actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 15px;
-    white-space: nowrap;
-}
-
-.timeline-icon, .chat-icon, .more-icon {
-    font-size: 18px;
-    color: var(--dark-grey);
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 50%;
-    transition: all 0.2s ease;
-}
-
-/* Darken icons on row hover */
-main .table-data .order table tbody tr:hover .timeline-icon,
-main .table-data .order table tbody tr:hover .chat-icon,
-main .table-data .order table tbody tr:hover .more-icon,
-main .table-data .order table tbody tr:hover .star-icon {
-    color: var(--dark);
-}
-
-.timeline-icon:hover {
-    color: var(--blue) !important;
-    background-color: rgba(60, 145, 230, 0.1);
-    transform: scale(1.15);
-}
-
-.chat-icon:hover {
-    color: var(--green) !important;
-    background-color: rgba(40, 199, 66, 0.1);
-    transform: scale(1.15);
-}
-
-.more-icon:hover {
-    color: var(--dark) !important;
-    background-color: rgba(52, 46, 55, 0.1);
-    transform: scale(1.15);
-}
-
-/* Make sure actions column stays in position */
-main .table-data .order table th:last-child, 
-main .table-data .order table td:last-child {
-    position: sticky;
-    right: 0;
-    min-width: 120px;
-    text-align: right;
-}
-
-/* Attachment styles */
-.attachment-container {
-    display: inline-flex;
-    align-items: center;
-    margin-top: 4px;
-    background-color: #f0f0f0;
-    border-radius: 12px;
-    padding: 3px 10px;
-    max-width: 200px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: 1px solid #e0e0e0;
-}
-
-.attachment-container:hover {
-    background-color: #e8e8e8;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.attachment-icon {
-    margin-right: 6px;
-    padding: 2px;
-    font-size: 14px;
-    color: var(--dark-grey);
-}
-
-.attachment-icon.pdf {
-    color: #e74c3c;
-}
-
-.attachment-icon.doc {
-    color: #3498db;
-}
-
-.attachment-icon.img {
-    color: #27ae60;
-}
-
-.attachment-name {
-    font-size: 12px;
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 150px;
-}
-
-/* RESPONSIVE DESIGN */
-@media screen and (max-width: 768px) {
-    main .table-data .head {
-        min-width: 420px;
-    }
-    
-    main .table-data .order table {
-        min-width: 420px;
-    }
-}
-
-@media screen and (max-width: 576px) {
-    main .box-info {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* end of v1 */

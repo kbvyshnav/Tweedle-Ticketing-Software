@@ -69,9 +69,10 @@
                 <div class="head">
                     <h3>Tickets <span class="highlight-status">INPROGRESS</span></h3>
                     <div class="search-container">
-                        <i class='bx bx-search search-icon'></i>
-                        <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search..." title="Type to search">
-                    </div>                    
+                        <i class='bx bx-search search-icon' aria-hidden="true"></i>
+                        <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search..." title="Type to search" aria-label="Search tickets">
+                        <div id="searchFeedback" class="search-feedback" aria-live="polite"></div>
+                    </div>                   
                     <i class='bx bx-search'></i>
                     <i class='bx bx-filter'></i>
                     <i class='bx bx-dots-vertical-rounded'></i>
@@ -91,62 +92,74 @@
                     <tbody>
                         <tr>
                             <td><i class='bx bx-star star-icon'></i> GMEC25010001</td>
-                            <td>Wallet Option Agents </td>
-                            <td>01-10-2021</td>                       
+                            <td>
+                                <div>Wallet Option Agents</div>
+                                <div class="attachment-container">
+                                    <i class='bx bxs-file-pdf attachment-icon pdf'></i>
+                                    <span class="attachment-name">wallet_specs.pdf</span>
+                                </div>
+                            </td>
+                            <td>11-09-2021</td>                       
                             <td>GMEC</td>
                             <td><span class="status completed">Testing</span></td>
                             <td class="actions">
-                                <i class='bx bx-time-five timeline-icon'></i>
-                                <i class='bx bx-chat chat-icon'></i>
-                                <i class='bx bx-dots-vertical-rounded more-icon'></i>
+                                <i class='bx bx-time-five timeline-icon' role="button" aria-label="View timeline"></i>
+                                <i class='bx bx-chat chat-icon' role="button" aria-label="Open chat"></i>
+                                <i class='bx bx-dots-vertical-rounded more-icon' role="button" aria-label="More options"></i>
                             </td>
                         </tr>
                         <tr>
                             <td><i class='bx bx-star star-icon'></i> GMEC25010002</td>
-                            <td>Terra pay</td>
-                            <td>01-10-2021</td>                          
+                            <td>
+                                <div>Terra pay</div>
+                                <div class="attachment-container">
+                                    <i class='bx bxs-file-doc attachment-icon doc'></i>
+                                    <span class="attachment-name">terra_integration_guide.docx</span>
+                                </div>
+                            </td>
+                            <td>23-01-2022</td>                          
                             <td>GMEC</td>
                             <td><span class="status pending">Development</span></td>
                             <td class="actions">
-                                <i class='bx bx-time-five timeline-icon'></i>
-                                <i class='bx bx-chat chat-icon'></i>
-                                <i class='bx bx-dots-vertical-rounded more-icon'></i>
+                                <i class='bx bx-time-five timeline-icon' role="button" aria-label="View timeline"></i>
+                                <i class='bx bx-chat chat-icon' role="button" aria-label="Open chat"></i>
+                                <i class='bx bx-dots-vertical-rounded more-icon' role="button" aria-label="More options"></i>
                             </td>
                         </tr>
                         <tr>
                             <td><i class='bx bx-star star-icon'></i> GMEC25010003</td>
                             <td>Recon issue</td>
-                            <td>01-10-2021</td>                           
+                            <td>24-04-2020</td>                           
                             <td>GMEC</td>
                             <td><span class="status pending">Development</span></td>
                             <td class="actions">
-                                <i class='bx bx-time-five timeline-icon'></i>
-                                <i class='bx bx-chat chat-icon'></i>
-                                <i class='bx bx-dots-vertical-rounded more-icon'></i>
+                                <i class='bx bx-time-five timeline-icon' role="button" aria-label="View timeline"></i>
+                                <i class='bx bx-chat chat-icon' role="button" aria-label="Open chat"></i>
+                                <i class='bx bx-dots-vertical-rounded more-icon' role="button" aria-label="More options"></i>
                             </td>
                         </tr>
                         <tr>
                             <td><i class='bx bx-star star-icon'></i> GMEC25010004</td>
                             <td>Kumari API Intergration</td>
-                            <td>01-10-2023</td>
+                            <td>08-01-2022</td>
                             <td>GMEC</td>
                             <td><span class="status completed">Testing</span></td>
                             <td class="actions">
-                                <i class='bx bx-time-five timeline-icon'></i>
-                                <i class='bx bx-chat chat-icon'></i>
-                                <i class='bx bx-dots-vertical-rounded more-icon'></i>
+                                <i class='bx bx-time-five timeline-icon' role="button" aria-label="View timeline"></i>
+                                <i class='bx bx-chat chat-icon' role="button" aria-label="Open chat"></i>
+                                <i class='bx bx-dots-vertical-rounded more-icon' role="button" aria-label="More options"></i>
                             </td>
                         </tr>
                         <tr>
                             <td><i class='bx bx-star star-icon'></i> GMEC25010005</td>
                             <td>Missing March Data</td>
-                            <td>01-10-2021</td>
+                            <td>22-11-2025</td>
                             <td>BGEX</td>
                             <td><span class="status process">UAT</span></td>
                             <td class="actions">
-                                <i class='bx bx-time-five timeline-icon'></i>
-                                <i class='bx bx-chat chat-icon'></i>
-                                <i class='bx bx-dots-vertical-rounded more-icon'></i>
+                                <i class='bx bx-time-five timeline-icon' role="button" aria-label="View timeline"></i>
+                                <i class='bx bx-chat chat-icon' role="button" aria-label="Open chat"></i>
+                                <i class='bx bx-dots-vertical-rounded more-icon' role="button" aria-label="More options"></i>
                             </td>
                         </tr>
                     </tbody>
@@ -157,29 +170,77 @@
 
     <script>
         function myFunction() {
-            var input, filter, table, tr, td, i, j, txtValue, match;
-            input = document.getElementById("myInput");
-            filter = input.value.toUpperCase();
-            table = document.querySelector("table");
-            tr = table.getElementsByTagName("tr");
-        
-            for (i = 1; i < tr.length; i++) { // start from 1 to skip the header row
-                td = tr[i].getElementsByTagName("td");
-                match = false;
-                for (j = 0; j < td.length; j++) {
-                    if (td[j]) {
-                        txtValue = td[j].textContent || td[j].innerText;
+            const input = document.getElementById("myInput");
+            const filter = input.value.toUpperCase();
+            const table = document.querySelector("table");
+            const rows = table.getElementsByTagName("tr");
+            const feedbackElement = document.getElementById("searchFeedback");
+            
+            let matchCount = 0;
+
+            for (let i = 1; i < rows.length; i++) { // start from 1 to skip the header row
+                const cells = rows[i].getElementsByTagName("td");
+                let match = false;
+                
+                for (let j = 0; j < cells.length; j++) {
+                    if (cells[j]) {
+                        const txtValue = cells[j].textContent || cells[j].innerText;
                         if (txtValue.toUpperCase().indexOf(filter) > -1) {
                             match = true;
                             break;
                         }
                     }
                 }
-                tr[i].style.display = match ? "" : "none";
+                
+                rows[i].style.display = match ? "" : "none";
+                if (match) matchCount++;
+            }
+            
+            // Provide feedback for screen readers
+            if (filter.length > 0) {
+                feedbackElement.textContent = matchCount > 0 ? 
+                    `Found ${matchCount} matching tickets` : 
+                    "No matching tickets found";
+            } else {
+                feedbackElement.textContent = "";
             }
         }
-        </script>
-        
+
+        // Add debounce for better performance
+        function debounce(func, wait = 300) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        const debouncedSearch = debounce(myFunction);
+
+        document.getElementById("myInput").addEventListener("input", debouncedSearch);
+
+        // Add functionality for the star icons
+        document.addEventListener('DOMContentLoaded', function() {
+            const starIcons = document.querySelectorAll('.star-icon');
+            
+            starIcons.forEach(star => {
+                star.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent row click event
+                    this.classList.toggle('active');
+                    
+                    // Update the icon class to filled star when active
+                    if (this.classList.contains('active')) {
+                        this.classList.remove('bx-star');
+                        this.classList.add('bxs-star');
+                    } else {
+                        this.classList.remove('bxs-star');
+                        this.classList.add('bx-star');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
 
+<!-- ---end of v1----- -->
