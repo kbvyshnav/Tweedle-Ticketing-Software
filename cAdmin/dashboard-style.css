@@ -36,7 +36,7 @@ li {
     --text-primary: #262a39;
     --primary-color: #4270f4;
     --dark-blue: #1677d7;
-    --star-gold: #FFD700;
+    --star-gold: #e9cc2c;
     --hover-bg: #f5f5f5;
     --row-border: #e5e5e5;
 }
@@ -389,8 +389,7 @@ main .table-data .order table tr td .status.pending {
 /* Darken icons on row hover */
 main .table-data .order table tbody tr:hover .timeline-icon,
 main .table-data .order table tbody tr:hover .chat-icon,
-main .table-data .order table tbody tr:hover .more-icon,
-main .table-data .order table tbody tr:hover .star-icon {
+main .table-data .order table tbody tr:hover .more-icon{
     color: var(--dark);
 }
 

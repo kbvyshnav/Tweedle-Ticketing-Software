@@ -205,14 +205,13 @@
 
 
 
-        //functionality for the star icons
+         //functionality for the star icons
         document.addEventListener('DOMContentLoaded', function() {
             const starIcons = document.querySelectorAll('.star-icon');
             
             starIcons.forEach(star => {
                 star.setAttribute('role', 'button');
                 star.setAttribute('aria-label', 'Favorite this ticket');
-                star.setAttribute('tabindex', '0');
                 
                 const handleStarAction = function() {
                     this.classList.toggle('active');
