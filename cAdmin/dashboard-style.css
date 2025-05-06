@@ -246,6 +246,24 @@ main .table-data .head .bx {
     background-color: #f2f2f2;
 }
 
+.filter-icon,
+.options {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;      
+    height: 30px;    
+    border-radius: 50%; 
+    transition: background-color 0.3s;
+  }
+  
+.filter-icon:hover,
+.options:hover {
+    background-color: #e0e0e0; 
+    cursor: pointer;
+}
+  
+
 main .table-data .order {
     flex-grow: 1;
     flex-basis: 500px;
@@ -486,3 +504,4 @@ a:focus, button:focus, input:focus,
 }
 
 /* end of v1 */
+
