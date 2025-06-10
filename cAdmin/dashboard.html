@@ -33,6 +33,43 @@
             </a>
         </div>
 
+<!-- Simplified Filter Controls Section -->
+<div class="filter-controls">
+    <div class="filter-group">
+        <label for="companyFilter">Company:</label>
+        <div class="select-wrapper">
+            <select id="companyFilter" class="filter-select">
+                <option value="">All Companies</option>
+                <option value="GMEC">GMEC</option>
+                <option value="BGEX">BGEX</option>
+            </select>
+            <i class='bx bx-chevron-down'></i>
+        </div>
+    </div>
+    
+    <div class="filter-group date-range-group">
+        <div class="date-input-group">
+            <label for="fromDate">From:</label>
+            <div class="date-input-wrapper">
+                <input type="date" id="fromDate" class="date-input">
+                <i class='bx bx-calendar'></i>
+            </div>
+        </div>
+        
+        <div class="date-separator">to</div>
+        
+        <div class="date-input-group">
+            <label for="toDate">To:</label>
+            <div class="date-input-wrapper">
+                <input type="date" id="toDate" class="date-input">
+                <i class='bx bx-calendar'></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
         <ul class="box-info">
             <li>
                 <i class='bx bxs-envelope'></i>

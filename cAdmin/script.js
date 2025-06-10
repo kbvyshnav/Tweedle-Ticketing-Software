@@ -26,7 +26,7 @@ menuBar.addEventListener('click', function () {
 
 
 
-
+//search button functionality
 const searchButton = document.querySelector('#content nav form .search-form-input button');
 const searchButtonIcon = document.querySelector('#content nav form .search-form-input button .bx');
 const searchForm = document.querySelector('#content nav form');

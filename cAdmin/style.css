@@ -90,20 +90,32 @@
 		z-index: 500;
 		padding-bottom: 20px;
 		box-sizing: content-box;
+		padding-left: 15px;
 	}
 	.brand .text {
-		background: linear-gradient(90deg, var(--text-primary), var(--primary-color));
+		background: linear-gradient(180deg, #3C91E6, #2ECC71); 
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent;
 		-webkit-text-fill-color: transparent;
+		margin-left: 18px;
+		font-size: 28px;
 	}
 	
-	#sidebar .brand .bx {
-		min-width: 60px;
-		display: flex;
-		justify-content: center;
+	@keyframes rotateY360 {
+		from {
+			transform: rotateY(0deg);
+		}
+		to {
+			transform: rotateY(360deg);
+		}
 	}
+
+	.company-logo {
+		animation: rotateY360 5s linear infinite; 
+	}
+
+
 	#sidebar .side-menu {
 		width: 100%;
 		margin-top: 48px;
