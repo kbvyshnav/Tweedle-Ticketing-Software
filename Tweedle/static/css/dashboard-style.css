@@ -508,31 +508,33 @@ a:focus, button:focus, input:focus,
             gap: 10px;
             align-items: center;
         }
-
-        .filter-btn {
-            background: var(--light);
-            color: rgb(0, 0, 0);
-            border: none;
-            border-radius: 4px;
-            padding: 8px 16px;
-            font-size: 13px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 40px;
-            position: relative;
-        }
+.filter-btn {
+    background: transparent;            /* Remove existing background */
+    color: rgb(0, 0, 0);
+    border: 1.5px solid var(--blue);        /* Add a blue border (adjust color as needed) */
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    position: relative;
+    outline: none;
+}
 
         .filter-btn:hover {
-            background: #3367d6;
+            background: var(--blue);
+            color:white;
         }
 
         .dropdown-icon {
             width: 0;
             height: 0;
+            color: white;
             border-left: 4px solid transparent;
             border-right: 4px solid transparent;
-            border-top: 4px solid white;
+            border-top: 4px solid rgb(16, 16, 16);
         }
 
         .dropdown {
