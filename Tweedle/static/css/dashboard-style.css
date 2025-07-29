@@ -510,16 +510,16 @@ a:focus, button:focus, input:focus,
         }
 
         .filter-btn {
-            background: #4285f4;
-            color: white;
+            background: var(--light);
+            color: rgb(0, 0, 0);
             border: none;
             border-radius: 4px;
             padding: 8px 16px;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 40px;
             position: relative;
         }
 
@@ -576,7 +576,7 @@ a:focus, button:focus, input:focus,
         /* Date Dropdown */
         .date-dropdown {
             padding: 16px;
-            width: 350px;
+            width: 400px;
         }
 
         .date-inputs {
@@ -603,7 +603,7 @@ a:focus, button:focus, input:focus,
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 14px;
-            width: 120px;
+            width: 150px;
         }
 
         .date-separator {
