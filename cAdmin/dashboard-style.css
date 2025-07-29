@@ -72,27 +72,8 @@ main .head-title .left h1 {
     color: var(--dark);
 }
 
-main .head-title .left .breadcrumb {
-    display: flex;
-    align-items: center;
-    grid-gap: 16px;
-}
 
-main .head-title .left .breadcrumb li {
-    color: var(--dark);
-}
-
-main .head-title .left .breadcrumb li a {
-    color: var(--dark-grey);
-    pointer-events: none;
-}
-
-main .head-title .left .breadcrumb li a.active {
-    color: var(--blue);
-    pointer-events: unset;
-}
-
-main .head-title .btn-download {
+.filter-controls .btn-download {
     height: 36px;
     padding: 0 16px;
     border-radius: 36px;
@@ -109,7 +90,7 @@ main .box-info {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     grid-gap: 24px;
-    margin-top: 36px;
+    margin-top: 24px;
 }
 
 main .box-info li {
@@ -510,7 +491,6 @@ a:focus, button:focus, input:focus,
     background: var(--light);
     border-radius: 12px;
     padding: 16px 20px;
-    margin-top: 24px;
     box-shadow: 0 3px 10px rgba(0,0,0,0.04);
     transition: all 0.3s ease;
     display: flex;
@@ -523,93 +503,139 @@ a:focus, button:focus, input:focus,
     box-shadow: 0 5px 15px rgba(0,0,0,0.08);
 }
 
-.filter-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+ .filter-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
 
-.filter-group label {
-    font-size: 14px;
-    color: var(--dark);
-    font-weight: 500;
-    white-space: nowrap;
-}
+        .filter-btn {
+            background: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+        }
 
-.select-wrapper, .date-input-wrapper {
-    position: relative;
-}
+        .filter-btn:hover {
+            background: #3367d6;
+        }
 
-.filter-select, .date-input {
-    padding: 8px 12px;
-    border: 1px solid var(--grey);
-    border-radius: 6px;
-    background-color: #fff;
-    font-size: 14px;
-    color: var(--dark);
-    appearance: none;
-    transition: all 0.2s ease;
-    min-width: 160px;
-}
+        .dropdown-icon {
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 4px solid white;
+        }
 
-.date-input {
-    min-width: 140px;
-}
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            min-width: 300px;
+            display: none;
+        }
 
-.filter-select:focus, .date-input:focus {
-    border-color: var(--blue);
-    box-shadow: 0 0 0 2px rgba(60, 145, 230, 0.1);
-    outline: none;
-}
+        .dropdown.active {
+            display: block;
+        }
 
-.select-wrapper i, .date-input-wrapper i {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--dark-grey);
-    pointer-events: none;
-    font-size: 16px;
-}
+        /* Company Dropdown */
+        .company-dropdown {
+            padding: 8px 0;
+        }
 
-.date-separator {
-    font-size: 14px;
-    color: var(--dark-grey);
-    margin: 0 -5px;
-}
+        .company-option {
+            padding: 10px 16px;
+            cursor: pointer;
+            color: #333;
+            font-size: 14px;
+        }
 
-/* Responsive Design for Filters */
-@media screen and (max-width: 768px) {
-    .filter-controls {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-    }
-    
-    .filter-group {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .filter-select, .date-input {
-        flex: 1;
-    }
-    
-    .date-range-group {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .date-input-group {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .date-input-wrapper {
-        flex: 1;
-    }
-}
+        .company-option:hover {
+            background: #f5f5f5;
+        }
+
+        .company-option.selected {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        /* Date Dropdown */
+        .date-dropdown {
+            padding: 16px;
+            width: 350px;
+        }
+
+        .date-inputs {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .date-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .date-input-group label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .date-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 120px;
+        }
+
+        .date-separator {
+            color: #666;
+            margin-top: 20px;
+        }
+
+        .quick-filters {
+            border-top: 1px solid #eee;
+            padding-top: 12px;
+        }
+
+        .quick-filter {
+            display: block;
+            width: 100%;
+            padding: 8px 12px;
+            background: none;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            border-radius: 3px;
+        }
+
+        .quick-filter:hover {
+            background: #f5f5f5;
+        }
+
+        .quick-filter.selected {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+

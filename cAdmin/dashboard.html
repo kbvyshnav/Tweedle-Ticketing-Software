@@ -17,55 +17,65 @@
         <div class="head-title">
             <div class="left">
                 <h1>Dashboard</h1>
-                <ul class="breadcrumb">
-                    <li>
-                        <a href="#">Dashboard</a>
-                    </li>
-                    <li><i class='bx bx-chevron-right'></i></li>
-                    <li>
-                        <a class="active" href="#">In Progress</a>
-                    </li>
-                </ul>
+                
             </div>
-            <a href="#" class="btn-download">
-                <i class='bx bxs-cloud-download'></i>
-                <span class="text">Download PDF</span>
-            </a>
+            
+
         </div>
 
 <!-- Simplified Filter Controls Section -->
 <div class="filter-controls">
-    <div class="filter-group">
-        <label for="companyFilter">Company:</label>
-        <div class="select-wrapper">
-            <select id="companyFilter" class="filter-select">
-                <option value="">All Companies</option>
-                <option value="GMEC">GMEC</option>
-                <option value="BGEX">BGEX</option>
-            </select>
-            <i class='bx bx-chevron-down'></i>
-        </div>
-    </div>
-    
-    <div class="filter-group date-range-group">
-        <div class="date-input-group">
-            <label for="fromDate">From:</label>
-            <div class="date-input-wrapper">
-                <input type="date" id="fromDate" class="date-input">
-                <i class='bx bx-calendar'></i>
+    <div class="filter-container">
+        <!-- Company Filter -->
+        <div style="position: relative;">
+            <button class="filter-btn" id="companyBtn">
+                <span id="companyText">All Companies</span>
+                <div class="dropdown-icon"></div>
+            </button>
+            <div class="dropdown company-dropdown" id="companyDropdown">
+                <div class="company-option selected" data-company="all">All Companies</div>
+                <div class="company-option" data-company="gmec">GMEC</div>
+                <div class="company-option" data-company="techcorp">TechCorp</div>
+                <div class="company-option" data-company="innovate">Innovate Ltd</div>
+                <div class="company-option" data-company="solutions">Solutions Inc</div>
             </div>
         </div>
-        
-        <div class="date-separator">to</div>
-        
-        <div class="date-input-group">
-            <label for="toDate">To:</label>
-            <div class="date-input-wrapper">
-                <input type="date" id="toDate" class="date-input">
-                <i class='bx bx-calendar'></i>
+
+        <!-- Date Filter -->
+        <div style="position: relative;">
+            <button class="filter-btn" id="dateBtn">
+                <span id="dateText"><i class='bx  bx-calendar-alt'  ></i>  Any Date</span>
+                <div class="dropdown-icon"></div>
+            </button>
+            <div class="dropdown date-dropdown" id="dateDropdown">
+                <div class="date-inputs">
+                    <div class="date-input-group">
+                        <label>From</label>
+                        <input type="date" class="date-input" id="fromDate" value="2017-01-12">
+                    </div>
+                    <div class="date-separator">—</div>
+                    <div class="date-input-group">
+                        <label>To</label>
+                        <input type="date" class="date-input" id="toDate" value="2018-01-03">
+                    </div>
+                </div>
+                <div class="quick-filters">
+                    <button class="quick-filter" data-period="today">Today</button>
+                    <button class="quick-filter" data-period="yesterday">Yesterday</button>
+                    <button class="quick-filter" data-period="thismonth">This Month</button>
+                    <button class="quick-filter" data-period="pastmonth">Past Month</button>
+                    <button class="quick-filter" data-period="past3months">Past 3 Months</button>
+                </div>
             </div>
         </div>
+
+            <a href="#" class="btn-download">
+                <i class='bx bxs-cloud-download'></i>
+                <span class="text">Download PDF</span>
+            </a>
     </div>
+
+
 </div>
 
 
@@ -279,6 +289,121 @@
                 });
             });
         });
+
+
+        //filter for company select and date filter:::
+        // Company filter functionality
+        const companyBtn = document.getElementById('companyBtn');
+        const companyDropdown = document.getElementById('companyDropdown');
+        const companyText = document.getElementById('companyText');
+        const companyOptions = document.querySelectorAll('.company-option');
+
+        companyBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            companyDropdown.classList.toggle('active');
+            dateDropdown.classList.remove('active');
+        });
+
+        companyOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // Remove selected class from all options
+                companyOptions.forEach(opt => opt.classList.remove('selected'));
+                // Add selected class to clicked option
+                option.classList.add('selected');
+                // Update button text
+                companyText.textContent = option.textContent;
+                // Close dropdown
+                companyDropdown.classList.remove('active');
+            });
+        });
+
+        // Date filter functionality
+        const dateBtn = document.getElementById('dateBtn');
+        const dateDropdown = document.getElementById('dateDropdown');
+        const dateText = document.getElementById('dateText');
+        const fromDate = document.getElementById('fromDate');
+        const toDate = document.getElementById('toDate');
+        const quickFilters = document.querySelectorAll('.quick-filter');
+
+        dateBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dateDropdown.classList.toggle('active');
+            companyDropdown.classList.remove('active');
+        });
+
+        // Quick filter functionality
+        quickFilters.forEach(filter => {
+            filter.addEventListener('click', () => {
+                // Remove selected class from all quick filters
+                quickFilters.forEach(f => f.classList.remove('selected'));
+                // Add selected class to clicked filter
+                filter.classList.add('selected');
+                
+                const period = filter.dataset.period;
+                const today = new Date();
+                let startDate, endDate;
+
+                switch(period) {
+                    case 'today':
+                        startDate = endDate = today;
+                        dateText.textContent = 'Today';
+                        break;
+                    case 'yesterday':
+                        startDate = endDate = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+                        dateText.textContent = 'Yesterday';
+                        break;
+                    case 'thismonth':
+                        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                        endDate = today;
+                        dateText.textContent = 'This Month';
+                        break;
+                    case 'pastmonth':
+                        startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                        endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+                        dateText.textContent = 'Past Month';
+                        break;
+                    case 'past3months':
+                        startDate = new Date(today.getFullYear(), today.getMonth() - 3, 1);
+                        endDate = today;
+                        dateText.textContent = 'Past 3 Months';
+                        break;
+                }
+
+                // Update date inputs
+                fromDate.value = startDate.toISOString().split('T')[0];
+                toDate.value = endDate.toISOString().split('T')[0];
+                
+                // Close dropdown after a short delay
+                setTimeout(() => {
+                    dateDropdown.classList.remove('active');
+                }, 200);
+            });
+        });
+
+        // Custom date input change handlers
+        fromDate.addEventListener('change', updateCustomDateText);
+        toDate.addEventListener('change', updateCustomDateText);
+
+        function updateCustomDateText() {
+            if (fromDate.value && toDate.value) {
+                // Clear quick filter selections
+                quickFilters.forEach(f => f.classList.remove('selected'));
+                // Update button text to show custom range
+                const from = new Date(fromDate.value).toLocaleDateString();
+                const to = new Date(toDate.value).toLocaleDateString();
+                dateText.textContent = `${from} - ${to}`;
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', () => {
+            companyDropdown.classList.remove('active');
+            dateDropdown.classList.remove('active');
+        });
+
+        // Prevent dropdown close when clicking inside
+        companyDropdown.addEventListener('click', (e) => e.stopPropagation());
+        dateDropdown.addEventListener('click', (e) => e.stopPropagation());
 
     </script>
 </body>
