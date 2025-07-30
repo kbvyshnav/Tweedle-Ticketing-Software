@@ -7,8 +7,8 @@
     <!-- Boxicons -->
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <!-- My CSS -->
-    <link rel="stylesheet" href="../static/css/dashboard-style.css">
-    <script src="../static/js/script.js" defer></script>
+    <link rel="stylesheet" href="../static/css/cAdmin_dashboard_style.css">
+    <script src="../static/js/cAdmin_script.js" defer></script>
 
     <title>Tweedle - InProgress</title>
 </head>
@@ -21,13 +21,13 @@
             </div>
         </div>
 
-        <!-- Simplified Filter Controls Section -->
+        <!-- Filter Controls Section : Company sort, date picker, global search bar -->
         <div class="filter-controls">
             <div class="filter-container">
                 <!-- Company Filter -->
                 <div style="position: relative;">
                     <button class="filter-btn" id="companyBtn">
-                        <span id="companyText"><i class='bx  bx-align-justify'  ></i>Sort by Company</span>
+                        <span id="companyText"><i class='bx bx-align-justify'></i>Sort by Company</span>
                         <div class="dropdown-icon"></div>
                     </button>
                     <div class="dropdown company-dropdown" id="companyDropdown">
@@ -40,7 +40,7 @@
                 <!-- Date Filter -->
                 <div style="position: relative;">
                     <button class="filter-btn" id="dateBtn">
-                        <span id="dateText"><i class='bx  bx-calendar-alt'  ></i>  Any Date</span>
+                        <span id="dateText"><i class='bx bx-calendar-alt'></i>  Any Date</span>
                         <div class="dropdown-icon"></div>
                     </button>
                     <div class="dropdown date-dropdown" id="dateDropdown">
@@ -52,7 +52,7 @@
                             <div class="date-separator">—</div>
                             <div class="date-input-group">
                                 <label>To</label>
-                                <input type="date" class="date-input" id="toDate" value="20-089-2025">
+                                <input type="date" class="date-input" id="toDate" value="20-08-2025">
                             </div>
                         </div>
                         <div class="quick-filters">
@@ -62,16 +62,21 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                    <a href="#" class="btn-download">
-                        <i class='bx bxs-cloud-download'></i>
-                        <span class="text">Download PDF</span>
-                    </a>
+            <!-- 🔍 Search box on right -->
+            <div class="search-form-wrapper">
+                <form action="#">
+                    <div class="search-form-input">
+                        <input type="search" placeholder="Search ticket id...">
+                        <button type="submit" class="search-btn"><i class='bx bx-search'></i></button>
+                    </div>
+                </form>
             </div>
         </div>
 
 
-
+        <!--Ticket box tabs-->
         <ul class="box-info">
             <li>
                 <i class='bx bxs-envelope'></i>
@@ -103,13 +108,14 @@
             </li>
         </ul>
 
+
         <div class="table-data">
             <div class="order">
                 <div class="head">
                     <h3>Tickets <span class="highlight-status">INPROGRESS</span></h3>
                     <div class="search-container">
                         <i class='bx bx-search search-icon' aria-hidden="true"></i>
-                        <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search..." title="Type to search" aria-label="Search tickets">
+                        <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search ticket id or Subject..." title="Type to search" aria-label="Search tickets">
                         <div id="searchFeedback" class="search-feedback" aria-live="polite"></div>
                     </div>                                      
                     <i class='bx bx-filter filter-icon'></i>
@@ -204,45 +210,8 @@
             </div>
         </div>
     </main>
-
+ 
     <script>
-        function myFunction() {
-            var input, filter, table, tr, td, i, j, txtValue, match;
-            input = document.getElementById("myInput");
-            filter = input.value.toUpperCase();
-            table = document.querySelector("table");
-            tr = table.getElementsByTagName("tr");
-        
-            for (i = 1; i < tr.length; i++) { // start from 1 to skip the header row
-                td = tr[i].getElementsByTagName("td");
-                match = false;
-                for (j = 0; j < td.length; j++) {
-                    if (td[j]) {
-                        txtValue = td[j].textContent || td[j].innerText;
-                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                            match = true;
-                            break;
-                        }
-                    }
-                }
-                tr[i].style.display = match ? "" : "none";
-            }
-        }
-
-        // search debounce for better performance
-            function debounce(func, wait = 300) {
-                let timeout;
-                return function(...args) {
-                    clearTimeout(timeout);
-                    timeout = setTimeout(() => func.apply(this, args), wait);
-                };
-            }
-
-            const debouncedSearch = debounce(myFunction);
-
-            document.getElementById("myInput").addEventListener("input", debouncedSearch);
-
-
 
          //functionality for the star icons
         document.addEventListener('DOMContentLoaded', function() {
@@ -340,19 +309,10 @@
                         startDate = endDate = today;
                         dateText.textContent = 'Today';
                         break;
-                    case 'yesterday':
-                        startDate = endDate = new Date(today.getTime() - 24 * 60 * 60 * 1000);
-                        dateText.textContent = 'Yesterday';
-                        break;
                     case 'thismonth':
                         startDate = new Date(today.getFullYear(), today.getMonth(), 1);
                         endDate = today;
                         dateText.textContent = 'This Month';
-                        break;
-                    case 'pastmonth':
-                        startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-                        endDate = new Date(today.getFullYear(), today.getMonth(), 0);
-                        dateText.textContent = 'Past Month';
                         break;
                     case 'past3months':
                         startDate = new Date(today.getFullYear(), today.getMonth() - 3, 1);
@@ -396,10 +356,10 @@
         // Prevent dropdown close when clicking inside
         companyDropdown.addEventListener('click', (e) => e.stopPropagation());
         dateDropdown.addEventListener('click', (e) => e.stopPropagation());
+        
 
     </script>
 </body>
 </html>
 
-<!-- 
-end of v1 -->
+<!-- end of v1 -->

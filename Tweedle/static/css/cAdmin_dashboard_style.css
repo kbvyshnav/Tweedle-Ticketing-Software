@@ -28,7 +28,7 @@ li {
     --red: #DB504A;
     --yellow: #ecbe25;
     --light-yellow: #FFF2C6;
-    --dark-yellow:#be950d;
+    --dark-yellow:#d1a513;
     --orange: #FD7238;
     --light-orange: #FFE0D3;
     --green: #28c742;
@@ -39,6 +39,8 @@ li {
     --star-gold: #e9cc2c;
     --hover-bg: #f1ecec;
     --row-border: #e5e5e5;
+    --table-head:#dfdfdf;
+    --table-font:#484847;
 }
 
 html {
@@ -66,26 +68,274 @@ main .head-title {
 }
 
 main .head-title .left h1 {
-    font-size: 36px;
+    font-size: 30px;
     font-weight: 600;
     margin-bottom: 10px;
     color: var(--dark);
 }
 
-
-.filter-controls .btn-download {
-    height: 36px;
-    padding: 0 16px;
-    border-radius: 36px;
-    background: var(--blue);
-    color: var(--light);
+/* Filter Controls Section : cmpny,date,search*/
+.filter-controls {
+    background: var(--light);
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
     display: flex;
-    justify-content: center;
     align-items: center;
-    grid-gap: 10px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.filter-controls:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.filter-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.filter-btn {
+    background: transparent;
+    color: rgb(0, 0, 0);
+    border: 1.5px solid var(--blue);
+    border-radius: 20px;
+    padding: 10px 18px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    position: relative;
+    outline: none;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.filter-btn:hover,
+.filter-btn:focus {
+    background-color: var(--blue);
+    color: white;
+    transform: scale(1.02);
+}
+
+.filter-btn:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Dropdown Icon */
+.dropdown-icon {
+    width: 0;
+    height: 0;
+    margin-left: auto;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #333;
+    transition: transform 0.3s ease;
+}
+
+.filter-btn:hover .dropdown-icon {
+    transform: rotate(180deg);
+    border-top-color: white; /* arrow turns white */
+}
+
+
+/* Dropdown Styles */
+.dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 300px;
+    display: none;
+    animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown.active {
+    display: block;
+}
+
+/* Company Dropdown */
+.company-dropdown {
+    padding: 8px 0;
+}
+
+.company-option {
+    padding: 10px 18px;
+    cursor: pointer;
+    color: #333;
+    font-size: 13px;
+    transition: background 0.3s ease;
+}
+
+.company-option:hover {
+    background: #f5f5f5;
+}
+
+.company-option.selected {
+    background: #e3f2fd;
+    color: #1976d2;
+    font-weight: bold;
+}
+
+/* Date Dropdown */
+.date-dropdown {
+    padding: 16px;
+    width: 400px;
+}
+
+.date-inputs {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.date-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.date-input-group label {
+    font-size: 13px;
+    color: #666;
     font-weight: 500;
 }
 
+.date-input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    width: 150px;
+}
+
+.date-separator {
+    color: #666;
+    margin-top: 20px;
+}
+
+/* Quick Filters */
+.quick-filters {
+    border-top: 1px solid #eee;
+    padding-top: 12px;
+}
+
+.quick-filter {
+    display: block;
+    width: 100%;
+    padding: 10px 18px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+    border-radius: 3px;
+    transition: background 0.3s ease;
+    font-weight: 500;
+}
+
+.quick-filter:hover {
+    background: #dbe9f4;
+}
+
+.quick-filter.selected {
+    background: #cce5ff;
+    color: var(--blue);
+    font-weight: bold;
+}
+
+/* Search Form Wrapper */
+.search-form-wrapper {
+    margin-left: auto;
+    max-width: 350px;
+    width: 100%;
+}
+
+.search-form-wrapper form {
+    width: 100%;
+}
+
+.search-form-input {
+    display: flex;
+    align-items: center;
+    height: 36px;
+}
+
+.search-form-input input {
+    flex-grow: 1;
+    padding: 0 16px;
+    height: 100%;
+    border: none;
+    background: var(--grey);
+    border-radius: 36px 0 0 36px;
+    outline: none;
+    width: 100%;
+    color: var(--dark);
+    transition: all 0.2s ease-in-out;
+}
+
+.search-form-input input:focus {
+    border: 1px solid var(--blue);
+    background: white;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.search-form-input button {
+    width: 50px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--blue);
+    color: var(--light);
+    font-size: 18px;
+    border: none;
+    outline: none;
+    border-radius: 0 36px 36px 0;
+    cursor: pointer;
+}
+
+/* Responsive Improvements */
+@media (max-width: 768px) {
+    .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .search-form-wrapper {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+
+/* Ticket box tabs */
 main .box-info {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -149,7 +399,7 @@ main .table-data {
     margin-top: 24px;
     width: 100%;
     color: var(--dark);
-    font-size: 15px;
+    font-size: 13px;
 }
 
 main .table-data > div {
@@ -177,7 +427,7 @@ main .table-data .head {
 
 main .table-data .head h3 {
     margin-right: auto;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 600;
     position: relative;
     padding-left: 15px;
@@ -196,7 +446,7 @@ main .table-data .head .bx {
     cursor: pointer;
 }
 
-/* search bar - table head */
+/* search bar in table head */
 .search-container {
     position: relative;
     width: 300px;
@@ -214,7 +464,7 @@ main .table-data .head .bx {
 #myInput {
     width: 100%;
     padding: 8px 12px 8px 38px; 
-    font-size: 14px;
+    font-size: 13px;
     border: 1px solid #ccc;
     border-radius: 20px;
     outline: none;
@@ -261,8 +511,8 @@ main .table-data .order table th {
     font-size: 13px;
     text-align: left;
     border-bottom: 1px solid var(--grey);
-    background-color: var(--light-yellow);
-    color: var(--dark-yellow);
+    background-color: var(--table-head);
+    color: var(--table-font);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -467,6 +717,11 @@ a:focus, button:focus, input:focus,
 
 
 /* RESPONSIVE DESIGN */
+
+#content main .box-info {
+    grid-template-columns: 1fr;
+}
+
 @media screen and (max-width: 768px) {
     main .table-data .head {
         min-width: 420px;
@@ -483,161 +738,7 @@ a:focus, button:focus, input:focus,
     }
 }
 
-/* end of v1 */
 
 
-/* Simplified Filter Controls Section */
-.filter-controls {
-    background: var(--light);
-    border-radius: 12px;
-    padding: 16px 20px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.04);
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.filter-controls:hover {
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-}
-
- .filter-container {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-.filter-btn {
-    background: transparent;            /* Remove existing background */
-    color: rgb(0, 0, 0);
-    border: 1.5px solid var(--blue);        /* Add a blue border (adjust color as needed) */
-    border-radius: 4px;
-    padding: 8px 16px;
-    font-size: 13px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 40px;
-    position: relative;
-    outline: none;
-}
-
-        .filter-btn:hover {
-            background: var(--blue);
-            color:white;
-        }
-
-        .dropdown-icon {
-            width: 0;
-            height: 0;
-            color: white;
-            border-left: 4px solid transparent;
-            border-right: 4px solid transparent;
-            border-top: 4px solid rgb(16, 16, 16);
-        }
-
-        .dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-            min-width: 300px;
-            display: none;
-        }
-
-        .dropdown.active {
-            display: block;
-        }
-
-        /* Company Dropdown */
-        .company-dropdown {
-            padding: 8px 0;
-        }
-
-        .company-option {
-            padding: 10px 16px;
-            cursor: pointer;
-            color: #333;
-            font-size: 14px;
-        }
-
-        .company-option:hover {
-            background: #f5f5f5;
-        }
-
-        .company-option.selected {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
-
-        /* Date Dropdown */
-        .date-dropdown {
-            padding: 16px;
-            width: 400px;
-        }
-
-        .date-inputs {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .date-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .date-input-group label {
-            font-size: 12px;
-            color: #666;
-            font-weight: 500;
-        }
-
-        .date-input {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            width: 150px;
-        }
-
-        .date-separator {
-            color: #666;
-            margin-top: 20px;
-        }
-
-        .quick-filters {
-            border-top: 1px solid #eee;
-            padding-top: 12px;
-        }
-
-        .quick-filter {
-            display: block;
-            width: 100%;
-            padding: 8px 12px;
-            background: none;
-            border: none;
-            text-align: left;
-            cursor: pointer;
-            font-size: 14px;
-            color: #333;
-            border-radius: 3px;
-        }
-
-        .quick-filter:hover {
-            background: #f5f5f5;
-        }
-
-        .quick-filter.selected {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
 
 

@@ -13,6 +13,11 @@ git remote add origin [ insert link]
 
   to push code :
 git push -u origin main
+git push
+
+  git remote pull :
+git pull  
+
 
 -------------------------
 

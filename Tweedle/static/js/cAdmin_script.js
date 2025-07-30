@@ -1,4 +1,3 @@
-
 // sidebar selection
 const allSideMenu = document.querySelectorAll('#sidebar .side-menu.top li a');
 
@@ -12,7 +11,6 @@ allSideMenu.forEach(item=> {
 		li.classList.add('active');
 	})
 });
-
 
 
 
@@ -44,9 +42,6 @@ searchButton.addEventListener('click', function (e) {
 })
 
 
-
-
-
 if(window.innerWidth < 768) {
 	sidebar.classList.add('hide');
 } else if(window.innerWidth > 576) {
@@ -63,3 +58,41 @@ window.addEventListener('resize', function () {
 })
 
 
+//Dashboard scripts -------------------------------------------------------------
+
+       //table search container js code ::
+        function myFunction() {
+            var input, filter, table, tr, td, i, j, txtValue, match;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            table = document.querySelector("table");
+            tr = table.getElementsByTagName("tr");
+        
+            for (i = 1; i < tr.length; i++) { // start from 1 to skip the header row
+                td = tr[i].getElementsByTagName("td");
+                match = false;
+                for (j = 0; j < td.length; j++) {
+                    if (td[j]) {
+                        txtValue = td[j].textContent || td[j].innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            match = true;
+                            break;
+                        }
+                    }
+                }
+                tr[i].style.display = match ? "" : "none";
+            }
+        }
+
+        // search debounce for better performance
+            function debounce(func, wait = 300) {
+                let timeout;
+                return function(...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), wait);
+                };
+            }
+
+            const debouncedSearch = debounce(myFunction);
+
+            document.getElementById("myInput").addEventListener("input", debouncedSearch);
