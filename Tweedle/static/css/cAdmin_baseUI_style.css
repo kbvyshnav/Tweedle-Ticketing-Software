@@ -239,6 +239,7 @@
 		margin-right: auto;
 	}
 	
+
     /* Notification section */
 	#content nav .notification {
 		font-size: 20px;
@@ -260,6 +261,7 @@
 		justify-content: center;
 		align-items: center;
 	}
+	/* Notification section - end*/
 
 	#content nav .profile img {
 		width: 36px;
@@ -267,8 +269,6 @@
 		object-fit: cover;
 		border-radius: 50%;
 	}
-	
-/* NAVBAR */
 
 
 /* MAIN */
@@ -279,8 +279,6 @@
 		max-height: calc(100vh - 56px);
 		overflow-y: auto;
 	}
-
-/* CONTENT */
 
 
 /* Responsiveness code */
