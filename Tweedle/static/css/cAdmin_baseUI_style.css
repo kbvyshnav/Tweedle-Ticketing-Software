@@ -90,7 +90,7 @@
 		padding-left: 15px;
 	}
 	.brand .text {
-		background: #889baf; 
+		background: var(--dark); 
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent;

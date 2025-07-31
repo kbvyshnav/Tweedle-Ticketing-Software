@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <title>Dropdown Menu</title>
+  <style>
+
+    @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+    :root {
+        --poppins: 'Poppins', sans-serif;
+    }
+
+    body {
+        font-family: var(--poppins); 
+        padding: 50px;
+    }
+
+
+    .dropdown-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .options-btn {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s ease;
+    }
+
+    .options-btn:hover,
+    .options-btn.active {
+        background-color: #f0f0f0;
+        color: #342E37;
+    }
+
+
+    .dropdown-menu {
+        display: none;
+        font-size: 13px;
+        position: absolute;
+        top: 40px;
+        right: 0;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        z-index: 1000;
+        min-width: 220px;
+        padding: 8px 0;
+    }
+
+    .dropdown-menu.active {
+        display: block;
+    }
+
+    .dropdown-menu div {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #342E37;
+        padding: 10px 16px;
+        margin: 4px 8px;
+        border-radius: 6px;
+        transition: background 0.2s ease;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .dropdown-menu div:hover {
+        background-color: #f3f3f3;
+    }
+
+    .dropdown-menu i {
+        font-size: 18px;
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);"> -->
+<div style="position: fixed; top: 250px; left: 800px;">
+  <div class="dropdown-container">
+    <button class="options-btn" id="optionsButton">&#8942;</button> <!-- Three dots -->
+    <div class="dropdown-menu" id="dropdownMenu">
+    <div><i class='bx bx-calendar'></i> Issue Date: Low to High</div>
+    <div><i class='bx bx-calendar'></i> Issue Date: High to Low</div>
+    <div><i class='bx bx-sort-up'></i> Priority: High to Low</div>
+    <div><i class='bx bx-time'></i> Status: Pending First</div>
+    </div>
+  </div>
+</div>
+
+
+  <script>
+    const btn = document.getElementById("optionsButton");
+    const menu = document.getElementById("dropdownMenu");
+
+    btn.addEventListener("click", () => {
+      menu.classList.toggle("active");
+      btn.classList.toggle("active");
+    });
+
+    // Optional: hide menu if clicked outside
+    document.addEventListener("click", (e) => {
+      if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.remove("active");
+        btn.classList.remove("active");
+      }
+    });
+
+
+  </script>
+
+</body>
+</html>
