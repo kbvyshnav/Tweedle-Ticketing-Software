@@ -26,7 +26,7 @@
 
         .chat-container {
             width: 450px;
-            height: 450px;
+            height: 630px;
             background: white;
             border-radius: 12px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
@@ -195,11 +195,23 @@
             border: 1px solid #ffeaa7;
             color: #856404;
             padding: 8px 12px;
-            border-radius: 16px;
+            border-radius: 12px;
             font-size: 11px;
             font-weight: 500;
             margin: 8px 0;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .status-message .status-text {
+            font-weight: 600;
+        }
+
+        .status-message .status-time {
+            font-size: 9px;
+            color: #6c757d;
         }
 
         /* Comment Label */
@@ -208,13 +220,31 @@
             background: #d1ecf1;
             border: 1px solid #bee5eb;
             color: #0c5460;
-            padding: 6px 10px;
+            padding: 10px 14px;
             border-radius: 12px;
-            font-size: 10px;
-            font-weight: 500;
-            margin: 4px 0;
-            text-align: center;
+            font-size: 11px;
+            font-weight: 400;
+            max-width: 90%;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
+        .comment-label .label-title {
+            font-weight: 700;
+            font-size: 12px;
+            color: #004085;
+        }
+        .comment-label .label-message {
+            font-size: 12px;
+            color: #0c5460;
+        }
+        .comment-label .label-meta {
+            font-size: 10px;
+            color: #084c61;
+        }
+
 
         /* Footer */
         .chat-footer {
@@ -360,6 +390,41 @@
         .messages-area::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
         }
+
+        .message-attachment {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #e9ecef;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #333;
+    margin-top: 4px;
+    word-break: break-word;
+}
+
+.message.sent .message-attachment {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.message-attachment i {
+    font-size: 16px;
+    color: inherit;
+}
+
+.attachment-filename {
+    text-decoration: underline;
+    cursor: pointer;
+    color: inherit;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
     </style>
 </head>
 <body>
@@ -367,8 +432,8 @@
         <!-- Header -->
         <div class="chat-header">
             <div class="header-info">
-                <div class="ticket-id">Ticket ID: #TKT-2024-001</div>
-                <div class="ticket-subject">Website Login Issue - Password Reset Not Working</div>
+                <div class="ticket-id">Ticket ID: GMEC25060057</div>
+                <div class="ticket-subject">Enable UPI Services</div>
             </div>
             <button class="close-btn" onclick="closeChat()">
                 <i class='bx bx-x'></i>
@@ -379,52 +444,88 @@
         <div class="messages-area" id="messagesArea">
             <!-- Status Message -->
             <div class="status-message">
-                Ticket created • Jan 15, 2024 at 10:30 AM
+                <div class="status-text">Ticket created<span class="status-time"> • Jan 15, 2025 at 10:30 AM</span></div>
             </div>
+
 
             <!-- User Message -->
             <div class="message received">
                 <div class="message-avatar avatar-user">U</div>
                 <div class="message-content">
                     <div class="message-header">
-                        <span class="sender-name">John Smith</span>
-                        <span class="sender-role">User</span>
+                        <span class="sender-name">KINGSHUK DEBNATH</span>
+                        <span class="sender-role">Client</span>
                     </div>
                     <div class="message-text">
-                        I'm unable to reset my password. When I click the reset link, it shows an error message saying "Invalid token".
+                        Team please enable the UPI Services for Federal bank API.
                     </div>
-                    <div class="message-time">Jan 15, 2024 at 10:32 AM</div>
+                    <div class="message-time">Jan 15, 2025 at 10:32 AM</div>
                 </div>
             </div>
 
-            <!-- Comment Label -->
-            <div class="comment-label">
-                Comment by John Smith (User) • Jan 15, 2024 at 10:33 AM
+            <div class="message received">
+                <div class="message-avatar avatar-user">U</div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="sender-name">KINGSHUK DEBNATH</span>
+                        <span class="sender-role">Client</span>
+                    </div>
+                    <div class="message-text">Here is the required document.</div>
+                    <div class="message-attachment">
+                        <i class='bx bx-paperclip'></i>
+                        <a href="files/upi_approval.pdf" class="attachment-filename" download>federal-bank_api.pdf</a>
+                    </div>
+                    <div class="message-time">Jan 15, 2025 at 11:05 AM</div>
+                </div>
             </div>
 
             <!-- Status Message -->
             <div class="status-message">
-                Developer accepted ticket • Jan 15, 2024 at 11:15 AM
+                <div class="status-text">Admin accepted ticket<span class="status-time"> • Jan 15, 2025 at 11:15 AM</span></div>
             </div>
 
-            <!-- Developer Message -->
-            <div class="message sent">
+            <div class="status-message">
+                <div class="status-text"> Ticket moved to developer<span class="status-time"> • Jan 15, 2025 at 11:30 AM</span></div>
+            </div>
+
+            <div class="message received">
                 <div class="message-avatar avatar-developer">D</div>
                 <div class="message-content">
                     <div class="message-header">
-                        <span class="sender-name">Mike Johnson</span>
+                        <span class="sender-name">RITHIK SUNIL</span>
                         <span class="sender-role">Developer</span>
                     </div>
                     <div class="message-text">
-                        Hi John, I've identified the issue. The password reset tokens were expiring too quickly. I'm working on a fix now.
+                        Waiting for the approval of Federal API Team
                     </div>
-                    <div class="message-time">Jan 15, 2024 at 11:18 AM</div>
+                    <div class="message-time">Jan 15, 2025 at 02:02 AM</div>
+                </div>
+            </div>
+           
+            <!-- Comment Label -->
+            <div class="comment-label">
+                <div class="label-title">Remarks</div>
+                <div class="label-message">Awaiting approval</div>
+                <div class="label-meta">RITHIK SUNIL (Developer) • Jan 15, 2025 at 10:33 AM</div>
+            </div>
+
+            <!-- Admin Message -->
+            <div class="message sent">
+                <div class="message-avatar avatar-admin">A</div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="sender-name">RAJAGOPAL P</span>
+                        <span class="sender-role">Admin</span>
+                    </div>
+                    <div class="message-text">
+                        GMEC team, please contact the Federal bank API team for approval.
+                    </div>
+                    <div class="message-time">Jan 15, 2025 at 04:18 AM</div>
                 </div>
             </div>
 
-            <!-- Status Message -->
             <div class="status-message">
-                Ticket moved to testing • Jan 15, 2024 at 2:45 PM
+                <div class="status-text">Ticket moved to testing<span class="status-time"> • Jan 15, 2025 at 2:45 PM</span></div>
             </div>
 
             <!-- Tester Message -->
@@ -432,15 +533,48 @@
                 <div class="message-avatar avatar-tester">T</div>
                 <div class="message-content">
                     <div class="message-header">
-                        <span class="sender-name">Sarah Wilson</span>
+                        <span class="sender-name">AKHIL SAGAR</span>
                         <span class="sender-role">Tester</span>
                     </div>
                     <div class="message-text">
-                        Password reset functionality has been tested and is working correctly. @John Smith, please try resetting your password again.
+                        Fedearal bank API has been tested and is working correctly. @Kingshuk, please try UPI services and update.
                     </div>
-                    <div class="message-time">Jan 15, 2024 at 3:20 PM</div>
+                    <div class="message-time">Jan 15, 2025 at 3:20 PM</div>
                 </div>
             </div>
+
+
+            <div class="message received">
+                <div class="message-avatar avatar-user">U</div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="sender-name">KINGSHUK DEBNATH</span>
+                        <span class="sender-role">Client</span>
+                    </div>
+                    <div class="message-attachment">
+                        <i class='bx bx-paperclip'></i>
+                        <a href="files/client_doc.pdf" class="attachment-filename" download>client_doc.pdf</a>
+                    </div>
+                    <div class="message-time">Jan 15, 2025 at 11:18 AM</div>
+                </div>
+            </div>
+
+            <div class="message sent">
+                <div class="message-avatar avatar-admin">A</div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="sender-name">RAJAGOPAL P</span>
+                        <span class="sender-role">Admin</span>
+                    </div>
+                    <div class="message-text">PFA checklist before UAT.</div>
+                    <div class="message-attachment">
+                        <i class='bx bx-paperclip'></i>
+                        <a href="files/upi_summary.pdf" class="attachment-filename" download>fed-api_checklist.pdf</a>
+                    </div>
+                    <div class="message-time">Jan 15, 2025 at 11:20 AM</div>
+                </div>
+            </div>
+
         </div>
 
         <!-- Footer -->
@@ -533,7 +667,7 @@
                     <div class="message-avatar avatar-admin">A</div>
                     <div class="message-content">
                         <div class="message-header">
-                            <span class="sender-name">Admin User</span>
+                            <span class="sender-name">Rajagopal P</span>
                             <span class="sender-role">Admin</span>
                         </div>
                         <div class="message-text">${messageText}</div>
