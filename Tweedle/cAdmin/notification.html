@@ -242,13 +242,30 @@
             justify-content: center;
             align-items: center;
         }
+
+        .ticket-label {
+            display: inline-block;
+            background-color: #e7f3ff; 
+            color: #3C91E6;            
+            font-weight: 500;
+            padding: 2px 6px;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+
+        .highlight-user {
+            font-weight: 500;
+            color: #b3880f; 
+        }
+
     </style>
 </head>
 <body>
     <!-- Demo notification icon (replace this with your existing notification structure) -->
     <div class="demo-notification">
         <i class='bx bxs-bell demo-bell' onclick="toggleNotifications()"></i>
-        <span class="demo-badge">8</span>
+        <span class="demo-badge">3</span>
         
         <!-- Notification Dropdown -->
         <div class="notification-dropdown" id="notificationDropdown">
@@ -263,67 +280,50 @@
                 <div class="notification-item unread">
                     <div class="notification-content">
                         <div class="notification-icon success">
-                            <i class='bx bx-check'></i>
+                            <i class='bx bx-message-rounded-dots'></i>
+
                         </div>
                         <div class="notification-text">
-                            <div class="notification-title">Task Completed</div>
-                            <div class="notification-message">Your project "Website Redesign" has been successfully completed.</div>
+                            <div class="notification-title">New Message in Chat</div>
+                            <div class="notification-message">
+                                New message from <span class="highlight-user">Kingshuk (User)</span> in Ticket <span class="ticket-label">GMEC25060057</span>.
+                            </div>
                             <div class="notification-time">2 minutes ago</div>
                         </div>
                     </div>
                 </div>
-                
-                <div class="notification-item unread">
-                    <div class="notification-content">
-                        <div class="notification-icon info">
-                            <i class='bx bx-user'></i>
-                        </div>
-                        <div class="notification-text">
-                            <div class="notification-title">New Team Member</div>
-                            <div class="notification-message">Sarah Johnson has joined your team as a UI/UX Designer.</div>
-                            <div class="notification-time">1 hour ago</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="notification-item">
-                    <div class="notification-content">
-                        <div class="notification-icon warning">
-                            <i class='bx bx-time'></i>
-                        </div>
-                        <div class="notification-text">
-                            <div class="notification-title">Deadline Reminder</div>
-                            <div class="notification-message">Project "Mobile App" deadline is approaching in 2 days.</div>
-                            <div class="notification-time">3 hours ago</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="notification-item">
-                    <div class="notification-content">
-                        <div class="notification-icon error">
-                            <i class='bx bx-x'></i>
-                        </div>
-                        <div class="notification-text">
-                            <div class="notification-title">Server Error</div>
-                            <div class="notification-message">Database connection failed. Please check server status.</div>
-                            <div class="notification-time">5 hours ago</div>
-                        </div>
-                    </div>
-                </div>
+                               
                 
                 <div class="notification-item">
                     <div class="notification-content">
                         <div class="notification-icon info">
-                            <i class='bx bx-message'></i>
+                            <i class='bx bx-message-rounded-dots'></i>
                         </div>
                         <div class="notification-text">
-                            <div class="notification-title">New Message</div>
-                            <div class="notification-message">You have received a new message from John Doe.</div>
+                            <div class="notification-title">New Message in Chat</div>
+                            <div class="notification-message">
+                                New message from <span class="highlight-user">Arun (Developer)</span> in Ticket <span class="ticket-label">GMEC25060057</span>.
+                            </div>
                             <div class="notification-time">1 day ago</div>
                         </div>
                     </div>
                 </div>
+
+                <div class="notification-item">
+                    <div class="notification-content">
+                        <div class="notification-icon info">
+                            <i class='bx bx-comment'></i>
+                        </div>
+                        <div class="notification-text">
+                            <div class="notification-title">Remarks Added</div>
+                            <div class="notification-message">
+                                <span class="highlight-user">Manju (Tester)</span> added a remarks to Ticket <span class="ticket-label">GMEC25060018</span>
+                            </div>
+                            <div class="notification-time">1 day ago</div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             
             <div class="notification-footer">
