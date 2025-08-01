@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css" rel="stylesheet" />
+  <title>Ticket Timeline - OUTLOOK</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: #f8f9fa;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Combined Container */
+    .ticket-box {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      border-left: 5px solid #3C91E6;
+      position: relative;
+    }
+
+    .ticket-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      font-size: 26px;
+      color: #888;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .ticket-close:hover {
+      color: #e74c3c;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .system-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #2c3e50;
+      letter-spacing: 1px;
+    }
+
+    .ticket-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-open {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-in-progress {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .status-resolved {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-closed {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .ticket-info {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 15px;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .ticket-id {
+      font-size: 18px;
+      font-weight: 600;
+      color: #3C91E6;
+      background: #e7f3ff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    .ticket-subject {
+      font-size: 16px;
+      color: #2c3e50;
+      font-weight: 500;
+    }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #3C91E6;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .timeline-header {
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .timeline-header h2 {
+      font-size: 20px;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 40px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 20px;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, #3C91E6, #e0e0e0);
+      border-radius: 2px;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 25px;
+      background: #fdfdfd;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #f0f0f0;
+      transition: all 0.3s ease;
+    }
+
+    .timeline-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border-color: #3C91E6;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -32px;
+      top: 25px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid #3C91E6;
+      z-index: 2;
+    }
+
+    .timeline-item.resolved::before {
+      border-color: #28a745;
+      background: #28a745;
+    }
+
+    .timeline-item.closed::before {
+      border-color: #dc3545;
+      background: #dc3545;
+    }
+
+    .timeline-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .timeline-main {
+      flex: 1;
+    }
+
+    .timeline-subject {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .timeline-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: white;
+    }
+
+    .icon-created {
+      background: #28a745;
+    }
+
+    .icon-assigned {
+      background: #17a2b8;
+    }
+
+    .icon-progress {
+      background: #ffc107;
+    }
+
+    .icon-resolved {
+      background: #28a745;
+    }
+
+    .icon-closed {
+      background: #dc3545;
+    }
+
+    .timeline-description {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .timeline-datetime {
+      font-size: 13px;
+      color: #999;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .timeline-user {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .user-info {
+      text-align: right;
+    }
+
+    .user-name {
+      font-weight: 600;
+      color: #b3880f;
+      font-size: 12px;
+    }
+
+    .user-role {
+      display: inline-block;
+      background: #e7f3ff;
+      color: #3C91E6;
+      font-weight: 500;
+      padding: 4px 10px;
+      font-size: 11px;
+      border-radius: 12px;
+      margin-top: 4px;
+    }
+
+    .priority-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-left: 10px;
+    }
+
+    .priority-high {
+      background: #ffe6e6;
+      color: #dc3545;
+    }
+
+    .priority-medium {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .priority-low {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+
+      .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+
+      .system-title {
+        font-size: 20px;
+      }
+
+      .timeline-content {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .timeline-user {
+        align-items: flex-start;
+      }
+
+      .user-info {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="ticket-box">
+      <div class="ticket-close"><i class='bx bx-x'></i></div>
+
+      <div class="header-top">
+        <h1 class="system-title">OUTLOOK</h1>
+        <div class="ticket-status status-resolved">
+          <i class='bx bx-check-circle'></i>
+          CLOSED
+        </div>
+      </div>
+
+      <div class="ticket-info">
+        <div class="ticket-id">GMEC25060057</div>
+        <div class="ticket-subject">IBAN Validation</div>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat-item">
+          <div class="stat-value">15-01-2025</div>
+          <div class="stat-label">Issue Date</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">18-01-2025</div>
+          <div class="stat-label">Close Date</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">3 Days</div>
+          <div class="stat-label">Resolution Time</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">High</div>
+          <div class="stat-label">Priority</div>
+        </div>
+      </div>
+
+      <div class="timeline-header">
+        <h2>Ticket Timeline</h2>
+      </div>
+
+      <div class="timeline">
+        <!-- Ticket Created -->
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-main">
+                            <div class="timeline-subject">
+                                <div class="timeline-icon icon-created">
+                                    <i class='bx bx-plus'></i>
+                                </div>
+                                Ticket Created
+                            </div>
+
+                            <div class="timeline-datetime">
+                                <i class='bx bx-time'></i>
+                                Monday, January 15, 2025 at 9:30 AM
+                            </div>
+                        </div>
+                        <div class="timeline-user">
+                            <div class="user-info">
+                                <div class="user-name">Kingshuk</div>
+                                <div class="user-role">User</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ticket Assigned -->
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-main">
+                            <div class="timeline-subject">
+                                <div class="timeline-icon icon-assigned">
+                                    <i class='bx bx-user'></i>
+                                </div>
+                                Admin accepted ticket
+                                <span class="priority-badge priority-high">High Priority</span>
+                            </div>
+                            <div class="timeline-description">
+                                Ticket has been accepted and assigned to developer.
+                            </div>
+                            <div class="timeline-datetime">
+                                <i class='bx bx-time'></i>
+                                Monday, January 15, 2025 at 10:15 AM
+                            </div>
+                        </div>
+                        <div class="timeline-user">
+                            <div class="user-info">
+                                <div class="user-name">Rajagopal P</div>
+                                <div class="user-role">Admin</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Work Started -->
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-main">
+                            <div class="timeline-subject">
+                                <div class="timeline-icon icon-progress">
+                                    <i class='bx bx-play'></i>
+                                </div>
+                                Developer accepted ticket
+                            </div>
+                            <div class="timeline-description">
+                                Developer started working on ticket. Initial diagnosis in progress.
+                            </div>
+                            <div class="timeline-datetime">
+                                <i class='bx bx-time'></i>
+                                Tuesday, January 16, 2025 at 11:45 AM
+                            </div>
+                        </div>
+                        <div class="timeline-user">
+                            <div class="user-info">
+                                <div class="user-name">Arun</div>
+                                <div class="user-role">Developer</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testing Phase -->
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-main">
+                            <div class="timeline-subject">
+                                <div class="timeline-icon icon-progress">
+                                    <i class='bx bx-test-tube'></i>
+                                </div>
+                                Tester accepted ticket
+                            </div>
+                            <div class="timeline-description">
+                                Solution implemented by developer and moved to testing phase. Tester assigned to verify the fix.
+                            </div>
+                            <div class="timeline-datetime">
+                                <i class='bx bx-time'></i>
+                                Wednesday, January 17, 2025 at 2:30 PM
+                            </div>
+                        </div>
+                        <div class="timeline-user">
+                            <div class="user-info">
+                                <div class="user-name">Manju</div>
+                                <div class="user-role">Tester</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ticket Resolved -->
+                <div class="timeline-item resolved">
+                    <div class="timeline-content">
+                        <div class="timeline-main">
+                            <div class="timeline-subject">
+                                <div class="timeline-icon icon-resolved">
+                                    <i class='bx bx-check'></i>
+                                </div>
+                                Admin Closed Ticket     
+                            </div>
+                            <div class="timeline-description">
+                                Ticket successfully closed.
+                            </div>
+                            <div class="timeline-datetime">
+                                <i class='bx bx-time'></i>
+                                Thursday, January 18, 2025 at 4:20 PM
+                            </div>
+                        </div>
+                        <div class="timeline-user">
+                            <div class="user-info">
+                                <div class="user-name">Rajagopal P</div>
+                                <div class="user-role">Admin</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.querySelector('.ticket-close').addEventListener('click', () => {
+      document.querySelector('.ticket-box').style.display = 'none';
+    });
+  </script>
+</body>
+</html>
