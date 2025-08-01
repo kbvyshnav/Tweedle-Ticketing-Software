@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
-    <title>Ticket Chat</title>
+    <title>Ticket Chat - Tweedle</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap');
 
@@ -25,8 +25,10 @@
         }
 
         .chat-container {
-            width: 450px;
-            height: 630px;
+            width: 100%;
+            max-width: 450px;
+            height: 100%;
+            max-height: 630px;
             background: white;
             border-radius: 12px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
@@ -129,10 +131,13 @@
             padding: 10px 12px;
             border-radius: 12px;
             position: relative;
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word; 
         }
 
         .message.sent .message-content {
-            background: #3C91E6;
+            background: #6b89a7;
             color: white;
         }
 
@@ -173,6 +178,8 @@
             line-height: 1.4;
             margin-bottom: 4px;
             color: #333;
+            word-break: break-word; /* ✅ add this */
+            overflow-wrap: break-word; /* ✅ add this */
         }
 
         .message.sent .message-text {
@@ -269,15 +276,21 @@
             width: 100%;
             min-height: 36px;
             max-height: 80px;
-            padding: 8px 40px 8px 12px;
+            padding: 8px 50px 8px 12px;
             border: 1px solid #ddd;
             border-radius: 18px 0 0 18px;
-
             font-size: 13px;
             resize: none;
             outline: none;
             font-family: inherit;
             line-height: 1.4;
+            overflow-y: auto;
+        }
+
+        .input-with-attachment {
+            position: relative;
+            display: flex;
+            align-items: center;
         }
 
         .message-input::-webkit-scrollbar {
@@ -306,13 +319,13 @@
 
         .attachment-btn {
             position: absolute;
-            right: 12px; /* changed from 8px */
-            top: 50%;
-            transform: translateY(-50%);
+            right: 12px;
+            
+            transform: none;
             background: none;
             border: none;
             color: #6c757d;
-            font-size: 18px; /* slightly larger */
+            font-size: 18px;
             cursor: pointer;
             padding: 4px;
             border-radius: 6px;
@@ -342,6 +355,12 @@
 
         .attachment-preview.show {
             display: flex;
+        }
+
+        .attachment-img {
+            max-width: 200px;
+            margin-top: 8px;
+            border-radius: 6px;
         }
 
         .remove-attachment {
@@ -400,8 +419,8 @@
         }
 
         .email-checkbox {
-            width: 14px;
-            height: 14px;
+            width: 15px;
+            height: 15px;
         }
 
         /* Scrollbar */
@@ -455,6 +474,18 @@
             white-space: nowrap;
         }
 
+        @media (max-width: 600px) {
+        body {
+            padding: 5vw;
+        }
+        .chat-container {
+            max-width: 100vw;
+            width: 100vw;
+            border-radius: 0;
+            max-height: 100vh;
+            height: 100vh;
+        }
+        }
 
     </style>
 </head>
@@ -466,7 +497,7 @@
                 <div class="ticket-id">Ticket ID: GMEC25060057</div>
                 <div class="ticket-subject">Enable UPI Services</div>
             </div>
-            <button class="close-btn" onclick="closeChat()">
+            <button class="close-btn" aria-label="Close chat">
                 <i class='bx bx-x'></i>
             </button>
         </div>
@@ -485,7 +516,7 @@
                 <div class="message-content">
                     <div class="message-header">
                         <span class="sender-name">KINGSHUK DEBNATH</span>
-                        <span class="sender-role">Client</span>
+                        <span class="sender-role">User</span>
                     </div>
                     <div class="message-text">
                         Team please enable the UPI Services for Federal bank API.
@@ -499,12 +530,12 @@
                 <div class="message-content">
                     <div class="message-header">
                         <span class="sender-name">KINGSHUK DEBNATH</span>
-                        <span class="sender-role">Client</span>
+                        <span class="sender-role">User</span>
                     </div>
                     <div class="message-text">Here is the required document.</div>
                     <div class="message-attachment">
                         <i class='bx bx-paperclip'></i>
-                        <a href="files/upi_approval.pdf" class="attachment-filename" download>federal-bank_api.pdf</a>
+                        <a href="files/upi_approval.pdf" class="attachment-filename" download title="Download file">federal-bank_api.pdf</a>
                     </div>
                     <div class="message-time">Jan 15, 2025 at 11:05 AM</div>
                 </div>
@@ -529,7 +560,7 @@
                     <div class="message-text">
                         Waiting for the approval of Federal API Team
                     </div>
-                    <div class="message-time">Jan 15, 2025 at 02:02 AM</div>
+                    <div class="message-time">Jan 15, 2025 at 02:02 PM</div>
                 </div>
             </div>
            
@@ -580,7 +611,7 @@
                 <div class="message-content">
                     <div class="message-header">
                         <span class="sender-name">KINGSHUK DEBNATH</span>
-                        <span class="sender-role">Client</span>
+                        <span class="sender-role">User</span>
                     </div>
                     <div class="message-attachment">
                         <i class='bx bx-paperclip'></i>
@@ -612,15 +643,15 @@
         <div class="chat-footer">
             <div class="input-area">
                 <div class="message-input-container">
-                    <textarea 
-                        class="message-input" 
-                        id="messageInput" 
-                        placeholder="Type your message..."
-                        rows="1"
-                    ></textarea>
-                    <button class="attachment-btn" onclick="document.getElementById('fileInput').click()">
+                    <div class="input-with-attachment">
+                        <textarea class="message-input" id="messageInput" placeholder="Type your message..." rows="1"></textarea>
+                        <button class="attachment-btn"
+                            aria-label="Attach file"
+                            title="Attach file"
+                            onclick="document.getElementById('fileInput').click()">
                         <i class='bx bx-paperclip'></i>
                     </button>
+                    </div>
                     <input type="file" id="fileInput" class="attachment-input" onchange="handleFileSelect(event)">
                     <div class="attachment-preview" id="attachmentPreview">
                         <i class='bx bx-file'></i>
@@ -630,15 +661,19 @@
                         </button>
                     </div>
                 </div>
-                <button class="send-btn" onclick="sendMessage()">
+
+                <button class="send-btn" onclick="sendMessage()"
+                    aria-label="Send message"
+                    title="Send message">
                     <i class='bx bx-send'></i>
                 </button>
+
             </div>
             
             <div class="footer-options">
                 <label class="email-notification">
                     <input type="checkbox" class="email-checkbox" id="emailNotification">
-                    Send email notification
+                    Send email notification to Client
                 </label>
             </div>
         </div>
@@ -673,18 +708,17 @@
             preview.classList.remove('show');
         }
 
-        // Send message
         function sendMessage() {
             const messageText = messageInput.value.trim();
             const emailNotification = document.getElementById('emailNotification').checked;
             const attachmentPreview = document.getElementById('attachmentPreview');
-            
+            const fileInput = document.getElementById('fileInput'); // updated ID
+
             if (messageText || attachmentPreview.classList.contains('show')) {
-                // Create new message element
                 const messagesArea = document.getElementById('messagesArea');
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'message sent';
-                
+
                 const currentTime = new Date().toLocaleString('en-US', {
                     month: 'short',
                     day: 'numeric',
@@ -693,7 +727,23 @@
                     minute: '2-digit',
                     hour12: true
                 });
-                
+
+                // File handling
+                let attachmentHTML = '';
+                if (fileInput && fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    const fileName = file.name;
+                    const fileType = file.type;
+
+                    if (fileType.startsWith('image/')) {
+                        const imageURL = URL.createObjectURL(file);
+                        attachmentHTML = `<img src="${imageURL}" alt="Attachment" class="attachment-img" />`;
+                    } else {
+                        attachmentHTML = `<a href="#" class="message-attachment">${fileName}</a>`;
+                    }
+                }
+
+                // Message + optional attachment
                 messageDiv.innerHTML = `
                     <div class="message-avatar avatar-admin">A</div>
                     <div class="message-content">
@@ -701,25 +751,28 @@
                             <span class="sender-name">Rajagopal P</span>
                             <span class="sender-role">Admin</span>
                         </div>
-                        <div class="message-text">${messageText}</div>
+                        <div class="message-text">${messageText.replace(/\n/g, '<br>')}</div>
+                        ${attachmentHTML}
                         <div class="message-time">${currentTime}</div>
                     </div>
                 `;
-                
+
                 messagesArea.appendChild(messageDiv);
-                
-                // Clear input and scroll to bottom
+
+                // Clear inputs
                 messageInput.value = '';
                 messageInput.style.height = 'auto';
+                fileInput.value = '';
                 removeAttachment();
                 messagesArea.scrollTop = messagesArea.scrollHeight;
-                
-                // Show notification if email checkbox is checked
+
                 if (emailNotification) {
                     console.log('Email notification will be sent');
                 }
             }
         }
+
+
 
         // Send message on Enter key (but allow Shift+Enter for new line)
         messageInput.addEventListener('keydown', function(event) {
@@ -729,11 +782,22 @@
             }
         });
 
-        // Close chat function
+        // Close chat Button : closeChat function
         function closeChat() {
-            // Add your close modal logic here
-            console.log('Closing chat modal');
+            const chatBox = document.querySelector('.chat-container');
+            if (chatBox) {
+                chatBox.style.display = 'none'; // also use .classList.remove('active') if needed
+            }
         }
+
+        //  event listener to the button once the DOM is loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            const closeBtn = document.querySelector('.close-btn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeChat);
+            }
+        });
+
 
         // Auto-scroll to bottom on load
         window.addEventListener('load', function() {
