@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <title>Ticket Details Modal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --poppins: 'Poppins', sans-serif;
+            --lato: 'Lato', sans-serif;
+            --light: #F9F9F9;
+            --blue: #3C91E6;
+            --light-blue: #CFE8FF;
+            --grey: #eee;
+            --dark-grey: #9c9c9c;
+            --dark: #342E37;
+            --red: #DB504A;
+            --yellow: #ecbe25;
+            --light-yellow: #FFF2C6;
+            --dark-yellow: #d1a513;
+            --orange: #FD7238;
+            --light-orange: #FFE0D3;
+            --green: #28c742;
+            --light-green: #d3f9df;
+            --text-primary: #262a39;
+            --primary-color: #4270f4;
+            --dark-blue: #1677d7;
+            --star-gold: #e9cc2c;
+            --hover-bg: #f1ecec;
+            --row-border: #e5e5e5;
+            --table-head: #dfdfdf;
+            --table-font: #484847;
+        }
+
+        body {
+            background: var(--grey);
+            font-family: var(--poppins);
+            padding: 20px;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Modal Container */
+        .modal-container {
+            background: var(--light);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            animation: slideUp 0.4s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Sticky Header */
+        .modal-header {
+            background: white;
+            padding: 24px 30px;
+            border-bottom: 2px solid var(--grey);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .ticket-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .ticket-id {
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .star-icon {
+            font-size: 18px;
+            color: var(--star-gold);
+            cursor: pointer;
+        }
+
+        .ticket-subject {
+            font-size: 15px;
+            color: var(--dark-grey);
+            font-weight: 500;
+        }
+
+        .status-holder-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .status {
+            font-size: 12px;
+            color: var(--light);
+            font-weight: 600;
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status.testing {
+            background-color: #e0f0ff;  
+            color: #1d4e89;            
+        }
+
+        .status.uat {
+            background-color: #f1f6e9;   
+            color: #6a8e3f;             
+        }
+
+        .status.development {
+            background-color: #d4edda;  
+            color: #155724;         
+        }
+
+        .current-holder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .holder-name {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .holder-role {
+            font-size: 12px;
+            color: var(--dark-grey);
+            background: var(--grey);
+            padding: 2px 8px;
+            border-radius: 8px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .chat-btn {
+            background: var(--light-green);
+            color: var(--green);
+        }
+
+        .chat-btn:hover {
+            background: var(--green);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .timeline-btn {
+            background: var(--light-blue);
+            color: var(--blue);
+        }
+
+        .timeline-btn:hover {
+            background: var(--blue);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .close-btn {
+            background: var(--light-orange);
+            color: var(--orange);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: var(--orange);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Modal Content */
+        .modal-content {
+            padding: 30px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .info-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .info-section:hover {
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--grey);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--blue);
+            font-size: 18px;
+        }
+
+        .info-item {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--dark-grey);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-high {
+            background: var(--light-orange);
+            color: var(--orange);
+        }
+
+        .priority-medium {
+            background: var(--light-yellow);
+            color: var(--dark-yellow);
+        }
+
+        .priority-low {
+            background: var(--light-green);
+            color: var(--green);
+        }
+
+        /* Description Section */
+        .description-section {
+            grid-column: 1 / -1;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .description-content {
+            line-height: 1.6;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        /* Attachments Section */
+        .attachments-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .attachments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .attachment-card {
+            background: var(--grey);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .attachment-card:hover {
+            border-color: var(--blue);
+            background: var(--light-blue);
+            transform: translateY(-2px);
+        }
+
+        .attachment-icon {
+            font-size: 24px;
+            padding: 8px;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .attachment-icon.pdf {
+            color: #e74c3c;
+        }
+
+        .attachment-icon.doc {
+            color: #3498db;
+        }
+
+        .attachment-icon.img {
+            color: #27ae60;
+        }
+
+        .attachment-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .attachment-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 3px;
+        }
+
+        .attachment-size {
+            font-size: 11px;
+            color: var(--dark-grey);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .modal-container {
+                width: 95%;
+                max-height: 95vh;
+            }
+
+            .modal-header {
+                padding: 20px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .header-left {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .status-holder-section {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+
+            .attachments-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .action-btn {
+                flex: 1;
+                justify-content: center;
+                margin-right: 10px;
+            }
+
+            .action-btn:last-child {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Demo Button to Open Modal -->
+    <div style="text-align: center; margin: 50px 0;">
+        <button onclick="openModal()" style="padding: 15px 30px; background: var(--blue); color: white; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; font-weight: 600;">
+            <i class='bx bx-show'></i> Open Ticket
+        </button>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="ticketModal" style="display: none;">
+        <div class="modal-container">
+            <!-- Sticky Header -->
+            <div class="modal-header">
+                <div class="header-left">
+                    <div class="ticket-info">
+                        <div class="ticket-id">
+                            <i class='bx bxs-star star-icon'></i>
+                            GMEC25010001
+                        </div>
+                        <div class="ticket-subject">Wallet Option Agents Integration</div>
+                    </div>
+                    
+                    <div class="status-holder-section">
+                        <span class="status testing">Testing</span>
+                        
+                        <div class="current-holder">
+                            <div class="holder-name">Manju</div>
+                            <div class="holder-role">Tester</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <button class="action-btn chat-btn">
+                        <i class='bx bx-chat'></i>
+                        Chat
+                    </button>
+                    <button class="action-btn timeline-btn">
+                        <i class='bx bx-time-five'></i>
+                        Outlook
+                    </button>
+                    <button class="close-btn" onclick="closeModal()">
+                        <i class='bx bx-x'></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="modal-content">
+                <div class="content-grid">
+                    <!-- Basic Information -->
+                    <div class="info-section">
+                        <div class="section-title">
+                            <i class='bx bx-info-circle'></i>
+                            Basic Information
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Ticket Maker</div>
+                            <div class="info-value">Kingshuk Debnath</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Client</div>
+                            <div class="info-value">GMEC</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Issue Date</div>
+                            <div class="info-value">07-07-2025</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Priority</div>
+                            <div class="info-value">
+                                <span class="priority-badge priority-high">High</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ticket Details -->
+                    <div class="info-section">
+                        <div class="section-title">
+                            <i class='bx bx-detail'></i>
+                            Ticket Details
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Subject</div>
+                            <div class="info-value">Wallet Option Agents Integration</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Category</div>
+                            <div class="info-value">API Integration</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">File</div>
+                            <div class="info-value">wallet_api.pdf</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Estimated Completion</div>
+                            <div class="info-value">August 15, 2025</div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="description-section">
+                        <div class="section-title">
+                            <i class='bx bx-text'></i>
+                            Description
+                        </div>
+                        <div class="description-content">
+                            <p>We need to integrate the wallet option for agents in our current payment system. This involves implementing new API endpoints for agent wallet management, including balance checking, transaction history, and fund transfers.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attachments Section -->
+                <div class="attachments-section">
+                    <div class="section-title">
+                        <i class='bx bx-paperclip'></i>
+                        Attachments (3 files)
+                    </div>
+                    
+                    <div class="attachments-grid">
+                        <div class="attachment-card">
+                            <div class="attachment-icon pdf">
+                                <i class='bx bxs-file-pdf'></i>
+                            </div>
+                            <div class="attachment-info">
+                                <div class="attachment-name">wallet_specs.pdf</div>
+                                <div class="attachment-size">2.4 MB</div>
+                            </div>
+                        </div>
+                        
+                        <div class="attachment-card">
+                            <div class="attachment-icon doc">
+                                <i class='bx bxs-file-doc'></i>
+                            </div>
+                            <div class="attachment-info">
+                                <div class="attachment-name">api_documentation.docx</div>
+                                <div class="attachment-size">1.8 MB</div>
+                            </div>
+                        </div>
+                        
+                        <div class="attachment-card">
+                            <div class="attachment-icon img">
+                                <i class='bx bxs-image'></i>
+                            </div>
+                            <div class="attachment-info">
+                                <div class="attachment-name">workflow_diagram.png</div>
+                                <div class="attachment-size">856 KB</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById('ticketModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('ticketModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('ticketModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Star toggle functionality
+        document.querySelector('.star-icon').addEventListener('click', function(e) {
+            e.stopPropagation();
+            this.classList.toggle('bx-star');
+            this.classList.toggle('bxs-star');
+        });
+
+        // Attachment click handlers
+        document.querySelectorAll('.attachment-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const fileName = this.querySelector('.attachment-name').textContent;
+                alert(`Opening ${fileName}...`);
+                // Here you would implement actual file opening/download logic
+            });
+        });
+
+        // Action button handlers
+        document.querySelector('.chat-btn').addEventListener('click', function() {
+            alert('Opening chat for ticket GMEC25010001...');
+            // Implement chat functionality
+        });
+
+        document.querySelector('.timeline-btn').addEventListener('click', function() {
+            alert('Opening timeline for ticket GMEC25010001...');
+            // Implement timeline functionality
+        });
+    </script>
+</body>
+</html>

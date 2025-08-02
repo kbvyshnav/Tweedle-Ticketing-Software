@@ -559,28 +559,27 @@ main .table-data .order table tbody tr td:before {
 
 main .table-data .order table tr td .status {
     font-size: 11px;
-    padding: 6px 16px;
     color: var(--light);
-    border-radius: 20px;
-    font-weight: 700;
+    font-weight: 500;
     display: inline-block;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+    padding: 5px 10px;
+    border-radius: 10px;
 }
 
-main .table-data .order table tr td .status.completed {
-    background: var(--blue);
+main .table-data .order table tr td .status.testing {
+    background-color: #e0f0ff;  
+    color: #1d4e89;            
+}
+main .table-data .order table tr td .status.uat {
+    background-color: #f1f6e9;   
+    color: #6a8e3f;             
+}
+main .table-data .order table tr td .status.development {
+     background-color: #d4edda;  
+    color: #155724;         
 }
 
-main .table-data .order table tr td .status.process {
-    background: var(--yellow);
-}
 
-main .table-data .order table tr td .status.pending {
-    background: var(--orange);
-}
-
-/* Star icon styling with active state */
 .star-icon {
     font-size: 18px;
     color: #ccc;
