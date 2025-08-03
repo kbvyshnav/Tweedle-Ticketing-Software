@@ -39,3 +39,15 @@ The . means you are adding all modified files.
 4. Push the Changes to GitHub
          git push origin main
 
+
+
+         rough work :
+
+         git version --    to se the hit version
+         git init     tom initialize git repo
+         git add .
+         git commit -m 'this is for pushing peropose'
+         git remote origin main
+         git push -u origin main
+         git pull
+
