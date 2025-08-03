@@ -132,12 +132,6 @@
             gap: 10px;
         }
 
-        .star-icon {
-            font-size: 18px;
-            color: var(--star-gold);
-            cursor: pointer;
-        }
-
         .ticket-subject {
             font-size: 15px;
             color: var(--dark-grey);
@@ -509,10 +503,9 @@
                 <div class="header-left">
                     <div class="ticket-info">
                         <div class="ticket-id">
-                            <i class='bx bxs-star star-icon'></i>
                             GMEC25010001
                         </div>
-                        <div class="ticket-subject">Wallet Option Agents Integration</div>
+                        <div class="ticket-subject">Global Pay Customer onboarding API</div>
                     </div>
                     
                     <div class="status-holder-section">
@@ -582,7 +575,7 @@
                         
                         <div class="info-item">
                             <div class="info-label">Subject</div>
-                            <div class="info-value">Wallet Option Agents Integration</div>
+                            <div class="info-value">Global Pay Customer onboarding API</div>
                         </div>
                         
                         <div class="info-item">
@@ -626,7 +619,7 @@
                                 <i class='bx bxs-file-pdf'></i>
                             </div>
                             <div class="attachment-info">
-                                <div class="attachment-name">wallet_specs.pdf</div>
+                                <div class="attachment-name">gpay_cus_onboard.pdf</div>
                                 <div class="attachment-size">2.4 MB</div>
                             </div>
                         </div>
@@ -681,13 +674,7 @@
             }
         });
 
-        // Star toggle functionality
-        document.querySelector('.star-icon').addEventListener('click', function(e) {
-            e.stopPropagation();
-            this.classList.toggle('bx-star');
-            this.classList.toggle('bxs-star');
-        });
-
+        
         // Attachment click handlers
         document.querySelectorAll('.attachment-card').forEach(card => {
             card.addEventListener('click', function() {
