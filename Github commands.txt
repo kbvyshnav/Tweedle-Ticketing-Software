@@ -1,23 +1,56 @@
-git version--
+🔹 Setup & Config
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+git config --list    # check config
 
-git init
+🔹 Start a Repo
+git init                              # start a new repo in current folder
+git clone <repo-url>                  # copy a remote repo locally
 
-git add .
 
-git commit -m "initial commit  - this is a comment"
+🔹 Link to GitHub
+git remote add origin <repo-url>      # link local repo to remote
+git remote -v                         # check linked remotes
+git branch -M main                    # rename branch to main
 
-   Link Your Local Repository to GitHub 
-Add repo Link
+🔹 Check Status & Changes
+git status                            # see changes and branch
+git diff                              # see changes in files
 
-git remote add origin [ insert link]
+🔹 Stage & Commit
+git add .                             # stage all changes
+git add <file>                        # stage a specific file
+git commit -m "Commit message"        # commit staged changes
+git commit --amend                    # edit last commit message
 
-  to push code :
-git push -u origin main
-git push
+🔹 Push to GitHub
+git push -u origin main               # push first time
+git push                              # push later changes
 
-  git remote pull :
-git pull origin main
-git pull  
+🔹 Pull from GitHub
+git pull                              # get latest changes
+git pull origin main                  # pull specific branch
+
+🔹 Branching
+git branch                            # list branches
+git branch <branch-name>              # create new branch
+git checkout <branch-name>            # switch branch
+git checkout -b <branch-name>         # create & switch branch
+git merge <branch-name>               # merge into current branch
+
+🔹 Undo Changes
+git restore <file>                    # discard changes in file
+git reset HEAD <file>                 # unstage a file
+git reset --hard                      # reset all changes to last commit
+
+
+🔹 Log & History
+git log                               # full commit history
+git log --oneline                     # short history
+
+🔹 Delete
+git branch -d <branch-name>           # delete local branch
+git push origin --delete <branch>     # delete remote branch
 
 
 -------------------------
