@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tweedle - Secure Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+      /* Google Font Link: Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* --- Variable Definitions --- */
+:root {
+    --primary-color: #6a5acd; /* Royal Purple */
+    --primary-hover: #5a4ac0;
+    --secondary-color: #493979; /* Darker Purple for cover */
+    --background-light: #e0e0e0;
+    --text-dark: #333;
+    --text-light: #fff;
+    --shadow-main: 0 8px 25px rgba(0, 0, 0, 0.15);
+    --input-focus: #6a5acd;
+    --border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* --- Base Styles --- */
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins" , sans-serif;
+}
+body{
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--background-light);
+  padding: 30px;
+}
+.container{
+  position: relative;
+  max-width: 850px;
+  width: 100%;
+  background: var(--text-light);
+  padding: 40px 30px;
+  box-shadow: var(--shadow-main);
+  border-radius: 12px;
+  /* Removed perspective as flip feature is gone */
+  overflow: hidden; 
+  display: flex; /* Changed container layout to manage cover and forms */
+}
+
+/* --- Cover Side (The visual half) --- */
+.container .cover{
+  position: relative; /* Changed to relative */
+  top: 0;
+  left: 0;
+  height: auto; /* Adjusted for flow */
+  width: 50%; /* Remains 50% */
+  /* Removed flip related CSS */
+}
+
+.container .cover .front{
+  position: relative; /* Changed to relative */
+  height: 100%;
+  width: 100%;
+  /* Added padding to account for the container's 40px top/bottom padding */
+  padding: 40px 0; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: var(--secondary-color); /* Set background color explicitly */
+}
+
+/* Subtle gradient overlay is now part of background or removed for simplicity */
+.container .cover::before{
+  content: '';
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background: var(--secondary-color);
+  opacity: 0.6;
+  z-index: 12;
+}
+
+.container .cover img{
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  z-index: 10;
+}
+.container .cover::before{
+  content: '';
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background: var(--secondary-color);
+  opacity: 0.6; 
+  z-index: 12;
+}
+
+
+/* Logo & Text Styling */
+.logo {
+  max-width: 80px; /* Slightly smaller logo */
+  max-height: 90px; 
+  margin-bottom: 10px; 
+  z-index: 131; 
+  position: relative;
+}
+.container .cover .text{
+  position: relative; /* Changed to relative */
+  z-index: 130;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: auto; /* Adjusted for content */
+  width: 100%;
+}
+.cover .text .text-1{
+  font-size: 36px; /* Reduced size */
+  font-weight: 700;
+  color: var(--text-light);
+  text-align: center;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+  margin-bottom: 5px;
+}
+.cover .text .text-3{
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-light);
+  opacity: 0.9;
+  margin-top: 0;
+}
+/* Copyright text repositioning and styling */
+.cover .text .text-4{
+  color: var(--text-light);
+  position: absolute; 
+  bottom: -150px; /* Adjusted position to sit at the bottom edge */
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+/* --- Form Styles --- */
+.container .forms{
+  height: 100%;
+  width: 50%; /* Remains 50% */
+  background: var(--text-light);
+  padding-left: 30px; /* Added padding to separate from the cover */
+}
+.container .form-content{
+  display: flex;
+  align-items: flex-start; /* Align content to the top */
+  justify-content: flex-start;
+  height: 100%;
+}
+
+.form-content .login-form{
+  width: 100%;
+  padding: 0 10px;
+}
+.forms .form-content .title{
+  position: relative;
+  font-size: 24px; /* Reduced size */
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 20px;
+}
+.forms .form-content .title:before{
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -5px;
+  height: 4px;
+  width: 30px; /* Reduced width */
+  background: var(--primary-color);
+  border-radius: 2px;
+}
+.forms .form-content .input-boxes{
+  margin-top: 20px;
+}
+.forms .form-content .input-box{
+  display: flex;
+  align-items: center;
+  height: 50px;
+  width: 100%;
+  margin: 20px 0;
+  position: relative;
+}
+
+/* Stylish Input Fields */
+.form-content .input-box input{
+  height: 100%;
+  width: 100%;
+  outline: none;
+  border: 1px solid var(--border-color);
+  border-radius: 6px; 
+  padding: 0 45px 0 45px; 
+  font-size: 16px;
+  font-weight: 400;
+  transition: all 0.3s ease;
+}
+
+/* ... rest of input styling remains the same ... */
+
+.form-content .input-box i{
+  position: absolute;
+  left: 15px;
+  color: var(--primary-color);
+  font-size: 18px;
+  pointer-events: none;
+}
+.forms .form-content .text{
+  font-size: 14px;
+  font-weight: 500;
+  color: #e74c3c;
+  text-align: left; /* Aligned left for better flow with message */
+  margin-top: 10px;
+}
+.forms .form-content .button{
+  margin-top: 30px;
+}
+
+/* Password Toggle Button */
+#togglebtn {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-dark);
+  padding: 5px;
+  font-size: 16px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease, color 0.2s ease;
+  z-index: 100; /* Ensure button is clickable over input */
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 730px) {
+  .container{
+    padding: 30px;
+    flex-direction: column;
+  }
+  .container .cover{
+    display: none;
+  }
+  .forms{
+      width: 100%;
+      padding-left: 0;
+  }
+  .form-content .login-form{
+    width: 100%;
+    padding: 0;
+  }
+}
+    </style>
+  </head>
+<body>
+  <div class="container">
+    <div class="cover">
+      <img src="https://via.placeholder.com/425x470/6a5acd/ffffff?text=Tweedle+Login+Background" alt="Login Cover Image">
+      <div class="front">
+        <img src="https://via.placeholder.com/90x102/ffffff/6a5acd?text=Logo" alt="MEFS Logo" class="logo">
+        <div class="text">
+          <span class="text-1">TWEEDLE</span>
+          <span class="text-3">Version 1.1 - The Secure Way</span>
+          <span class="text-4">Copyright © 2200 MEFS. All rights reserved.</span>
+        </div>
+      </div>
+    </div>
+    <div class="forms">
+      <div class="form-content">
+        <div class="login-form">
+          <div class="title">Welcome Back</div>
+          <form action="#" method="POST" id="loginForm">
+            <div class="input-boxes">
+              <div class="input-box">
+                <i class='bx bx-user'></i>
+                <input type="text" name="username" placeholder="Enter your Username" required>
+              </div>
+              <div class="input-box">
+                <i class='bx bx-lock-alt'></i>
+                <input id='passwrd' type="password" name="password" placeholder="Secure Password" required>
+                <button type="button" id='togglebtn' onclick='passwordview();' aria-label="Toggle password visibility">
+                    <i class="fa-solid fa-eye-slash"></i>
+                </button>
+              </div>
+              <div class="text">Login status message goes here.</div> 
+              <div class="button input-box">
+                <input type="submit" value="LOGIN SECURELY">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Page reload for security/session refresh (12 minutes)
+    setTimeout(function () {
+      console.log('Session timed out. Reloading...');
+      // window.location.reload(1);
+    }, 720000);
+    
+    // Function to toggle password visibility (FIXED)
+    function passwordview(){
+      const pwd = document.getElementById('passwrd');
+      const toggleButtonIcon = document.querySelector('#togglebtn i'); // CORRECTLY TARGETS THE <i> TAG
+      
+      // Stop if the field is empty on initial click
+      if(pwd.value === '' && pwd.type === 'password' && toggleButtonIcon.classList.contains('fa-eye-slash')){
+          return;
+      }
+
+      if(pwd.type === 'password'){
+        toggleButtonIcon.classList.remove('fa-eye-slash');
+        toggleButtonIcon.classList.add('fa-eye');
+        pwd.type = 'text';
+      }
+      else{
+        toggleButtonIcon.classList.remove('fa-eye');
+        toggleButtonIcon.classList.add('fa-eye-slash');
+        pwd.type = 'password';
+      }
+    }
+  </script>
+</body>
+</html>
