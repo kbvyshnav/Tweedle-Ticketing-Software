@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    
+    <title>Tweedle - Clients</title>
+    
+    <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            /* Font Correction 4: Apply Poppins globally */
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #eee;
+            overflow-x: hidden;
+        }
+
+        main {
+            width: 100%;
+            padding: 36px 24px;
+            margin: 0 auto;
+        }
+
+        .head-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px; 
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .head-title .left h1 {
+            font-size: 30px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .onboard-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: #3c91e6;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0; 
+        }
+
+        .onboard-btn:hover {
+            background: #2878c9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(60, 145, 230, 0.3);
+        }
+
+        .onboard-btn i {
+            font-size: 18px;
+        }
+        
+        .table-header-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; 
+            gap: 16px;
+            margin-bottom: 24px; 
+            flex-wrap: wrap;
+        }
+        
+        .left-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-grow: 1; 
+            flex-wrap: wrap;
+        }
+
+        .search-container {
+            position: relative;    
+            flex-grow: 0; 
+            max-width: 300px; 
+        }
+
+        .search-container input {
+            width: 150%;
+            padding: 8px 12px 8px 38px;
+            border: 2px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: #3c91e6;
+        }
+
+        .search-container .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+            font-size: 18px;
+        }
+        
+        /* Table Section */
+        .table-data {
+            background: #fff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .table-data .head {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0; 
+        }
+
+        .table-data .head h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        .clients-count {
+            display: inline-block;
+            background: #e8f4fd;
+            color: #3c91e6;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-left: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead tr {
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        thead th {
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        thead th:last-child {
+            text-align: right;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f5f5f5;
+            transition: all 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        tbody td {
+            padding: 20px 12px;
+            color: #555;
+            font-size: 13px;
+        }
+        
+        /* Correction 3: Stick action button to the right of the row */
+        tbody td:last-child .action-buttons {
+            justify-content: flex-end;
+        }
+
+
+        .client-name {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .client-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .client-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .client-company {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .client-id {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .country-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #d4f4dd;
+            color: #2e7d32;
+        }
+
+        .status-inactive {
+            background: #ffe0e0;
+            color: #c62828;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border: 1px solid #e5e5e5;
+            background: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #555;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .action-btn:hover {
+            background: #f5f5f5;
+            border-color: #3c91e6;
+            color: #3c91e6;
+        }
+
+        .action-btn.primary {
+            background: #3c91e6;
+            color: #fff;
+            border-color: #3c91e6;
+        }
+
+        .action-btn.primary:hover {
+            background: #2878c9;
+        }
+
+        .action-btn i {
+            font-size: 16px;
+        }
+
+        .more-options {
+            position: relative;
+        }
+
+        .more-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid #e5e5e5;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .more-btn:hover {
+            background: #f5f5f5;
+            border-color: #3c91e6;
+        }
+
+        .more-btn i {
+            font-size: 18px;
+            color: #555;
+        }
+
+        /* Categories */
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-width: 250px;
+        }
+
+        .category-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #e8f4fd;
+            color: #3c91e6;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .category-tag.payment {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .category-tag.integration {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .category-tag.support {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        /* Responsive */
+        @media screen and (max-width: 768px) {
+            main {
+                padding: 24px 16px;
+            }
+
+            .head-title {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            /* Adjust mobile layout for table header controls */
+            .table-header-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .left-section {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .search-container {
+                max-width: none;
+            }
+
+            .table-data .head {
+                margin-bottom: 0;
+            }
+
+            .onboard-btn {
+                order: 3; /* Push button to the bottom on mobile */
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .table-data {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 900px;
+            }
+
+            .action-buttons {
+                flex-direction: row; 
+                align-items: center;
+                gap: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <!-- Page Header -->
+        <!-- Correction 1: margin-bottom adjusted via CSS for .head-title -->
+        <div class="head-title">
+            <div class="left">
+                <h1>Clients</h1>
+            </div>
+
+        </div>
+
+        <!-- Clients Table -->
+        <div class="table-data">
+            
+            <!-- Correction 2: Re-ordered elements and added .left-section wrapper -->
+            <div class="table-header-controls">
+                
+                <!-- New wrapper to group Heading and Search -->
+                <div class="left-section"> 
+                    <div class="head">
+                        <h3>All Clients <span class="clients-count">2</span></h3>
+                    </div>
+                    
+                    <!-- Search Section -->
+                    <div class="search-container">
+                        <i class='bx bx-search search-icon'></i>
+                        <input type="text" id="clientSearch" placeholder="Search by name, email, or country..." onkeyup="searchClients()">
+                    </div>
+                </div>
+                
+                <!-- Onboard Button (pushed to the right by flex-grow: 1 on .left-section) -->
+                <button class="onboard-btn" onclick="handleOnboardClient()">
+                    <i class='bx bx-plus-circle'></i>
+                    <span>Onboard New Client</span>
+                </button>
+                
+            </div>
+            
+            <table id="clientsTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Country</th>
+                        <th>Contact</th>
+                        <th>Email</th>                   
+                        <th>Status</th>
+                        <!-- Correction 3: Aligned Action header to the right -->
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="client-name">
+                                <div class="client-avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">G</div>
+                                <div class="client-info">
+                                    <div class="client-company">Global Money Exchange CO.LLC</div>
+                                    <div class="client-id">Client ID: GMEC</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="country-badge">
+                                <i class='bx bx-flag'></i> Oman
+                            </span>
+                        </td>
+                        <td>+977-1234567890</td>
+                        <td>contact@gmec.com.np</td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <!-- Correction 3: Action buttons align to the right (CSS adjustment made for last td) -->
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn primary" onclick="manageUsers('GMEC')">
+                                    <i class='bx bx-user'></i> Manage Users
+                                </button>
+                                <button class="action-btn" onclick="showDetails('GMEC')">
+                                    <i class='bx bx-info-circle'></i> Details
+                                </button>
+                                <div class="more-options">
+                                    <button class="more-btn" onclick="showSettings('GMEC')">
+                                        <i class='bx bx-dots-vertical-rounded'></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="client-name">
+                                <div class="client-avatar" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">B</div>
+                                <div class="client-info">
+                                    <div class="client-company">Belhasa Global Exchange Co.LLC</div>
+                                    <div class="client-id">Client ID: BGEX</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="country-badge">
+                                <i class='bx bx-flag'></i> Dubai
+                            </span>
+                        </td>
+                        <td>+880-9876543210</td>
+                        <td>info@bgex.com.bd</td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn primary" onclick="manageUsers('BGEX')">
+                                    <i class='bx bx-user'></i> Manage Users
+                                </button>
+                                <button class="action-btn" onclick="showDetails('BGEX')">
+                                    <i class='bx bx-info-circle'></i> Details
+                                </button>
+                                <div class="more-options">
+                                    <button class="more-btn" onclick="showSettings('BGEX')">
+                                        <i class='bx bx-dots-vertical-rounded'></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // NOTE: alert() used here is for placeholder functionality and should be replaced by modal UI in a real application.
+        // Search functionality
+        function searchClients() {
+            const input = document.getElementById('clientSearch');
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById('clientsTable');
+            const tr = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < tr.length; i++) {
+                const td = tr[i].getElementsByTagName('td');
+                let found = false;
+                
+                for (let j = 0; j < td.length; j++) {
+                    if (td[j]) {
+                        const txtValue = td[j].textContent || td[j].innerText;
+                        if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                tr[i].style.display = found ? '' : 'none';
+            }
+        }
+
+        // Action handlers
+        function handleOnboardClient() {
+            console.log('Redirecting to Onboard New Client form...');
+            // window.location.href = '/onboard-client';
+        }
+
+        function manageUsers(clientName) {
+            console.log(`Redirecting to Manage Users page for ${clientName}...`);
+            // window.location.href = `/clients/${clientName}/users`;
+        }
+
+        function showDetails(clientName) {
+            console.log(`Showing detailed information for ${clientName}...`);
+            // window.location.href = `/clients/${clientName}/details`;
+        }
+
+        function showSettings(clientName) {
+            console.log(`Opening settings for ${clientName}...\n\nOptions:\n• Delete Client\n• Manage Categories\n• Update Information`);
+            // Show settings modal or redirect
+        }
+
+        function filterByStatus(status) {
+            const table = document.getElementById('clientsTable');
+            const tr = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < tr.length; i++) {
+                const statusCell = tr[i].getElementsByClassName('status-badge')[0];
+                if (status === 'all') {
+                    tr[i].style.display = '';
+                } else {
+                    const isMatch = statusCell.textContent.toLowerCase() === status;
+                    tr[i].style.display = isMatch ? '' : 'none';
+                }
+            }
+        }
+
+        function sortClients() {
+            const table = document.getElementById('clientsTable');
+            const tbody = table.getElementsByTagName('tbody')[0];
+            const rows = Array.from(tbody.getElementsByTagName('tr'));
+
+            rows.sort((a, b) => {
+                const nameA = a.getElementsByClassName('client-company')[0].textContent;
+                const nameB = b.getElementsByClassName('client-company')[0].textContent;
+                return nameA.localeCompare(nameB);
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        function exportClients() {
+            console.log('Exporting client data to CSV...');
+            // Export functionality would go here
+        }
+    </script>
+</body>
+</html>
