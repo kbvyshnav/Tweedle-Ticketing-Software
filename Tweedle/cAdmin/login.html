@@ -46,121 +46,107 @@ body{
   padding: 40px 30px;
   box-shadow: var(--shadow-main);
   border-radius: 12px;
-  /* Removed perspective as flip feature is gone */
   overflow: hidden; 
-  display: flex; /* Changed container layout to manage cover and forms */
+  display: flex;
 }
 
 /* --- Cover Side (The visual half) --- */
 .container .cover{
-  position: relative; /* Changed to relative */
-  top: 0;
-  left: 0;
-  height: auto; /* Adjusted for flow */
-  width: 50%; /* Remains 50% */
-  /* Removed flip related CSS */
+  position: relative;
+  height: auto;
+  width: 50%;
 }
 
 .container .cover .front{
-  position: relative; /* Changed to relative */
+  position: relative;
   height: 100%;
   width: 100%;
-  /* Added padding to account for the container's 40px top/bottom padding */
   padding: 40px 0; 
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: var(--secondary-color); /* Set background color explicitly */
-}
-
-/* Subtle gradient overlay is now part of background or removed for simplicity */
-.container .cover::before{
-  content: '';
-  position: absolute;
-  height: 100%;
-  width: 100%;
   background: var(--secondary-color);
-  opacity: 0.6;
-  z-index: 12;
+  border-radius: 12px 0 0 12px; /* Match container border radius */
 }
 
-.container .cover img{
+/* Background image for the cover */
+.container .cover img.background-image {
   position: absolute;
   height: 100%;
   width: 100%;
   object-fit: cover;
   z-index: 10;
+  border-radius: 12px 0 0 12px;
 }
+
+/* Subtle overlay on the background image */
 .container .cover::before{
   content: '';
   position: absolute;
   height: 100%;
   width: 100%;
-  background: var(--secondary-color);
-  opacity: 0.6; 
-  z-index: 12;
+  background: rgba(73, 57, 121, 0.7); /* Darker purple with transparency */
+  z-index: 11; /* Ensure overlay is above image but below text/logo */
+  border-radius: 12px 0 0 12px;
 }
-
 
 /* Logo & Text Styling */
 .logo {
-  max-width: 80px; /* Slightly smaller logo */
+  max-width: 90px;
   max-height: 90px; 
-  margin-bottom: 10px; 
-  z-index: 131; 
+  margin-bottom: 20px; 
+  z-index: 130; 
   position: relative;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); /* Add shadow to logo */
 }
 .container .cover .text{
-  position: relative; /* Changed to relative */
+  position: relative;
   z-index: 130;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: auto; /* Adjusted for content */
+  height: auto;
   width: 100%;
 }
 .cover .text .text-1{
-  font-size: 36px; /* Reduced size */
+  font-size: 42px; /* Slightly larger for impact */
   font-weight: 700;
   color: var(--text-light);
   text-align: center;
-  letter-spacing: 2px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+  letter-spacing: 3px; /* Increased letter spacing */
+  text-shadow: 0 3px 6px rgba(0,0,0,0.6); 
   margin-bottom: 5px;
 }
-.cover .text .text-3{
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-light);
-  opacity: 0.9;
-  margin-top: 0;
+.cover .text .text-3{ /* Removed this element from HTML, keeping CSS for reference */
+  display: none; 
 }
 /* Copyright text repositioning and styling */
 .cover .text .text-4{
   color: var(--text-light);
   position: absolute; 
-  bottom: -150px; /* Adjusted position to sit at the bottom edge */
+  bottom: -100px; /* Adjusted position to sit at the bottom edge of the cover div */
   left: 0;
   right: 0;
   text-align: center;
   font-size: 0.7rem;
   font-weight: 400;
-  opacity: 0.7;
+  opacity: 0.8;
+  z-index: 130; /* Ensure it's above the overlay */
 }
 
 /* --- Form Styles --- */
 .container .forms{
   height: 100%;
-  width: 50%; /* Remains 50% */
+  width: 50%;
   background: var(--text-light);
-  padding-left: 30px; /* Added padding to separate from the cover */
+  padding-left: 30px;
 }
 .container .form-content{
   display: flex;
-  align-items: flex-start; /* Align content to the top */
-  justify-content: flex-start;
+  align-items: center; /* Center form vertically */
+  justify-content: center; /* Center form horizontally */
   height: 100%;
 }
 
@@ -170,18 +156,20 @@ body{
 }
 .forms .form-content .title{
   position: relative;
-  font-size: 24px; /* Reduced size */
+  font-size: 28px; /* Slightly larger title */
   font-weight: 600;
   color: var(--text-dark);
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  text-align: left; /* Center the title */
 }
 .forms .form-content .title:before{
   content: '';
   position: absolute;
-  left: 0;
+  right: 82%; /* Center the underline */
+  transform: translateX(-50%); /* Center the underline */
   bottom: -5px;
   height: 4px;
-  width: 30px; /* Reduced width */
+  width: 40px; /* Increased width */
   background: var(--primary-color);
   border-radius: 2px;
 }
@@ -193,7 +181,7 @@ body{
   align-items: center;
   height: 50px;
   width: 100%;
-  margin: 20px 0;
+  margin: 25px 0; /* Increased margin */
   position: relative;
 }
 
@@ -203,48 +191,77 @@ body{
   width: 100%;
   outline: none;
   border: 1px solid var(--border-color);
-  border-radius: 6px; 
-  padding: 0 45px 0 45px; 
+  border-radius: 8px; /* Slightly more rounded corners */
+  padding: 0 45px; 
   font-size: 16px;
   font-weight: 400;
   transition: all 0.3s ease;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.08); /* Subtle inner shadow */
 }
-
-/* ... rest of input styling remains the same ... */
+.form-content .input-box input:focus{
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 3px rgba(106, 90, 205, 0.2); /* Focus glow */
+}
 
 .form-content .input-box i{
   position: absolute;
   left: 15px;
   color: var(--primary-color);
-  font-size: 18px;
+  font-size: 19px;
   pointer-events: none;
 }
 .forms .form-content .text{
-  font-size: 14px;
+  font-size: 13px; /* Slightly smaller text */
   font-weight: 500;
   color: #e74c3c;
-  text-align: left; /* Aligned left for better flow with message */
-  margin-top: 10px;
+  text-align: left;
+  margin-top: -10px; /* Adjusted margin */
 }
 .forms .form-content .button{
-  margin-top: 30px;
+  margin-top: 35px; /* Increased margin for button */
+}
+
+/* Login Button Design */
+.forms .form-content .button input{
+  color: var(--text-light);
+  background: var(--primary-color);
+  border: none;
+  padding: 12px 0; /* Larger padding */
+  border-radius: 8px; /* Match input field radius */
+  font-size: 18px; /* Larger font */
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(106, 90, 205, 0.4); /* Button shadow */
+}
+.forms .form-content .button input:hover{
+  background: var(--primary-hover);
+  box-shadow: 0 6px 20px rgba(106, 90, 205, 0.6); /* Enhanced hover shadow */
+}
+.forms .form-content .button input:active{
+  transform: translateY(1px); /* Slight press effect */
+  box-shadow: 0 2px 10px rgba(106, 90, 205, 0.4);
 }
 
 /* Password Toggle Button */
 #togglebtn {
   position: absolute;
-  right: 15px;
-  top: 50%;
+  right: 40px;
+  top: 35%;
   transform: translateY(-50%);
   background: transparent;
   border: none;
   cursor: pointer;
   color: var(--text-dark);
   padding: 5px;
-  font-size: 16px;
-  opacity: 0.7;
+  font-size: 18px; /* Larger icon */
+  opacity: 0.8;
   transition: opacity 0.2s ease, color 0.2s ease;
-  z-index: 100; /* Ensure button is clickable over input */
+  z-index: 100;
+}
+#togglebtn:hover {
+    opacity: 1;
+    color: var(--primary-color);
 }
 
 /* --- Responsive Design --- */
@@ -252,6 +269,7 @@ body{
   .container{
     padding: 30px;
     flex-direction: column;
+    max-width: 400px; /* Constrain width on small screens */
   }
   .container .cover{
     display: none;
@@ -264,19 +282,21 @@ body{
     width: 100%;
     padding: 0;
   }
+  .container{
+    padding: 30px 20px; /* Adjust container padding for smaller screens */
+  }
 }
     </style>
   </head>
 <body>
   <div class="container">
     <div class="cover">
-      <img src="https://via.placeholder.com/425x470/6a5acd/ffffff?text=Tweedle+Login+Background" alt="Login Cover Image">
+      <img src="https://image.pollinations.ai/prompt/purple%20abstract%20digital%20network%20connection%20lines%20subtle%20holographic%20data%20flow%20modern%20tech%20background%20secure%20feeling?width=425&height=470&seed=1" alt="Login Cover Image" class="background-image">
       <div class="front">
-        <img src="https://via.placeholder.com/90x102/ffffff/6a5acd?text=Logo" alt="MEFS Logo" class="logo">
+        <img src="https://via.placeholder.com/90x102/ffffff/6a5acd?text=Tweedle%20Logo" alt="Tweedle Logo" class="logo">
         <div class="text">
           <span class="text-1">TWEEDLE</span>
-          <span class="text-3">Version 1.1 - The Secure Way</span>
-          <span class="text-4">Copyright © 2200 MEFS. All rights reserved.</span>
+          <span class="text-4">Copyright © kbvyshnav. All rights reserved.</span>
         </div>
       </div>
     </div>
@@ -299,7 +319,7 @@ body{
               </div>
               <div class="text">Login status message goes here.</div> 
               <div class="button input-box">
-                <input type="submit" value="LOGIN SECURELY">
+                <input type="submit" value="LOGIN">
               </div>
             </div>
           </form>
@@ -314,16 +334,11 @@ body{
       // window.location.reload(1);
     }, 720000);
     
-    // Function to toggle password visibility (FIXED)
+    // Function to toggle password visibility
     function passwordview(){
       const pwd = document.getElementById('passwrd');
-      const toggleButtonIcon = document.querySelector('#togglebtn i'); // CORRECTLY TARGETS THE <i> TAG
+      const toggleButtonIcon = document.querySelector('#togglebtn i');
       
-      // Stop if the field is empty on initial click
-      if(pwd.value === '' && pwd.type === 'password' && toggleButtonIcon.classList.contains('fa-eye-slash')){
-          return;
-      }
-
       if(pwd.type === 'password'){
         toggleButtonIcon.classList.remove('fa-eye-slash');
         toggleButtonIcon.classList.add('fa-eye');
