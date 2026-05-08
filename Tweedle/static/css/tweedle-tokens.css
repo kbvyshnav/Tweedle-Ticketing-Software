@@ -32,6 +32,7 @@
     --tw-bg-surface:    #ffffff;    /* cards, panels, modals */
     --tw-bg-sidebar:    #F9F9F9;    /* sidebar and topbar background */
     --tw-bg-input:      #F9F9F9;    /* input field background */
+    --tw-bg-input-rest: #f0f0f0;    /* topbar/inline search at rest (between body and surface) */
     --tw-border:        #e5e5e5;    /* default border color */
     --tw-border-light:  #f0f0f0;    /* dividers, subtle separators */
     --tw-text-primary:  #342E37;    /* headings and strong body text */

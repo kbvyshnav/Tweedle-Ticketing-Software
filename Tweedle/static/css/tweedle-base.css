@@ -383,7 +383,7 @@ p {
     height: 100%;
     padding: 0 var(--tw-space-4);
     border: 1px solid transparent;
-    background: #f0f0f0;
+    background: var(--tw-bg-input-rest);
     border-radius: var(--tw-radius-pill) 0 0 var(--tw-radius-pill);
     outline: none;
     font-size: var(--tw-text-base);
