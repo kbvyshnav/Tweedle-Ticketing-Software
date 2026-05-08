@@ -245,6 +245,41 @@
     color: var(--tw-status-closed-text);
 }
 
+/* --- Sub-status badge base + In-Progress breakdown variants --
+ * Base class provides structure; modifiers add color.
+ * These appear inside ticket table rows (testing/dev/UAT stages).
+ * Colors are semantic — they do NOT follow role --tw-primary.
+ * ------------------------------------------------------------ */
+.tw-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px var(--tw-space-3);
+    border-radius: var(--tw-radius-pill);
+    font-size: var(--tw-text-xs);
+    font-weight: var(--tw-weight-semibold);
+    white-space: nowrap;
+}
+
+.tw-status-badge--testing {
+    background: var(--tw-status-testing-bg);
+    color: var(--tw-status-testing-text);
+}
+
+.tw-status-badge--uat {
+    background: var(--tw-status-uat-bg);
+    color: var(--tw-status-uat-text);
+}
+
+.tw-status-badge--development {
+    background: var(--tw-status-development-bg);
+    color: var(--tw-status-development-text);
+}
+
+.tw-status-badge--new {
+    background: var(--tw-status-inbox-bg);
+    color: var(--tw-status-inbox-text);
+}
+
 /* --- Smaller square-corner status tag (used in reports table) */
 .tw-status-tag {
     display: inline-block;
@@ -485,7 +520,7 @@
 }
 
 .tw-table thead tr {
-    background: var(--tw-bg-body);
+    background: var(--tw-bg-table-head);
     border-bottom: 2px solid var(--tw-border);
 }
 
@@ -499,7 +534,7 @@
     letter-spacing: 0.5px;
     position: sticky;
     top: 0;
-    background: var(--tw-bg-body);
+    background: var(--tw-bg-table-head);
 }
 
 .tw-table thead th:last-child {

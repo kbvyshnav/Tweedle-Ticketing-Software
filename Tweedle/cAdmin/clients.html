@@ -3,658 +3,341 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
+    <!-- Django: {% block page_title %}Clients — Tweedle{% endblock %} -->
+    <title>Clients — Tweedle</title>
+
+    <!-- Google Fonts -->
+    <!-- Django: move to base template <head> -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap">
+
     <!-- Boxicons -->
-    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
-    
-    <title>Tweedle - Clients</title>
-    
-    <style>
+    <!-- Django: <link rel="stylesheet" href="{% static 'vendors/boxicons/css/boxicons.min.css' %}"> -->
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
 
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+    <!-- Bootstrap 5 -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'vendors/bootstrap/css/bootstrap.min.css' %}"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            /* Font Correction 4: Apply Poppins globally */
-            font-family: 'Poppins', sans-serif;
-        }
+    <!-- 1. Tokens -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-tokens.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/tweedle-tokens.css">
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #eee;
-            overflow-x: hidden;
-        }
+    <!-- 2. Admin theme -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/themes/theme-admin.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/themes/theme-admin.css">
 
-        main {
-            width: 100%;
-            padding: 36px 24px;
-            margin: 0 auto;
-        }
+    <!-- 3. Base layout -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-base.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/tweedle-base.css">
 
-        .head-title {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px; 
-            flex-wrap: wrap;
-            gap: 16px;
-        }
+    <!-- 4. UI Components -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-components.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/tweedle-components.css">
 
-        .head-title .left h1 {
-            font-size: 30px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .onboard-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            background: #3c91e6;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex-shrink: 0; 
-        }
-
-        .onboard-btn:hover {
-            background: #2878c9;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(60, 145, 230, 0.3);
-        }
-
-        .onboard-btn i {
-            font-size: 18px;
-        }
-        
-        .table-header-controls {
-            display: flex;
-            align-items: center;
-            justify-content: space-between; 
-            gap: 16px;
-            margin-bottom: 24px; 
-            flex-wrap: wrap;
-        }
-        
-        .left-section {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            flex-grow: 1; 
-            flex-wrap: wrap;
-        }
-
-        .search-container {
-            position: relative;    
-            flex-grow: 0; 
-            max-width: 300px; 
-        }
-
-        .search-container input {
-            width: 150%;
-            padding: 8px 12px 8px 38px;
-            border: 2px solid #e5e5e5;
-            border-radius: 8px;
-            font-size: 13px;
-            transition: all 0.3s ease;
-        }
-
-        .search-container input:focus {
-            outline: none;
-            border-color: #3c91e6;
-        }
-
-        .search-container .search-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #888;
-            font-size: 18px;
-        }
-        
-        /* Table Section */
-        .table-data {
-            background: #fff;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .table-data .head {
-            display: flex;
-            align-items: center;
-            flex-shrink: 0; 
-        }
-
-        .table-data .head h3 {
-            font-size: 20px;
-            font-weight: 600;
-            color: #333;
-            white-space: nowrap;
-        }
-
-        .clients-count {
-            display: inline-block;
-            background: #e8f4fd;
-            color: #3c91e6;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            margin-left: 12px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead tr {
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        thead th {
-            padding: 16px 12px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 13px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        thead th:last-child {
-            text-align: right;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid #f5f5f5;
-            transition: all 0.2s ease;
-        }
-
-        tbody tr:hover {
-            background: #f9f9f9;
-        }
-
-        tbody td {
-            padding: 20px 12px;
-            color: #555;
-            font-size: 13px;
-        }
-        
-        /* Correction 3: Stick action button to the right of the row */
-        tbody td:last-child .action-buttons {
-            justify-content: flex-end;
-        }
-
-
-        .client-name {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .client-avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 600;
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-
-        .client-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .client-company {
-            font-weight: 500;
-            color: #333;
-        }
-
-        .client-id {
-            font-size: 12px;
-            color: #999;
-        }
-
-        .country-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 10px;
-            background: #f0f0f0;
-            border-radius: 6px;
-            font-size: 13px;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .status-active {
-            background: #d4f4dd;
-            color: #2e7d32;
-        }
-
-        .status-inactive {
-            background: #ffe0e0;
-            color: #c62828;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .action-btn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
-            border: 1px solid #e5e5e5;
-            background: #fff;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            color: #555;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-
-        .action-btn:hover {
-            background: #f5f5f5;
-            border-color: #3c91e6;
-            color: #3c91e6;
-        }
-
-        .action-btn.primary {
-            background: #3c91e6;
-            color: #fff;
-            border-color: #3c91e6;
-        }
-
-        .action-btn.primary:hover {
-            background: #2878c9;
-        }
-
-        .action-btn i {
-            font-size: 16px;
-        }
-
-        .more-options {
-            position: relative;
-        }
-
-        .more-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            border: 1px solid #e5e5e5;
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .more-btn:hover {
-            background: #f5f5f5;
-            border-color: #3c91e6;
-        }
-
-        .more-btn i {
-            font-size: 18px;
-            color: #555;
-        }
-
-        /* Categories */
-        .categories {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            max-width: 250px;
-        }
-
-        .category-tag {
-            display: inline-block;
-            padding: 4px 10px;
-            background: #e8f4fd;
-            color: #3c91e6;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-
-        .category-tag.payment {
-            background: #fff3e0;
-            color: #f57c00;
-        }
-
-        .category-tag.integration {
-            background: #f3e5f5;
-            color: #7b1fa2;
-        }
-
-        .category-tag.support {
-            background: #e8f5e9;
-            color: #388e3c;
-        }
-
-        /* Responsive */
-        @media screen and (max-width: 768px) {
-            main {
-                padding: 24px 16px;
-            }
-
-            .head-title {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            /* Adjust mobile layout for table header controls */
-            .table-header-controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .left-section {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 8px;
-            }
-
-            .search-container {
-                max-width: none;
-            }
-
-            .table-data .head {
-                margin-bottom: 0;
-            }
-
-            .onboard-btn {
-                order: 3; /* Push button to the bottom on mobile */
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .table-data {
-                overflow-x: auto;
-            }
-
-            table {
-                min-width: 900px;
-            }
-
-            .action-buttons {
-                flex-direction: row; 
-                align-items: center;
-                gap: 4px;
-            }
-        }
-    </style>
+    <!-- 5. Clients page CSS -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/pages/clients.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/pages/clients.css">
 </head>
-<body>
-    <main>
-        <!-- Page Header -->
-        <!-- Correction 1: margin-bottom adjusted via CSS for .head-title -->
-        <div class="head-title">
-            <div class="left">
-                <h1>Clients</h1>
-            </div>
+<body class="role-admin">
 
-        </div>
+<!-- Django: this entire <main> block becomes {% block content %} -->
+<main>
 
-        <!-- Clients Table -->
-        <div class="table-data">
-            
-            <!-- Correction 2: Re-ordered elements and added .left-section wrapper -->
-            <div class="table-header-controls">
-                
-                <!-- New wrapper to group Heading and Search -->
-                <div class="left-section"> 
-                    <div class="head">
-                        <h3>All Clients <span class="clients-count">2</span></h3>
-                    </div>
-                    
-                    <!-- Search Section -->
-                    <div class="search-container">
-                        <i class='bx bx-search search-icon'></i>
-                        <input type="text" id="clientSearch" placeholder="Search by name, email, or country..." onkeyup="searchClients()">
-                    </div>
+    <!-- === PAGE HEADER ======================================= -->
+    <!-- Django: {% block page_title %}Clients{% endblock %} -->
+    <div class="page-head">
+        <h1>Clients</h1>
+    </div>
+
+
+    <!-- === CLIENTS TABLE CARD ================================ -->
+    <div class="tw-table-card">
+
+        <!-- Card header: heading + search (left), onboard button (right) -->
+        <div class="tw-table-head-row">
+
+            <div class="tw-table-head-left">
+                <h3 class="tw-table-title">
+                    All Clients
+                    <!-- Django: {{ clients|length }} -->
+                    <span class="tw-count-badge" id="clientCount">3</span>
+                </h3>
+
+                <div class="tw-table-search">
+                    <i class="bx bx-search search-icon" aria-hidden="true"></i>
+                    <input
+                        type="text"
+                        id="clientSearchInput"
+                        placeholder="Search by name, email, or country..."
+                        aria-label="Search clients">
                 </div>
-                
-                <!-- Onboard Button (pushed to the right by flex-grow: 1 on .left-section) -->
-                <button class="onboard-btn" onclick="handleOnboardClient()">
-                    <i class='bx bx-plus-circle'></i>
-                    <span>Onboard New Client</span>
-                </button>
-                
             </div>
-            
-            <table id="clientsTable">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Country</th>
-                        <th>Contact</th>
-                        <th>Email</th>                   
-                        <th>Status</th>
-                        <!-- Correction 3: Aligned Action header to the right -->
-                        <th style="text-align: right;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <div class="client-name">
-                                <div class="client-avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">G</div>
-                                <div class="client-info">
-                                    <div class="client-company">Global Money Exchange CO.LLC</div>
-                                    <div class="client-id">Client ID: GMEC</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="country-badge">
-                                <i class='bx bx-flag'></i> Oman
-                            </span>
-                        </td>
-                        <td>+977-1234567890</td>
-                        <td>contact@gmec.com.np</td>
-                        <td><span class="status-badge status-active">Active</span></td>
-                        <!-- Correction 3: Action buttons align to the right (CSS adjustment made for last td) -->
-                        <td>
-                            <div class="action-buttons">
-                                <button class="action-btn primary" onclick="manageUsers('GMEC')">
-                                    <i class='bx bx-user'></i> Manage Users
-                                </button>
-                                <button class="action-btn" onclick="showDetails('GMEC')">
-                                    <i class='bx bx-info-circle'></i> Details
-                                </button>
-                                <div class="more-options">
-                                    <button class="more-btn" onclick="showSettings('GMEC')">
-                                        <i class='bx bx-dots-vertical-rounded'></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="client-name">
-                                <div class="client-avatar" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">B</div>
-                                <div class="client-info">
-                                    <div class="client-company">Belhasa Global Exchange Co.LLC</div>
-                                    <div class="client-id">Client ID: BGEX</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="country-badge">
-                                <i class='bx bx-flag'></i> Dubai
-                            </span>
-                        </td>
-                        <td>+880-9876543210</td>
-                        <td>info@bgex.com.bd</td>
-                        <td><span class="status-badge status-active">Active</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="action-btn primary" onclick="manageUsers('BGEX')">
-                                    <i class='bx bx-user'></i> Manage Users
-                                </button>
-                                <button class="action-btn" onclick="showDetails('BGEX')">
-                                    <i class='bx bx-info-circle'></i> Details
-                                </button>
-                                <div class="more-options">
-                                    <button class="more-btn" onclick="showSettings('BGEX')">
-                                        <i class='bx bx-dots-vertical-rounded'></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="client-name">
-                                <div class="client-avatar" style="background: linear-gradient(135deg, #621e39 0%, #c55866 100%);">T</div>
-                                <div class="client-info">
-                                    <div class="client-company">Tata Consultancy Services</div>
-                                    <div class="client-id">Client ID: TCS</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="country-badge">
-                                <i class='bx bx-flag'></i> India
-                            </span>
-                        </td>
-                        <td>+91-987654321</td>
-                        <td>info@tcs.com.in</td>
-                        <td><span class="status-badge status-active">Active</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="action-btn primary" onclick="manageUsers('BGEX')">
-                                    <i class='bx bx-user'></i> Manage Users
-                                </button>
-                                <button class="action-btn" onclick="showDetails('BGEX')">
-                                    <i class='bx bx-info-circle'></i> Details
-                                </button>
-                                <div class="more-options">
-                                    <button class="more-btn" onclick="showSettings('BGEX')">
-                                        <i class='bx bx-dots-vertical-rounded'></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    
-                </tbody>
-            </table>
+
+            <div class="tw-table-head-right">
+                <!-- Django: opens {% url 'admin_onboard_client' %} or modal -->
+                <button
+                    class="tw-btn tw-btn-primary onboard-btn"
+                    id="onboardBtn"
+                    aria-haspopup="dialog"
+                    aria-controls="onboardModal">
+                    <i class="bx bx-plus-circle" aria-hidden="true"></i>
+                    Onboard New Client
+                </button>
+            </div>
+
         </div>
-    </main>
 
-    <script>
-        // NOTE: alert() used here is for placeholder functionality and should be replaced by modal UI in a real application.
-        // Search functionality
-        function searchClients() {
-            const input = document.getElementById('clientSearch');
-            const filter = input.value.toLowerCase();
-            const table = document.getElementById('clientsTable');
-            const tr = table.getElementsByTagName('tr');
+        <!-- Clients table -->
+        <!-- Django: {% for client in clients %} -->
+        <div class="table-scroll-wrapper">
+        <table class="tw-table" id="clientsTable">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Country</th>
+                    <th scope="col">Contact</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
 
-            for (let i = 1; i < tr.length; i++) {
-                const td = tr[i].getElementsByTagName('td');
-                let found = false;
-                
-                for (let j = 0; j < td.length; j++) {
-                    if (td[j]) {
-                        const txtValue = td[j].textContent || td[j].innerText;
-                        if (txtValue.toLowerCase().indexOf(filter) > -1) {
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-                
-                tr[i].style.display = found ? '' : 'none';
-            }
+                <!-- Row 1: GMEC -->
+                <tr>
+                    <td>
+                        <div class="client-name-cell">
+                            <div class="tw-avatar tw-avatar--gmec" aria-hidden="true">G</div>
+                            <div class="client-info">
+                                <!-- Django: {{ client.company_name }} -->
+                                <span class="client-company">Global Money Exchange CO.LLC</span>
+                                <!-- Django: {{ client.client_id }} -->
+                                <span class="client-id-label">Client ID: GMEC</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="tw-country-badge">
+                            <i class="bx bx-flag" aria-hidden="true"></i> Oman
+                        </span>
+                    </td>
+                    <!-- Django: {{ client.contact }} -->
+                    <td>+977-1234567890</td>
+                    <!-- Django: {{ client.email }} -->
+                    <td>contact@gmec.com.np</td>
+                    <td>
+                        <!-- Django: class="tw-status-badge tw-status-badge--{{ client.status }}" -->
+                        <span class="tw-status-badge tw-status-badge--active">Active</span>
+                    </td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <!-- Django: {% url 'admin_manage_users' client.id %} -->
+                            <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers('GMEC')">
+                                <i class="bx bx-user" aria-hidden="true"></i> Manage Users
+                            </button>
+                            <!-- Django: {% url 'admin_client_detail' client.id %} -->
+                            <button class="tw-btn tw-btn-outline tw-btn--sm" onclick="showDetails('GMEC')">
+                                <i class="bx bx-info-circle" aria-hidden="true"></i> Details
+                            </button>
+                            <button class="tw-btn-icon" onclick="showSettings('GMEC')" aria-label="More options for GMEC">
+                                <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Row 2: BGEX -->
+                <tr>
+                    <td>
+                        <div class="client-name-cell">
+                            <div class="tw-avatar tw-avatar--bgex" aria-hidden="true">B</div>
+                            <div class="client-info">
+                                <span class="client-company">Belhasa Global Exchange Co.LLC</span>
+                                <span class="client-id-label">Client ID: BGEX</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="tw-country-badge">
+                            <i class="bx bx-flag" aria-hidden="true"></i> Dubai
+                        </span>
+                    </td>
+                    <td>+880-9876543210</td>
+                    <td>info@bgex.com.bd</td>
+                    <td><span class="tw-status-badge tw-status-badge--active">Active</span></td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers('BGEX')">
+                                <i class="bx bx-user" aria-hidden="true"></i> Manage Users
+                            </button>
+                            <button class="tw-btn tw-btn-outline tw-btn--sm" onclick="showDetails('BGEX')">
+                                <i class="bx bx-info-circle" aria-hidden="true"></i> Details
+                            </button>
+                            <button class="tw-btn-icon" onclick="showSettings('BGEX')" aria-label="More options for BGEX">
+                                <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Row 3: TCS -->
+                <tr>
+                    <td>
+                        <div class="client-name-cell">
+                            <div class="tw-avatar tw-avatar--tcs" aria-hidden="true">T</div>
+                            <div class="client-info">
+                                <span class="client-company">Tata Consultancy Services</span>
+                                <span class="client-id-label">Client ID: TCS</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="tw-country-badge">
+                            <i class="bx bx-flag" aria-hidden="true"></i> India
+                        </span>
+                    </td>
+                    <td>+91-987654321</td>
+                    <td>info@tcs.com.in</td>
+                    <td><span class="tw-status-badge tw-status-badge--active">Active</span></td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers('TCS')">
+                                <i class="bx bx-user" aria-hidden="true"></i> Manage Users
+                            </button>
+                            <button class="tw-btn tw-btn-outline tw-btn--sm" onclick="showDetails('TCS')">
+                                <i class="bx bx-info-circle" aria-hidden="true"></i> Details
+                            </button>
+                            <button class="tw-btn-icon" onclick="showSettings('TCS')" aria-label="More options for TCS">
+                                <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        </div>
+        <!-- Django: {% endfor %} -->
+
+    </div>
+    <!-- END TABLE CARD -->
+
+
+    <!-- === ONBOARD CLIENT MODAL STUB =========================
+         Phase 7: full onboard form goes here.
+         Django: opens {% url 'admin_onboard_client' %} or modal
+         ======================================================= -->
+    <div class="tw-modal-overlay" id="onboardModal" role="dialog" aria-modal="true" aria-labelledby="onboardModalTitle">
+        <div class="tw-modal tw-modal--sm">
+
+            <div class="tw-modal-header tw-header-gradient">
+                <div>
+                    <h2 id="onboardModalTitle">
+                        <i class="bx bx-buildings" aria-hidden="true"></i>
+                        Onboard New Client
+                    </h2>
+                </div>
+                <button class="tw-btn-close" id="onboardModalClose" aria-label="Close modal">
+                    <i class="bx bx-x" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div class="tw-modal-body modal-placeholder-body">
+                <i class="bx bx-building-house" aria-hidden="true"></i>
+                <!-- Phase 7: full onboard form goes here -->
+                <p>Onboard Client form coming soon.</p>
+                <p>This modal will contain the client registration form in Phase 7.</p>
+            </div>
+
+        </div>
+    </div>
+    <!-- END ONBOARD MODAL -->
+
+</main>
+<!-- END MAIN CONTENT -->
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Django: cAdmin_script.js is loaded by the base template -->
+
+
+<script>
+    /* ============================================================
+     * CLIENT TABLE SEARCH
+     * ============================================================
+     * Filters visible table rows by matching the typed value
+     * against any cell text. Uses .row-hidden class (no inline
+     * style manipulation).
+     * ============================================================ */
+    const clientSearchInput = document.getElementById('clientSearchInput');
+    const clientsTable      = document.getElementById('clientsTable');
+
+    clientSearchInput.addEventListener('input', function () {
+        const filter = this.value.trim().toLowerCase();
+        const rows   = clientsTable.querySelectorAll('tbody tr');
+
+        rows.forEach(row => {
+            const matches = row.textContent.toLowerCase().includes(filter);
+            row.classList.toggle('row-hidden', !matches);
+        });
+    });
+
+
+    /* ============================================================
+     * ONBOARD CLIENT MODAL
+     * ============================================================
+     * Opens and closes the onboard modal stub.
+     * Phase 7 will replace the stub body with the full form.
+     * ============================================================ */
+    const onboardModal = document.getElementById('onboardModal');
+    const onboardBtn   = document.getElementById('onboardBtn');
+    const onboardClose = document.getElementById('onboardModalClose');
+
+    function openOnboardModal() {
+        onboardModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeOnboardModal() {
+        onboardModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    onboardBtn.addEventListener('click', openOnboardModal);
+    onboardClose.addEventListener('click', closeOnboardModal);
+
+    /* Close when clicking the backdrop */
+    onboardModal.addEventListener('click', (e) => {
+        if (e.target === onboardModal) closeOnboardModal();
+    });
+
+    /* Close on Escape key */
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && onboardModal.classList.contains('active')) {
+            closeOnboardModal();
         }
+    });
 
-        // Action handlers
-        function handleOnboardClient() {
-            console.log('Redirecting to Onboard New Client form...');
-            // window.location.href = '/onboard-client';
-        }
 
-        function manageUsers(clientName) {
-            console.log(`Redirecting to Manage Users page for ${clientName}...`);
-            // window.location.href = `/clients/${clientName}/users`;
-        }
+    /* ============================================================
+     * PLACEHOLDER ACTION HANDLERS
+     * Django: replace with {% url %} redirects or fetch() calls
+     * ============================================================ */
+    function manageUsers(clientId) {
+        /* Django: window.location.href = `{% url 'admin_manage_users' clientId %}`; */
+        console.log('[Phase 7] Manage Users for:', clientId);
+    }
 
-        function showDetails(clientName) {
-            console.log(`Showing detailed information for ${clientName}...`);
-            // window.location.href = `/clients/${clientName}/details`;
-        }
+    function showDetails(clientId) {
+        /* Django: window.location.href = `{% url 'admin_client_detail' clientId %}`; */
+        console.log('[Phase 7] Show Details for:', clientId);
+    }
 
-        function showSettings(clientName) {
-            console.log(`Opening settings for ${clientName}...\n\nOptions:\n• Delete Client\n• Manage Categories\n• Update Information`);
-            // Show settings modal or redirect
-        }
+    function showSettings(clientId) {
+        console.log('[Phase 7] Settings dropdown for:', clientId);
+    }
+</script>
 
-        function filterByStatus(status) {
-            const table = document.getElementById('clientsTable');
-            const tr = table.getElementsByTagName('tr');
-
-            for (let i = 1; i < tr.length; i++) {
-                const statusCell = tr[i].getElementsByClassName('status-badge')[0];
-                if (status === 'all') {
-                    tr[i].style.display = '';
-                } else {
-                    const isMatch = statusCell.textContent.toLowerCase() === status;
-                    tr[i].style.display = isMatch ? '' : 'none';
-                }
-            }
-        }
-
-        function sortClients() {
-            const table = document.getElementById('clientsTable');
-            const tbody = table.getElementsByTagName('tbody')[0];
-            const rows = Array.from(tbody.getElementsByTagName('tr'));
-
-            rows.sort((a, b) => {
-                const nameA = a.getElementsByClassName('client-company')[0].textContent;
-                const nameB = b.getElementsByClassName('client-company')[0].textContent;
-                return nameA.localeCompare(nameB);
-            });
-
-            rows.forEach(row => tbody.appendChild(row));
-        }
-
-        function exportClients() {
-            console.log('Exporting client data to CSV...');
-            // Export functionality would go here
-        }
-    </script>
 </body>
 </html>

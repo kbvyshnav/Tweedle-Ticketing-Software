@@ -1,0 +1,197 @@
+/*
+ * ============================================================
+ * FILE:        clients.css
+ * PURPOSE:     Clients page — styles unique to this page only.
+ *              General layout and components are in base + components.
+ * LOAD ORDER:  5 of 5
+ * DJANGO PATH: <!-- Django: {% static 'css/pages/clients.css' %} -->
+ * DEPENDS ON:  tweedle-tokens.css
+ * MODIFIED:    <!-- Last modified: {{date}} -->
+ * ============================================================
+ */
+
+
+/* === STANDALONE PADDING ===================================== */
+body > main {
+    padding: var(--tw-content-padding);
+}
+
+
+/* === SHARED OUTLINE BUTTON ==================================
+ * Candidate for tweedle-components.css (also used in reports).
+ * Flagged for Phase 6 migration.
+ * ============================================================ */
+.tw-btn-outline {
+    background: var(--tw-bg-surface);
+    color: var(--tw-text-secondary);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    transition: border-color var(--tw-transition-fast),
+                color var(--tw-transition-fast),
+                background var(--tw-transition-fast);
+}
+
+.tw-btn-outline:hover {
+    border-color: var(--tw-primary);
+    color: var(--tw-primary);
+    background: var(--tw-primary-light);
+}
+
+/* Small size modifier for table row buttons */
+.tw-btn--sm {
+    height: 34px;
+    padding: var(--tw-space-1) var(--tw-space-3);
+    font-size: var(--tw-text-sm);
+}
+
+
+/* === CLIENT AVATAR IDENTITY COLORS ==========================
+ * These are entity identity gradients — not role theme colors.
+ * Hardcoded per client so they persist regardless of active role.
+ * ============================================================ */
+.tw-avatar--gmec {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.tw-avatar--bgex {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.tw-avatar--tcs {
+    background: linear-gradient(135deg, #621e39 0%, #c55866 100%);
+}
+
+
+/* === CLIENT STATUS BADGES ===================================
+ * Active/Inactive state — maps to success/danger semantic tokens.
+ * NOT role-themed. These are entity lifecycle states.
+ * ============================================================ */
+.tw-status-badge--active {
+    background: var(--tw-success-light);
+    color: var(--tw-success-dark);
+    padding: var(--tw-space-1) var(--tw-space-3);
+    border-radius: var(--tw-radius-pill);
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-medium);
+}
+
+.tw-status-badge--inactive {
+    background: var(--tw-danger-light);
+    color: var(--tw-danger);
+    padding: var(--tw-space-1) var(--tw-space-3);
+    border-radius: var(--tw-radius-pill);
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-medium);
+}
+
+
+/* === CLIENT NAME CELL ======================================= */
+.client-name-cell {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+}
+
+.client-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.client-company {
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-primary);
+    font-size: var(--tw-text-base);
+}
+
+.client-id-label {
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-muted);
+}
+
+
+/* === COUNTRY BADGE ========================================== */
+.tw-country-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    padding: var(--tw-space-1) var(--tw-space-3);
+    background: var(--tw-bg-body);
+    border-radius: var(--tw-radius-sm);
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-secondary);
+}
+
+
+/* === TABLE ROW ACTIONS ======================================
+ * Override .tw-row-actions justification:
+ * client actions have 3 buttons so they need wrap support.
+ * ============================================================ */
+.tw-table td:last-child .tw-row-actions {
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: var(--tw-space-2);
+}
+
+
+/* === ONBOARD MODAL STUB =====================================
+ * Phase 7: full onboard form goes here.
+ * ============================================================ */
+.modal-placeholder-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--tw-space-12) var(--tw-space-8);
+    text-align: center;
+    gap: var(--tw-space-4);
+    color: var(--tw-text-secondary);
+}
+
+.modal-placeholder-body i {
+    font-size: 48px;
+    color: var(--tw-primary-light);
+    opacity: 0.6;
+}
+
+.modal-placeholder-body p {
+    font-size: var(--tw-text-md);
+    color: var(--tw-text-secondary);
+}
+
+
+/* === RESPONSIVE =============================================
+ * 1024px, 768px, 576px — standard breakpoints only.
+ * ============================================================ */
+
+@media screen and (max-width: 1024px) {
+    .tw-table td:last-child .tw-row-actions {
+        gap: var(--tw-space-1);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    body > main {
+        padding: var(--tw-content-padding-mobile);
+    }
+
+    .tw-table {
+        min-width: 860px;
+    }
+
+    .tw-table-search {
+        max-width: 200px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .tw-btn-primary.onboard-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .tw-table-search {
+        max-width: none;
+        width: 100%;
+    }
+}

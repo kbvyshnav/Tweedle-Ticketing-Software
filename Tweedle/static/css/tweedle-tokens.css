@@ -49,6 +49,8 @@
      * These must NOT be overridden in theme files — status colors
      * are semantic, not role-specific, so they remain constant.
      * ============================================================ */
+    --tw-bg-table-head:          #dfdfdf;   /* table header row background */
+
     --tw-status-inbox-bg:         #CFE8FF;
     --tw-status-inbox-text:       #1a5fa8;
     --tw-status-progress-bg:      #FFF2C6;
@@ -57,6 +59,14 @@
     --tw-status-forwarded-text:   #FD7238;
     --tw-status-closed-bg:        #d3f9df;
     --tw-status-closed-text:      #1a7a32;
+
+    /* Ticket sub-status states (In-Progress breakdown) */
+    --tw-status-testing-bg:       #e0f0ff;
+    --tw-status-testing-text:     #1d4e89;
+    --tw-status-uat-bg:           #f1f6e9;
+    --tw-status-uat-text:         #6a8e3f;
+    --tw-status-development-bg:   #d4edda;
+    --tw-status-development-text: #155724;
 
 
     /* === PRIORITY COLORS ==========================================

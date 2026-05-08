@@ -1,0 +1,249 @@
+/*
+ * ============================================================
+ * FILE:        reports.css
+ * PURPOSE:     Reports page — styles unique to this page only.
+ *              This is an ADMIN page using theme-admin (blue).
+ *              Previous teal (#20b8a6) primary is replaced by
+ *              var(--tw-primary) = Admin blue #3C91E6.
+ * LOAD ORDER:  5 of 5
+ * DJANGO PATH: <!-- Django: {% static 'css/pages/reports.css' %} -->
+ * DEPENDS ON:  tweedle-tokens.css
+ * MODIFIED:    <!-- Last modified: {{date}} -->
+ * ============================================================
+ */
+
+
+/* === STANDALONE PADDING ===================================== */
+body > main {
+    padding: var(--tw-content-padding);
+}
+
+
+/* === SHARED OUTLINE BUTTON ==================================
+ * Candidate for tweedle-components.css (also defined in clients/team).
+ * Flagged for Phase 6 migration.
+ * ============================================================ */
+.tw-btn-outline {
+    background: var(--tw-bg-surface);
+    color: var(--tw-text-secondary);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    transition: border-color var(--tw-transition-fast),
+                color var(--tw-transition-fast),
+                background var(--tw-transition-fast);
+}
+
+.tw-btn-outline:hover {
+    border-color: var(--tw-primary);
+    color: var(--tw-primary);
+    background: var(--tw-primary-light);
+}
+
+
+/* === FILTER CARD BUTTON GROUP ===============================
+ * The "Show Report" filter group does not grow — it holds
+ * the button flush to the other filter groups.
+ * ============================================================ */
+.filter-btn-group {
+    flex-grow: 0 !important;
+    min-width: auto !important;
+    align-self: flex-end;
+}
+
+.filter-btn-group .tw-btn-primary {
+    height: 40px;
+    white-space: nowrap;
+}
+
+
+/* === REPORT SUMMARY BANNER ==================================
+ * Overrides .summary-banner from base.css with a slightly
+ * larger left border to match the original visual weight.
+ * ============================================================ */
+.report-summary-banner {
+    background: var(--tw-primary-light);
+    border-left: 5px solid var(--tw-primary);
+    padding: var(--tw-space-4);
+    border-radius: var(--tw-radius-md);
+    margin-bottom: var(--tw-space-3);
+    font-size: var(--tw-text-md);
+    color: var(--tw-text-primary);
+    font-weight: var(--tw-weight-medium);
+    line-height: 1.4;
+}
+
+.report-summary-banner strong {
+    font-weight: var(--tw-weight-bold);
+    color: var(--tw-primary-text);
+}
+
+
+/* === TABLE HEADER CONTROLS ==================================
+ * Table card title row: heading left, download buttons right.
+ * ============================================================ */
+.report-table-title {
+    font-size: var(--tw-text-xl);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    white-space: nowrap;
+}
+
+.download-buttons {
+    display: flex;
+    gap: var(--tw-space-3);
+    flex-shrink: 0;
+}
+
+
+/* === DOWNLOAD BUTTONS =======================================
+ * Extend .tw-btn-outline with file-type tints.
+ * Colors use existing file-type tokens from tweedle-tokens.css.
+ * ============================================================ */
+.btn-download--pdf {
+    border-color: var(--tw-file-pdf-icon);
+    color: var(--tw-file-pdf-icon);
+}
+
+.btn-download--pdf:hover {
+    background: var(--tw-file-pdf-bg);
+    border-color: var(--tw-file-pdf-icon);
+    color: var(--tw-file-pdf-icon);
+}
+
+.btn-download--excel {
+    border-color: var(--tw-success);
+    color: var(--tw-success);
+}
+
+.btn-download--excel:hover {
+    background: var(--tw-success-light);
+    border-color: var(--tw-success);
+    color: var(--tw-success);
+}
+
+
+/* === TAT COLUMN =============================================
+ * TAT (Turnaround Time) column is center-aligned.
+ * ============================================================ */
+.tw-tat-col {
+    text-align: center !important;
+}
+
+
+/* === TAT BADGES =============================================
+ * Turnaround time evaluation badges.
+ * Reuses token palette rather than hardcoded values.
+ * ============================================================ */
+.tw-tat-badge {
+    display: inline-block;
+    font-weight: var(--tw-weight-semibold);
+    padding: 5px var(--tw-space-3);
+    border-radius: var(--tw-space-1);
+    font-size: var(--tw-text-sm);
+    white-space: nowrap;
+}
+
+.tw-tat-badge--met {
+    background: var(--tw-success-light);
+    color: var(--tw-status-closed-text);
+}
+
+.tw-tat-badge--missed {
+    background: var(--tw-danger-light);
+    color: var(--tw-priority-high-text);
+}
+
+.tw-tat-badge--pending {
+    background: var(--tw-border);
+    color: var(--tw-text-muted);
+}
+
+
+/* === REPORT DETAIL MODAL ====================================
+ * Replaces the dynamically-created modal from the original JS.
+ * Now pre-defined in HTML; JS only updates content and toggles
+ * the .active class.
+ * ============================================================ */
+.report-modal-title {
+    font-size: var(--tw-text-xl);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin-bottom: var(--tw-space-3);
+}
+
+.report-modal-message {
+    font-size: var(--tw-text-md);
+    color: var(--tw-text-secondary);
+    margin-bottom: var(--tw-space-5);
+    line-height: 1.5;
+}
+
+.report-modal-body {
+    padding: var(--tw-space-8);
+    text-align: center;
+}
+
+
+/* === RESPONSIVE =============================================
+ * 1024px, 768px, 576px — standard breakpoints only.
+ * ============================================================ */
+
+@media screen and (max-width: 1024px) {
+    .tw-filter-card .filter-controls {
+        gap: var(--tw-space-3);
+    }
+
+    .download-buttons {
+        flex-direction: column;
+        gap: var(--tw-space-2);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    body > main {
+        padding: var(--tw-content-padding-mobile);
+    }
+
+    .tw-filter-card .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tw-filter-group {
+        min-width: 100%;
+    }
+
+    .filter-btn-group {
+        min-width: 100% !important;
+    }
+
+    .tw-table {
+        min-width: 1100px;
+    }
+
+    .tw-table-head-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .download-buttons {
+        flex-direction: row;
+        width: 100%;
+        margin-top: var(--tw-space-4);
+    }
+
+    .download-buttons .tw-btn {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .download-buttons {
+        flex-direction: column;
+    }
+
+    .download-buttons .tw-btn {
+        width: 100%;
+    }
+}

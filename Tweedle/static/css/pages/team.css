@@ -1,0 +1,167 @@
+/*
+ * ============================================================
+ * FILE:        team.css
+ * PURPOSE:     Team page — styles unique to this page only.
+ *              This is an ADMIN page loading theme-admin (blue).
+ *              The purple/pink role badges are STATUS indicators —
+ *              they are not role theme colors.
+ * LOAD ORDER:  5 of 5
+ * DJANGO PATH: <!-- Django: {% static 'css/pages/team.css' %} -->
+ * DEPENDS ON:  tweedle-tokens.css
+ * MODIFIED:    <!-- Last modified: {{date}} -->
+ * ============================================================
+ */
+
+
+/* === STANDALONE PADDING ===================================== */
+body > main {
+    padding: var(--tw-content-padding);
+}
+
+
+/* === SHARED OUTLINE BUTTON ==================================
+ * Candidate for tweedle-components.css (also used in clients/reports).
+ * Flagged for Phase 6 migration.
+ * ============================================================ */
+.tw-btn-outline {
+    background: var(--tw-bg-surface);
+    color: var(--tw-text-secondary);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    transition: border-color var(--tw-transition-fast),
+                color var(--tw-transition-fast),
+                background var(--tw-transition-fast);
+}
+
+.tw-btn-outline:hover {
+    border-color: var(--tw-primary);
+    color: var(--tw-primary);
+    background: var(--tw-primary-light);
+}
+
+.tw-btn--sm {
+    height: 34px;
+    padding: var(--tw-space-1) var(--tw-space-3);
+    font-size: var(--tw-text-sm);
+}
+
+
+/* === TEAM MEMBER AVATAR IDENTITY COLORS =====================
+ * Identity gradients per team member — not role theme colors.
+ * Add one per member as the team grows.
+ * ============================================================ */
+.tw-avatar--john {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+}
+
+.tw-avatar--alice {
+    background: linear-gradient(135deg, #f472b6 0%, #a855f7 100%);
+}
+
+.tw-avatar--vyshnav {
+    background: linear-gradient(135deg, #5bdde3 0%, #4e55df 100%);
+}
+
+
+/* === ROLE BADGES ============================================
+ * Role types shown inside the team table.
+ * NOT theme colors — these are fixed semantic colors.
+ * The "Developer" badge is cyan (not purple) to avoid confusion
+ * with the Developer role theme which is purple.
+ * ============================================================ */
+.tw-role-badge {
+    display: inline-block;
+    padding: var(--tw-space-1) var(--tw-space-3);
+    border-radius: var(--tw-radius-sm);
+    font-size: var(--tw-text-xs);
+    font-weight: var(--tw-weight-medium);
+    white-space: nowrap;
+}
+
+.tw-role-badge--developer {
+    background: #e0f7fa;
+    color: #00bcd4;
+}
+
+.tw-role-badge--tester {
+    background: #fce4ec;
+    color: #e91e63;
+}
+
+
+/* === MEMBER NAME CELL ======================================= */
+.member-name-cell {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+}
+
+.member-name {
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-primary);
+    font-size: var(--tw-text-base);
+}
+
+
+/* === STATUS TOGGLE LABEL ====================================
+ * The checkbox is styled by .tw-status-toggle in components.
+ * Only the enabled/disabled label color needs a page override.
+ * ============================================================ */
+.toggle-label--disabled {
+    color: var(--tw-danger);
+}
+
+
+/* === ADD MEMBER MODAL STUB ==================================
+ * Phase 7: full add member form goes here.
+ * ============================================================ */
+.modal-placeholder-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--tw-space-12) var(--tw-space-8);
+    text-align: center;
+    gap: var(--tw-space-4);
+    color: var(--tw-text-secondary);
+}
+
+.modal-placeholder-body i {
+    font-size: 48px;
+    color: var(--tw-primary-light);
+    opacity: 0.6;
+}
+
+.modal-placeholder-body p {
+    font-size: var(--tw-text-md);
+    color: var(--tw-text-secondary);
+}
+
+
+/* === RESPONSIVE ============================================= */
+
+@media screen and (max-width: 768px) {
+    body > main {
+        padding: var(--tw-content-padding-mobile);
+    }
+
+    .tw-table {
+        min-width: 900px;
+    }
+
+    .tw-table-search {
+        max-width: 200px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .tw-btn-primary.add-member-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .tw-table-search {
+        max-width: none;
+        width: 100%;
+    }
+}
