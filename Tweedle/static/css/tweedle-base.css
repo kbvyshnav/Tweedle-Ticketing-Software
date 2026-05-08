@@ -12,10 +12,13 @@
  * ============================================================
  */
 
-/* Django: load Google Fonts in the HTML <head>, not here.
-   Required fonts: Poppins (400,500,600,700) + Lato (400,700)
-   <!-- Django: <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"> -->
-*/
+/* === FONT IMPORT =============================================
+ * DO NOT @import fonts here — Google Fonts must load in <head>.
+ * Single combined URL (Poppins 400,500,600,700 + Lato 400,600):
+ *
+ * <!-- Django: move this <link> tag to base template <head> -->
+ * <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap">
+ * ============================================================ */
 
 
 /* === RESET ==================================================== */
@@ -107,6 +110,29 @@ p {
 }
 
 
+/* === SECTION TITLE ACCENT =====================================
+ * Left-border rule applied to all section headings and page-level
+ * h2 elements. Color is role-aware via --tw-primary.
+ * Use 3px solid for section titles, 4px for table card titles
+ * (the heavier weight is defined in tweedle-components.css via
+ * .tw-table-title which is used inside table card headers).
+ * ============================================================ */
+
+.section-title,
+.head-title h2 {
+    border-left: 3px solid var(--tw-primary);
+    padding-left: 10px;
+}
+
+/* Shared heading style for all named section blocks */
+.section-title {
+    font-size: var(--tw-text-lg);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin-bottom: var(--tw-space-3);
+}
+
+
 /* === SCROLLBAR (custom thin style, cross-browser) ============= */
 
 ::-webkit-scrollbar {
@@ -115,7 +141,7 @@ p {
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--tw-bg-body);
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -338,6 +364,58 @@ p {
     max-width: 400px;
     width: 100%;
     margin-right: auto;
+}
+
+/* Topbar search input + button pill
+ * At rest: no border, background #f0f0f0 (subtle grey).
+ * On focus: 1px solid var(--tw-primary), white background.
+ */
+.topbar-search {
+    display: flex;
+    align-items: center;
+    height: 36px;
+    border-radius: var(--tw-radius-pill);
+    overflow: hidden;
+}
+
+.topbar-search input {
+    flex-grow: 1;
+    height: 100%;
+    padding: 0 var(--tw-space-4);
+    border: 1px solid transparent;
+    background: #f0f0f0;
+    border-radius: var(--tw-radius-pill) 0 0 var(--tw-radius-pill);
+    outline: none;
+    font-size: var(--tw-text-base);
+    font-family: var(--tw-font-primary);
+    color: var(--tw-text-primary);
+    transition: background var(--tw-transition-fast),
+                border-color var(--tw-transition-fast);
+}
+
+.topbar-search input:focus {
+    background: var(--tw-bg-surface);
+    border-color: var(--tw-primary);
+    box-shadow: 0 0 0 2px rgba(60, 145, 230, 0.12);
+}
+
+.topbar-search button {
+    width: 46px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--tw-primary);
+    color: #ffffff;
+    border: none;
+    font-size: 18px;
+    border-radius: 0 var(--tw-radius-pill) var(--tw-radius-pill) 0;
+    cursor: pointer;
+    transition: background var(--tw-transition-fast);
+}
+
+.topbar-search button:hover {
+    background: var(--tw-primary-dark);
 }
 
 /* Notification bell */
@@ -620,8 +698,33 @@ textarea:focus-visible,
 }
 
 
-/* === RESPONSIVE =============================================== */
+/* === RESPONSIVE ===============================================
+ * Three standardized breakpoints — used everywhere in this file
+ * and in tweedle-components.css. No other breakpoint values are
+ * permitted. CSS custom properties cannot appear in @media
+ * conditions, so these are enforced by naming convention only:
+ *
+ *   --bp-lg → 1024px  Large screen: filter bar / layout tweaks
+ *   --bp-md →  768px  Tablet: sidebar collapses, grids stack
+ *   --bp-sm →  576px  Mobile: single column, full-width
+ * ============================================================ */
 
+/* --- 1024px: large screen adjustments ----------------------- */
+@media screen and (max-width: 1024px) {
+    .filter-bar {
+        gap: var(--tw-space-3);
+    }
+
+    .filter-bar__controls {
+        gap: var(--tw-space-2);
+    }
+
+    .stat-tiles {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* --- 768px: tablet ------------------------------------------ */
 @media screen and (max-width: 768px) {
     #sidebar {
         width: var(--tw-sidebar-collapsed-width);
@@ -657,8 +760,13 @@ textarea:focus-visible,
     }
 }
 
+/* --- 576px: mobile ------------------------------------------ */
 @media screen and (max-width: 576px) {
     .stat-tiles {
         grid-template-columns: 1fr;
+    }
+
+    .topbar-search input {
+        max-width: 140px;
     }
 }
