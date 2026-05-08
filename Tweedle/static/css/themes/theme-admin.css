@@ -1,0 +1,111 @@
+/*
+ * ============================================================
+ * FILE:        theme-admin.css
+ * PURPOSE:     Admin role color theme overrides.
+ *              Overrides the 4 role theme tokens defined in
+ *              tweedle-tokens.css. All other tokens unchanged.
+ * ROLE:        Admin
+ * COLOR:       Blue — #3C91E6
+ * LOAD ORDER:  2 of 5 — after tweedle-tokens.css, before base
+ * DJANGO PATH: <!-- Django: {% static 'css/themes/theme-admin.css' %} -->
+ * APPLIED VIA: <body class="role-admin"> on the shell template
+ * MODIFIED:    <!-- Last modified: {{date}} -->
+ * ============================================================
+ */
+
+
+/* === ROLE TOKEN OVERRIDES =====================================
+ * These four values are the only ones that differ per role.
+ * The default values in tweedle-tokens.css already match Admin,
+ * so this file is authoritative — tokens.css defaults are not
+ * relied on; the theme file always sets them explicitly.
+ * ============================================================ */
+:root {
+    --tw-primary:       #3C91E6;
+    --tw-primary-dark:  #1677d7;
+    --tw-primary-light: #CFE8FF;
+    --tw-primary-text:  #1a5fa8;
+
+    /* Role shadow — used on primary buttons in this theme */
+    --tw-shadow-primary: 0 4px 12px rgba(60, 145, 230, 0.30);
+}
+
+
+/* === ROLE BODY CLASS ==========================================
+ * Applied to <body class="role-admin"> in the HTML shell.
+ * Kept empty intentionally — all visual changes come through
+ * the token overrides above. This class exists as a stable
+ * hook for any future admin-specific structural rules.
+ * ============================================================ */
+body.role-admin {}
+
+
+/* === THEMED UTILITY CLASSES ===================================
+ * These classes consume --tw-primary* tokens, so they
+ * automatically reflect the correct role color.
+ * Defined identically in every theme file.
+ * ============================================================ */
+
+/* Primary action button */
+.tw-btn-primary {
+    background-color: var(--tw-primary);
+    color: #ffffff;
+    border: none;
+    transition: background-color var(--tw-transition-base),
+                transform var(--tw-transition-fast),
+                box-shadow var(--tw-transition-base);
+}
+.tw-btn-primary:hover,
+.tw-btn-primary:focus-visible {
+    background-color: var(--tw-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--tw-shadow-primary);
+}
+.tw-btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Left-border accent (section titles, summary banners) */
+.tw-accent-border {
+    border-left: 4px solid var(--tw-primary);
+}
+
+/* Light-tinted badge using role color */
+.tw-badge-primary {
+    background-color: var(--tw-primary-light);
+    color: var(--tw-primary-text);
+}
+
+/* Icon in role color */
+.tw-icon-primary {
+    color: var(--tw-primary);
+}
+
+/* Text links in role color */
+.tw-link-primary {
+    color: var(--tw-primary);
+    text-decoration: none;
+    transition: color var(--tw-transition-fast);
+}
+.tw-link-primary:hover {
+    color: var(--tw-primary-dark);
+    text-decoration: underline;
+}
+
+/* Input/select focus ring in role color */
+.tw-focus-primary:focus,
+.tw-focus-primary:focus-visible {
+    outline: none;
+    border-color: var(--tw-primary);
+    box-shadow: 0 0 0 3px rgba(60, 145, 230, 0.15);
+}
+
+/* Sidebar active nav item indicator */
+.tw-nav-active {
+    color: var(--tw-primary);
+}
+
+/* Topbar / modal header gradient */
+.tw-header-gradient {
+    background: linear-gradient(135deg, var(--tw-primary) 0%, var(--tw-primary-dark) 100%);
+}

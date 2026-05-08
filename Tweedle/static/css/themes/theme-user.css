@@ -1,0 +1,88 @@
+/*
+ * ============================================================
+ * FILE:        theme-user.css
+ * PURPOSE:     User / Client role color theme overrides.
+ *              Overrides the 4 role theme tokens defined in
+ *              tweedle-tokens.css. All other tokens unchanged.
+ * ROLE:        User / Client
+ * COLOR:       Orange — #FD7238
+ * LOAD ORDER:  2 of 5 — after tweedle-tokens.css, before base
+ * DJANGO PATH: <!-- Django: {% static 'css/themes/theme-user.css' %} -->
+ * APPLIED VIA: <body class="role-user"> on the shell template
+ * MODIFIED:    <!-- Last modified: {{date}} -->
+ * ============================================================
+ */
+
+
+/* === ROLE TOKEN OVERRIDES ===================================== */
+:root {
+    --tw-primary:       #FD7238;
+    --tw-primary-dark:  #e65c2e;
+    --tw-primary-light: #FFE0D3;
+    --tw-primary-text:  #b94a1e;
+
+    --tw-shadow-primary: 0 4px 12px rgba(253, 114, 56, 0.30);
+}
+
+
+/* === ROLE BODY CLASS ========================================== */
+body.role-user {}
+
+
+/* === THEMED UTILITY CLASSES =================================== */
+
+.tw-btn-primary {
+    background-color: var(--tw-primary);
+    color: #ffffff;
+    border: none;
+    transition: background-color var(--tw-transition-base),
+                transform var(--tw-transition-fast),
+                box-shadow var(--tw-transition-base);
+}
+.tw-btn-primary:hover,
+.tw-btn-primary:focus-visible {
+    background-color: var(--tw-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--tw-shadow-primary);
+}
+.tw-btn-primary:active {
+    transform: translateY(0);
+}
+
+.tw-accent-border {
+    border-left: 4px solid var(--tw-primary);
+}
+
+.tw-badge-primary {
+    background-color: var(--tw-primary-light);
+    color: var(--tw-primary-text);
+}
+
+.tw-icon-primary {
+    color: var(--tw-primary);
+}
+
+.tw-link-primary {
+    color: var(--tw-primary);
+    text-decoration: none;
+    transition: color var(--tw-transition-fast);
+}
+.tw-link-primary:hover {
+    color: var(--tw-primary-dark);
+    text-decoration: underline;
+}
+
+.tw-focus-primary:focus,
+.tw-focus-primary:focus-visible {
+    outline: none;
+    border-color: var(--tw-primary);
+    box-shadow: 0 0 0 3px rgba(253, 114, 56, 0.15);
+}
+
+.tw-nav-active {
+    color: var(--tw-primary);
+}
+
+.tw-header-gradient {
+    background: linear-gradient(135deg, var(--tw-primary) 0%, var(--tw-primary-dark) 100%);
+}

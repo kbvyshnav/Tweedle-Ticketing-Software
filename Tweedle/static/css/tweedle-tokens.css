@@ -1,0 +1,220 @@
+/*
+ * ============================================================
+ * FILE:        tweedle-tokens.css
+ * PURPOSE:     Global CSS custom properties (design tokens).
+ *              Contains ONLY :root variable declarations.
+ *              No classes. No selectors. No rules.
+ * LOAD ORDER:  1 of 5 — load before all other Tweedle CSS
+ * DJANGO PATH: <!-- Django: {% static 'css/tweedle-tokens.css' %} -->
+ * MODIFIED:    <!-- Last modified: {{date}} -->
+ * ============================================================
+ */
+
+:root {
+
+    /* === ROLE THEME TOKENS ========================================
+     * These four tokens are the only values that change per theme.
+     * Each theme file (theme-{role}.css) overrides exactly these.
+     * All other component colors derive from these four.
+     * Default values set here = Admin (blue) role.
+     * ============================================================ */
+    --tw-primary:       #3C91E6;
+    --tw-primary-dark:  #1677d7;
+    --tw-primary-light: #CFE8FF;
+    --tw-primary-text:  #1a5fa8;
+
+
+    /* === NEUTRAL PALETTE ==========================================
+     * Structural colors shared across all roles and pages.
+     * Never override these in theme files.
+     * ============================================================ */
+    --tw-bg-body:       #eeeeee;    /* page background */
+    --tw-bg-surface:    #ffffff;    /* cards, panels, modals */
+    --tw-bg-sidebar:    #F9F9F9;    /* sidebar and topbar background */
+    --tw-bg-input:      #F9F9F9;    /* input field background */
+    --tw-border:        #e5e5e5;    /* default border color */
+    --tw-border-light:  #f0f0f0;    /* dividers, subtle separators */
+    --tw-text-primary:  #342E37;    /* headings and strong body text */
+    --tw-text-secondary:#666666;    /* labels, meta info */
+    --tw-text-muted:    #999999;    /* timestamps, placeholders */
+    --tw-text-disabled: #aaaaaa;    /* disabled states */
+    --tw-scrollbar:     #c1c1c1;    /* custom scrollbar thumb */
+    --tw-overlay:       rgba(0, 0, 0, 0.60); /* modal backdrop */
+    --tw-hover-row:     #f1ecec;    /* table row hover background */
+
+
+    /* === STATUS COLORS ============================================
+     * Ticket lifecycle states. Universal across all roles.
+     * These must NOT be overridden in theme files — status colors
+     * are semantic, not role-specific, so they remain constant.
+     * ============================================================ */
+    --tw-status-inbox-bg:         #CFE8FF;
+    --tw-status-inbox-text:       #1a5fa8;
+    --tw-status-progress-bg:      #FFF2C6;
+    --tw-status-progress-text:    #d1a513;
+    --tw-status-forwarded-bg:     #FFE0D3;
+    --tw-status-forwarded-text:   #FD7238;
+    --tw-status-closed-bg:        #d3f9df;
+    --tw-status-closed-text:      #1a7a32;
+
+
+    /* === PRIORITY COLORS ==========================================
+     * Ticket priority levels. Universal, never role-overridden.
+     * ============================================================ */
+    --tw-priority-high-bg:        #ffe6e6;
+    --tw-priority-high-text:      #c0392b;
+    --tw-priority-medium-bg:      #fff3cd;
+    --tw-priority-medium-text:    #856404;
+    --tw-priority-low-bg:         #d3f9df;
+    --tw-priority-low-text:       #1a7a32;
+
+
+    /* === SEMANTIC / ACTION COLORS =================================
+     * Danger, warning, success, info — used for alerts, buttons,
+     * confirmations. These are NOT the same as role colors even
+     * when they share a hue (e.g. blue info ≠ admin primary).
+     * ============================================================ */
+    --tw-danger:          #DB504A;
+    --tw-danger-dark:     #c0392b;
+    --tw-danger-light:    #ffe5e5;
+    --tw-warning:         #FD7238;
+    --tw-warning-dark:    #e65c2e;
+    --tw-warning-light:   #FFE0D3;
+    --tw-success:         #28a745;
+    --tw-success-dark:    #1a7a32;
+    --tw-success-light:   #d3f9df;
+    --tw-info:            #3C91E6;
+    --tw-info-dark:       #1677d7;
+    --tw-info-light:      #CFE8FF;
+
+
+    /* === NOTIFICATION PANEL TYPES =================================
+     * Icon background/text for the 4 notification variants in the
+     * notification dropdown. Separate from semantic colors above
+     * because the tints are deliberately softer.
+     * ============================================================ */
+    --tw-notif-success-bg:    #d4edda;
+    --tw-notif-success-text:  #155724;
+    --tw-notif-warning-bg:    #fff3cd;
+    --tw-notif-warning-text:  #856404;
+    --tw-notif-info-bg:       #d1ecf1;
+    --tw-notif-info-text:     #0c5460;
+    --tw-notif-error-bg:      #f8d7da;
+    --tw-notif-error-text:    #721c24;
+    --tw-notif-unread-border: #DB504A;
+    --tw-notif-unread-bg:     #fff5f5;
+
+
+    /* === ATTACHMENT FILE TYPE COLORS ==============================
+     * Used in the attachment item component across all pages.
+     * PDF = red family, DOC = blue family, IMG = green family.
+     * ============================================================ */
+    --tw-file-pdf-bg:     #ffe5e5;
+    --tw-file-pdf-icon:   #e74c3c;
+    --tw-file-doc-bg:     #e3f2fd;
+    --tw-file-doc-icon:   #3498db;
+    --tw-file-img-bg:     #e8f5e9;
+    --tw-file-img-icon:   #27ae60;
+
+
+    /* === AVATAR GRADIENT PALETTE ==================================
+     * Preset gradients for user/client avatar circles.
+     * Named by color family, assigned per entity.
+     * ============================================================ */
+    --tw-avatar-blue:    linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    --tw-avatar-purple:  linear-gradient(135deg, #f472b6 0%, #a855f7 100%);
+    --tw-avatar-violet:  linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --tw-avatar-pink:    linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --tw-avatar-teal:    linear-gradient(135deg, #5bdde3 0%, #4e55df 100%);
+    --tw-avatar-rose:    linear-gradient(135deg, #621e39 0%, #c55866 100%);
+
+
+    /* === TYPOGRAPHY ===============================================
+     * Font families. Poppins = all UI content.
+     * Lato = sidebar nav and topbar only.
+     * ============================================================ */
+    --tw-font-primary:   'Poppins', sans-serif;
+    --tw-font-secondary: 'Lato', sans-serif;
+
+
+    /* === FONT SIZE SCALE ==========================================
+     * Named by role in the UI, not by abstract size.
+     * ============================================================ */
+    --tw-text-xs:    11px;   /* timestamps, meta text */
+    --tw-text-sm:    12px;   /* badge labels, sub-labels */
+    --tw-text-base:  13px;   /* body text, table cells, buttons */
+    --tw-text-md:    14px;   /* modal body, form labels */
+    --tw-text-lg:    16px;   /* sidebar nav items */
+    --tw-text-xl:    20px;   /* section headings (h3) */
+    --tw-text-2xl:   24px;   /* modal headings (h2) */
+    --tw-text-3xl:   30px;   /* page title (h1) */
+
+
+    /* === FONT WEIGHT SCALE ======================================== */
+    --tw-weight-normal:   400;
+    --tw-weight-medium:   500;
+    --tw-weight-semibold: 600;
+    --tw-weight-bold:     700;
+
+
+    /* === SPACING SCALE ============================================
+     * Used for padding, margin, and gap throughout.
+     * Numbers loosely follow a 4px base grid.
+     * ============================================================ */
+    --tw-space-1:   4px;
+    --tw-space-2:   8px;
+    --tw-space-3:   12px;
+    --tw-space-4:   16px;
+    --tw-space-5:   20px;
+    --tw-space-6:   24px;
+    --tw-space-8:   32px;
+    --tw-space-10:  40px;
+    --tw-space-12:  48px;
+
+
+    /* === BORDER RADIUS SCALE ======================================
+     * Consistent corner rounding across component types.
+     * ============================================================ */
+    --tw-radius-sm:   6px;     /* small buttons, inputs, icon-btns */
+    --tw-radius-md:   10px;    /* filter cards, dropdowns, form groups */
+    --tw-radius-lg:   12px;    /* table wrapper cards, timeline items */
+    --tw-radius-xl:   20px;    /* stat tiles, modal container */
+    --tw-radius-pill: 999px;   /* status pills, role badges, count badges */
+
+
+    /* === SHADOW SCALE ============================================= */
+    --tw-shadow-sm:   0 1px 4px rgba(0, 0, 0, 0.06);
+    --tw-shadow-md:   0 4px 12px rgba(0, 0, 0, 0.08);
+    --tw-shadow-lg:   0 8px 24px rgba(0, 0, 0, 0.12);
+    --tw-shadow-xl:   0 20px 60px rgba(0, 0, 0, 0.25); /* modals */
+    --tw-shadow-primary: 0 4px 12px rgba(60, 145, 230, 0.30); /* role-colored shadow — override in theme */
+
+
+    /* === LAYOUT DIMENSIONS ========================================
+     * Fixed structural dimensions for the shell layout.
+     * ============================================================ */
+    --tw-sidebar-width:           209px;
+    --tw-sidebar-collapsed-width: 60px;
+    --tw-topbar-height:           56px;
+    --tw-content-padding:         36px 24px;
+    --tw-content-padding-mobile:  24px 16px;
+
+
+    /* === TRANSITIONS ============================================== */
+    --tw-transition-fast:   0.15s ease;
+    --tw-transition-base:   0.25s ease;
+    --tw-transition-slow:   0.35s ease;
+    --tw-transition-layout: 0.3s ease; /* sidebar collapse/expand */
+
+
+    /* === Z-INDEX SCALE ============================================
+     * Layering hierarchy. Each layer must be a multiple of 100
+     * to leave room for sub-layers within each context.
+     * ============================================================ */
+    --tw-z-dropdown:  100;
+    --tw-z-sticky:    200;
+    --tw-z-modal:     300;
+    --tw-z-overlay:   400;
+    --tw-z-toast:     500;
+
+}

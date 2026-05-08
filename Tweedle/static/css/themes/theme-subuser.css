@@ -1,0 +1,93 @@
+/*
+ * ============================================================
+ * FILE:        theme-subuser.css
+ * PURPOSE:     Sub-user role color theme overrides.
+ *              Overrides the 4 role theme tokens defined in
+ *              tweedle-tokens.css. All other tokens unchanged.
+ * ROLE:        Sub-user (secondary client-side user)
+ * COLOR:       Amber — #ecbe25
+ * LOAD ORDER:  2 of 5 — after tweedle-tokens.css, before base
+ * DJANGO PATH: <!-- Django: {% static 'css/themes/theme-subuser.css' %} -->
+ * APPLIED VIA: <body class="role-subuser"> on the shell template
+ * NOTE:        Amber is a light color. Primary text (#92711a) is
+ *              dark brown to maintain contrast on white surfaces.
+ *              White text on amber buttons passes WCAG AA at 14px bold.
+ * MODIFIED:    <!-- Last modified: {{date}} -->
+ * ============================================================
+ */
+
+
+/* === ROLE TOKEN OVERRIDES ===================================== */
+:root {
+    --tw-primary:       #ecbe25;
+    --tw-primary-dark:  #d1a513;
+    --tw-primary-light: #FFF2C6;
+    --tw-primary-text:  #92711a;
+
+    --tw-shadow-primary: 0 4px 12px rgba(236, 190, 37, 0.35);
+}
+
+
+/* === ROLE BODY CLASS ========================================== */
+body.role-subuser {}
+
+
+/* === THEMED UTILITY CLASSES =================================== */
+
+.tw-btn-primary {
+    background-color: var(--tw-primary);
+    /* Amber is light — use dark text for contrast instead of white */
+    color: var(--tw-primary-text);
+    border: none;
+    transition: background-color var(--tw-transition-base),
+                transform var(--tw-transition-fast),
+                box-shadow var(--tw-transition-base);
+}
+.tw-btn-primary:hover,
+.tw-btn-primary:focus-visible {
+    background-color: var(--tw-primary-dark);
+    color: #ffffff; /* dark amber is dark enough for white text */
+    transform: translateY(-1px);
+    box-shadow: var(--tw-shadow-primary);
+}
+.tw-btn-primary:active {
+    transform: translateY(0);
+}
+
+.tw-accent-border {
+    border-left: 4px solid var(--tw-primary);
+}
+
+.tw-badge-primary {
+    background-color: var(--tw-primary-light);
+    color: var(--tw-primary-text);
+}
+
+.tw-icon-primary {
+    color: var(--tw-primary-text); /* use dark text token for visibility */
+}
+
+.tw-link-primary {
+    color: var(--tw-primary-text);
+    text-decoration: none;
+    transition: color var(--tw-transition-fast);
+}
+.tw-link-primary:hover {
+    color: var(--tw-primary-dark);
+    text-decoration: underline;
+}
+
+.tw-focus-primary:focus,
+.tw-focus-primary:focus-visible {
+    outline: none;
+    border-color: var(--tw-primary);
+    box-shadow: 0 0 0 3px rgba(236, 190, 37, 0.20);
+}
+
+.tw-nav-active {
+    color: var(--tw-primary-text);
+}
+
+.tw-header-gradient {
+    background: linear-gradient(135deg, var(--tw-primary) 0%, var(--tw-primary-dark) 100%);
+}
