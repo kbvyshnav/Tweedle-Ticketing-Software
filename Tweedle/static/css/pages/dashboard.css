@@ -2,43 +2,31 @@
  * ============================================================
  * FILE:        dashboard.css
  * PURPOSE:     Dashboard page — styles unique to this page only.
- *              All general-purpose rules are in tweedle-base.css
- *              and tweedle-components.css. This file only adds
- *              or overrides what those files do not cover.
- * LOAD ORDER:  5 of 5 — after tweedle-components.css
+ *              Classes moved to tweedle-components.css in Phase 6:
+ *              .table-scroll-wrapper, .row-hidden,
+ *              .tw-status-badge + --testing/--development/--uat
+ *              (those are now in components with proper tokens)
+ * LOAD ORDER:  5 of 5
  * DJANGO PATH: <!-- Django: {% static 'css/pages/dashboard.css' %} -->
- * DEPENDS ON:  tweedle-tokens.css (must load first)
+ * DEPENDS ON:  tweedle-tokens.css
  * MODIFIED:    <!-- Last modified: {{date}} -->
  * ============================================================
  */
 
 
-/* === STANDALONE PADDING ======================================
- * Applied when cAdmin_dashboard.html is opened directly (without
- * the cAdmin_baseUI.html shell). The `body > main` selector has
- * no effect when the file is injected as {% block content %}
- * because the parent is then `#content`, not `body`.
- * ============================================================ */
+/* === STANDALONE PADDING ===================================== */
 body > main {
     padding: var(--tw-content-padding);
 }
 
 
-/* === FILTER BAR — dropdown wrapper ===========================
- * The filter button dropdowns need a `position: relative` parent
- * so the absolutely-positioned dropdown panel anchors correctly.
- * Replaces the inline `style="position: relative;"` from the
- * original HTML.
- * ============================================================ */
+/* === FILTER BAR — dropdown wrapper ========================= */
 .filter-btn-wrap {
     position: relative;
 }
 
 
-/* === DATE DROPDOWN — separator =================================
- * The "—" text between From and To date inputs needs top margin
- * to vertically align with the inputs (which have a label above).
- * ============================================================ */
+/* === DATE DROPDOWN — separator ============================= */
 .date-separator {
     color: var(--tw-text-secondary);
     margin-top: var(--tw-space-5);
@@ -48,7 +36,7 @@ body > main {
 }
 
 
-/* === STAT TILES — overrides ===================================
+/* === STAT TILES — overrides ================================
  * Override base.css: spec requires tw-text-3xl / tw-weight-bold
  * for the count number (base uses tw-text-2xl / semibold).
  * ============================================================ */
@@ -66,12 +54,7 @@ body > main {
 }
 
 
-/* === TICKET TABS =============================================
- * Tab row above the ticket table.
- * Active tab: uses --tw-primary via .tw-btn-primary from theme.
- * Inactive tab: ghost/neutral pill.
- * Django: active tab driven by {% url %} and view context.
- * ============================================================ */
+/* === TICKET TABS =========================================== */
 .ticket-tabs {
     display: flex;
     gap: var(--tw-space-2);
@@ -104,7 +87,6 @@ body > main {
     background: var(--tw-primary-light);
 }
 
-/* Active state — inherits color from --tw-primary token */
 .ticket-tab.active {
     background: var(--tw-primary);
     color: #ffffff;
@@ -112,7 +94,6 @@ body > main {
     box-shadow: var(--tw-shadow-primary);
 }
 
-/* Count badge inside each tab */
 .tab-count {
     font-size: var(--tw-text-xs);
     font-weight: var(--tw-weight-bold);
@@ -129,12 +110,7 @@ body > main {
 }
 
 
-/* === HIGHLIGHT STATUS BADGE (table title) ====================
- * Amber badge showing the current tab name in the table heading.
- * e.g. "Tickets [INPROGRESS]" — changes via JS tab switching.
- * Uses status-progress tokens (amber) since the default active
- * tab is In Progress.
- * ============================================================ */
+/* === HIGHLIGHT STATUS BADGE (table title) ================== */
 .highlight-status {
     display: inline-block;
     background: var(--tw-status-progress-bg);
@@ -151,51 +127,7 @@ body > main {
 }
 
 
-/* === TICKET TABLE STATUS BADGES ==============================
- * Sub-statuses within the In-Progress view: Testing, Development,
- * UAT. Also covers New (maps visually to Inbox / blue).
- * These are DISTINCT from the main status tokens used in stat
- * tiles and reports (inbox/progress/forwarded/closed).
- *
- * Design decision: Testing uses a custom blue (#e0f0ff / #1d4e89)
- * not in the token system — flagged for future tokenization.
- * UAT uses a custom green (#f1f6e9 / #6a8e3f) — same flag.
- * Development and New reuse existing status tokens.
- * ============================================================ */
-.tw-status-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 5px var(--tw-space-3);
-    border-radius: var(--tw-radius-pill);
-    font-size: var(--tw-text-xs);
-    font-weight: var(--tw-weight-semibold);
-    white-space: nowrap;
-}
-
-.tw-status-badge--testing {
-    background: #e0f0ff;
-    color: #1d4e89;
-}
-
-.tw-status-badge--development {
-    background: var(--tw-status-closed-bg);
-    color: var(--tw-status-closed-text);
-}
-
-.tw-status-badge--uat {
-    background: #f1f6e9;
-    color: #6a8e3f;
-}
-
-.tw-status-badge--new {
-    background: var(--tw-status-inbox-bg);
-    color: var(--tw-status-inbox-text);
-}
-
-
-/* === TABLE CELLS ============================================== */
-
-/* Ticket ID: monospace, slightly heavier to stand out */
+/* === TABLE CELLS =========================================== */
 .ticket-id-cell {
     font-weight: var(--tw-weight-semibold);
     font-family: 'Courier New', Courier, monospace;
@@ -204,7 +136,6 @@ body > main {
     letter-spacing: 0.3px;
 }
 
-/* Allottee: avatar circle + name, inline */
 .allottee-cell {
     display: inline-flex;
     align-items: center;
@@ -213,26 +144,19 @@ body > main {
     color: var(--tw-text-secondary);
 }
 
-/* Unassigned placeholder dash */
 .allottee-cell.unassigned {
     color: var(--tw-text-muted);
     font-style: italic;
 }
 
 
-/* === SELECTED ROW ============================================
- * Applied via JS on row click. Removed when another row is
- * clicked. Phase 6 will open the ticket-details modal instead.
- * ============================================================ */
+/* === SELECTED ROW ========================================== */
 .row-selected {
     background: var(--tw-primary-light) !important;
 }
 
 
-/* === SEARCH FEEDBACK =========================================
- * Visually hidden but accessible to screen readers (aria-live).
- * Standard SR-only pattern — no visual impact.
- * ============================================================ */
+/* === SEARCH FEEDBACK ======================================= */
 .search-feedback {
     position: absolute;
     width: 1px;
@@ -245,22 +169,11 @@ body > main {
     border: 0;
 }
 
-/* Hides table rows that don't match the inline search filter */
-.row-hidden {
-    display: none;
-}
 
-/* Horizontal scroll wrapper for the ticket table */
-.table-scroll-wrapper {
-    overflow-x: auto;
-}
-
-
-/* === RESPONSIVE ===============================================
- * Breakpoints: 1024px (bp-lg), 768px (bp-md), 576px (bp-sm)
+/* === RESPONSIVE ============================================
+ * 1024px (bp-lg), 768px (bp-md), 576px (bp-sm)
  * ============================================================ */
 
-/* --- 1024px: filter bar adjustments ------------------------- */
 @media screen and (max-width: 1024px) {
     .ticket-tabs {
         gap: var(--tw-space-1);
@@ -276,7 +189,6 @@ body > main {
     }
 }
 
-/* --- 768px: tablet ------------------------------------------ */
 @media screen and (max-width: 768px) {
     body > main {
         padding: var(--tw-content-padding-mobile);
@@ -286,7 +198,6 @@ body > main {
         flex-wrap: nowrap;
         overflow-x: auto;
         padding-bottom: var(--tw-space-1);
-        /* Hide scrollbar visually but keep scroll behavior */
         scrollbar-width: none;
     }
 
@@ -303,7 +214,6 @@ body > main {
     }
 }
 
-/* --- 576px: mobile ------------------------------------------ */
 @media screen and (max-width: 576px) {
     .tab-count {
         display: none;

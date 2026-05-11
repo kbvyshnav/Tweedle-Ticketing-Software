@@ -62,17 +62,31 @@
     padding: var(--tw-space-2) var(--tw-space-5);
 }
 
-/* --- Secondary / outline button ------------------------------ */
-.tw-btn-secondary {
+/* --- Outline / secondary button (canonical definition) -------
+ * Consolidated from clients.css, team.css, reports.css in Phase 6.
+ * .tw-btn-secondary is REMOVED — use .tw-btn-outline everywhere.
+ * ------------------------------------------------------------ */
+.tw-btn-outline {
     background: var(--tw-bg-surface);
     color: var(--tw-text-secondary);
-    border-color: var(--tw-border);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    transition: border-color var(--tw-transition-fast),
+                color var(--tw-transition-fast),
+                background var(--tw-transition-fast);
 }
 
-.tw-btn-secondary:hover {
-    background: var(--tw-bg-body);
+.tw-btn-outline:hover {
+    background: var(--tw-primary-light);
     border-color: var(--tw-primary);
     color: var(--tw-primary);
+}
+
+/* --- Small size modifier (table row buttons) ---------------- */
+.tw-btn--sm {
+    height: 34px;
+    padding: var(--tw-space-1) var(--tw-space-3);
+    font-size: var(--tw-text-sm);
 }
 
 /* --- Danger button (reject, delete) -------------------------- */
@@ -307,30 +321,11 @@
     color: var(--tw-priority-low-text);
 }
 
-/* --- TAT badges (reports page) ------------------------------ */
-.tw-tat-met {
-    background: var(--tw-priority-low-bg);
-    color: var(--tw-priority-low-text);
-    font-weight: var(--tw-weight-semibold);
-    padding: 5px var(--tw-space-3);
-    border-radius: var(--tw-space-1);
-}
-
-.tw-tat-missed {
-    background: var(--tw-priority-high-bg);
-    color: var(--tw-priority-high-text);
-    font-weight: var(--tw-weight-semibold);
-    padding: 5px var(--tw-space-3);
-    border-radius: var(--tw-space-1);
-}
-
-.tw-tat-pending {
-    background: #e9e9e9;
-    color: #999999;
-    font-weight: var(--tw-weight-semibold);
-    padding: 5px var(--tw-space-3);
-    border-radius: var(--tw-space-1);
-}
+/* --- TAT badges (reports page) ------------------------------
+ * .tw-tat-met / .tw-tat-missed / .tw-tat-pending REMOVED (Phase 6).
+ * Use .tw-tat-badge--met / --missed / --pending from reports.css.
+ * The -- convention is the project standard going forward.
+ * ------------------------------------------------------------ */
 
 /* --- Role badges (team page) -------------------------------- */
 .tw-role-developer {
@@ -418,6 +413,51 @@
 .tw-highlight-user {
     font-weight: var(--tw-weight-medium);
     color: #b3880f;
+}
+
+
+/* ============================================================
+ * SECTION 2B: SHARED UTILITIES (consolidated from page CSS — Phase 6)
+ * ============================================================ */
+
+/* --- Horizontal scroll wrapper (every table page) -----------
+ * Moved from dashboard.css — needed on all table pages.
+ * ------------------------------------------------------------ */
+.table-scroll-wrapper {
+    overflow-x: auto;
+    width: 100%;
+}
+
+/* --- Hidden row (JS table search filter) --------------------
+ * Moved from dashboard.css — needed by every filterable table.
+ * ------------------------------------------------------------ */
+.row-hidden {
+    display: none !important;
+}
+
+/* --- Placeholder modal body (stub modals, Phase 7 target) ---
+ * Moved from clients.css + team.css — identical in both.
+ * ------------------------------------------------------------ */
+.modal-placeholder-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--tw-space-12) var(--tw-space-8);
+    text-align: center;
+    gap: var(--tw-space-4);
+    color: var(--tw-text-secondary);
+}
+
+.modal-placeholder-body i {
+    font-size: 48px;
+    color: var(--tw-primary-light);
+    opacity: 0.6;
+}
+
+.modal-placeholder-body p {
+    font-size: var(--tw-text-md);
+    color: var(--tw-text-secondary);
 }
 
 

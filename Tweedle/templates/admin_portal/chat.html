@@ -1,0 +1,409 @@
+<!--
+  File: templates/admin_portal/chat.html
+  Moved from: cAdmin/chatbox.html (Phase 6 restructure — full refactor)
+  Django template: extends 'base.html'
+  Django view: admin_portal.views.ticket_chat
+  Django url:  admin:ticket_chat
+  Usage: Django: chat panel opened via JS from ticket row action
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Django: {% block page_title %}Chat — Tweedle{% endblock %} -->
+    <title>Ticket Chat — Tweedle</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap">
+    <!-- Django: <link rel="stylesheet" href="{% static 'vendors/boxicons/css/boxicons.min.css' %}"> -->
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
+
+    <!-- 1. Tokens -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-tokens.css' %}"> -->
+    <link rel="stylesheet" href="../../static/css/tweedle-tokens.css">
+    <!-- 2. Admin theme -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/themes/theme-admin.css' %}"> -->
+    <link rel="stylesheet" href="../../static/css/themes/theme-admin.css">
+    <!-- 3. Base -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-base.css' %}"> -->
+    <link rel="stylesheet" href="../../static/css/tweedle-base.css">
+    <!-- 4. Components -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-components.css' %}"> -->
+    <link rel="stylesheet" href="../../static/css/tweedle-components.css">
+    <!-- 5. Chat page CSS -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/pages/chat.css' %}"> -->
+    <link rel="stylesheet" href="../../static/css/pages/chat.css">
+</head>
+<body class="role-admin">
+
+<!--
+    In production this panel is injected into the DOM by a JS call
+    from the ticket table row "chat" action icon, not opened as a
+    standalone page. The standalone view exists for development only.
+    Django: chat panel opened via JS from ticket row action
+-->
+<div class="tw-chat-panel" id="chatPanel" role="dialog" aria-modal="false" aria-label="Ticket chat">
+
+    <!-- === CHAT HEADER ======================================= -->
+    <div class="tw-chat-header">
+        <div class="chat-header-info">
+            <!-- Django: {{ ticket.id }} -->
+            <div class="chat-ticket-id">Ticket ID: GMEC25060057</div>
+            <!-- Django: {{ ticket.subject }} -->
+            <div class="chat-ticket-subject">Enable UPI Services</div>
+        </div>
+        <button class="chat-close-btn" id="chatCloseBtn" aria-label="Close chat">
+            <i class="bx bx-x" aria-hidden="true"></i>
+        </button>
+    </div>
+
+
+    <!-- === MESSAGES AREA =====================================
+         Django: {% for message in messages %}{% endfor %}
+         ======================================================= -->
+    <div class="tw-messages-area" id="messagesArea">
+
+        <!-- Status: ticket created -->
+        <div class="tw-chat-status-msg">
+            Ticket created
+            <span class="tw-chat-status-time">• Jan 15, 2025 at 10:30 AM</span>
+        </div>
+
+        <!-- User message (received) -->
+        <!-- Django: {% if message.sender == request.user %}sent{% else %}received{% endif %} -->
+        <div class="tw-message received">
+            <div class="tw-avatar tw-avatar--sm tw-avatar--chat-user" aria-hidden="true">K</div>
+            <div>
+                <div class="tw-message-sender">
+                    <!-- Django: {{ message.sender.get_full_name }} -->
+                    KINGSHUK DEBNATH
+                    <span class="tw-chat-role-badge">User</span>
+                </div>
+                <div class="tw-message-bubble">
+                    <div class="tw-message-text">Team please enable the UPI Services for Federal bank API.</div>
+                    <!-- Django: {{ message.timestamp|date:"M d, Y \a\t g:i A" }} -->
+                    <div class="tw-message-time">Jan 15, 2025 at 10:32 AM</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User message with attachment -->
+        <div class="tw-message received">
+            <div class="tw-avatar tw-avatar--sm tw-avatar--chat-user" aria-hidden="true">K</div>
+            <div>
+                <div class="tw-message-sender">
+                    KINGSHUK DEBNATH <span class="tw-chat-role-badge">User</span>
+                </div>
+                <div class="tw-message-bubble">
+                    <div class="tw-message-text">Here is the required document.</div>
+                    <div class="tw-file-chip">
+                        <i class="bx bx-paperclip" aria-hidden="true"></i>
+                        <a href="#" class="tw-file-chip-name" download title="federal-bank_api.pdf">federal-bank_api.pdf</a>
+                    </div>
+                    <div class="tw-message-time">Jan 15, 2025 at 11:05 AM</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status: admin accepted -->
+        <div class="tw-chat-status-msg">
+            Admin accepted ticket
+            <span class="tw-chat-status-time">• Jan 15, 2025 at 11:15 AM</span>
+        </div>
+
+        <!-- Status: moved to developer -->
+        <div class="tw-chat-status-msg">
+            Ticket moved to developer
+            <span class="tw-chat-status-time">• Jan 15, 2025 at 11:30 AM</span>
+        </div>
+
+        <!-- Developer message -->
+        <div class="tw-message received">
+            <div class="tw-avatar tw-avatar--sm tw-avatar--chat-developer" aria-hidden="true">R</div>
+            <div>
+                <div class="tw-message-sender">
+                    RITHIK SUNIL <span class="tw-chat-role-badge">Developer</span>
+                </div>
+                <div class="tw-message-bubble">
+                    <div class="tw-message-text">Waiting for the approval of Federal API Team</div>
+                    <div class="tw-message-time">Jan 15, 2025 at 2:02 PM</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Remarks / comment label -->
+        <div class="tw-chat-remark" role="note" aria-label="Remarks">
+            <div class="tw-chat-remark__title">Remarks</div>
+            <div>Awaiting approval</div>
+            <div class="tw-chat-remark__meta">RITHIK SUNIL (Developer) • Jan 15, 2025 at 10:33 AM</div>
+        </div>
+
+        <!-- Admin message (sent) -->
+        <!-- Django: {% if message.sender == request.user %}sent{% endif %} -->
+        <div class="tw-message sent">
+            <div class="tw-avatar tw-avatar--sm tw-avatar--chat-admin" aria-hidden="true">A</div>
+            <div>
+                <div class="tw-message-sender">
+                    RAJAGOPAL P <span class="tw-chat-role-badge">Admin</span>
+                </div>
+                <div class="tw-message-bubble">
+                    <div class="tw-message-text">GMEC team, please contact the Federal bank API team for approval.</div>
+                    <div class="tw-message-time">Jan 15, 2025 at 4:18 PM</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status: moved to testing -->
+        <div class="tw-chat-status-msg">
+            Ticket moved to testing
+            <span class="tw-chat-status-time">• Jan 15, 2025 at 2:45 PM</span>
+        </div>
+
+        <!-- Tester message -->
+        <div class="tw-message received">
+            <div class="tw-avatar tw-avatar--sm tw-avatar--chat-tester" aria-hidden="true">T</div>
+            <div>
+                <div class="tw-message-sender">
+                    AKHIL SAGAR <span class="tw-chat-role-badge">Tester</span>
+                </div>
+                <div class="tw-message-bubble">
+                    <div class="tw-message-text">Federal bank API has been tested and is working correctly. @Kingshuk, please try UPI services and update.</div>
+                    <div class="tw-message-time">Jan 15, 2025 at 3:20 PM</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin message with attachment -->
+        <div class="tw-message sent">
+            <div class="tw-avatar tw-avatar--sm tw-avatar--chat-admin" aria-hidden="true">A</div>
+            <div>
+                <div class="tw-message-sender">
+                    RAJAGOPAL P <span class="tw-chat-role-badge">Admin</span>
+                </div>
+                <div class="tw-message-bubble">
+                    <div class="tw-message-text">PFA checklist before UAT.</div>
+                    <div class="tw-file-chip">
+                        <i class="bx bx-paperclip" aria-hidden="true"></i>
+                        <a href="#" class="tw-file-chip-name" download title="fed-api_checklist.pdf">fed-api_checklist.pdf</a>
+                    </div>
+                    <div class="tw-message-time">Jan 15, 2025 at 11:20 AM</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status: moved back to developer -->
+        <div class="tw-chat-status-msg">
+            Ticket moved to developer
+            <span class="tw-chat-status-time">• Jan 16, 2025 at 8:49 PM</span>
+        </div>
+
+    </div>
+    <!-- END MESSAGES AREA -->
+    <!-- Django: {% endfor %} -->
+
+
+    <!-- === CHAT FOOTER ======================================= -->
+    <div class="tw-chat-footer">
+
+        <!-- Attachment preview strip (hidden until file selected) -->
+        <div class="tw-attach-preview-strip" id="attachPreviewStrip" aria-live="polite">
+            <i class="bx bx-file" aria-hidden="true"></i>
+            <span id="attachFileName"></span>
+            <button
+                class="tw-file-chip-remove"
+                onclick="removeAttachment()"
+                aria-label="Remove attachment">
+                <i class="bx bx-x" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <!-- Input row -->
+        <div class="tw-chat-input-row">
+            <div class="tw-chat-input-wrap">
+                <textarea
+                    class="tw-chat-textarea"
+                    id="chatTextarea"
+                    placeholder="Type your message…"
+                    rows="1"
+                    aria-label="Message input"></textarea>
+
+                <button
+                    class="tw-chat-attach-btn"
+                    aria-label="Attach file"
+                    onclick="document.getElementById('fileInput').click()">
+                    <i class="bx bx-paperclip" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <!-- Hidden file input -->
+            <input
+                type="file"
+                id="fileInput"
+                aria-hidden="true"
+                tabindex="-1"
+                onchange="handleFileSelect(event)">
+
+            <button
+                class="tw-chat-send-btn"
+                id="sendBtn"
+                onclick="sendMessage()"
+                aria-label="Send message">
+                <i class="bx bx-send" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <!-- Email notification row -->
+        <div class="tw-chat-email-row">
+            <input type="checkbox" id="emailNotification" aria-label="Send email notification to client">
+            <label for="emailNotification">Send email notification to Client</label>
+        </div>
+
+    </div>
+    <!-- END CHAT FOOTER -->
+
+</div>
+<!-- END CHAT PANEL -->
+
+
+<script>
+    /* ============================================================
+     * CHAT: AUTO-RESIZE TEXTAREA
+     * ============================================================ */
+    const chatTextarea = document.getElementById('chatTextarea');
+
+    chatTextarea.addEventListener('input', function () {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 80) + 'px';
+    });
+
+
+    /* ============================================================
+     * CHAT: FILE ATTACHMENT HANDLER
+     * ============================================================ */
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const strip    = document.getElementById('attachPreviewStrip');
+        const nameSpan = document.getElementById('attachFileName');
+
+        nameSpan.textContent = file.name;
+        strip.classList.add('show');
+    }
+
+    function removeAttachment() {
+        const fileInput = document.getElementById('fileInput');
+        const strip     = document.getElementById('attachPreviewStrip');
+
+        fileInput.value = '';
+        strip.classList.remove('show');
+    }
+
+
+    /* ============================================================
+     * CHAT: SEND MESSAGE
+     * ============================================================
+     * Django: replace with fetch() POST to {% url 'admin:send_message' %}
+     * The sent message is appended locally for instant feedback;
+     * the server response confirms persistence.
+     * ============================================================ */
+    function sendMessage() {
+        const text       = chatTextarea.value.trim();
+        const fileInput  = document.getElementById('fileInput');
+        const strip      = document.getElementById('attachPreviewStrip');
+        const area       = document.getElementById('messagesArea');
+
+        if (!text && !strip.classList.contains('show')) return;
+
+        const time = new Date().toLocaleString('en-US', {
+            month: 'short', day: 'numeric', year: 'numeric',
+            hour: 'numeric', minute: '2-digit', hour12: true
+        });
+
+        let attachHTML = '';
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            if (file.type.startsWith('image/')) {
+                const url  = URL.createObjectURL(file);
+                attachHTML = `<img src="${url}" alt="${file.name}" class="tw-chat-img-attachment">`;
+            } else {
+                attachHTML = `
+                    <div class="tw-file-chip">
+                        <i class="bx bx-paperclip" aria-hidden="true"></i>
+                        <span class="tw-file-chip-name">${file.name}</span>
+                    </div>`;
+            }
+        }
+
+        const msgEl = document.createElement('div');
+        msgEl.className = 'tw-message sent';
+        msgEl.innerHTML = `
+            <div class="tw-avatar tw-avatar--sm tw-avatar--chat-admin" aria-hidden="true">A</div>
+            <div>
+                <div class="tw-message-sender">RAJAGOPAL P <span class="tw-chat-role-badge">Admin</span></div>
+                <div class="tw-message-bubble">
+                    ${text ? `<div class="tw-message-text">${text.replace(/\n/g, '<br>')}</div>` : ''}
+                    ${attachHTML}
+                    <div class="tw-message-time">${time}</div>
+                </div>
+            </div>`;
+
+        area.appendChild(msgEl);
+
+        /* Reset inputs */
+        chatTextarea.value     = '';
+        chatTextarea.style.height = 'auto';
+        fileInput.value        = '';
+        strip.classList.remove('show');
+        area.scrollTop = area.scrollHeight;
+    }
+
+
+    /* ============================================================
+     * CHAT: EMAIL CHECKBOX TOGGLE
+     * ============================================================ */
+    const emailCheckbox = document.getElementById('emailNotification');
+    emailCheckbox.addEventListener('change', function () {
+        /* Django: include in the POST payload when sending a message */
+        console.log('[Chat] Email notification:', this.checked);
+    });
+
+
+    /* ============================================================
+     * CHAT: CLOSE PANEL
+     * ============================================================ */
+    document.getElementById('chatCloseBtn').addEventListener('click', function () {
+        const panel = document.getElementById('chatPanel');
+        panel.style.display = 'none';
+        /* Django: or dispatch a custom event: panel.dispatchEvent(new CustomEvent('chat:close')) */
+    });
+
+    /* Close on Escape */
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            document.getElementById('chatPanel').style.display = 'none';
+        }
+    });
+
+
+    /* ============================================================
+     * CHAT: SCROLL TO BOTTOM ON LOAD
+     * ============================================================ */
+    window.addEventListener('load', function () {
+        const area = document.getElementById('messagesArea');
+        area.scrollTop = area.scrollHeight;
+    });
+
+
+    /* Enter to send (Shift+Enter for new line) */
+    chatTextarea.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+</script>
+
+</body>
+</html>

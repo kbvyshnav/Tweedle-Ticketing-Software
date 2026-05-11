@@ -1,0 +1,258 @@
+<!--
+  File: templates/admin_portal/ticket-timeline.html
+  Moved from: cAdmin/outlook.html (Phase 6 restructure — full refactor)
+  Django template: extends 'base.html'
+  Django view: admin_portal.views.ticket_timeline
+  Django url:  admin:ticket_timeline
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Django: {% block page_title %}Timeline — Tweedle{% endblock %} -->
+    <title>Ticket Timeline — Tweedle</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap">
+    <!-- Django: <link rel="stylesheet" href="{% static 'vendors/boxicons/css/boxicons.min.css' %}"> -->
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
+    <!-- Django: <link rel="stylesheet" href="{% static 'vendors/bootstrap/css/bootstrap.min.css' %}"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+    <!-- 1. Tokens -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-tokens.css' %}"> -->
+    <link rel="stylesheet" href="../../static/css/tweedle-tokens.css">
+    <!-- 2. Admin theme -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/themes/theme-admin.css' %}"> -->
+    <link rel="stylesheet" href="../../static/css/themes/theme-admin.css">
+    <!-- 3. Base -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-base.css' %}"> -->
+    <link rel="stylesheet" href="../../static/css/tweedle-base.css">
+    <!-- 4. Components -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-components.css' %}"> -->
+    <link rel="stylesheet" href="../../static/css/tweedle-components.css">
+    <!-- 5. Ticket timeline CSS -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/pages/ticket-timeline.css' %}"> -->
+    <link rel="stylesheet" href="../../static/css/pages/ticket-timeline.css">
+</head>
+<body class="role-admin">
+
+<!-- Django: this panel is rendered inline or via {% include %} inside ticket-details -->
+<main>
+<div class="tl-container">
+
+    <!-- === TICKET HEADER CARD ================================
+         Django: {{ ticket.id }}, {{ ticket.subject }}, {{ ticket.status }}
+         ======================================================= -->
+    <div class="tw-ticket-header-card" id="timelineCard">
+
+        <div class="tw-ticket-header-top">
+            <div class="tw-ticket-header-meta">
+                <!-- Ticket ID pill (.tw-badge-primary adapts to role theme) -->
+                <!-- Django: {{ ticket.id }} -->
+                <span class="tw-badge tw-badge-primary">GMEC25060057</span>
+                <!-- Django: {{ ticket.subject }} -->
+                <span class="tw-ticket-subject">IBAN Validation</span>
+            </div>
+
+            <div class="tw-ticket-header-actions">
+                <!-- Django: class="tw-badge tw-status-{{ ticket.status }}" -->
+                <span class="tw-badge tw-status-closed">
+                    <i class="bx bx-check-circle" aria-hidden="true"></i> CLOSED
+                </span>
+                <button class="tl-close-btn" id="timelineClose" aria-label="Close timeline">
+                    <i class="bx bx-x" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats bar: 4 columns -->
+        <div class="tl-stats-bar" role="list">
+
+            <div class="tl-stat" role="listitem">
+                <div class="tl-stat-label">Issue Date</div>
+                <!-- Django: {{ ticket.created_at|date:"d-m-Y" }} -->
+                <div class="tl-stat-value">15-01-2025</div>
+            </div>
+
+            <div class="tl-stat" role="listitem">
+                <div class="tl-stat-label">Priority</div>
+                <!-- Django: {{ ticket.priority }} -->
+                <div class="tl-stat-value">
+                    <span class="tw-priority-badge tw-priority-badge--high">High</span>
+                </div>
+            </div>
+
+            <div class="tl-stat" role="listitem">
+                <div class="tl-stat-label">Close Date</div>
+                <!-- Django: {{ ticket.closed_at|date:"d-m-Y"|default:"Open" }} -->
+                <div class="tl-stat-value">18-01-2025</div>
+            </div>
+
+            <div class="tl-stat" role="listitem">
+                <div class="tl-stat-label">Resolution Time</div>
+                <!-- Django: {{ ticket.resolution_days }} Days -->
+                <div class="tl-stat-value">3 Days</div>
+            </div>
+
+        </div>
+
+        <!-- Timeline section header -->
+        <div class="tl-section-header">
+            <h2>Ticket Timeline</h2>
+        </div>
+
+        <!-- === VERTICAL TIMELINE ============================= -->
+        <!-- Django: {% for event in ticket.events.all %} -->
+        <div class="tl-timeline" role="list">
+
+            <!-- Event 1: Ticket Created -->
+            <div class="tl-item" role="listitem">
+                <div class="tl-icon tl-icon--created" aria-hidden="true">
+                    <i class="bx bx-plus"></i>
+                </div>
+                <div class="tl-card">
+                    <div class="tl-card-header">
+                        <div class="tl-card-main">
+                            <!-- Django: {{ event.description }} -->
+                            <div class="tl-event-title">Ticket Created</div>
+                            <div class="tl-event-time">
+                                <i class="bx bx-time" aria-hidden="true"></i>
+                                <!-- Django: {{ event.timestamp|date:"l, F d, Y \a\t g:i A" }} -->
+                                Monday, January 15, 2025 at 9:21 AM
+                            </div>
+                        </div>
+                        <div class="tl-card-actor">
+                            <!-- Django: {{ event.actor.get_full_name }} -->
+                            <span class="tl-actor-name">Kingshuk</span>
+                            <!-- Django: class="tw-role-pill tw-role-pill--{{ event.actor.role }}" -->
+                            <span class="tw-role-pill tw-role-pill--user">User</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event 2: Admin Accepted -->
+            <div class="tl-item" role="listitem">
+                <div class="tl-icon tl-icon--assigned" aria-hidden="true">
+                    <i class="bx bx-user"></i>
+                </div>
+                <div class="tl-card">
+                    <div class="tl-card-header">
+                        <div class="tl-card-main">
+                            <div class="tl-event-title">
+                                Admin accepted ticket
+                                <span class="tw-priority-badge tw-priority-badge--high">High Priority</span>
+                            </div>
+                            <div class="tl-event-desc">Ticket has been accepted and assigned to developer.</div>
+                            <div class="tl-event-time">
+                                <i class="bx bx-time" aria-hidden="true"></i>
+                                Monday, January 15, 2025 at 10:45 AM
+                            </div>
+                        </div>
+                        <div class="tl-card-actor">
+                            <span class="tl-actor-name">Rajagopal P</span>
+                            <span class="tw-role-pill tw-role-pill--admin">Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event 3: Developer Accepted -->
+            <div class="tl-item" role="listitem">
+                <div class="tl-icon tl-icon--progress" aria-hidden="true">
+                    <i class="bx bx-play"></i>
+                </div>
+                <div class="tl-card">
+                    <div class="tl-card-header">
+                        <div class="tl-card-main">
+                            <div class="tl-event-title">Developer accepted ticket</div>
+                            <div class="tl-event-desc">Developer started working on ticket. Initial diagnosis in progress.</div>
+                            <div class="tl-event-time">
+                                <i class="bx bx-time" aria-hidden="true"></i>
+                                Tuesday, January 16, 2025 at 11:45 AM
+                            </div>
+                        </div>
+                        <div class="tl-card-actor">
+                            <span class="tl-actor-name">Arun</span>
+                            <span class="tw-role-pill tw-role-pill--developer">Developer</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event 4: Tester Accepted -->
+            <div class="tl-item" role="listitem">
+                <div class="tl-icon tl-icon--progress" aria-hidden="true">
+                    <i class="bx bx-test-tube"></i>
+                </div>
+                <div class="tl-card">
+                    <div class="tl-card-header">
+                        <div class="tl-card-main">
+                            <div class="tl-event-title">Tester accepted ticket</div>
+                            <div class="tl-event-desc">Solution implemented by developer and moved to testing.</div>
+                            <div class="tl-event-time">
+                                <i class="bx bx-time" aria-hidden="true"></i>
+                                Wednesday, January 19, 2025 at 3:33 PM
+                            </div>
+                        </div>
+                        <div class="tl-card-actor">
+                            <span class="tl-actor-name">Manju</span>
+                            <span class="tw-role-pill tw-role-pill--tester">Tester</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event 5: Admin Closed -->
+            <div class="tl-item" role="listitem">
+                <div class="tl-icon tl-icon--resolved" aria-hidden="true">
+                    <i class="bx bx-check"></i>
+                </div>
+                <div class="tl-card">
+                    <div class="tl-card-header">
+                        <div class="tl-card-main">
+                            <div class="tl-event-title">Admin Closed Ticket</div>
+                            <div class="tl-event-desc">Ticket successfully closed.</div>
+                            <div class="tl-event-time">
+                                <i class="bx bx-time" aria-hidden="true"></i>
+                                Thursday, February 24, 2025 at 5:45 PM
+                            </div>
+                        </div>
+                        <div class="tl-card-actor">
+                            <span class="tl-actor-name">Rajagopal P</span>
+                            <span class="tw-role-pill tw-role-pill--admin">Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- Django: {% endfor %} -->
+
+    </div>
+    <!-- END TICKET HEADER CARD -->
+
+</div>
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    /* ============================================================
+     * TIMELINE: CLOSE PANEL
+     * ============================================================
+     * Django: in production, dispatch a custom event so the
+     * parent view (ticket-details) can handle the close action.
+     * ============================================================ */
+    document.getElementById('timelineClose').addEventListener('click', function () {
+        const card = document.getElementById('timelineCard');
+        card.style.display = 'none';
+        /* Django: card.dispatchEvent(new CustomEvent('timeline:close')); */
+    });
+</script>
+
+</body>
+</html>

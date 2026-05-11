@@ -1,0 +1,350 @@
+<!--
+  File: templates/admin_portal/clients.html
+  Moved from: cAdmin/clients.html (Phase 6 restructure)
+  Django template: extends 'base.html'
+  Django view: admin_portal.views.clients
+  Django url:  admin:clients
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Django: {% block page_title %}Clients — Tweedle{% endblock %} -->
+    <title>Clients — Tweedle</title>
+
+    <!-- Google Fonts -->
+    <!-- Django: move to base template <head> -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap">
+
+    <!-- Boxicons -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'vendors/boxicons/css/boxicons.min.css' %}"> -->
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
+
+    <!-- Bootstrap 5 -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'vendors/bootstrap/css/bootstrap.min.css' %}"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+    <!-- 1. Tokens -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-tokens.css' %}"> -->
+    <link rel="stylesheet" href="../../static/css/tweedle-tokens.css">
+
+    <!-- 2. Admin theme -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/themes/theme-admin.css' %}"> -->
+    <link rel="stylesheet" href="../../static/css/themes/theme-admin.css">
+
+    <!-- 3. Base layout -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-base.css' %}"> -->
+    <link rel="stylesheet" href="../../static/css/tweedle-base.css">
+
+    <!-- 4. UI Components -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-components.css' %}"> -->
+    <link rel="stylesheet" href="../../static/css/tweedle-components.css">
+
+    <!-- 5. Clients page CSS -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/pages/clients.css' %}"> -->
+    <link rel="stylesheet" href="../../static/css/pages/clients.css">
+</head>
+<body class="role-admin">
+
+<!-- Django: this entire <main> block becomes {% block content %} -->
+<main>
+
+    <!-- === PAGE HEADER ======================================= -->
+    <!-- Django: {% block page_title %}Clients{% endblock %} -->
+    <div class="page-head">
+        <h1>Clients</h1>
+    </div>
+
+
+    <!-- === CLIENTS TABLE CARD ================================ -->
+    <div class="tw-table-card">
+
+        <!-- Card header: heading + search (left), onboard button (right) -->
+        <div class="tw-table-head-row">
+
+            <div class="tw-table-head-left">
+                <h3 class="tw-table-title">
+                    All Clients
+                    <!-- Django: {{ clients|length }} -->
+                    <span class="tw-count-badge" id="clientCount">3</span>
+                </h3>
+
+                <div class="tw-table-search">
+                    <i class="bx bx-search search-icon" aria-hidden="true"></i>
+                    <input
+                        type="text"
+                        id="clientSearchInput"
+                        placeholder="Search by name, email, or country..."
+                        aria-label="Search clients">
+                </div>
+            </div>
+
+            <div class="tw-table-head-right">
+                <!-- Django: opens {% url 'admin_onboard_client' %} or modal -->
+                <button
+                    class="tw-btn tw-btn-primary onboard-btn"
+                    id="onboardBtn"
+                    aria-haspopup="dialog"
+                    aria-controls="onboardModal">
+                    <i class="bx bx-plus-circle" aria-hidden="true"></i>
+                    Onboard New Client
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Clients table -->
+        <!-- Django: {% for client in clients %} -->
+        <div class="table-scroll-wrapper">
+        <table class="tw-table" id="clientsTable">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Country</th>
+                    <th scope="col">Contact</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <!-- Row 1: GMEC -->
+                <tr>
+                    <td>
+                        <div class="client-name-cell">
+                            <div class="tw-avatar tw-avatar--gmec" aria-hidden="true">G</div>
+                            <div class="client-info">
+                                <!-- Django: {{ client.company_name }} -->
+                                <span class="client-company">Global Money Exchange CO.LLC</span>
+                                <!-- Django: {{ client.client_id }} -->
+                                <span class="client-id-label">Client ID: GMEC</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="tw-country-tag">
+                            <i class="bx bx-flag" aria-hidden="true"></i> Oman
+                        </span>
+                    </td>
+                    <!-- Django: {{ client.contact }} -->
+                    <td>+977-1234567890</td>
+                    <!-- Django: {{ client.email }} -->
+                    <td>contact@gmec.com.np</td>
+                    <td>
+                        <!-- Django: class="tw-status-badge tw-status-badge--{{ client.status }}" -->
+                        <span class="tw-status-badge tw-status-badge--active">Active</span>
+                    </td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <!-- Django: {% url 'admin_manage_users' client.id %} -->
+                            <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers('GMEC')">
+                                <i class="bx bx-user" aria-hidden="true"></i> Manage Users
+                            </button>
+                            <!-- Django: {% url 'admin_client_detail' client.id %} -->
+                            <button class="tw-btn tw-btn-outline tw-btn--sm" onclick="showDetails('GMEC')">
+                                <i class="bx bx-info-circle" aria-hidden="true"></i> Details
+                            </button>
+                            <button class="tw-btn-icon" onclick="showSettings('GMEC')" aria-label="More options for GMEC">
+                                <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Row 2: BGEX -->
+                <tr>
+                    <td>
+                        <div class="client-name-cell">
+                            <div class="tw-avatar tw-avatar--bgex" aria-hidden="true">B</div>
+                            <div class="client-info">
+                                <span class="client-company">Belhasa Global Exchange Co.LLC</span>
+                                <span class="client-id-label">Client ID: BGEX</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="tw-country-tag">
+                            <i class="bx bx-flag" aria-hidden="true"></i> Dubai
+                        </span>
+                    </td>
+                    <td>+880-9876543210</td>
+                    <td>info@bgex.com.bd</td>
+                    <td><span class="tw-status-badge tw-status-badge--active">Active</span></td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers('BGEX')">
+                                <i class="bx bx-user" aria-hidden="true"></i> Manage Users
+                            </button>
+                            <button class="tw-btn tw-btn-outline tw-btn--sm" onclick="showDetails('BGEX')">
+                                <i class="bx bx-info-circle" aria-hidden="true"></i> Details
+                            </button>
+                            <button class="tw-btn-icon" onclick="showSettings('BGEX')" aria-label="More options for BGEX">
+                                <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Row 3: TCS -->
+                <tr>
+                    <td>
+                        <div class="client-name-cell">
+                            <div class="tw-avatar tw-avatar--tcs" aria-hidden="true">T</div>
+                            <div class="client-info">
+                                <span class="client-company">Tata Consultancy Services</span>
+                                <span class="client-id-label">Client ID: TCS</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="tw-country-tag">
+                            <i class="bx bx-flag" aria-hidden="true"></i> India
+                        </span>
+                    </td>
+                    <td>+91-987654321</td>
+                    <td>info@tcs.com.in</td>
+                    <td><span class="tw-status-badge tw-status-badge--active">Active</span></td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers('TCS')">
+                                <i class="bx bx-user" aria-hidden="true"></i> Manage Users
+                            </button>
+                            <button class="tw-btn tw-btn-outline tw-btn--sm" onclick="showDetails('TCS')">
+                                <i class="bx bx-info-circle" aria-hidden="true"></i> Details
+                            </button>
+                            <button class="tw-btn-icon" onclick="showSettings('TCS')" aria-label="More options for TCS">
+                                <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        </div>
+        <!-- Django: {% endfor %} -->
+
+    </div>
+    <!-- END TABLE CARD -->
+
+
+    <!-- === ONBOARD CLIENT MODAL STUB =========================
+         Phase 7: full onboard form goes here.
+         Django: opens {% url 'admin_onboard_client' %} or modal
+         ======================================================= -->
+    <div class="tw-modal-overlay" id="onboardModal" role="dialog" aria-modal="true" aria-labelledby="onboardModalTitle">
+        <div class="tw-modal tw-modal--sm">
+
+            <div class="tw-modal-header tw-header-gradient">
+                <div>
+                    <h2 id="onboardModalTitle">
+                        <i class="bx bx-buildings" aria-hidden="true"></i>
+                        Onboard New Client
+                    </h2>
+                </div>
+                <button class="tw-btn-close" id="onboardModalClose" aria-label="Close modal">
+                    <i class="bx bx-x" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div class="tw-modal-body modal-placeholder-body">
+                <i class="bx bx-building-house" aria-hidden="true"></i>
+                <!-- Phase 7: full onboard form goes here -->
+                <p>Onboard Client form coming soon.</p>
+                <p>This modal will contain the client registration form in Phase 7.</p>
+            </div>
+
+        </div>
+    </div>
+    <!-- END ONBOARD MODAL -->
+
+</main>
+<!-- END MAIN CONTENT -->
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Django: cAdmin_script.js is loaded by the base template -->
+
+
+<script>
+    /* ============================================================
+     * CLIENT TABLE SEARCH
+     * ============================================================
+     * Filters visible table rows by matching the typed value
+     * against any cell text. Uses .row-hidden class (no inline
+     * style manipulation).
+     * ============================================================ */
+    const clientSearchInput = document.getElementById('clientSearchInput');
+    const clientsTable      = document.getElementById('clientsTable');
+
+    clientSearchInput.addEventListener('input', function () {
+        const filter = this.value.trim().toLowerCase();
+        const rows   = clientsTable.querySelectorAll('tbody tr');
+
+        rows.forEach(row => {
+            const matches = row.textContent.toLowerCase().includes(filter);
+            row.classList.toggle('row-hidden', !matches);
+        });
+    });
+
+
+    /* ============================================================
+     * ONBOARD CLIENT MODAL
+     * ============================================================
+     * Opens and closes the onboard modal stub.
+     * Phase 7 will replace the stub body with the full form.
+     * ============================================================ */
+    const onboardModal = document.getElementById('onboardModal');
+    const onboardBtn   = document.getElementById('onboardBtn');
+    const onboardClose = document.getElementById('onboardModalClose');
+
+    function openOnboardModal() {
+        onboardModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeOnboardModal() {
+        onboardModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    onboardBtn.addEventListener('click', openOnboardModal);
+    onboardClose.addEventListener('click', closeOnboardModal);
+
+    /* Close when clicking the backdrop */
+    onboardModal.addEventListener('click', (e) => {
+        if (e.target === onboardModal) closeOnboardModal();
+    });
+
+    /* Close on Escape key */
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && onboardModal.classList.contains('active')) {
+            closeOnboardModal();
+        }
+    });
+
+
+    /* ============================================================
+     * PLACEHOLDER ACTION HANDLERS
+     * Django: replace with {% url %} redirects or fetch() calls
+     * ============================================================ */
+    function manageUsers(clientId) {
+        /* Django: window.location.href = `{% url 'admin_manage_users' clientId %}`; */
+        console.log('[Phase 7] Manage Users for:', clientId);
+    }
+
+    function showDetails(clientId) {
+        /* Django: window.location.href = `{% url 'admin_client_detail' clientId %}`; */
+        console.log('[Phase 7] Show Details for:', clientId);
+    }
+
+    function showSettings(clientId) {
+        console.log('[Phase 7] Settings dropdown for:', clientId);
+    }
+</script>
+
+</body>
+</html>

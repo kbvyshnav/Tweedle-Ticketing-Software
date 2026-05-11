@@ -2,9 +2,10 @@
  * ============================================================
  * FILE:        team.css
  * PURPOSE:     Team page — styles unique to this page only.
- *              This is an ADMIN page loading theme-admin (blue).
- *              The purple/pink role badges are STATUS indicators —
- *              they are not role theme colors.
+ *              Classes moved to tweedle-components.css in Phase 6:
+ *              .tw-btn-outline, .tw-btn--sm, .modal-placeholder-body
+ *              Admin page: loads theme-admin (blue). Purple/pink
+ *              role badges are STATUS indicators, not theme colors.
  * LOAD ORDER:  5 of 5
  * DJANGO PATH: <!-- Django: {% static 'css/pages/team.css' %} -->
  * DEPENDS ON:  tweedle-tokens.css
@@ -19,36 +20,8 @@ body > main {
 }
 
 
-/* === SHARED OUTLINE BUTTON ==================================
- * Candidate for tweedle-components.css (also used in clients/reports).
- * Flagged for Phase 6 migration.
- * ============================================================ */
-.tw-btn-outline {
-    background: var(--tw-bg-surface);
-    color: var(--tw-text-secondary);
-    border: 1px solid var(--tw-border);
-    border-radius: var(--tw-radius-sm);
-    transition: border-color var(--tw-transition-fast),
-                color var(--tw-transition-fast),
-                background var(--tw-transition-fast);
-}
-
-.tw-btn-outline:hover {
-    border-color: var(--tw-primary);
-    color: var(--tw-primary);
-    background: var(--tw-primary-light);
-}
-
-.tw-btn--sm {
-    height: 34px;
-    padding: var(--tw-space-1) var(--tw-space-3);
-    font-size: var(--tw-text-sm);
-}
-
-
 /* === TEAM MEMBER AVATAR IDENTITY COLORS =====================
  * Identity gradients per team member — not role theme colors.
- * Add one per member as the team grows.
  * ============================================================ */
 .tw-avatar--john {
     background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
@@ -64,10 +37,7 @@ body > main {
 
 
 /* === ROLE BADGES ============================================
- * Role types shown inside the team table.
- * NOT theme colors — these are fixed semantic colors.
- * The "Developer" badge is cyan (not purple) to avoid confusion
- * with the Developer role theme which is purple.
+ * Role type indicators — fixed semantic colors, NOT theme.
  * ============================================================ */
 .tw-role-badge {
     display: inline-block;
@@ -104,37 +74,11 @@ body > main {
 
 
 /* === STATUS TOGGLE LABEL ====================================
- * The checkbox is styled by .tw-status-toggle in components.
- * Only the enabled/disabled label color needs a page override.
+ * Checkbox styling from .tw-status-toggle in components.
+ * Only the disabled label color is overridden here.
  * ============================================================ */
 .toggle-label--disabled {
     color: var(--tw-danger);
-}
-
-
-/* === ADD MEMBER MODAL STUB ==================================
- * Phase 7: full add member form goes here.
- * ============================================================ */
-.modal-placeholder-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: var(--tw-space-12) var(--tw-space-8);
-    text-align: center;
-    gap: var(--tw-space-4);
-    color: var(--tw-text-secondary);
-}
-
-.modal-placeholder-body i {
-    font-size: 48px;
-    color: var(--tw-primary-light);
-    opacity: 0.6;
-}
-
-.modal-placeholder-body p {
-    font-size: var(--tw-text-md);
-    color: var(--tw-text-secondary);
 }
 
 

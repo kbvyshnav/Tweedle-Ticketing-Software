@@ -1,0 +1,341 @@
+<!--
+  File: templates/base.html
+  Moved from: cAdmin/cAdmin_baseUI.html (Phase 6 restructure)
+  Django template: base shell — extended by all admin_portal templates
+  Django view: N/A (base template, not rendered directly)
+  Django url:  N/A
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ============================================================
+         PAGE TITLE
+         Django: {% block title %}Tweedle{% endblock %}
+         ============================================================ -->
+    <title>Tweedle</title>
+
+    <!-- ============================================================
+         GOOGLE FONTS — Poppins (UI) + Lato (sidebar/nav)
+         Django: move this link to the base template <head> block.
+         Combined URL keeps a single HTTP request.
+         ============================================================ -->
+    <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap">
+
+    <!-- ============================================================
+         BOXICONS — icon library used across all pages
+         Django: {% static 'vendors/boxicons/css/boxicons.min.css' %}
+         ============================================================ -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
+
+    <!-- ============================================================
+         BOOTSTRAP 5 — grid system and responsive utilities
+         Django: {% static 'vendors/bootstrap/css/bootstrap.min.css' %}
+         ============================================================ -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+    <!-- ============================================================
+         CSS LOAD ORDER
+         1. tweedle-tokens.css   — all CSS custom properties (no rules)
+         2. theme-{role}.css     — role color overrides (4 tokens only)
+         3. tweedle-base.css     — layout shell, typography, sidebar/nav
+         4. tweedle-components.css — all UI components
+         5. page-specific CSS    — only when a page needs extra rules
+         ============================================================ -->
+
+    <!-- 1. Design tokens -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-tokens.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/tweedle-tokens.css">
+
+    <!-- 2. Admin role theme (blue — #3C91E6) -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/themes/theme-admin.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/themes/theme-admin.css">
+
+    <!-- 3. Base layout -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-base.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/tweedle-base.css">
+
+    <!-- 4. UI components -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-components.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/tweedle-components.css">
+
+    <!-- 5. Page-specific CSS slot -->
+    <!-- Django: {% block page_css %}{% endblock %} -->
+</head>
+
+<!--
+    BODY CLASS controls the active role theme.
+    Django: class="role-{% block body_role %}admin{% endblock %}"
+    The matching theme file (loaded above) overrides --tw-primary
+    for this role. Do NOT set color values inline on <body>.
+-->
+<body class="role-admin">
+
+
+<!-- ==============================================================
+     SIDEBAR
+     Fixed left panel. Collapses to icon-only mode via .hide class.
+     Width transitions are defined in tweedle-base.css using
+     --tw-sidebar-width (209px) and --tw-sidebar-collapsed-width (60px).
+     ============================================================== -->
+<section id="sidebar">
+
+    <!-- --- Brand row ------------------------------------------- -->
+    <!--
+        Django: <a href="{% url 'admin_dashboard' %}" class="brand">
+        Static file: <img src="{% static 'images/mefs.png' %}" ...>
+    -->
+    <a href="#" class="brand">
+        <img
+            src="../static/images/mefs.png"
+            alt="Tweedle logo"
+            class="company-logo"
+            width="35"
+            height="35">
+        <span class="brand-text">Tweedle.</span>
+    </a>
+
+    <!-- --- Navigation list ------------------------------------- -->
+    <!--
+        Django active state pattern for each <li>:
+        class="{% if request.resolver_match.url_name == '<url_name>' %}active{% endif %}"
+
+        The JS fallback below handles active state during static dev.
+    -->
+    <ul class="side-menu top">
+
+        <!-- Dashboard -->
+        <!--
+            Django: <li class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+            Django: <a href="{% url 'admin_dashboard' %}">
+        -->
+        <li class="active">
+            <a href="#">
+                <i class="bx bx-grid-alt"></i>
+                <span class="text">Dashboard</span>
+            </a>
+        </li>
+
+        <!-- Inbox -->
+        <!--
+            Django: <li class="{% if request.resolver_match.url_name == 'admin_inbox' %}active{% endif %}">
+            Django: <a href="{% url 'admin_inbox' %}">
+        -->
+        <li>
+            <a href="#">
+                <i class="bx bx-envelope"></i>
+                <span class="text">Inbox</span>
+            </a>
+        </li>
+
+        <!-- Clients -->
+        <!--
+            Django: <li class="{% if request.resolver_match.url_name == 'admin_clients' %}active{% endif %}">
+            Django: <a href="{% url 'admin_clients' %}">
+        -->
+        <li>
+            <a href="#">
+                <i class="bx bx-buildings"></i>
+                <span class="text">Clients</span>
+            </a>
+        </li>
+
+        <!-- Team -->
+        <!--
+            Django: <li class="{% if request.resolver_match.url_name == 'admin_team' %}active{% endif %}">
+            Django: <a href="{% url 'admin_team' %}">
+        -->
+        <li>
+            <a href="#">
+                <i class="bx bx-group"></i>
+                <span class="text">Team</span>
+            </a>
+        </li>
+
+        <!-- Reports -->
+        <!--
+            Django: <li class="{% if request.resolver_match.url_name == 'admin_reports' %}active{% endif %}">
+            Django: <a href="{% url 'admin_reports' %}">
+        -->
+        <li>
+            <a href="#">
+                <i class="bx bx-bar-chart-alt-2"></i>
+                <span class="text">Reports</span>
+            </a>
+        </li>
+
+    </ul>
+</section>
+<!-- END SIDEBAR -->
+
+
+<!-- ==============================================================
+     MAIN CONTENT WRAPPER
+     Positioned to the right of the sidebar.
+     Width = 100% minus sidebar width (handled by tweedle-base.css).
+     ============================================================== -->
+<section id="content">
+
+    <!-- ==========================================================
+         TOPBAR
+         Sticky top navigation bar. Lato font via --tw-font-secondary.
+         Contains: sidebar toggle, search, notifications, profile.
+         ========================================================== -->
+    <nav>
+
+        <!-- Sidebar collapse / expand toggle -->
+        <i class="bx bx-menu" id="sidebarToggle" role="button" aria-label="Toggle sidebar"></i>
+
+        <!-- Global ticket search -->
+        <!--
+            Django: <form action="{% url 'admin_search' %}" method="get">
+        -->
+        <form action="#" class="topbar-search-form">
+            <div class="topbar-search">
+                <input
+                    type="search"
+                    name="q"
+                    placeholder="Search tickets..."
+                    aria-label="Search tickets">
+                <button type="submit" aria-label="Submit search">
+                    <i class="bx bx-search"></i>
+                </button>
+            </div>
+        </form>
+
+        <!-- COMPONENT: notification_bell -->
+        <!--
+            Django: {% include 'components/notification_bell.html' %}
+            Displays the bell icon, unread count badge, and the
+            notification dropdown panel (notification.html component).
+            The count is injected from context: {{ unread_notification_count }}
+        -->
+        <a href="#" class="notification" id="notificationBell" aria-label="Notifications">
+            <i class="bx bxs-bell"></i>
+            <!-- Django: {% if unread_notification_count %} -->
+            <span class="num">8</span>
+            <!-- Django: {% endif %} -->
+        </a>
+        <!-- END COMPONENT: notification_bell -->
+
+        <!-- COMPONENT: profile_dropdown -->
+        <!--
+            Django: {% include 'components/profile_dropdown.html' %}
+            Shows the logged-in user's avatar. On click, shows a
+            dropdown with: View Profile, Settings, Logout.
+            Django: <img src="{{ request.user.profile.avatar.url }}"
+                         alt="{{ request.user.get_full_name }}">
+        -->
+        <a href="#" class="profile" aria-label="Profile">
+            <img
+                src="../static/images/jinoy.jpg"
+                alt="Profile avatar">
+        </a>
+        <!-- END COMPONENT: profile_dropdown -->
+
+    </nav>
+    <!-- END TOPBAR -->
+
+
+    <!-- ==========================================================
+         MAIN PAGE CONTENT
+         Each page injects its own content here via Django template
+         inheritance. The <main> padding is defined in tweedle-base.css
+         via var(--tw-content-padding) = 36px 24px.
+         ========================================================== -->
+    <main id="main-content">
+        <!-- Django: {% block content %}{% endblock %} -->
+    </main>
+    <!-- END MAIN PAGE CONTENT -->
+
+</section>
+<!-- END MAIN CONTENT WRAPPER -->
+
+
+<!-- ==============================================================
+     VENDOR SCRIPTS
+     Bootstrap 5 bundle (includes Popper.js for dropdowns/tooltips).
+     Django: {% static 'vendors/bootstrap/js/bootstrap.bundle.min.js' %}
+     ============================================================== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Shared admin JS (search, star toggle, filter dropdowns) -->
+<!-- Django: <script src="{% static 'js/cAdmin_script.js' %}" defer></script> -->
+<script src="../static/js/cAdmin_script.js" defer></script>
+
+<!-- Page-specific JS slot -->
+<!-- Django: {% block page_js %}{% endblock %} -->
+
+
+<!-- ==============================================================
+     SHELL JAVASCRIPT
+     Self-contained scripts for the base layout only.
+     Page-level JS goes in {% block page_js %} above.
+     ============================================================== -->
+<script>
+    /* ============================================================
+     * SIDEBAR TOGGLE
+     * ============================================================
+     * Adds/removes .hide on #sidebar when the hamburger is clicked.
+     * CSS in tweedle-base.css handles the width transition using
+     * var(--tw-transition-layout) = 0.3s ease.
+     * The sibling combinator (#sidebar.hide ~ #content) in base.css
+     * automatically adjusts the content area width.
+     * ============================================================ */
+    const sidebar       = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+
+    sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('hide');
+    });
+
+
+    /* ============================================================
+     * ACTIVE NAV ITEM (static-file fallback)
+     * ============================================================
+     * In Django, active state is set server-side via template tags:
+     *   class="{% if request.resolver_match.url_name == 'x' %}active{% endif %}"
+     *
+     * This JS block is a fallback for static file development only.
+     * It marks the nav item whose href matches the current URL.
+     * Django: remove or guard with {% if debug %} when deploying.
+     * ============================================================ */
+    document.querySelectorAll('#sidebar .side-menu li').forEach(item => {
+        const link = item.querySelector('a');
+        if (link && link.href === window.location.href) {
+            document.querySelectorAll('#sidebar .side-menu li').forEach(li => li.classList.remove('active'));
+            item.classList.add('active');
+        }
+    });
+
+
+    /* ============================================================
+     * RESPONSIVE COLLAPSE
+     * ============================================================
+     * Auto-collapses the sidebar on page load for screens at or
+     * below 768px (--bp-md). Re-evaluates on window resize.
+     * ============================================================ */
+    const BP_MD = 768;
+
+    function handleResponsiveCollapse() {
+        if (window.innerWidth <= BP_MD) {
+            sidebar.classList.add('hide');
+        } else {
+            sidebar.classList.remove('hide');
+        }
+    }
+
+    handleResponsiveCollapse();
+    window.addEventListener('resize', handleResponsiveCollapse);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,246 @@
+/*
+ * ============================================================
+ * FILE:        notification.css
+ * PURPOSE:     Notification bell component + dropdown panel.
+ *              Used by templates/components/notification-bell.html
+ * LOAD ORDER:  5 of 5
+ * DJANGO PATH: <!-- Django: {% static 'css/pages/notification.css' %} -->
+ * DEPENDS ON:  tweedle-tokens.css
+ * MODIFIED:    <!-- Last modified: {{date}} -->
+ * ============================================================
+ */
+
+
+/* === STANDALONE PREVIEW PADDING ============================= */
+body > .notif-preview-wrapper {
+    padding: var(--tw-space-12);
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+/* Placeholder text on the notification full-page view */
+.notif-page-placeholder {
+    color: var(--tw-text-secondary);
+    padding: var(--tw-space-6);
+}
+
+
+/* === BELL WRAPPER =========================================== */
+.tw-notif-bell-wrap {
+    position: relative;
+    display: inline-block;
+}
+
+/* The bell button itself */
+.tw-notif-bell-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 22px;
+    color: var(--tw-text-primary);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--tw-radius-pill);
+    transition: background var(--tw-transition-fast),
+                color var(--tw-transition-fast);
+}
+
+.tw-notif-bell-btn:hover {
+    background: var(--tw-bg-body);
+    color: var(--tw-primary);
+}
+
+/* Unread count badge on bell */
+.tw-notif-count-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    border-radius: var(--tw-radius-pill);
+    border: 2px solid var(--tw-bg-sidebar);
+    background: var(--tw-danger);
+    color: #ffffff;
+    font-size: var(--tw-text-xs);
+    font-weight: var(--tw-weight-bold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0 3px;
+}
+
+.tw-notif-count-badge:empty {
+    display: none;
+}
+
+
+/* === DROPDOWN PANEL ========================================= */
+.tw-notif-panel {
+    position: absolute;
+    top: calc(100% + var(--tw-space-2));
+    right: 0;
+    width: 380px;
+    max-height: 480px;
+    background: var(--tw-bg-surface);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-lg);
+    box-shadow: var(--tw-shadow-lg);
+    z-index: var(--tw-z-dropdown);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* Hidden by default */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity var(--tw-transition-base),
+                visibility var(--tw-transition-base),
+                transform var(--tw-transition-base);
+}
+
+.tw-notif-panel.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Panel header */
+.tw-notif-panel-header {
+    padding: var(--tw-space-3) var(--tw-space-4);
+    border-bottom: 1px solid var(--tw-border);
+    background: var(--tw-bg-sidebar);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.tw-notif-panel-title {
+    font-size: var(--tw-text-lg);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+}
+
+/* Scrollable notification list */
+.tw-notif-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Panel footer */
+.tw-notif-panel-footer {
+    padding: var(--tw-space-3) var(--tw-space-4);
+    border-top: 1px solid var(--tw-border);
+    background: var(--tw-bg-sidebar);
+    text-align: center;
+    flex-shrink: 0;
+}
+
+
+/* === NOTIFICATION ITEMS ===================================== */
+.tw-notif-item {
+    padding: var(--tw-space-3) var(--tw-space-4);
+    border-bottom: 1px solid var(--tw-border-light);
+    cursor: pointer;
+    position: relative;
+    transition: background var(--tw-transition-fast);
+    border-left: 3px solid transparent;
+}
+
+.tw-notif-item:hover {
+    background: var(--tw-bg-sidebar);
+}
+
+/* Unread state */
+.tw-notif-item.unread {
+    border-left-color: var(--tw-danger);
+    background: var(--tw-danger-light);
+}
+
+.tw-notif-item.unread:hover {
+    background: #ffe0df;
+}
+
+/* Red dot on unread */
+.tw-notif-item.unread::after {
+    content: '';
+    position: absolute;
+    top: var(--tw-space-3);
+    right: var(--tw-space-3);
+    width: 8px;
+    height: 8px;
+    background: var(--tw-danger);
+    border-radius: var(--tw-radius-pill);
+}
+
+.tw-notif-item-body {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--tw-space-3);
+}
+
+/* Circular type icon */
+.tw-notif-type-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--tw-radius-pill);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.tw-notif-type-icon--success { background: var(--tw-notif-success-bg); color: var(--tw-notif-success-text); }
+.tw-notif-type-icon--warning { background: var(--tw-notif-warning-bg); color: var(--tw-notif-warning-text); }
+.tw-notif-type-icon--info    { background: var(--tw-notif-info-bg);    color: var(--tw-notif-info-text); }
+.tw-notif-type-icon--error   { background: var(--tw-notif-error-bg);   color: var(--tw-notif-error-text); }
+
+.tw-notif-item-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.tw-notif-item-title {
+    font-size: var(--tw-text-md);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin-bottom: 2px;
+    line-height: 1.3;
+}
+
+.tw-notif-item-msg {
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-secondary);
+    line-height: 1.4;
+    margin-bottom: var(--tw-space-1);
+}
+
+.tw-notif-item-time {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+}
+
+/* Highlighted user name in notification message */
+.tw-notif-user-name {
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-warning);
+}
+
+/* Empty state */
+.tw-notif-empty {
+    padding: var(--tw-space-12) var(--tw-space-5);
+    text-align: center;
+    color: var(--tw-text-muted);
+}
+
+.tw-notif-empty i {
+    font-size: 48px;
+    margin-bottom: var(--tw-space-3);
+    opacity: 0.4;
+}

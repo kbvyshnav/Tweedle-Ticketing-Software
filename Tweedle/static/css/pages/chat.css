@@ -1,0 +1,438 @@
+/*
+ * ============================================================
+ * FILE:        chat.css
+ * PURPOSE:     Ticket chat panel — page-specific styles.
+ *              Populated in Phase 6 (Task 3).
+ * LOAD ORDER:  5 of 5
+ * DJANGO PATH: <!-- Django: {% static 'css/pages/chat.css' %} -->
+ * DEPENDS ON:  tweedle-tokens.css
+ * MODIFIED:    <!-- Last modified: {{date}} -->
+ * ============================================================
+ */
+
+
+/* === CHAT PANEL CONTAINER ===================================
+ * Floating panel, fixed bottom-right of screen.
+ * ============================================================ */
+.tw-chat-panel {
+    position: fixed;
+    bottom: var(--tw-space-6);
+    right: var(--tw-space-6);
+    width: 100%;
+    max-width: 450px;
+    max-height: 630px;
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-xl);
+    box-shadow: var(--tw-shadow-lg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: var(--tw-z-modal);
+}
+
+
+/* === CHAT HEADER ============================================
+ * Role-aware color via var(--tw-primary).
+ * ============================================================ */
+.tw-chat-header {
+    background: var(--tw-primary);
+    color: #ffffff;
+    padding: var(--tw-space-3) var(--tw-space-4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.chat-header-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.chat-ticket-id {
+    font-size: var(--tw-text-xs);
+    opacity: 0.85;
+    margin-bottom: 2px;
+}
+
+.chat-ticket-subject {
+    font-size: var(--tw-text-md);
+    font-weight: var(--tw-weight-semibold);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 320px;
+}
+
+.chat-close-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #ffffff;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--tw-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    flex-shrink: 0;
+    transition: background var(--tw-transition-fast);
+}
+
+.chat-close-btn:hover {
+    background: rgba(255, 255, 255, 0.28);
+}
+
+
+/* === MESSAGES AREA ========================================== */
+.tw-messages-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--tw-space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--tw-space-3);
+}
+
+
+/* === MESSAGE BUBBLES ======================================== */
+.tw-message {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--tw-space-2);
+    max-width: 85%;
+}
+
+.tw-message.sent {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.tw-message.received {
+    align-self: flex-start;
+}
+
+.tw-message-bubble {
+    padding: var(--tw-space-2) var(--tw-space-3);
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.tw-message.sent .tw-message-bubble {
+    background: var(--tw-primary);
+    color: #ffffff;
+    border-radius: var(--tw-radius-lg) var(--tw-radius-sm) var(--tw-radius-lg) var(--tw-radius-lg);
+}
+
+.tw-message.received .tw-message-bubble {
+    background: var(--tw-bg-surface);
+    color: var(--tw-text-primary);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm) var(--tw-radius-lg) var(--tw-radius-lg) var(--tw-radius-lg);
+}
+
+.tw-message-sender {
+    font-size: var(--tw-text-xs);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-muted);
+    margin-bottom: 2px;
+}
+
+.tw-message.sent .tw-message-sender {
+    text-align: right;
+}
+
+.tw-message-text {
+    font-size: var(--tw-text-base);
+    line-height: 1.45;
+    margin-bottom: 2px;
+}
+
+.tw-message-time {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    margin-top: 2px;
+}
+
+.tw-message.sent .tw-message-time {
+    color: rgba(255, 255, 255, 0.70);
+}
+
+/* Role badge on sender name */
+.tw-chat-role-badge {
+    display: inline-block;
+    font-size: var(--tw-text-xs);
+    padding: 1px var(--tw-space-2);
+    border-radius: var(--tw-space-2);
+    background: var(--tw-bg-body);
+    color: var(--tw-text-secondary);
+    font-weight: var(--tw-weight-medium);
+    text-transform: uppercase;
+    margin-left: var(--tw-space-2);
+    vertical-align: middle;
+}
+
+.tw-message.sent .tw-chat-role-badge {
+    background: rgba(255, 255, 255, 0.20);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+
+/* === ROLE AVATAR IDENTITY COLORS ===========================
+ * Fixed semantic colors — independent of role theme.
+ * ============================================================ */
+:root {
+    --chat-avatar-admin:     #DB504A;
+    --chat-avatar-developer: #8b5cf6;
+    --chat-avatar-tester:    #20b8a6;
+    --chat-avatar-user:      #666666;
+}
+
+.tw-avatar--chat-admin     { background: var(--chat-avatar-admin); }
+.tw-avatar--chat-developer { background: var(--chat-avatar-developer); }
+.tw-avatar--chat-tester    { background: var(--chat-avatar-tester); }
+.tw-avatar--chat-user      { background: var(--chat-avatar-user); }
+
+
+/* === STATUS MESSAGES (ticket lifecycle events) ============== */
+.tw-chat-status-msg {
+    align-self: center;
+    background: var(--tw-status-progress-bg);
+    color: var(--tw-status-progress-text);
+    padding: var(--tw-space-1) var(--tw-space-4);
+    border-radius: var(--tw-radius-pill);
+    font-size: var(--tw-text-xs);
+    font-weight: var(--tw-weight-medium);
+    text-align: center;
+    max-width: 90%;
+}
+
+.tw-chat-status-time {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    margin-left: var(--tw-space-2);
+}
+
+
+/* === REMARKS / COMMENT LABEL ================================ */
+.tw-chat-remark {
+    align-self: center;
+    background: var(--tw-info-light);
+    color: var(--tw-info);
+    border-left: 3px solid var(--tw-info);
+    border-radius: var(--tw-radius-sm);
+    padding: var(--tw-space-3) var(--tw-space-4);
+    font-size: var(--tw-text-xs);
+    max-width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--tw-space-1);
+}
+
+.tw-chat-remark__title {
+    font-weight: var(--tw-weight-bold);
+    font-size: var(--tw-text-sm);
+    color: var(--tw-info-dark);
+}
+
+.tw-chat-remark__meta {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+}
+
+
+/* === FILE ATTACHMENT CHIP =================================== */
+.tw-file-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    background: var(--tw-bg-body);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    padding: var(--tw-space-2) var(--tw-space-3);
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-primary);
+    margin-top: var(--tw-space-1);
+    max-width: 260px;
+    overflow: hidden;
+}
+
+.tw-message.sent .tw-file-chip {
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.tw-file-chip-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.tw-file-chip-remove {
+    background: none;
+    border: none;
+    color: var(--tw-danger);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+
+/* === FOOTER INPUT AREA ====================================== */
+.tw-chat-footer {
+    border-top: 1px solid var(--tw-border);
+    background: var(--tw-bg-surface);
+    padding: var(--tw-space-3) var(--tw-space-4);
+    flex-shrink: 0;
+}
+
+.tw-chat-input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--tw-space-2);
+    margin-bottom: var(--tw-space-2);
+}
+
+.tw-chat-input-wrap {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-lg);
+    background: var(--tw-bg-surface);
+    transition: border-color var(--tw-transition-fast);
+}
+
+.tw-chat-input-wrap:focus-within {
+    border-color: var(--tw-primary);
+    box-shadow: 0 0 0 2px rgba(60, 145, 230, 0.10);
+}
+
+.tw-chat-textarea {
+    flex: 1;
+    min-height: 36px;
+    max-height: 80px;
+    padding: var(--tw-space-2) var(--tw-space-3);
+    padding-right: var(--tw-space-10);
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: var(--tw-font-primary);
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-primary);
+    resize: none;
+    line-height: 1.4;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.tw-chat-attach-btn {
+    position: absolute;
+    right: var(--tw-space-2);
+    background: none;
+    border: none;
+    color: var(--tw-text-secondary);
+    font-size: 18px;
+    cursor: pointer;
+    padding: var(--tw-space-1);
+    border-radius: var(--tw-radius-sm);
+    transition: color var(--tw-transition-fast);
+    bottom: var(--tw-space-1);
+}
+
+.tw-chat-attach-btn:hover {
+    color: var(--tw-primary);
+}
+
+.tw-chat-send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--tw-radius-sm);
+    border: none;
+    background: var(--tw-primary);
+    color: #ffffff;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background var(--tw-transition-fast),
+                transform var(--tw-transition-fast);
+}
+
+.tw-chat-send-btn:hover {
+    background: var(--tw-primary-dark);
+    transform: translateY(-1px);
+}
+
+.tw-chat-send-btn:disabled {
+    background: var(--tw-text-disabled);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Attachment preview strip */
+.tw-attach-preview-strip {
+    display: none;
+    align-items: center;
+    gap: var(--tw-space-2);
+    padding: var(--tw-space-1) var(--tw-space-2);
+    background: var(--tw-bg-body);
+    border-radius: var(--tw-radius-sm);
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-secondary);
+    margin-bottom: var(--tw-space-2);
+}
+
+.tw-attach-preview-strip.show {
+    display: flex;
+}
+
+/* Email notification checkbox row */
+.tw-chat-email-row {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-secondary);
+}
+
+.tw-chat-email-row input[type="checkbox"] {
+    accent-color: var(--tw-primary);
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+
+/* Inline-image attachments sent in chat messages */
+.tw-chat-img-attachment {
+    max-width: 200px;
+    border-radius: var(--tw-radius-sm);
+    margin-top: var(--tw-space-1);
+    display: block;
+}
+
+
+/* === RESPONSIVE =============================================
+ * 576px: full screen chat panel
+ * ============================================================ */
+@media screen and (max-width: 576px) {
+    .tw-chat-panel {
+        position: fixed;
+        inset: 0;
+        border-radius: 0;
+        max-width: 100%;
+        max-height: 100%;
+        bottom: auto;
+        right: auto;
+    }
+}

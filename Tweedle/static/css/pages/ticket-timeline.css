@@ -1,0 +1,360 @@
+/*
+ * ============================================================
+ * FILE:        ticket-timeline.css
+ * PURPOSE:     Ticket timeline (Outlook view) — page-specific styles.
+ * LOAD ORDER:  5 of 5
+ * DJANGO PATH: <!-- Django: {% static 'css/pages/ticket-timeline.css' %} -->
+ * DEPENDS ON:  tweedle-tokens.css
+ * MODIFIED:    <!-- Last modified: {{date}} -->
+ * ============================================================
+ */
+
+
+/* === STANDALONE PADDING ===================================== */
+body > main {
+    padding: var(--tw-content-padding);
+}
+
+/* Centered page container */
+.tl-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: var(--tw-space-5);
+}
+
+/* Header actions row (status badge + close button) */
+.tw-ticket-header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+    flex-shrink: 0;
+}
+
+
+/* === TICKET HEADER CARD =====================================
+ * Left border uses --tw-primary (role-aware).
+ * ============================================================ */
+.tw-ticket-header-card {
+    background: var(--tw-bg-surface);
+    border-left: 4px solid var(--tw-primary);
+    border-radius: var(--tw-radius-lg);
+    padding: var(--tw-space-6);
+    margin-bottom: var(--tw-space-6);
+    box-shadow: var(--tw-shadow-sm);
+    position: relative;
+}
+
+.tw-ticket-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--tw-space-3);
+    margin-bottom: var(--tw-space-4);
+}
+
+.tw-ticket-header-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.tw-ticket-subject {
+    font-size: var(--tw-text-lg);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-primary);
+}
+
+.tl-close-btn {
+    background: none;
+    border: none;
+    font-size: 26px;
+    color: var(--tw-text-muted);
+    cursor: pointer;
+    transition: color var(--tw-transition-fast);
+    flex-shrink: 0;
+}
+
+.tl-close-btn:hover {
+    color: var(--tw-danger);
+}
+
+
+/* === STATS BAR =============================================
+ * 4-column grid with visual dividers between stats.
+ * ============================================================ */
+.tl-stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    padding-top: var(--tw-space-4);
+    border-top: 1px solid var(--tw-border-light);
+    margin-top: var(--tw-space-4);
+}
+
+.tl-stat {
+    text-align: center;
+    padding: 0 var(--tw-space-4);
+}
+
+/* Dividers between stat cells */
+.tl-stat + .tl-stat {
+    border-left: 1px solid var(--tw-border);
+}
+
+.tl-stat-label {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--tw-space-1);
+}
+
+.tl-stat-value {
+    font-size: var(--tw-text-lg);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+}
+
+
+/* === TIMELINE SECTION HEADER ================================ */
+.tl-section-header {
+    margin-bottom: var(--tw-space-5);
+    padding-bottom: var(--tw-space-3);
+    border-bottom: 1px solid var(--tw-border-light);
+}
+
+.tl-section-header h2 {
+    font-size: var(--tw-text-xl);
+    color: var(--tw-text-primary);
+    font-weight: var(--tw-weight-semibold);
+}
+
+
+/* === VERTICAL TIMELINE ======================================
+ * Left connecting line + icon circles + event cards.
+ * ============================================================ */
+.tl-timeline {
+    position: relative;
+    padding-left: var(--tw-space-10);
+}
+
+/* Connecting vertical line */
+.tl-timeline::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--tw-primary), var(--tw-border));
+    border-radius: 2px;
+}
+
+/* Each event entry */
+.tl-item {
+    position: relative;
+    margin-bottom: var(--tw-space-6);
+}
+
+/* Event circle icon — anchored to the timeline line */
+.tl-icon {
+    position: absolute;
+    left: calc(-1 * var(--tw-space-10) + var(--tw-space-1));
+    top: var(--tw-space-3);
+    width: 32px;
+    height: 32px;
+    border-radius: var(--tw-radius-pill);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: var(--tw-text-md);
+    border: 2px solid var(--tw-bg-surface);
+    z-index: 2;
+}
+
+/* Event type colors — semantic, NOT role theme colors */
+.tl-icon--created  { background: var(--tw-success); }
+.tl-icon--assigned { background: var(--tw-info); }
+.tl-icon--progress { background: var(--tw-status-progress-text); }
+.tl-icon--resolved { background: var(--tw-success); }
+.tl-icon--closed   { background: var(--tw-danger); }
+
+/* Event content card */
+.tl-card {
+    background: var(--tw-bg-surface);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-md);
+    padding: var(--tw-space-4);
+    box-shadow: var(--tw-shadow-sm);
+    transition: box-shadow var(--tw-transition-base),
+                border-color var(--tw-transition-base),
+                transform var(--tw-transition-base);
+}
+
+.tl-card:hover {
+    box-shadow: var(--tw-shadow-md);
+    border-color: var(--tw-primary);
+    transform: translateY(-2px);
+}
+
+.tl-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--tw-space-4);
+    margin-bottom: var(--tw-space-2);
+}
+
+.tl-card-main {
+    flex: 1;
+}
+
+.tl-event-title {
+    font-size: var(--tw-text-md);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin-bottom: var(--tw-space-1);
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+    flex-wrap: wrap;
+}
+
+.tl-event-desc {
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-secondary);
+    margin-bottom: var(--tw-space-2);
+    line-height: 1.5;
+}
+
+.tl-event-time {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+}
+
+/* Actor info (right side of card) */
+.tl-card-actor {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--tw-space-2);
+    flex-shrink: 0;
+}
+
+.tl-actor-name {
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-semibold);
+    /* Amber color — consistent "user identity" color in timeline */
+    color: #b3880f;
+}
+
+
+/* === ROLE PILLS in timeline =================================
+ * Fixed semantic colors — not role theme.
+ * ============================================================ */
+.tw-role-pill {
+    display: inline-block;
+    padding: var(--tw-space-1) var(--tw-space-3);
+    border-radius: var(--tw-radius-lg);
+    font-size: var(--tw-text-xs);
+    font-weight: var(--tw-weight-medium);
+}
+
+.tw-role-pill--admin {
+    background: var(--tw-primary-light);
+    color: var(--tw-primary-text);
+}
+
+.tw-role-pill--developer {
+    background: #ede9fe;
+    color: #5b21b6;
+}
+
+.tw-role-pill--tester {
+    background: #ccfbf1;
+    color: #0f766e;
+}
+
+.tw-role-pill--user {
+    background: var(--tw-border);
+    color: var(--tw-text-secondary);
+}
+
+
+/* === PRIORITY BADGE ========================================= */
+.tw-priority-badge {
+    display: inline-block;
+    padding: var(--tw-space-1) var(--tw-space-2);
+    border-radius: var(--tw-radius-sm);
+    font-size: var(--tw-text-xs);
+    font-weight: var(--tw-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.tw-priority-badge--high   { background: var(--tw-priority-high-bg);   color: var(--tw-priority-high-text); }
+.tw-priority-badge--medium { background: var(--tw-priority-medium-bg); color: var(--tw-priority-medium-text); }
+.tw-priority-badge--low    { background: var(--tw-priority-low-bg);    color: var(--tw-priority-low-text); }
+
+
+/* === RESPONSIVE ============================================= */
+
+@media screen and (max-width: 768px) {
+    body > main {
+        padding: var(--tw-content-padding-mobile);
+    }
+
+    .tl-stats-bar {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--tw-space-3);
+    }
+
+    .tl-stat + .tl-stat {
+        border-left: none;
+    }
+
+    .tl-stat:nth-child(2n) {
+        border-left: 1px solid var(--tw-border);
+    }
+
+    .tl-card-header {
+        flex-direction: column;
+        gap: var(--tw-space-3);
+    }
+
+    .tl-card-actor {
+        align-items: flex-start;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .tl-stats-bar {
+        grid-template-columns: 1fr;
+        gap: var(--tw-space-2);
+    }
+
+    .tl-stat + .tl-stat {
+        border-left: none;
+        border-top: 1px solid var(--tw-border-light);
+        padding-top: var(--tw-space-2);
+    }
+
+    .tl-icon {
+        display: none;
+    }
+
+    .tl-timeline {
+        padding-left: var(--tw-space-3);
+    }
+
+    .tl-timeline::before {
+        display: none;
+    }
+}

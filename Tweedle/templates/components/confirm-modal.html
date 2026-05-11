@@ -1,0 +1,110 @@
+<!--
+  File: templates/components/confirm-modal.html
+  Extracted from: cAdmin/ticket-details-new.html (Phase 6 restructure)
+  Django template: reusable {% include 'components/confirm-modal.html' %}
+  Django view: Included in any page that requires a confirm/reject flow
+  Usage: Django: {% include 'components/confirm-modal.html' %}
+  JS API: openConfirmModal(config) / closeConfirmModal()
+-->
+
+<!-- === CONFIRM / REJECT MODAL ================================
+     Generic two-action confirmation overlay.
+     Driven by JS openConfirmModal({ type, title, message, details })
+     type: 'success' | 'danger'
+     Django: {% include 'components/confirm-modal.html' %}
+     ============================================================ -->
+<div class="tw-confirm-overlay" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+    <div class="tw-confirm-box">
+
+        <!-- Icon (updated by JS based on action type) -->
+        <div class="tw-confirm-icon" id="confirmIcon">
+            <i class="bx bx-check" aria-hidden="true"></i>
+        </div>
+
+        <!-- Title and message (updated by JS) -->
+        <h3 class="tw-confirm-title" id="confirmModalTitle">Confirm Action</h3>
+        <p class="tw-confirm-message" id="confirmMessage">Are you sure you want to proceed?</p>
+
+        <!-- Detail summary (updated by JS) -->
+        <div class="tw-confirm-details" id="confirmDetails">
+            <!-- JS injects detail rows here -->
+        </div>
+
+        <!-- Action buttons -->
+        <div class="tw-confirm-buttons">
+            <button class="tw-btn tw-btn-outline" id="confirmCancelBtn" onclick="closeConfirmModal()">
+                Cancel
+            </button>
+            <button class="tw-btn tw-btn-success" id="confirmActionBtn" onclick="executeConfirmAction()">
+                Confirm
+            </button>
+        </div>
+
+    </div>
+</div>
+<!-- END CONFIRM MODAL -->
+
+<script>
+    /* ============================================================
+     * CONFIRM MODAL — JS API
+     * ============================================================
+     * openConfirmModal(config):
+     *   config.type     → 'success' | 'danger'
+     *   config.title    → string
+     *   config.message  → string
+     *   config.details  → HTML string for the details area
+     *   config.onConfirm → function to call when confirmed
+     * ============================================================ */
+    let _confirmCallback = null;
+
+    function openConfirmModal(config) {
+        const overlay    = document.getElementById('confirmModal');
+        const icon       = document.getElementById('confirmIcon');
+        const title      = document.getElementById('confirmModalTitle');
+        const msg        = document.getElementById('confirmMessage');
+        const details    = document.getElementById('confirmDetails');
+        const actionBtn  = document.getElementById('confirmActionBtn');
+
+        /* Update icon type */
+        icon.className = `tw-confirm-icon ${config.type === 'danger' ? 'danger' : 'success'}`;
+        icon.innerHTML = config.type === 'danger'
+            ? `<i class="bx bx-error-circle" aria-hidden="true"></i>`
+            : `<i class="bx bx-check" aria-hidden="true"></i>`;
+
+        /* Update action button color */
+        actionBtn.className = config.type === 'danger'
+            ? 'tw-btn tw-btn-danger'
+            : 'tw-btn tw-btn-success';
+
+        title.textContent   = config.title   || 'Confirm Action';
+        msg.textContent     = config.message || 'Are you sure?';
+        details.innerHTML   = config.details || '';
+        _confirmCallback    = config.onConfirm || null;
+
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirmModal').classList.remove('active');
+        document.body.style.overflow = '';
+        _confirmCallback = null;
+    }
+
+    function executeConfirmAction() {
+        if (typeof _confirmCallback === 'function') {
+            _confirmCallback();
+        }
+        closeConfirmModal();
+    }
+
+    /* Close on backdrop click */
+    document.getElementById('confirmModal').addEventListener('click', function (e) {
+        if (e.target === this) closeConfirmModal();
+    });
+
+    /* Close on Escape */
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeConfirmModal();
+    });
+</script>

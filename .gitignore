@@ -1,13 +1,93 @@
-# Node.js related (if you use npm in the future)
-node_modules/
-
-# IDE and editor specific files
-.vscode/
-.idea/
-
-# OS-specific files
-.DS_Store  # For MacOS
-Thumbs.db  # For Windows
-
-# Log files (if any)
+# ── Personal notes and temp files ──────────────────────────────
+*.txt
+notes.txt
+Github commands.txt
+TODO.txt
 *.log
+
+# ── OS generated files ──────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ── VS Code ─────────────────────────────────────────────────────
+.vscode/
+*.code-workspace
+.history/
+
+# ── Python / Django (ready for when backend starts) ─────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyc
+.env
+.env.*
+!.env.example
+venv/
+env/
+.venv/
+*.sqlite3
+db.sqlite3
+/media/
+/staticfiles/
+local_settings.py
+*.egg-info/
+dist/
+build/
+
+# ── Node / tooling (if added later) ─────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.npm/
+
+# ── Testing ─────────────────────────────────────────────────────
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# ── Compiled / minified (we keep source only) ───────────────────
+*.min.css
+*.min.js
+*.map
+
+# ── Deprecated files (old named files before restructure) ────────
+# Path-specific patterns prevent gitignoring the new template files
+# that share some filenames (clients.html, team.html, etc.)
+Tweedle/cAdmin/cAdmin_baseUI.html
+Tweedle/static/css/cAdmin_baseUI_style.css
+Tweedle/cAdmin/cAdmin_dashboard.html
+Tweedle/static/css/cAdmin_dashboard_style.css
+Tweedle/static/js/cAdmin_script.js
+Tweedle/cAdmin/admin_reports.html
+Tweedle/cAdmin/chatbox.html
+Tweedle/cAdmin/outlook.html
+Tweedle/cAdmin/ticket-details.html
+Tweedle/cAdmin/ticket-details-new.html
+Tweedle/cAdmin/dropdownmenu.html
+Tweedle/cAdmin/clients.html
+Tweedle/cAdmin/team.html
+Tweedle/cAdmin/notification.html
+# Old CSS files
+Tweedle/cAdmin_baseUI_style.css
+Tweedle/cAdmin_dashboard_style.css
+# Other legacy files
+Tweedle/Ticket_timeline_contents.vb
+
+# ── Misc ────────────────────────────────────────────────────────
+*.bak
+*.swp
+*.swo
+*.tmp
+*.orig
+.idea/
+*.sublime-project
+*.sublime-workspace
