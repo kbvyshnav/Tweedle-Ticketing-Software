@@ -1,0 +1,673 @@
+/*
+ * ============================================================
+ * FILE:        ticket-details.css
+ * PURPOSE:     Ticket details modal + new-ticket assignment
+ *              modal — page-specific styles.
+ *              Covers both ticket-details.html (Task 1) and
+ *              ticket-details-new.html (Task 2).
+ * LOAD ORDER:  5 of 5
+ * DJANGO PATH: <!-- Django: {% static 'css/pages/ticket-details.css' %} -->
+ * DEPENDS ON:  tweedle-tokens.css, tweedle-components.css
+ * MODIFIED:    <!-- Last modified: {{date}} -->
+ * ============================================================
+ */
+
+
+/* === STANDALONE BODY =======================================
+ * Dev-only body background — layout CSS takes over in Django.
+ * ============================================================ */
+body {
+    background: var(--tw-bg-body);
+    min-height: 100vh;
+    padding: var(--tw-space-5);
+}
+
+/* Dev demo table row click affordance */
+.tw-table tbody tr {
+    cursor: pointer;
+}
+
+
+/* === MODAL OVERLAY =========================================
+ * Covers full viewport with blur backdrop.
+ * ============================================================ */
+.tw-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    z-index: var(--tw-z-modal);
+    justify-content: center;
+    align-items: center;
+    padding: var(--tw-space-5);
+    animation: tw-fade-in var(--tw-transition-base);
+}
+
+.tw-modal-overlay.active {
+    display: flex;
+}
+
+@keyframes tw-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes tw-slide-up {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* === MODAL CONTAINER ======================================= */
+.tw-modal-container {
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-xl);
+    max-width: 780px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: tw-slide-up var(--tw-transition-base);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Wide variant for new-ticket modal (includes assignment section) */
+.tw-modal-container--wide {
+    max-width: 1000px;
+}
+
+
+/* === MODAL HEADER ==========================================
+ * Role-aware gradient: --tw-primary → --tw-primary-dark.
+ * ============================================================ */
+.tw-modal-header {
+    background: linear-gradient(135deg, var(--tw-primary), var(--tw-primary-dark));
+    color: #ffffff;
+    padding: var(--tw-space-4) var(--tw-space-6);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-shrink: 0;
+    border-radius: var(--tw-radius-xl) var(--tw-radius-xl) 0 0;
+}
+
+.tw-modal-header-left {
+    flex: 1;
+    min-width: 0;
+}
+
+.tw-modal-title {
+    font-size: var(--tw-text-2xl);
+    font-weight: var(--tw-weight-semibold);
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+    margin-bottom: var(--tw-space-1);
+}
+
+.tw-modal-subtitle {
+    font-size: var(--tw-text-base);
+    opacity: 0.9;
+    margin-bottom: var(--tw-space-3);
+}
+
+.tw-modal-header-meta {
+    display: flex;
+    gap: var(--tw-space-3);
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--tw-space-3);
+}
+
+.tw-modal-status-pill {
+    display: inline-block;
+    padding: var(--tw-space-1) var(--tw-space-4);
+    border-radius: var(--tw-radius-pill);
+    font-size: var(--tw-text-xs);
+    font-weight: var(--tw-weight-semibold);
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.tw-modal-allottee-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    background: rgba(255, 255, 255, 0.2);
+    padding: var(--tw-space-1) var(--tw-space-3);
+    border-radius: var(--tw-radius-pill);
+    font-size: var(--tw-text-xs);
+}
+
+.tw-modal-header-actions {
+    display: flex;
+    gap: var(--tw-space-2);
+    margin-top: var(--tw-space-1);
+}
+
+.tw-modal-action-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border: none;
+    padding: var(--tw-space-2) var(--tw-space-4);
+    border-radius: var(--tw-radius-sm);
+    cursor: pointer;
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-medium);
+    font-family: var(--tw-font-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    transition: background var(--tw-transition-fast),
+                transform var(--tw-transition-fast);
+}
+
+.tw-modal-action-btn:hover {
+    background: rgba(255, 255, 255, 0.30);
+    transform: translateY(-2px);
+}
+
+.tw-modal-close {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--tw-radius-pill);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+    transition: background var(--tw-transition-fast),
+                transform var(--tw-transition-fast);
+}
+
+.tw-modal-close:hover {
+    background: rgba(255, 255, 255, 0.30);
+    transform: rotate(90deg);
+}
+
+
+/* === MODAL BODY ============================================ */
+.tw-modal-body {
+    padding: var(--tw-space-4) var(--tw-space-6);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.tw-modal-section {
+    margin-bottom: var(--tw-space-5);
+}
+
+
+/* === INFO GRID =============================================
+ * Default: 4 cols × 2 rows = 8 cells (ticket-details.html).
+ * ============================================================ */
+.tw-info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--tw-space-3);
+    margin-bottom: var(--tw-space-5);
+}
+
+/* 3-col variant for new-ticket modal (6 cells) */
+.tw-info-grid--6 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.tw-info-item {
+    background: var(--tw-bg-body);
+    padding: var(--tw-space-3) var(--tw-space-4);
+    border-radius: var(--tw-radius-md);
+    transition: background var(--tw-transition-fast),
+                transform var(--tw-transition-fast);
+}
+
+.tw-info-item:hover {
+    background: var(--tw-primary-light);
+    transform: translateY(-2px);
+}
+
+.tw-info-label {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    font-weight: var(--tw-weight-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--tw-space-1);
+}
+
+.tw-info-value {
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-primary);
+    font-weight: var(--tw-weight-semibold);
+}
+
+
+/* === DESCRIPTION BOX ====================================== */
+.tw-description-box {
+    background: var(--tw-bg-body);
+    padding: var(--tw-space-5);
+    border-radius: var(--tw-radius-md);
+    line-height: 1.7;
+    color: var(--tw-text-primary);
+    font-size: var(--tw-text-sm);
+}
+
+
+/* === ATTACHMENTS ==========================================
+ * Area container + individual item cards + type icon variants.
+ * ============================================================ */
+.tw-attachments-area {
+    background: var(--tw-bg-body);
+    padding: var(--tw-space-5);
+    border-radius: var(--tw-radius-md);
+}
+
+.tw-attachment-item {
+    background: var(--tw-bg-surface);
+    padding: var(--tw-space-4);
+    border-radius: var(--tw-radius-md);
+    margin-bottom: var(--tw-space-3);
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-4);
+    border: 1px solid var(--tw-border);
+    transition: box-shadow var(--tw-transition-fast),
+                transform var(--tw-transition-fast);
+}
+
+.tw-attachment-item:last-child {
+    margin-bottom: 0;
+}
+
+.tw-attachment-item:hover {
+    box-shadow: var(--tw-shadow-md);
+    transform: translateX(4px);
+}
+
+.tw-attachment-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--tw-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.tw-attachment-icon--pdf { background: var(--tw-file-pdf-bg); color: var(--tw-file-pdf-icon); }
+.tw-attachment-icon--doc { background: var(--tw-file-doc-bg); color: var(--tw-file-doc-icon); }
+.tw-attachment-icon--img { background: var(--tw-file-img-bg); color: var(--tw-file-img-icon); }
+
+.tw-attachment-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.tw-attachment-name {
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin-bottom: var(--tw-space-1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tw-attachment-meta {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+}
+
+.tw-attachment-actions {
+    display: flex;
+    gap: var(--tw-space-2);
+    flex-shrink: 0;
+}
+
+.tw-icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--tw-radius-sm);
+    border: none;
+    background: var(--tw-bg-body);
+    color: var(--tw-text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: background var(--tw-transition-fast),
+                color var(--tw-transition-fast),
+                transform var(--tw-transition-fast);
+}
+
+.tw-icon-btn:hover {
+    background: var(--tw-primary);
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+
+/* ============================================================
+ * === NEW TICKET MODAL ADDITIONS ===========================
+ * Extensions for ticket-details-new.html.
+ * ============================================================ */
+
+/* Fixed orange gradient header — overrides role-aware default */
+.tw-modal-header--new {
+    background: linear-gradient(135deg, #FD7238, #e65c2e);
+}
+
+/* Form structure */
+.tw-form-group {
+    margin-bottom: var(--tw-space-5);
+}
+
+.tw-form-label {
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin-bottom: var(--tw-space-2);
+    display: block;
+}
+
+.tw-required {
+    color: var(--tw-danger);
+    margin-left: 2px;
+}
+
+/* Assignment section */
+.tw-assignment-section {
+    background: linear-gradient(135deg, var(--tw-bg-body), var(--tw-bg-surface));
+    border: 2px solid var(--tw-info);
+    border-radius: var(--tw-radius-lg);
+    padding: var(--tw-space-6);
+    margin-bottom: var(--tw-space-5);
+}
+
+.tw-assignment-title {
+    font-size: var(--tw-text-lg);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin-bottom: var(--tw-space-5);
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+}
+
+.tw-assignment-title i {
+    color: var(--tw-info);
+    font-size: var(--tw-text-2xl);
+}
+
+/* Developer dropdown */
+.tw-developer-select {
+    width: 100%;
+    padding: var(--tw-space-3) var(--tw-space-4);
+    border: 2px solid var(--tw-border);
+    border-radius: var(--tw-radius-md);
+    font-size: var(--tw-text-base);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-primary);
+    background: var(--tw-bg-surface);
+    cursor: pointer;
+    transition: border-color var(--tw-transition-fast),
+                box-shadow var(--tw-transition-fast);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23666' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--tw-space-3) center;
+    padding-right: var(--tw-space-10);
+    font-family: var(--tw-font-primary);
+}
+
+.tw-developer-select:focus {
+    outline: none;
+    border-color: var(--tw-primary);
+    box-shadow: 0 0 0 3px rgba(60, 145, 230, 0.10);
+}
+
+/* Developer workload info panel */
+.tw-developer-info {
+    background: var(--tw-bg-surface);
+    border: 2px solid var(--tw-primary-light);
+    border-radius: var(--tw-radius-md);
+    padding: var(--tw-space-4);
+    margin-top: var(--tw-space-3);
+    display: none;
+    animation: tw-slide-up var(--tw-transition-base);
+}
+
+.tw-developer-info.active {
+    display: block;
+}
+
+/* Workload 3-column grid */
+.tw-workload-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--tw-space-4);
+}
+
+.tw-dev-stat {
+    text-align: center;
+}
+
+.tw-dev-stat-value {
+    font-size: var(--tw-text-2xl);
+    font-weight: var(--tw-weight-bold);
+    color: var(--tw-primary);
+    display: block;
+}
+
+.tw-dev-stat-label {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    text-transform: uppercase;
+    margin-top: var(--tw-space-1);
+}
+
+/* Comment / rejection reason textarea */
+.tw-comment-textarea {
+    width: 100%;
+    padding: var(--tw-space-3) var(--tw-space-4);
+    border: 2px solid var(--tw-border);
+    border-radius: var(--tw-radius-md);
+    font-size: var(--tw-text-sm);
+    font-family: var(--tw-font-primary);
+    color: var(--tw-text-primary);
+    background: var(--tw-bg-surface);
+    resize: vertical;
+    min-height: 100px;
+    transition: border-color var(--tw-transition-fast),
+                box-shadow var(--tw-transition-fast);
+}
+
+.tw-comment-textarea:focus {
+    outline: none;
+    border-color: var(--tw-primary);
+    box-shadow: 0 0 0 3px rgba(60, 145, 230, 0.10);
+}
+
+/* Compact height variant used in confirm modal details */
+.tw-comment-textarea--sm {
+    min-height: 80px;
+}
+
+/* Error state for textarea (toggled by JS .classList.add) */
+.tw-comment-textarea.tw-input--error {
+    border-color: var(--tw-danger);
+}
+
+/* Inline error helper text */
+.tw-error-text {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-danger);
+    margin-top: var(--tw-space-1);
+    display: none;
+}
+
+.tw-error-text.show {
+    display: block;
+}
+
+/* Email notification checkbox group */
+.tw-email-checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+    background: var(--tw-bg-surface);
+    padding: var(--tw-space-3) var(--tw-space-4);
+    border-radius: var(--tw-radius-md);
+    border: 2px solid var(--tw-border);
+    cursor: pointer;
+    transition: border-color var(--tw-transition-fast),
+                background var(--tw-transition-fast);
+}
+
+.tw-email-checkbox-group:hover {
+    border-color: var(--tw-primary);
+    background: var(--tw-primary-light);
+}
+
+.tw-email-checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--tw-primary);
+    flex-shrink: 0;
+}
+
+.tw-email-checkbox-group label {
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-primary);
+    cursor: pointer;
+    flex: 1;
+}
+
+/* Assignment action buttons row */
+.tw-modal-action-buttons {
+    display: flex;
+    gap: var(--tw-space-3);
+    margin-top: var(--tw-space-5);
+}
+
+/* Assign button (green gradient) */
+.tw-btn-assign {
+    flex: 1;
+    padding: var(--tw-space-4) var(--tw-space-6);
+    border: none;
+    border-radius: var(--tw-radius-md);
+    font-size: var(--tw-text-base);
+    font-weight: var(--tw-weight-semibold);
+    font-family: var(--tw-font-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--tw-space-2);
+    transition: transform var(--tw-transition-fast),
+                box-shadow var(--tw-transition-fast);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, var(--tw-success), #20a83a);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(40, 199, 66, 0.30);
+}
+
+.tw-btn-assign:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 199, 66, 0.40);
+}
+
+.tw-btn-assign:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Reject button (red gradient) */
+.tw-btn-reject {
+    flex: 1;
+    padding: var(--tw-space-4) var(--tw-space-6);
+    border: none;
+    border-radius: var(--tw-radius-md);
+    font-size: var(--tw-text-base);
+    font-weight: var(--tw-weight-semibold);
+    font-family: var(--tw-font-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--tw-space-2);
+    transition: transform var(--tw-transition-fast),
+                box-shadow var(--tw-transition-fast);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, var(--tw-danger), #c93d37);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(219, 80, 74, 0.30);
+}
+
+.tw-btn-reject:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(219, 80, 74, 0.40);
+}
+
+
+/* === RESPONSIVE =============================================
+ * 768px + 576px breakpoints.
+ * ============================================================ */
+@media screen and (max-width: 768px) {
+    .tw-modal-container {
+        max-height: 95vh;
+    }
+
+    .tw-modal-header {
+        padding: var(--tw-space-5);
+    }
+
+    .tw-modal-body {
+        padding: var(--tw-space-5);
+    }
+
+    .tw-info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tw-info-grid--6 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tw-modal-header-actions {
+        flex-direction: column;
+    }
+
+    .tw-attachment-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .tw-modal-action-buttons {
+        flex-direction: column;
+    }
+
+    .tw-workload-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .tw-info-grid,
+    .tw-info-grid--6 {
+        grid-template-columns: 1fr;
+    }
+}

@@ -2260,6 +2260,130 @@
 
 
 /* ============================================================
+ * SECTION 16: ROLE PILLS
+ * Canonical cross-page role identity chips.
+ * Fixed semantic colors — independent of role theme.
+ * ============================================================ */
+.tw-role-pill {
+    display: inline-block;
+    padding: var(--tw-space-1) var(--tw-space-3);
+    border-radius: var(--tw-radius-lg);
+    font-size: var(--tw-text-xs);
+    font-weight: var(--tw-weight-medium);
+}
+
+.tw-role-pill--admin {
+    background: var(--tw-primary-light);
+    color: var(--tw-primary-text);
+}
+
+.tw-role-pill--developer {
+    background: #ede9fe;
+    color: #5b21b6;
+}
+
+.tw-role-pill--tester {
+    background: #ccfbf1;
+    color: #0f766e;
+}
+
+.tw-role-pill--user {
+    background: var(--tw-border);
+    color: var(--tw-text-secondary);
+}
+
+.tw-role-pill--subuser {
+    background: #fef9c3;
+    color: #a16207;
+}
+
+
+/* ============================================================
+ * SECTION 17: PRIORITY BADGES
+ * ============================================================ */
+.tw-priority-badge {
+    display: inline-block;
+    padding: var(--tw-space-1) var(--tw-space-2);
+    border-radius: var(--tw-radius-sm);
+    font-size: var(--tw-text-xs);
+    font-weight: var(--tw-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.tw-priority-badge--high   { background: var(--tw-priority-high-bg);   color: var(--tw-priority-high-text); }
+.tw-priority-badge--medium { background: var(--tw-priority-medium-bg); color: var(--tw-priority-medium-text); }
+.tw-priority-badge--low    { background: var(--tw-priority-low-bg);    color: var(--tw-priority-low-text); }
+
+
+/* ============================================================
+ * SECTION 18: TAT BADGES
+ * Turnaround time evaluation badges.
+ * ============================================================ */
+.tw-tat-badge {
+    display: inline-block;
+    font-weight: var(--tw-weight-semibold);
+    padding: 5px var(--tw-space-3);
+    border-radius: var(--tw-space-1);
+    font-size: var(--tw-text-sm);
+    white-space: nowrap;
+}
+
+.tw-tat-badge--met {
+    background: var(--tw-success-light);
+    color: var(--tw-status-closed-text);
+}
+
+.tw-tat-badge--missed {
+    background: var(--tw-danger-light);
+    color: var(--tw-priority-high-text);
+}
+
+.tw-tat-badge--pending {
+    background: var(--tw-border);
+    color: var(--tw-text-muted);
+}
+
+
+/* ============================================================
+ * SECTION 19: TICKET HEADER CARD
+ * Full-width card with role-aware left border.
+ * ============================================================ */
+.tw-ticket-header-card {
+    background: var(--tw-bg-surface);
+    border-left: 4px solid var(--tw-primary);
+    border-radius: var(--tw-radius-lg);
+    padding: var(--tw-space-6);
+    margin-bottom: var(--tw-space-6);
+    box-shadow: var(--tw-shadow-sm);
+    position: relative;
+}
+
+.tw-ticket-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--tw-space-3);
+    margin-bottom: var(--tw-space-4);
+}
+
+.tw-ticket-header-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.tw-ticket-subject {
+    font-size: var(--tw-text-lg);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-primary);
+}
+
+
+/* ============================================================
  * SECTION 15: RESPONSIVE OVERRIDES FOR COMPONENTS
  * ============================================================ */
 

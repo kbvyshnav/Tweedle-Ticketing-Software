@@ -130,34 +130,6 @@ body > main {
 }
 
 
-/* === TAT BADGES =============================================
- * Turnaround time evaluation badges.
- * Reuses token palette rather than hardcoded values.
- * ============================================================ */
-.tw-tat-badge {
-    display: inline-block;
-    font-weight: var(--tw-weight-semibold);
-    padding: 5px var(--tw-space-3);
-    border-radius: var(--tw-space-1);
-    font-size: var(--tw-text-sm);
-    white-space: nowrap;
-}
-
-.tw-tat-badge--met {
-    background: var(--tw-success-light);
-    color: var(--tw-status-closed-text);
-}
-
-.tw-tat-badge--missed {
-    background: var(--tw-danger-light);
-    color: var(--tw-priority-high-text);
-}
-
-.tw-tat-badge--pending {
-    background: var(--tw-border);
-    color: var(--tw-text-muted);
-}
-
 
 /* === REPORT DETAIL MODAL ====================================
  * Replaces the dynamically-created modal from the original JS.

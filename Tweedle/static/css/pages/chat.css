@@ -159,21 +159,8 @@
     color: rgba(255, 255, 255, 0.70);
 }
 
-/* Role badge on sender name */
-.tw-chat-role-badge {
-    display: inline-block;
-    font-size: var(--tw-text-xs);
-    padding: 1px var(--tw-space-2);
-    border-radius: var(--tw-space-2);
-    background: var(--tw-bg-body);
-    color: var(--tw-text-secondary);
-    font-weight: var(--tw-weight-medium);
-    text-transform: uppercase;
-    margin-left: var(--tw-space-2);
-    vertical-align: middle;
-}
-
-.tw-message.sent .tw-chat-role-badge {
+/* Role pill context override: sent-bubble dark background */
+.tw-message.sent .tw-role-pill {
     background: rgba(255, 255, 255, 0.20);
     color: rgba(255, 255, 255, 0.85);
 }

@@ -31,41 +31,6 @@ body > main {
 }
 
 
-/* === TICKET HEADER CARD =====================================
- * Left border uses --tw-primary (role-aware).
- * ============================================================ */
-.tw-ticket-header-card {
-    background: var(--tw-bg-surface);
-    border-left: 4px solid var(--tw-primary);
-    border-radius: var(--tw-radius-lg);
-    padding: var(--tw-space-6);
-    margin-bottom: var(--tw-space-6);
-    box-shadow: var(--tw-shadow-sm);
-    position: relative;
-}
-
-.tw-ticket-header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: var(--tw-space-3);
-    margin-bottom: var(--tw-space-4);
-}
-
-.tw-ticket-header-meta {
-    display: flex;
-    align-items: center;
-    gap: var(--tw-space-3);
-    flex-wrap: wrap;
-    flex: 1;
-}
-
-.tw-ticket-subject {
-    font-size: var(--tw-text-lg);
-    font-weight: var(--tw-weight-medium);
-    color: var(--tw-text-primary);
-}
 
 .tl-close-btn {
     background: none;
@@ -82,17 +47,6 @@ body > main {
 }
 
 
-/* === STATS BAR =============================================
- * 4-column grid with visual dividers between stats.
- * ============================================================ */
-.tl-stats-bar {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0;
-    padding-top: var(--tw-space-4);
-    border-top: 1px solid var(--tw-border-light);
-    margin-top: var(--tw-space-4);
-}
 
 .tl-stat {
     text-align: center;
@@ -256,52 +210,6 @@ body > main {
 }
 
 
-/* === ROLE PILLS in timeline =================================
- * Fixed semantic colors — not role theme.
- * ============================================================ */
-.tw-role-pill {
-    display: inline-block;
-    padding: var(--tw-space-1) var(--tw-space-3);
-    border-radius: var(--tw-radius-lg);
-    font-size: var(--tw-text-xs);
-    font-weight: var(--tw-weight-medium);
-}
-
-.tw-role-pill--admin {
-    background: var(--tw-primary-light);
-    color: var(--tw-primary-text);
-}
-
-.tw-role-pill--developer {
-    background: #ede9fe;
-    color: #5b21b6;
-}
-
-.tw-role-pill--tester {
-    background: #ccfbf1;
-    color: #0f766e;
-}
-
-.tw-role-pill--user {
-    background: var(--tw-border);
-    color: var(--tw-text-secondary);
-}
-
-
-/* === PRIORITY BADGE ========================================= */
-.tw-priority-badge {
-    display: inline-block;
-    padding: var(--tw-space-1) var(--tw-space-2);
-    border-radius: var(--tw-radius-sm);
-    font-size: var(--tw-text-xs);
-    font-weight: var(--tw-weight-semibold);
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-
-.tw-priority-badge--high   { background: var(--tw-priority-high-bg);   color: var(--tw-priority-high-text); }
-.tw-priority-badge--medium { background: var(--tw-priority-medium-bg); color: var(--tw-priority-medium-text); }
-.tw-priority-badge--low    { background: var(--tw-priority-low-bg);    color: var(--tw-priority-low-text); }
 
 
 /* === RESPONSIVE ============================================= */
@@ -311,7 +219,7 @@ body > main {
         padding: var(--tw-content-padding-mobile);
     }
 
-    .tl-stats-bar {
+    .tw-stats-bar {
         grid-template-columns: repeat(2, 1fr);
         gap: var(--tw-space-3);
     }
@@ -335,7 +243,7 @@ body > main {
 }
 
 @media screen and (max-width: 576px) {
-    .tl-stats-bar {
+    .tw-stats-bar {
         grid-template-columns: 1fr;
         gap: var(--tw-space-2);
     }
