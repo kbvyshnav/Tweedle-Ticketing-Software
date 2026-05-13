@@ -1,11 +1,11 @@
 <!--
   File: templates/otp-verify.html
-  Phase 8 — Authentication pages (stub)
-  Django template: extends 'base_minimal.html'
+  Phase 8 — Authentication pages
+  Django template: extends 'base_minimal.html' (no sidebar, no topbar)
   Django view: accounts.views.otp_verify
   Django url:  otp_verify
-  Note: Phase 2 — implement with django-otp when 2FA is enabled.
-        This page is a fully functional UI stub — backend is not wired.
+  Django: Phase 2 — implement with django-otp when 2FA is enabled.
+  This page is a fully functional UI stub — backend not yet wired.
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -29,7 +29,7 @@
     <!-- 3. Components -->
     <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-components.css' %}"> -->
     <link rel="stylesheet" href="../static/css/tweedle-components.css">
-    <!-- 4. Login page CSS (shared with otp-verify) -->
+    <!-- 4. Auth page CSS (shared with login.html) -->
     <!-- Django: <link rel="stylesheet" href="{% static 'css/pages/login.css' %}"> -->
     <link rel="stylesheet" href="../static/css/pages/login.css">
 </head>
@@ -40,30 +40,26 @@
 <div class="tw-auth-card">
 
 
-    <!-- === LEFT PANEL — same as login.html =================== -->
+    <!-- === LEFT PANEL — BRAND ================================
+         Identical structure to login.html.
+         Different icon, headline, and subtext only.
+         ======================================================= -->
     <div class="tw-auth-left" aria-hidden="true">
 
-        <!-- Django: <img src="{% static 'images/tweedle_logo2.png' %}" ...> -->
-        <img
-            src="../static/images/tweedle_logo2.png"
-            alt="Tweedle"
-            class="tw-auth-brand-logo">
-        <span class="tw-auth-brand-name">Tweedle</span>
+        <!-- Wordmark -->
+        <div class="tw-auth-wordmark">Tweedle.</div>
 
+        <!-- Middle: icon + tagline -->
         <div class="tw-auth-brand-mid">
             <div class="tw-auth-icon-circle">
                 <i class="bx bxs-lock-alt"></i>
             </div>
-            <p class="tw-auth-headline">One more step.</p>
-            <p class="tw-auth-sub">Verify your identity to keep your account secure.</p>
+            <p class="tw-auth-headline">Verify your identity.</p>
+            <p class="tw-auth-sub">Enter the 6-digit code sent to your registered email.</p>
         </div>
 
+        <!-- Bottom: copyright -->
         <div class="tw-auth-brand-bottom">
-            <div class="tw-auth-pills">
-                <span class="tw-auth-pill">&#10003; Secure access</span>
-                <span class="tw-auth-pill">&#10003; 6-digit code</span>
-                <span class="tw-auth-pill">&#10003; Expires in 5 min</span>
-            </div>
             <p class="tw-auth-copy">&#169; 2025 Tweedle. All rights reserved.</p>
         </div>
 
@@ -74,23 +70,23 @@
     <!-- === RIGHT PANEL — OTP FORM ============================ -->
     <div class="tw-auth-right">
 
-        <!-- Back to sign in -->
+        <!-- Back link — very top of the panel -->
         <!-- Django: href="{% url 'account_login' %}" -->
-        <a href="login.html" class="tw-otp-back-link" aria-label="Back to sign in">
+        <a href="login.html" class="tw-otp-back-link" aria-label="Back to sign in page">
             <i class="bx bx-arrow-back" aria-hidden="true"></i>
             Back to sign in
         </a>
 
-        <!-- Form header -->
-        <span class="tw-auth-eyebrow">Verification</span>
+        <!-- Heading area -->
+        <span class="tw-auth-eyebrow">Two-Factor Auth</span>
         <h1 class="tw-auth-title">Check your email</h1>
         <p class="tw-auth-desc">
-            We've sent a 6-digit code to<br>
-            <!-- Django: <strong class="tw-otp-email-hint">{{ masked_email }}</strong> -->
-            <strong class="tw-otp-email-hint">r&#42;&#42;&#42;&#42;&#64;company.com</strong>
+            We sent a 6-digit verification code to<br>
+            <!-- Django: {{ masked_email }} -->
+            <span class="tw-otp-email-pill">r*****l@company.com</span>
         </p>
 
-        <!-- OTP form -->
+        <!-- OTP verification form -->
         <!-- Django: action="{% url 'otp_verify' %}" method="POST" -->
         <form
             id="otpForm"
@@ -101,24 +97,35 @@
 
             <!-- Django: {% csrf_token %} -->
 
-            <!-- 6 digit input row -->
-            <div
-                class="tw-otp-inputs"
-                role="group"
-                aria-label="One-time verification code">
-                <input class="tw-otp-input" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="Digit 1 of 6" name="otp_1">
-                <input class="tw-otp-input" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="Digit 2 of 6" name="otp_2">
-                <input class="tw-otp-input" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="Digit 3 of 6" name="otp_3">
-                <input class="tw-otp-input" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="Digit 4 of 6" name="otp_4">
-                <input class="tw-otp-input" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="Digit 5 of 6" name="otp_5">
-                <input class="tw-otp-input" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="Digit 6 of 6" name="otp_6">
+            <!-- 6-digit input group -->
+            <div class="tw-field-group">
+                <label class="tw-otp-label" id="otp-group-label">Enter verification code</label>
+
+                <div
+                    class="tw-otp-row"
+                    role="group"
+                    aria-labelledby="otp-group-label"
+                    aria-describedby="otp-error-msg">
+                    <input class="tw-otp-box" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" name="otp_1" aria-label="Digit 1 of 6">
+                    <input class="tw-otp-box" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" name="otp_2" aria-label="Digit 2 of 6">
+                    <input class="tw-otp-box" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" name="otp_3" aria-label="Digit 3 of 6">
+                    <input class="tw-otp-box" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" name="otp_4" aria-label="Digit 4 of 6">
+                    <input class="tw-otp-box" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" name="otp_5" aria-label="Digit 5 of 6">
+                    <input class="tw-otp-box" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" name="otp_6" aria-label="Digit 6 of 6">
+                </div>
+
+                <!-- Validation error (hidden until JS shows it) -->
+                <p class="tw-otp-error" id="otp-error-msg" role="alert" aria-live="polite">
+                    <i class="bx bx-error-circle" aria-hidden="true"></i>
+                    <span>Please enter all 6 digits to continue.</span>
+                </p>
             </div>
 
             <!-- Countdown timer + resend -->
             <div class="tw-otp-timer-row">
-                Code expires in
-                <span class="tw-otp-timer" id="otpTimer">&nbsp;04:59</span>
-                <!-- Resend button hidden until timer expires -->
+                <span>Code expires in</span>
+                <!-- aria-live so screen readers announce when expired -->
+                <span class="tw-otp-timer" id="otpTimer" aria-live="polite">05:00</span>
                 <button
                     type="button"
                     class="tw-resend-btn"
@@ -128,24 +135,33 @@
                 </button>
             </div>
 
-            <!-- Submit -->
-            <button
-                type="submit"
-                class="tw-submit-btn"
-                id="otpSubmitBtn"
-                aria-label="Verify code"
-                aria-busy="false">
-                <span class="tw-submit-text">Verify Code</span>
-                <span class="tw-submit-spinner" aria-hidden="true"></span>
-            </button>
+            <!-- Submit button -->
+            <div class="tw-otp-submit-wrap">
+                <button
+                    type="submit"
+                    class="tw-submit-btn"
+                    id="otpSubmitBtn"
+                    aria-label="Verify code"
+                    aria-busy="false">
+                    <span class="tw-submit-text">Verify Code</span>
+                    <span class="tw-submit-spinner" aria-hidden="true"></span>
+                </button>
+            </div>
+
+            <!-- Security note -->
+            <p class="tw-otp-security-note">
+                <i class="bx bx-shield-check" aria-hidden="true"></i>
+                This code is valid for 5 minutes only.
+            </p>
 
         </form>
         <!-- END OTP FORM -->
 
         <!-- Footer -->
         <footer class="tw-auth-form-footer">
-            Didn't receive an email? Check your spam folder<br>
-            or contact your system administrator.
+            Having trouble signing in?<br>
+            Contact your system administrator.
+            <!-- Django: <a href="mailto:admin@tweedle.app">Contact your system administrator.</a> -->
         </footer>
 
     </div>
@@ -161,49 +177,64 @@
     /* ============================================================
      * OTP: INPUT AUTO-ADVANCE
      * ============================================================
-     * Typing a digit moves focus to the next input.
-     * Backspace on an empty input moves focus to the previous one.
+     * Typing a digit advances focus to the next box.
+     * Backspace on an empty box moves focus back to the previous.
+     * Only digits 0-9 are accepted; all other keys are blocked.
+     * .filled class tracks which boxes have a value.
      * ============================================================ */
-    const otpInputs = Array.from(document.querySelectorAll('.tw-otp-input'));
+    const otpBoxes = Array.from(document.querySelectorAll('.tw-otp-box'));
 
-    otpInputs.forEach(function (input, index) {
-        input.addEventListener('input', function () {
-            /* Sanitise: keep only the last digit entered */
+    otpBoxes.forEach(function (box, i) {
+        box.addEventListener('input', function () {
             const val = this.value.replace(/[^0-9]/g, '');
             this.value = val ? val.slice(-1) : '';
 
             if (this.value) {
                 this.classList.add('filled');
-                if (index < otpInputs.length - 1) {
-                    otpInputs[index + 1].focus();
+                this.classList.remove('error');
+                if (i < otpBoxes.length - 1) {
+                    otpBoxes[i + 1].focus();
                 }
             } else {
                 this.classList.remove('filled');
             }
+            clearOtpError();
         });
 
-        input.addEventListener('keydown', function (e) {
-            if (e.key === 'Backspace' && !this.value && index > 0) {
-                otpInputs[index - 1].value = '';
-                otpInputs[index - 1].classList.remove('filled');
-                otpInputs[index - 1].focus();
+        box.addEventListener('keydown', function (e) {
+            if (e.key === 'Backspace' && !this.value && i > 0) {
+                otpBoxes[i - 1].value = '';
+                otpBoxes[i - 1].classList.remove('filled');
+                otpBoxes[i - 1].focus();
             }
         });
 
-        /* Prevent non-numeric key entry */
-        input.addEventListener('keypress', function (e) {
+        box.addEventListener('keypress', function (e) {
             if (!/[0-9]/.test(e.key)) e.preventDefault();
         });
     });
+
+    function clearOtpError() {
+        otpBoxes.forEach(function (b) { b.classList.remove('error'); });
+        document.getElementById('otp-error-msg').classList.remove('show');
+    }
+
+    function showOtpError(message) {
+        otpBoxes.forEach(function (b) { b.classList.add('error'); });
+        const errEl = document.getElementById('otp-error-msg');
+        errEl.querySelector('span').textContent = message;
+        errEl.classList.add('show');
+        const firstEmpty = otpBoxes.find(function (b) { return !b.value; });
+        if (firstEmpty) firstEmpty.focus();
+    }
 
 
     /* ============================================================
      * OTP: PASTE HANDLER
      * ============================================================
-     * Paste a full 6-digit code and it splits across all inputs.
-     * Attached to the first input; works regardless of which
-     * input is focused (event bubbles up to form, but simpler
-     * to attach here since paste propagates from focus).
+     * Captures paste on the form level so it works regardless
+     * of which digit box currently has focus.
+     * Strips non-numeric characters and distributes up to 6 digits.
      * ============================================================ */
     document.getElementById('otpForm').addEventListener('paste', function (e) {
         e.preventDefault();
@@ -213,101 +244,114 @@
             .slice(0, 6);
 
         pasted.split('').forEach(function (char, i) {
-            if (otpInputs[i]) {
-                otpInputs[i].value = char;
-                otpInputs[i].classList.add('filled');
+            if (otpBoxes[i]) {
+                otpBoxes[i].value = char;
+                otpBoxes[i].classList.add('filled');
+                otpBoxes[i].classList.remove('error');
             }
         });
 
-        /* Move focus to first empty slot, or last input if full */
-        const nextEmpty = otpInputs.findIndex(function (inp) { return !inp.value; });
-        if (nextEmpty !== -1) {
-            otpInputs[nextEmpty].focus();
-        } else {
-            otpInputs[otpInputs.length - 1].focus();
-        }
+        clearOtpError();
+        const nextEmpty = otpBoxes.findIndex(function (b) { return !b.value; });
+        (nextEmpty !== -1 ? otpBoxes[nextEmpty] : otpBoxes[5]).focus();
     });
 
 
     /* ============================================================
      * OTP: COUNTDOWN TIMER
      * ============================================================
-     * Counts down from 04:59. When expired: timer turns red,
-     * "Resend Code" button becomes visible.
+     * Starts at 05:00 on page load.
+     * When it hits 00:00, .expired is added to the timer
+     * and the resend button becomes visible.
+     * font-variant-numeric: tabular-nums in CSS keeps
+     * the timer width stable as digits change.
      * ============================================================ */
-    let _timeLeft    = 299;
+    let _timeLeft = 300;
     const timerEl   = document.getElementById('otpTimer');
     const resendBtn = document.getElementById('resendCode');
-    let   _otpCountdown;
+    let   _interval;
 
     function formatTime(secs) {
-        const m = Math.floor(secs / 60).toString().padStart(2, '0');
-        const s = (secs % 60).toString().padStart(2, '0');
-        return ' ' + m + ':' + s;
+        return String(Math.floor(secs / 60)).padStart(2, '0')
+             + ':' + String(secs % 60).padStart(2, '0');
     }
 
-    function startCountdown(seconds) {
+    function startTimer(seconds) {
+        clearInterval(_interval);
         _timeLeft = seconds;
         timerEl.textContent = formatTime(_timeLeft);
         timerEl.classList.remove('expired');
         resendBtn.classList.remove('visible');
 
-        clearInterval(_otpCountdown);
-        _otpCountdown = setInterval(function () {
+        _interval = setInterval(function () {
             _timeLeft--;
             timerEl.textContent = formatTime(_timeLeft);
 
             if (_timeLeft <= 0) {
-                clearInterval(_otpCountdown);
-                timerEl.textContent = ' 00:00';
+                clearInterval(_interval);
                 timerEl.classList.add('expired');
                 resendBtn.classList.add('visible');
             }
         }, 1000);
     }
 
-    startCountdown(299);
+    startTimer(300);
 
+
+    /* ============================================================
+     * OTP: RESEND CODE
+     * ============================================================
+     * Resets the timer, clears all inputs, hides the resend button.
+     * Django: fetch POST to {% url 'otp_resend' %}
+     * ============================================================ */
     resendBtn.addEventListener('click', function () {
-        /* Django: POST to {% url 'otp_resend' %} */
-        console.log('[OTP] Code resend requested');
-        otpInputs.forEach(function (inp) {
-            inp.value = '';
-            inp.classList.remove('filled');
+        otpBoxes.forEach(function (b) {
+            b.value = '';
+            b.classList.remove('filled', 'error');
         });
-        otpInputs[0].focus();
-        startCountdown(299);
+        clearOtpError();
+        otpBoxes[0].focus();
+        startTimer(300);
+        /* Django: fetch('{% url "otp_resend" %}', {
+               method: 'POST',
+               headers: { 'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)?.[1] }
+           }); */
+        console.log('[OTP] Resend requested');
     });
 
 
     /* ============================================================
      * OTP: FORM SUBMIT
      * ============================================================
-     * Django: Phase 2 — replace with actual POST and CSRF token.
+     * Validates all 6 boxes are filled with digits.
+     * Error: highlights all boxes + shows error message.
+     * Valid: loading state on button, form submits.
+     * Django: Phase 2 — implement with django-otp.
+     * Django: form POST to {% url 'otp_verify' %}
      * ============================================================ */
     document.getElementById('otpForm').addEventListener('submit', function (e) {
         e.preventDefault();
 
-        const code = otpInputs.map(function (inp) { return inp.value; }).join('');
-        if (code.length < 6) {
-            const nextEmpty = otpInputs.findIndex(function (inp) { return !inp.value; });
-            if (nextEmpty !== -1) otpInputs[nextEmpty].focus();
+        const code     = otpBoxes.map(function (b) { return b.value; }).join('');
+        const allValid = /^[0-9]{6}$/.test(code);
+
+        if (!allValid) {
+            showOtpError('Please enter all 6 digits to continue.');
             return;
         }
 
-        /* Loading state */
         const btn = document.getElementById('otpSubmitBtn');
         btn.classList.add('loading');
         btn.setAttribute('aria-busy', 'true');
 
-        /* Django: POST { otp_code: code } to {% url 'otp_verify' %} */
-        console.log('[OTP] Verifying code:', code);
-
-        /* Safety timeout */
+        /* Safety timeout: remove loading after 8 s if redirect stalls */
         setTimeout(function () {
             btn.classList.remove('loading');
             btn.setAttribute('aria-busy', 'false');
         }, 8000);
+
+        /* Django: this.submit(); — let the form POST naturally */
+        console.log('[OTP] Verifying code:', code);
     });
 </script>
 

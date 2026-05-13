@@ -59,6 +59,7 @@ body {
     padding: 48px;
     display: flex;
     flex-direction: column;
+    height: 100%;
     color: #ffffff;
 }
 
@@ -76,6 +77,15 @@ body {
     font-weight: 700;
     color: #ffffff;
     letter-spacing: -0.3px;
+}
+
+.tw-auth-wordmark {
+    font-family: var(--tw-font-primary);
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    margin-bottom: 0;
 }
 
 /* Grows to push pills + copyright to the bottom */
@@ -105,6 +115,7 @@ body {
 }
 
 .tw-auth-headline {
+    color: #ffffff;
     font-size: 26px;
     font-weight: 700;
     font-family: var(--tw-font-primary);
@@ -114,17 +125,17 @@ body {
 }
 
 .tw-auth-sub {
+    color: rgba(255, 255, 255, 0.82);
     font-size: 14px;
     font-weight: 400;
     line-height: 1.6;
-    opacity: 0.75;
-    max-width: 280px;
-    margin: 0 auto;
     text-align: center;
+    max-width: 280px;
 }
 
 .tw-auth-brand-bottom {
     flex-shrink: 0;
+    text-align: center;
 }
 
 .tw-auth-pills {
@@ -145,8 +156,9 @@ body {
 }
 
 .tw-auth-copy {
+    color: rgba(255, 255, 255, 0.55);
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.50);
+    text-align: center;
 }
 
 
@@ -539,16 +551,17 @@ body {
 }
 
 
-/* ============================================================
- * OTP VERIFY PAGE ADDITIONS
+/* === OTP VERIFY PAGE ========================================
+ * All styles specific to templates/otp-verify.html.
+ * Shared .tw-auth-* classes above apply without change.
  * ============================================================ */
 
-/* "Back to sign in" link above the OTP form */
+/* Back link — very top of right panel */
 .tw-otp-back-link {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    color: var(--tw-text-muted);
+    gap: 4px;
+    color: rgba(60, 145, 230, 0.85);
     font-size: 13px;
     font-weight: 500;
     text-decoration: none;
@@ -557,61 +570,120 @@ body {
 }
 
 .tw-otp-back-link:hover {
-    color: var(--tw-text-primary);
+    color: #3C91E6;
+    text-decoration: underline;
 }
 
-/* Bold email shown in subheading */
-.tw-otp-email-hint {
+.tw-otp-back-link i {
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+/* Masked email rendered as a pill in the subheading */
+.tw-otp-email-pill {
+    display: inline-block;
+    background: #f0f4ff;
     color: #3C91E6;
     font-weight: 600;
+    font-size: 13px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-top: 4px;
 }
 
-/* 6-input row */
-.tw-otp-inputs {
+/* Label above the 6-digit input row */
+.tw-otp-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--tw-text-primary);
+    margin-bottom: 14px;
+}
+
+/* 6-digit input row — horizontally centered */
+.tw-otp-row {
     display: flex;
     gap: 10px;
-    margin: 28px 0 20px;
+    justify-content: center;
+    margin-bottom: 8px;
 }
 
-.tw-otp-input {
+/* Individual digit box */
+.tw-otp-box {
     width: 52px;
-    height: 58px;
+    height: 60px;
     text-align: center;
     font-size: 24px;
     font-weight: 700;
-    border: 1.5px solid var(--tw-border);
-    border-radius: var(--tw-radius-sm);
-    background: var(--tw-bg-surface);
     font-family: var(--tw-font-primary);
     color: var(--tw-text-primary);
-    outline: none;
+    border: 2px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    background: var(--tw-bg-surface);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
     transition: border-color var(--tw-transition-fast),
-                box-shadow var(--tw-transition-fast);
+                box-shadow var(--tw-transition-fast),
+                background var(--tw-transition-fast);
+    outline: none;
     caret-color: #3C91E6;
 }
 
-.tw-otp-input:focus {
+.tw-otp-box:focus {
     border-color: #3C91E6;
-    box-shadow: 0 0 0 3px rgba(60, 145, 230, 0.15);
+    box-shadow: 0 0 0 3px rgba(60, 145, 230, 0.15),
+                inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-/* Filled input has a very faint blue tint */
-.tw-otp-input.filled {
+.tw-otp-box.filled {
     border-color: #3C91E6;
-    background: rgba(60, 145, 230, 0.04);
+    background: #f0f6ff;
 }
 
-/* Timer row */
+.tw-otp-box.error {
+    border-color: var(--tw-danger);
+    box-shadow: 0 0 0 3px rgba(219, 80, 74, 0.12);
+    background: var(--tw-danger-light);
+}
+
+/* Validation error message below inputs */
+.tw-otp-error {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: var(--tw-danger);
+    font-size: 12px;
+    text-align: center;
+    margin-top: 8px;
+}
+
+.tw-otp-error.show {
+    display: flex;
+}
+
+.tw-otp-error i {
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+/* Timer row — centered */
 .tw-otp-timer-row {
     display: flex;
     align-items: center;
-    margin-bottom: 28px;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 16px;
     font-size: 13px;
     color: var(--tw-text-muted);
 }
 
-.tw-otp-timer-row .tw-otp-timer {
+.tw-otp-timer {
+    font-size: 13px;
     font-weight: 600;
+    color: var(--tw-text-primary);
+    font-variant-numeric: tabular-nums;
+    min-width: 36px;
+    text-align: center;
 }
 
 .tw-otp-timer.expired {
@@ -628,12 +700,33 @@ body {
     font-family: var(--tw-font-primary);
     cursor: pointer;
     padding: 0;
-    margin-left: 8px;
     text-decoration: underline;
 }
 
 .tw-resend-btn.visible {
     display: inline;
+}
+
+/* Wrapper adds top spacing before the submit button */
+.tw-otp-submit-wrap {
+    margin-top: 28px;
+}
+
+/* Security note below submit button */
+.tw-otp-security-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 20px;
+    font-size: 12px;
+    color: var(--tw-text-muted);
+}
+
+.tw-otp-security-note i {
+    font-size: 16px;
+    color: var(--tw-success);
+    flex-shrink: 0;
 }
 
 
@@ -711,14 +804,14 @@ body {
         justify-content: flex-start;
     }
 
-    /* Tighter OTP inputs on small screens */
-    .tw-otp-inputs {
+    /* Tighter OTP digit boxes on small screens */
+    .tw-otp-row {
         gap: 7px;
     }
 
-    .tw-otp-input {
+    .tw-otp-box {
         width: 44px;
-        height: 52px;
+        height: 54px;
         font-size: 20px;
     }
 }
