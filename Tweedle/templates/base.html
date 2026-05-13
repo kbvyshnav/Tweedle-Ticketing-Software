@@ -82,98 +82,71 @@
 
 <!-- ==============================================================
      SIDEBAR
-     Fixed left panel. Collapses to icon-only mode via .hide class.
-     Width transitions are defined in tweedle-base.css using
-     --tw-sidebar-width (209px) and --tw-sidebar-collapsed-width (60px).
+     Fixed left panel. Collapses to icon-only via .hide class.
+     CSS: .sidebar in tweedle-base.css
      ============================================================== -->
-<section id="sidebar">
+<nav class="sidebar" id="sidebar">
 
-    <!-- --- Brand row ------------------------------------------- -->
-    <!--
-        Django: <a href="{% url 'admin_dashboard' %}" class="brand">
-        Static file: <img src="{% static 'images/mefs.png' %}" ...>
-    -->
-    <a href="#" class="brand">
-        <img
-            src="../static/images/mefs.png"
-            alt="Tweedle logo"
-            class="company-logo"
-            width="35"
-            height="35">
-        <span class="brand-text">Tweedle.</span>
-    </a>
+    <!-- Brand -->
+    <!-- Django: <a href="{% url 'admin_dashboard' %}"> -->
+    <div class="sidebar-brand">
+        <i class="bx bxs-layer brand-icon" aria-hidden="true"></i>
+        <span class="brand-text">Tweedle</span>
+    </div>
 
-    <!-- --- Navigation list ------------------------------------- -->
-    <!--
-        Django active state pattern for each <li>:
-        class="{% if request.resolver_match.url_name == '<url_name>' %}active{% endif %}"
-
-        The JS fallback below handles active state during static dev.
-    -->
-    <ul class="side-menu top">
+    <!-- Navigation -->
+    <!-- Django active state: add class="nav-link active" on the matching <a>
+         and class="nav-item active-item" on the matching <li> server-side -->
+    <ul class="sidebar-nav">
 
         <!-- Dashboard -->
-        <!--
-            Django: <li class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
-            Django: <a href="{% url 'admin_dashboard' %}">
-        -->
-        <li class="active">
-            <a href="#">
+        <!-- Django: {% url 'admin_dashboard' %} -->
+        <li class="nav-item active-item">
+            <a href="#" class="nav-link active" title="Dashboard">
                 <i class="bx bx-grid-alt"></i>
-                <span class="text">Dashboard</span>
+                <span class="nav-label">Dashboard</span>
             </a>
         </li>
 
         <!-- Inbox -->
-        <!--
-            Django: <li class="{% if request.resolver_match.url_name == 'admin_inbox' %}active{% endif %}">
-            Django: <a href="{% url 'admin_inbox' %}">
-        -->
-        <li>
-            <a href="#">
+        <!-- Django: {% url 'admin_inbox' %} -->
+        <li class="nav-item">
+            <a href="#" class="nav-link" title="Inbox">
                 <i class="bx bx-envelope"></i>
-                <span class="text">Inbox</span>
+                <span class="nav-label">Inbox</span>
             </a>
         </li>
 
         <!-- Clients -->
-        <!--
-            Django: <li class="{% if request.resolver_match.url_name == 'admin_clients' %}active{% endif %}">
-            Django: <a href="{% url 'admin_clients' %}">
-        -->
-        <li>
-            <a href="#">
+        <!-- Django: {% url 'admin_clients' %} -->
+        <li class="nav-item">
+            <a href="#" class="nav-link" title="Clients">
                 <i class="bx bx-buildings"></i>
-                <span class="text">Clients</span>
+                <span class="nav-label">Clients</span>
             </a>
         </li>
 
         <!-- Team -->
-        <!--
-            Django: <li class="{% if request.resolver_match.url_name == 'admin_team' %}active{% endif %}">
-            Django: <a href="{% url 'admin_team' %}">
-        -->
-        <li>
-            <a href="#">
+        <!-- Django: {% url 'admin_team' %} -->
+        <li class="nav-item">
+            <a href="#" class="nav-link" title="Team">
                 <i class="bx bx-group"></i>
-                <span class="text">Team</span>
+                <span class="nav-label">Team</span>
             </a>
         </li>
 
         <!-- Reports -->
-        <!--
-            Django: <li class="{% if request.resolver_match.url_name == 'admin_reports' %}active{% endif %}">
-            Django: <a href="{% url 'admin_reports' %}">
-        -->
-        <li>
-            <a href="#">
+        <!-- Django: {% url 'admin_reports' %} -->
+        <li class="nav-item">
+            <a href="#" class="nav-link" title="Reports">
                 <i class="bx bx-bar-chart-alt-2"></i>
-                <span class="text">Reports</span>
+                <span class="nav-label">Reports</span>
             </a>
         </li>
 
     </ul>
-</section>
+
+</nav>
 <!-- END SIDEBAR -->
 
 
@@ -186,13 +159,13 @@
 
     <!-- ==========================================================
          TOPBAR
-         Sticky top navigation bar. Lato font via --tw-font-secondary.
-         Contains: sidebar toggle, search, notifications, profile.
+         Fixed top navigation bar. CSS: .topbar in tweedle-base.css
+         Contains: hamburger toggle, search, notifications, profile.
          ========================================================== -->
-    <nav>
+    <nav class="topbar">
 
         <!-- Sidebar collapse / expand toggle -->
-        <i class="bx bx-menu" id="sidebarToggle" role="button" aria-label="Toggle sidebar"></i>
+        <i class="bx bx-menu" id="hamburger-btn" role="button" aria-label="Toggle sidebar"></i>
 
         <!-- Global ticket search -->
         <!--
@@ -281,60 +254,59 @@
      Page-level JS goes in {% block page_js %} above.
      ============================================================== -->
 <script>
-    /* ============================================================
-     * SIDEBAR TOGGLE
-     * ============================================================
-     * Adds/removes .hide on #sidebar when the hamburger is clicked.
-     * CSS in tweedle-base.css handles the width transition using
-     * var(--tw-transition-layout) = 0.3s ease.
-     * The sibling combinator (#sidebar.hide ~ #content) in base.css
-     * automatically adjusts the content area width.
-     * ============================================================ */
-    const sidebar       = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebarToggle');
+    /* === SIDEBAR TOGGLE === */
+    const sidebar   = document.getElementById('sidebar');
+    const hamburger = document.getElementById('hamburger-btn');
+    const isMobile  = () => window.innerWidth <= 768;
 
-    sidebarToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('hide');
-    });
-
-
-    /* ============================================================
-     * ACTIVE NAV ITEM (static-file fallback)
-     * ============================================================
-     * In Django, active state is set server-side via template tags:
-     *   class="{% if request.resolver_match.url_name == 'x' %}active{% endif %}"
-     *
-     * This JS block is a fallback for static file development only.
-     * It marks the nav item whose href matches the current URL.
-     * Django: remove or guard with {% if debug %} when deploying.
-     * ============================================================ */
-    document.querySelectorAll('#sidebar .side-menu li').forEach(item => {
-        const link = item.querySelector('a');
-        if (link && link.href === window.location.href) {
-            document.querySelectorAll('#sidebar .side-menu li').forEach(li => li.classList.remove('active'));
-            item.classList.add('active');
+    hamburger.addEventListener('click', function () {
+        if (isMobile()) {
+            sidebar.classList.toggle('mobile-open');
+        } else {
+            sidebar.classList.toggle('hide');
+            document.body.classList.toggle('sidebar-hidden');
         }
     });
 
 
-    /* ============================================================
-     * RESPONSIVE COLLAPSE
-     * ============================================================
-     * Auto-collapses the sidebar on page load for screens at or
-     * below 768px (--bp-md). Re-evaluates on window resize.
-     * ============================================================ */
-    const BP_MD = 768;
+    /* === ACTIVE NAV ITEM === */
+    /* Django: active state is set server-side — add class="nav-link active"
+     * on the matching <a> and class="nav-item active-item" on the matching <li>.
+     * This fallback handles active state for static-file development only.
+     * Django: remove or guard with {% if debug %} when deploying. */
+    const navLinks   = document.querySelectorAll('.nav-link');
+    const currentPath = window.location.pathname;
 
-    function handleResponsiveCollapse() {
-        if (window.innerWidth <= BP_MD) {
-            sidebar.classList.add('hide');
-        } else {
-            sidebar.classList.remove('hide');
+    navLinks.forEach(function (link) {
+        const href = link.getAttribute('href');
+        if (href && href !== '#' && currentPath.includes(href)) {
+            navLinks.forEach(function (l) {
+                l.classList.remove('active');
+                l.closest('.nav-item').classList.remove('active-item');
+            });
+            link.classList.add('active');
+            link.closest('.nav-item').classList.add('active-item');
+        }
+    });
+
+    /* Fallback: if no URL match, keep first item (Dashboard) active */
+    if (!document.querySelector('.nav-link.active')) {
+        const first = document.querySelector('.nav-link');
+        if (first) {
+            first.classList.add('active');
+            first.closest('.nav-item').classList.add('active-item');
         }
     }
 
-    handleResponsiveCollapse();
-    window.addEventListener('resize', handleResponsiveCollapse);
+
+    /* === RESPONSIVE === */
+    function handleResize() {
+        if (isMobile()) {
+            sidebar.classList.remove('hide');
+            document.body.classList.remove('sidebar-hidden');
+        }
+    }
+    window.addEventListener('resize', handleResize);
 </script>
 
 </body>

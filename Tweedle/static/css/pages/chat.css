@@ -275,39 +275,23 @@
 .tw-chat-footer {
     border-top: 1px solid var(--tw-border);
     background: var(--tw-bg-surface);
-    padding: var(--tw-space-3) var(--tw-space-4);
     flex-shrink: 0;
 }
 
+/* Flat flex row: textarea | attach-btn | send-btn — all centered */
 .tw-chat-input-row {
     display: flex;
-    align-items: flex-end;
-    gap: var(--tw-space-2);
-    margin-bottom: var(--tw-space-2);
-}
-
-.tw-chat-input-wrap {
-    flex: 1;
-    position: relative;
-    display: flex;
     align-items: center;
-    border: 1px solid var(--tw-border);
-    border-radius: var(--tw-radius-lg);
-    background: var(--tw-bg-surface);
-    transition: border-color var(--tw-transition-fast);
+    gap: 8px;
+    padding: 10px 14px;
 }
 
-.tw-chat-input-wrap:focus-within {
-    border-color: var(--tw-primary);
-    box-shadow: 0 0 0 2px rgba(60, 145, 230, 0.10);
-}
 
 .tw-chat-textarea {
     flex: 1;
     min-height: 36px;
-    max-height: 80px;
+    max-height: 120px;
     padding: var(--tw-space-2) var(--tw-space-3);
-    padding-right: var(--tw-space-10);
     border: none;
     background: transparent;
     outline: none;
@@ -321,17 +305,19 @@
 }
 
 .tw-chat-attach-btn {
-    position: absolute;
-    right: var(--tw-space-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
     background: none;
     border: none;
-    color: var(--tw-text-secondary);
-    font-size: 18px;
     cursor: pointer;
-    padding: var(--tw-space-1);
+    color: var(--tw-text-secondary);
+    font-size: 20px;
     border-radius: var(--tw-radius-sm);
     transition: color var(--tw-transition-fast);
-    bottom: var(--tw-space-1);
 }
 
 .tw-chat-attach-btn:hover {
@@ -339,8 +325,8 @@
 }
 
 .tw-chat-send-btn {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     border-radius: var(--tw-radius-sm);
     border: none;
     background: var(--tw-primary);
@@ -366,17 +352,17 @@
     transform: none;
 }
 
-/* Attachment preview strip */
+/* Attachment preview strip — shown above input row when files are selected */
 .tw-attach-preview-strip {
     display: none;
     align-items: center;
+    flex-wrap: wrap;
     gap: var(--tw-space-2);
-    padding: var(--tw-space-1) var(--tw-space-2);
-    background: var(--tw-bg-body);
-    border-radius: var(--tw-radius-sm);
+    padding: var(--tw-space-2) var(--tw-space-4);
+    background: var(--tw-bg-surface);
+    border-top: 1px solid var(--tw-border);
     font-size: var(--tw-text-xs);
     color: var(--tw-text-secondary);
-    margin-bottom: var(--tw-space-2);
 }
 
 .tw-attach-preview-strip.show {

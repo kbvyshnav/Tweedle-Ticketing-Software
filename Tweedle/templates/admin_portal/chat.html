@@ -218,31 +218,32 @@
             </button>
         </div>
 
-        <!-- Input row -->
+        <!-- Input row: [ textarea | 📎 | ➤ ] — all vertically centered -->
         <div class="tw-chat-input-row">
-            <div class="tw-chat-input-wrap">
-                <textarea
-                    class="tw-chat-textarea"
-                    id="chatTextarea"
-                    placeholder="Type your message…"
-                    rows="1"
-                    aria-label="Message input"></textarea>
 
-                <button
-                    class="tw-chat-attach-btn"
-                    aria-label="Attach file"
-                    onclick="document.getElementById('fileInput').click()">
-                    <i class="bx bx-paperclip" aria-hidden="true"></i>
-                </button>
-            </div>
+            <textarea
+                class="tw-chat-textarea"
+                id="chatTextarea"
+                placeholder="Type your message…"
+                rows="1"
+                aria-label="Message input"></textarea>
 
-            <!-- Hidden file input -->
+            <!-- Hidden file input — display:none is intentional (functional hide) -->
             <input
                 type="file"
-                id="fileInput"
+                id="chat-file-input"
+                multiple
+                accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
                 aria-hidden="true"
                 tabindex="-1"
-                onchange="handleFileSelect(event)">
+                style="display:none">
+
+            <button
+                class="tw-chat-attach-btn"
+                id="attach-btn"
+                aria-label="Attach file">
+                <i class="bx bx-paperclip" aria-hidden="true"></i>
+            </button>
 
             <button
                 class="tw-chat-send-btn"
@@ -251,6 +252,7 @@
                 aria-label="Send message">
                 <i class="bx bx-send" aria-hidden="true"></i>
             </button>
+
         </div>
 
         <!-- Email notification row -->
@@ -281,23 +283,29 @@
     /* ============================================================
      * CHAT: FILE ATTACHMENT HANDLER
      * ============================================================ */
-    function handleFileSelect(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+    const chatFileInput = document.getElementById('chat-file-input');
+    const attachBtn     = document.getElementById('attach-btn');
 
+    attachBtn.addEventListener('click', function () {
+        chatFileInput.click();
+    });
+
+    chatFileInput.addEventListener('change', function () {
+        handleFileSelection(this.files);
+    });
+
+    function handleFileSelection(files) {
+        if (!files || files.length === 0) return;
+        const file     = files[0];
         const strip    = document.getElementById('attachPreviewStrip');
         const nameSpan = document.getElementById('attachFileName');
-
         nameSpan.textContent = file.name;
         strip.classList.add('show');
     }
 
     function removeAttachment() {
-        const fileInput = document.getElementById('fileInput');
-        const strip     = document.getElementById('attachPreviewStrip');
-
-        fileInput.value = '';
-        strip.classList.remove('show');
+        chatFileInput.value = '';
+        document.getElementById('attachPreviewStrip').classList.remove('show');
     }
 
 
@@ -310,7 +318,7 @@
      * ============================================================ */
     function sendMessage() {
         const text       = chatTextarea.value.trim();
-        const fileInput  = document.getElementById('fileInput');
+        const fileInput  = document.getElementById('chat-file-input');
         const strip      = document.getElementById('attachPreviewStrip');
         const area       = document.getElementById('messagesArea');
 
