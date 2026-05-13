@@ -1,0 +1,332 @@
+<!--
+  File: templates/login.html
+  Phase 8 — Authentication pages
+  Django template: extends 'base_minimal.html' (no sidebar, no topbar)
+  Django view: accounts.views.login  (or django-allauth LoginView)
+  Django url:  account_login
+  On success → Django redirects to role dashboard:
+    admin      → /admin/dashboard/
+    developer  → /developer/dashboard/
+    tester     → /tester/dashboard/
+    user       → /user/dashboard/
+    subuser    → /subuser/dashboard/
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Django: {% block page_title %}Sign In — Tweedle{% endblock %} -->
+    <title>Sign In — Tweedle</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <!-- Django: <link rel="stylesheet" href="{% static 'vendors/boxicons/css/boxicons.min.css' %}"> -->
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
+
+    <!-- 1. Tokens (no theme file — role unknown at login) -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-tokens.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/tweedle-tokens.css">
+    <!-- 2. Base -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-base.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/tweedle-base.css">
+    <!-- 3. Components -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-components.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/tweedle-components.css">
+    <!-- 4. Login page CSS -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/pages/login.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/pages/login.css">
+</head>
+<body>
+
+<!-- Django: {% block content %} -->
+<main class="tw-auth-page">
+<div class="tw-auth-card">
+
+
+    <!-- === LEFT PANEL — BRAND ================================
+         Decorative brand content. Hidden from screen readers.
+         ======================================================= -->
+    <div class="tw-auth-left" aria-hidden="true">
+
+        <!-- Logo (desktop) + brand name (mobile banner only) -->
+        <!-- Django: <img src="{% static 'images/tweedle_logo2.png' %}" ...> -->
+        <img
+            src="../static/images/tweedle_logo2.png"
+            alt="Tweedle"
+            class="tw-auth-brand-logo">
+        <span class="tw-auth-brand-name">Tweedle</span>
+
+        <!-- Middle: icon + tagline -->
+        <div class="tw-auth-brand-mid">
+            <div class="tw-auth-icon-circle">
+                <i class="bx bxs-layer"></i>
+            </div>
+            <p class="tw-auth-headline">Streamline your support.</p>
+            <p class="tw-auth-sub">One platform for tickets,&nbsp;teams and clients.</p>
+        </div>
+
+        <!-- Bottom: feature pills + copyright -->
+        <div class="tw-auth-brand-bottom">
+<p class="tw-auth-copy">&#169; 2025 Tweedle. All rights reserved.</p>
+        </div>
+
+    </div>
+    <!-- END LEFT PANEL -->
+
+
+    <!-- === RIGHT PANEL — FORM ================================
+         ======================================================= -->
+    <div class="tw-auth-right">
+
+        <!-- Form header -->
+        <span class="tw-auth-eyebrow">Welcome Back</span>
+        <h1 class="tw-auth-title">Sign in to Tweedle</h1>
+        <p class="tw-auth-desc">Enter your credentials to access your dashboard.</p>
+
+        <!-- Server-side error alert (hidden until Django renders errors) -->
+        <!-- Django: {% if form.errors or messages %} add class="tw-alert--error visible" {% endif %} -->
+        <div class="tw-alert--error" id="serverAlert" role="alert" aria-live="polite">
+            <i class="bx bx-error-circle" aria-hidden="true"></i>
+            <!-- Django: {% for message in messages %}{{ message }}{% endfor %} -->
+            <span>Invalid username or password. Please try again.</span>
+        </div>
+
+        <!-- Login form -->
+        <!-- Django: action="{% url 'account_login' %}" method="POST" -->
+        <form
+            id="loginForm"
+            action="#"
+            method="POST"
+            novalidate
+            aria-label="Sign in form">
+
+            <!-- Django: {% csrf_token %} -->
+
+            <!-- Username / Email -->
+            <div class="tw-field-group">
+                <label class="tw-field-label" for="username">Username or Email</label>
+                <input
+                    class="tw-input"
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="you@company.com"
+                    autocomplete="username"
+                    aria-describedby="username-error"
+                    required>
+                <p class="tw-field-error" id="username-error" role="alert" aria-live="polite">
+                    <i class="bx bx-error-circle" aria-hidden="true"></i>
+                    <span>Username is required.</span>
+                </p>
+            </div>
+
+            <!-- Password -->
+            <div class="tw-field-group">
+                <label class="tw-field-label" for="password">Password</label>
+                <div class="tw-auth-input-wrap">
+                    <input
+                        class="tw-input tw-input--password"
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        aria-describedby="password-error"
+                        required>
+                    <button
+                        type="button"
+                        class="tw-toggle-pw"
+                        id="togglePw"
+                        aria-label="Show password"
+                        tabindex="0">
+                        <i class="bx bx-show" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <p class="tw-field-error" id="password-error" role="alert" aria-live="polite">
+                    <i class="bx bx-error-circle" aria-hidden="true"></i>
+                    <span id="passwordErrMsg">Password is required.</span>
+                </p>
+            </div>
+
+            <!-- Remember me + Forgot password -->
+            <div class="tw-auth-bottom-row">
+                <label class="tw-remember-label" for="remember">
+                    <input
+                        type="checkbox"
+                        id="remember"
+                        name="remember"
+                        class="tw-remember-input">
+                    <span class="tw-checkbox" aria-hidden="true"></span>
+                    Keep me signed in
+                </label>
+                <!-- Django: href="{% url 'password_reset' %}" -->
+                <a href="#" class="tw-forgot-link">Forgot password?</a>
+            </div>
+
+            <!-- Submit -->
+            <button
+                type="submit"
+                class="tw-submit-btn"
+                id="submitBtn"
+                aria-label="Sign in"
+                aria-busy="false">
+                <span class="tw-submit-text">Sign In</span>
+                <span class="tw-submit-spinner" aria-hidden="true"></span>
+            </button>
+
+            <!-- GOOGLE AUTH START — hidden until Phase 3 -->
+            <div class="tw-google-auth-section" style="display:none">
+                <div class="tw-auth-divider" aria-hidden="true">or</div>
+                <!-- Phase 3: Google OAuth via django-allauth -->
+                <!-- Django: action="{% url 'google_login' %}" -->
+                <button
+                    type="button"
+                    class="tw-btn-google"
+                    aria-label="Continue with Google">
+                    <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                        <path fill="#4285F4" d="M17.64 9.205c0-.638-.057-1.252-.164-1.841H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                        <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                        <path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.348 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/>
+                        <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+                    </svg>
+                    Continue with Google
+                </button>
+            </div>
+            <!-- GOOGLE AUTH END -->
+
+        </form>
+        <!-- END LOGIN FORM -->
+
+        <!-- Form footer -->
+        <footer class="tw-auth-form-footer">
+            Having trouble signing in?<br>
+            <!-- Django: <a href="mailto:admin@tweedle.app">Contact your system administrator.</a> -->
+            <!-- Django: or <a href="{% url 'support' %}">Contact your system administrator.</a> -->
+            Contact your system administrator.
+        </footer>
+
+    </div>
+    <!-- END RIGHT PANEL -->
+
+
+</div>
+</main>
+<!-- Django: {% endblock %} -->
+
+
+<script>
+    /* ============================================================
+     * LOGIN: FORM VALIDATION
+     * ============================================================
+     * Validates on submit only (not on every keystroke).
+     * Errors cleared as user types after first submit attempt.
+     * ============================================================ */
+    const loginForm      = document.getElementById('loginForm');
+    const usernameInput  = document.getElementById('username');
+    const passwordInput  = document.getElementById('password');
+    const usernameError  = document.getElementById('username-error');
+    const passwordError  = document.getElementById('password-error');
+    const passwordErrMsg = document.getElementById('passwordErrMsg');
+    let   _submitted     = false;
+
+    function showFieldError(input, errorEl, message) {
+        input.classList.add('tw-input--error');
+        input.classList.remove('tw-input--success');
+        errorEl.querySelector('span').textContent = message;
+        errorEl.classList.add('show');
+    }
+
+    function clearFieldError(input, errorEl) {
+        input.classList.remove('tw-input--error');
+        errorEl.classList.remove('show');
+    }
+
+    /* Clear errors on input after first submit attempt */
+    usernameInput.addEventListener('input', function () {
+        if (_submitted) clearFieldError(this, usernameError);
+    });
+
+    passwordInput.addEventListener('input', function () {
+        if (_submitted) clearFieldError(this, passwordError);
+    });
+
+    loginForm.addEventListener('submit', function (e) {
+        _submitted = true;
+        let valid  = true;
+
+        clearFieldError(usernameInput, usernameError);
+        clearFieldError(passwordInput, passwordError);
+
+        if (!usernameInput.value.trim()) {
+            showFieldError(usernameInput, usernameError, 'Username is required.');
+            valid = false;
+        }
+
+        if (!passwordInput.value) {
+            showFieldError(passwordInput, passwordError, 'Password is required.');
+            valid = false;
+        } else if (passwordInput.value.length < 6) {
+            showFieldError(passwordInput, passwordError, 'Password must be at least 6 characters.');
+            valid = false;
+        }
+
+        if (!valid) {
+            e.preventDefault();
+            if (usernameInput.classList.contains('tw-input--error')) {
+                usernameInput.focus();
+            } else {
+                passwordInput.focus();
+            }
+            return;
+        }
+
+        /* Valid — trigger loading state */
+        /* === LOGIN: SUBMIT LOADING STATE === */
+        const btn = document.getElementById('submitBtn');
+        btn.classList.add('loading');
+        btn.setAttribute('aria-busy', 'true');
+
+        /* Safety timeout: 8 s max — removes loading if redirect stalls */
+        setTimeout(function () {
+            btn.classList.remove('loading');
+            btn.setAttribute('aria-busy', 'false');
+        }, 8000);
+    });
+
+
+    /* ============================================================
+     * LOGIN: PASSWORD TOGGLE
+     * ============================================================ */
+    const togglePw = document.getElementById('togglePw');
+
+    togglePw.addEventListener('click', function () {
+        const isHidden = passwordInput.type === 'password';
+        passwordInput.type = isHidden ? 'text' : 'password';
+        const icon = this.querySelector('i');
+        icon.className = isHidden ? 'bx bx-hide' : 'bx bx-show';
+        this.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+    });
+
+
+    /* ============================================================
+     * LOGIN: REMEMBER ME
+     * ============================================================
+     * Stores UI preference only. Django session length is set
+     * server-side — this only restores the checkbox on reload.
+     * ============================================================ */
+    const rememberCheck = document.getElementById('remember');
+
+    try {
+        if (localStorage.getItem('tweedle_remember') === 'true') {
+            rememberCheck.checked = true;
+        }
+    } catch (e) { /* localStorage blocked in private mode */ }
+
+    rememberCheck.addEventListener('change', function () {
+        try { localStorage.setItem('tweedle_remember', this.checked); } catch (e) {}
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!--
+  File: templates/otp-verify.html
+  Phase 8 — Authentication pages (stub)
+  Django template: extends 'base_minimal.html'
+  Django view: accounts.views.otp_verify
+  Django url:  otp_verify
+  Note: Phase 2 — implement with django-otp when 2FA is enabled.
+        This page is a fully functional UI stub — backend is not wired.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Django: {% block page_title %}Verify Code — Tweedle{% endblock %} -->
+    <title>Verify Code — Tweedle</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <!-- Django: <link rel="stylesheet" href="{% static 'vendors/boxicons/css/boxicons.min.css' %}"> -->
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
+
+    <!-- 1. Tokens (no theme file — role unknown at auth time) -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-tokens.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/tweedle-tokens.css">
+    <!-- 2. Base -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-base.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/tweedle-base.css">
+    <!-- 3. Components -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-components.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/tweedle-components.css">
+    <!-- 4. Login page CSS (shared with otp-verify) -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/pages/login.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/pages/login.css">
+</head>
+<body>
+
+<!-- Django: {% block content %} -->
+<main class="tw-auth-page">
+<div class="tw-auth-card">
+
+
+    <!-- === LEFT PANEL — same as login.html =================== -->
+    <div class="tw-auth-left" aria-hidden="true">
+
+        <!-- Django: <img src="{% static 'images/tweedle_logo2.png' %}" ...> -->
+        <img
+            src="../static/images/tweedle_logo2.png"
+            alt="Tweedle"
+            class="tw-auth-brand-logo">
+        <span class="tw-auth-brand-name">Tweedle</span>
+
+        <div class="tw-auth-brand-mid">
+            <div class="tw-auth-icon-circle">
+                <i class="bx bxs-lock-alt"></i>
+            </div>
+            <p class="tw-auth-headline">One more step.</p>
+            <p class="tw-auth-sub">Verify your identity to keep your account secure.</p>
+        </div>
+
+        <div class="tw-auth-brand-bottom">
+            <div class="tw-auth-pills">
+                <span class="tw-auth-pill">&#10003; Secure access</span>
+                <span class="tw-auth-pill">&#10003; 6-digit code</span>
+                <span class="tw-auth-pill">&#10003; Expires in 5 min</span>
+            </div>
+            <p class="tw-auth-copy">&#169; 2025 Tweedle. All rights reserved.</p>
+        </div>
+
+    </div>
+    <!-- END LEFT PANEL -->
+
+
+    <!-- === RIGHT PANEL — OTP FORM ============================ -->
+    <div class="tw-auth-right">
+
+        <!-- Back to sign in -->
+        <!-- Django: href="{% url 'account_login' %}" -->
+        <a href="login.html" class="tw-otp-back-link" aria-label="Back to sign in">
+            <i class="bx bx-arrow-back" aria-hidden="true"></i>
+            Back to sign in
+        </a>
+
+        <!-- Form header -->
+        <span class="tw-auth-eyebrow">Verification</span>
+        <h1 class="tw-auth-title">Check your email</h1>
+        <p class="tw-auth-desc">
+            We've sent a 6-digit code to<br>
+            <!-- Django: <strong class="tw-otp-email-hint">{{ masked_email }}</strong> -->
+            <strong class="tw-otp-email-hint">r&#42;&#42;&#42;&#42;&#64;company.com</strong>
+        </p>
+
+        <!-- OTP form -->
+        <!-- Django: action="{% url 'otp_verify' %}" method="POST" -->
+        <form
+            id="otpForm"
+            action="#"
+            method="POST"
+            novalidate
+            aria-label="Enter verification code">
+
+            <!-- Django: {% csrf_token %} -->
+
+            <!-- 6 digit input row -->
+            <div
+                class="tw-otp-inputs"
+                role="group"
+                aria-label="One-time verification code">
+                <input class="tw-otp-input" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="Digit 1 of 6" name="otp_1">
+                <input class="tw-otp-input" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="Digit 2 of 6" name="otp_2">
+                <input class="tw-otp-input" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="Digit 3 of 6" name="otp_3">
+                <input class="tw-otp-input" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="Digit 4 of 6" name="otp_4">
+                <input class="tw-otp-input" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="Digit 5 of 6" name="otp_5">
+                <input class="tw-otp-input" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="Digit 6 of 6" name="otp_6">
+            </div>
+
+            <!-- Countdown timer + resend -->
+            <div class="tw-otp-timer-row">
+                Code expires in
+                <span class="tw-otp-timer" id="otpTimer">&nbsp;04:59</span>
+                <!-- Resend button hidden until timer expires -->
+                <button
+                    type="button"
+                    class="tw-resend-btn"
+                    id="resendCode"
+                    aria-label="Resend verification code">
+                    Resend Code
+                </button>
+            </div>
+
+            <!-- Submit -->
+            <button
+                type="submit"
+                class="tw-submit-btn"
+                id="otpSubmitBtn"
+                aria-label="Verify code"
+                aria-busy="false">
+                <span class="tw-submit-text">Verify Code</span>
+                <span class="tw-submit-spinner" aria-hidden="true"></span>
+            </button>
+
+        </form>
+        <!-- END OTP FORM -->
+
+        <!-- Footer -->
+        <footer class="tw-auth-form-footer">
+            Didn't receive an email? Check your spam folder<br>
+            or contact your system administrator.
+        </footer>
+
+    </div>
+    <!-- END RIGHT PANEL -->
+
+
+</div>
+</main>
+<!-- Django: {% endblock %} -->
+
+
+<script>
+    /* ============================================================
+     * OTP: INPUT AUTO-ADVANCE
+     * ============================================================
+     * Typing a digit moves focus to the next input.
+     * Backspace on an empty input moves focus to the previous one.
+     * ============================================================ */
+    const otpInputs = Array.from(document.querySelectorAll('.tw-otp-input'));
+
+    otpInputs.forEach(function (input, index) {
+        input.addEventListener('input', function () {
+            /* Sanitise: keep only the last digit entered */
+            const val = this.value.replace(/[^0-9]/g, '');
+            this.value = val ? val.slice(-1) : '';
+
+            if (this.value) {
+                this.classList.add('filled');
+                if (index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            } else {
+                this.classList.remove('filled');
+            }
+        });
+
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Backspace' && !this.value && index > 0) {
+                otpInputs[index - 1].value = '';
+                otpInputs[index - 1].classList.remove('filled');
+                otpInputs[index - 1].focus();
+            }
+        });
+
+        /* Prevent non-numeric key entry */
+        input.addEventListener('keypress', function (e) {
+            if (!/[0-9]/.test(e.key)) e.preventDefault();
+        });
+    });
+
+
+    /* ============================================================
+     * OTP: PASTE HANDLER
+     * ============================================================
+     * Paste a full 6-digit code and it splits across all inputs.
+     * Attached to the first input; works regardless of which
+     * input is focused (event bubbles up to form, but simpler
+     * to attach here since paste propagates from focus).
+     * ============================================================ */
+    document.getElementById('otpForm').addEventListener('paste', function (e) {
+        e.preventDefault();
+        const pasted = (e.clipboardData || window.clipboardData)
+            .getData('text')
+            .replace(/[^0-9]/g, '')
+            .slice(0, 6);
+
+        pasted.split('').forEach(function (char, i) {
+            if (otpInputs[i]) {
+                otpInputs[i].value = char;
+                otpInputs[i].classList.add('filled');
+            }
+        });
+
+        /* Move focus to first empty slot, or last input if full */
+        const nextEmpty = otpInputs.findIndex(function (inp) { return !inp.value; });
+        if (nextEmpty !== -1) {
+            otpInputs[nextEmpty].focus();
+        } else {
+            otpInputs[otpInputs.length - 1].focus();
+        }
+    });
+
+
+    /* ============================================================
+     * OTP: COUNTDOWN TIMER
+     * ============================================================
+     * Counts down from 04:59. When expired: timer turns red,
+     * "Resend Code" button becomes visible.
+     * ============================================================ */
+    let _timeLeft    = 299;
+    const timerEl   = document.getElementById('otpTimer');
+    const resendBtn = document.getElementById('resendCode');
+    let   _otpCountdown;
+
+    function formatTime(secs) {
+        const m = Math.floor(secs / 60).toString().padStart(2, '0');
+        const s = (secs % 60).toString().padStart(2, '0');
+        return ' ' + m + ':' + s;
+    }
+
+    function startCountdown(seconds) {
+        _timeLeft = seconds;
+        timerEl.textContent = formatTime(_timeLeft);
+        timerEl.classList.remove('expired');
+        resendBtn.classList.remove('visible');
+
+        clearInterval(_otpCountdown);
+        _otpCountdown = setInterval(function () {
+            _timeLeft--;
+            timerEl.textContent = formatTime(_timeLeft);
+
+            if (_timeLeft <= 0) {
+                clearInterval(_otpCountdown);
+                timerEl.textContent = ' 00:00';
+                timerEl.classList.add('expired');
+                resendBtn.classList.add('visible');
+            }
+        }, 1000);
+    }
+
+    startCountdown(299);
+
+    resendBtn.addEventListener('click', function () {
+        /* Django: POST to {% url 'otp_resend' %} */
+        console.log('[OTP] Code resend requested');
+        otpInputs.forEach(function (inp) {
+            inp.value = '';
+            inp.classList.remove('filled');
+        });
+        otpInputs[0].focus();
+        startCountdown(299);
+    });
+
+
+    /* ============================================================
+     * OTP: FORM SUBMIT
+     * ============================================================
+     * Django: Phase 2 — replace with actual POST and CSRF token.
+     * ============================================================ */
+    document.getElementById('otpForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const code = otpInputs.map(function (inp) { return inp.value; }).join('');
+        if (code.length < 6) {
+            const nextEmpty = otpInputs.findIndex(function (inp) { return !inp.value; });
+            if (nextEmpty !== -1) otpInputs[nextEmpty].focus();
+            return;
+        }
+
+        /* Loading state */
+        const btn = document.getElementById('otpSubmitBtn');
+        btn.classList.add('loading');
+        btn.setAttribute('aria-busy', 'true');
+
+        /* Django: POST { otp_code: code } to {% url 'otp_verify' %} */
+        console.log('[OTP] Verifying code:', code);
+
+        /* Safety timeout */
+        setTimeout(function () {
+            btn.classList.remove('loading');
+            btn.setAttribute('aria-busy', 'false');
+        }, 8000);
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,724 @@
+/*
+ * ============================================================
+ * FILE:        login.css
+ * PURPOSE:     Authentication pages — login + OTP verify.
+ *              ROLE NEUTRAL: brand color #3C91E6 used literally
+ *              throughout. No --tw-primary. No theme file loaded.
+ * LOAD ORDER:  tokens → base → components → login.css
+ *              (theme-*.css is intentionally omitted here)
+ * DJANGO PATH: <!-- Django: {% static 'css/pages/login.css' %} -->
+ * DEPENDS ON:  tweedle-tokens.css
+ * MODIFIED:    <!-- Last modified: {{date}} -->
+ * ============================================================ */
+
+
+/* === PAGE LAYOUT ===========================================
+ * Two-tone split background behind the centered card.
+ * Split is 45 / 55 — left slightly narrower than the card.
+ * ============================================================ */
+body {
+    background: linear-gradient(to right, #f0f4ff 45%, #ffffff 45%);
+    min-height: 100vh;
+}
+
+.tw-auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+}
+
+
+/* === AUTH CARD =============================================
+ * Two-column grid. Left: 420px brand. Right: fluid form.
+ * ============================================================ */
+.tw-auth-card {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    max-width: 900px;
+    width: 92%;
+    min-height: 580px;
+    background: #ffffff;
+    border-radius: var(--tw-radius-xl);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.10),
+                0 4px 16px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+
+/* === LEFT PANEL — BRAND =====================================
+ * Fixed Tweedle blue. Three radial gradients add subtle depth.
+ * ============================================================ */
+.tw-auth-left {
+    background-color: #3C91E6;
+    background-image:
+        radial-gradient(circle at 15% 85%, rgba(255, 255, 255, 0.10) 0%, transparent 50%),
+        radial-gradient(circle at 85% 15%, rgba(255, 255, 255, 0.07) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.04) 0%, transparent 70%);
+    padding: 48px;
+    display: flex;
+    flex-direction: column;
+    color: #ffffff;
+}
+
+.tw-auth-brand-logo {
+    width: 140px;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
+}
+
+/* Shown only on mobile banner — hidden on desktop */
+.tw-auth-brand-name {
+    display: none;
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.3px;
+}
+
+/* Grows to push pills + copyright to the bottom */
+.tw-auth-brand-mid {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.tw-auth-icon-circle {
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 64px auto 32px;
+    flex-shrink: 0;
+}
+
+.tw-auth-icon-circle i {
+    font-size: 48px;
+    color: #ffffff;
+}
+
+.tw-auth-headline {
+    font-size: 26px;
+    font-weight: 700;
+    font-family: var(--tw-font-primary);
+    line-height: 1.3;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.tw-auth-sub {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.6;
+    opacity: 0.75;
+    max-width: 280px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.tw-auth-brand-bottom {
+    flex-shrink: 0;
+}
+
+.tw-auth-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.tw-auth-pill {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.tw-auth-copy {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.50);
+}
+
+
+/* === RIGHT PANEL — FORM CONTAINER ==========================
+ * White background. Flex column, vertically centered.
+ * ============================================================ */
+.tw-auth-right {
+    background: #ffffff;
+    padding: 48px 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+/* === FORM HEADER ===========================================
+ * Eyebrow → H1 → description. Three distinct type levels.
+ * ============================================================ */
+.tw-auth-eyebrow {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: #3C91E6;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.tw-auth-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--tw-text-primary);
+    line-height: 1.2;
+    margin-bottom: 6px;
+}
+
+.tw-auth-desc {
+    font-size: 13px;
+    color: var(--tw-text-muted);
+    line-height: 1.5;
+    margin-bottom: 36px;
+}
+
+
+/* === SERVER ERROR ALERT ===================================
+ * Hidden by default. Django adds .visible on form.errors.
+ * ============================================================ */
+.tw-alert--error {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    background: var(--tw-danger-light);
+    border-left: 4px solid var(--tw-danger);
+    border-radius: var(--tw-radius-sm);
+    padding: 12px 16px;
+    margin-bottom: 24px;
+}
+
+.tw-alert--error.visible {
+    display: flex;
+}
+
+.tw-alert--error i {
+    font-size: 18px;
+    color: var(--tw-danger);
+    flex-shrink: 0;
+}
+
+.tw-alert--error span {
+    font-size: 13px;
+    color: var(--tw-priority-high-text);
+    line-height: 1.4;
+}
+
+
+/* === FORM FIELDS ==========================================
+ * Field group → label → input. Error message beneath input.
+ * ============================================================ */
+.tw-field-group {
+    margin-bottom: 20px;
+}
+
+.tw-field-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--tw-text-primary);
+    margin-bottom: 6px;
+}
+
+/* Wrapper for password field (anchors the toggle button) */
+.tw-auth-input-wrap {
+    position: relative;
+}
+
+/* Base input */
+.tw-input {
+    width: 100%;
+    height: 46px;
+    padding: 0 16px;
+    border: 1.5px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    background: var(--tw-bg-surface);
+    font-size: 14px;
+    font-family: var(--tw-font-primary);
+    color: var(--tw-text-primary);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: border-color var(--tw-transition-fast),
+                box-shadow var(--tw-transition-fast);
+    outline: none;
+    display: block;
+}
+
+.tw-input::placeholder {
+    color: var(--tw-text-muted);
+    font-size: 13px;
+}
+
+.tw-input:focus {
+    border-color: #3C91E6;
+    box-shadow: 0 0 0 3px rgba(60, 145, 230, 0.15),
+                inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Extra right padding reserves space for the toggle button */
+.tw-input--password {
+    padding-right: 44px;
+}
+
+.tw-input--error {
+    border-color: var(--tw-danger);
+    box-shadow: 0 0 0 3px rgba(219, 80, 74, 0.12);
+}
+
+.tw-input--success {
+    border-color: var(--tw-success);
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.10);
+}
+
+/* Field-level error message */
+.tw-field-error {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    color: var(--tw-danger);
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.tw-field-error.show {
+    display: flex;
+}
+
+.tw-field-error i {
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+
+/* === PASSWORD TOGGLE ====================================== */
+.tw-toggle-pw {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--tw-text-muted);
+    font-size: 18px;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color var(--tw-transition-fast);
+    line-height: 1;
+}
+
+.tw-toggle-pw:hover {
+    color: var(--tw-text-primary);
+}
+
+
+/* === BOTTOM ROW: REMEMBER + FORGOT ======================== */
+.tw-auth-bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+}
+
+/* Custom checkbox label */
+.tw-remember-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--tw-text-secondary);
+    user-select: none;
+}
+
+/* Visually hidden native checkbox (still keyboard-focusable) */
+.tw-remember-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+/* Custom visual checkbox */
+.tw-checkbox {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--tw-border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    background: var(--tw-bg-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--tw-transition-fast),
+                border-color var(--tw-transition-fast);
+}
+
+.tw-remember-input:checked + .tw-checkbox {
+    background: #3C91E6;
+    border-color: #3C91E6;
+}
+
+.tw-remember-input:checked + .tw-checkbox::after {
+    content: '';
+    width: 4px;
+    height: 8px;
+    border: 2px solid #ffffff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translateY(-1px);
+    display: block;
+}
+
+.tw-remember-input:focus-visible + .tw-checkbox {
+    outline: 2px solid #3C91E6;
+    outline-offset: 2px;
+}
+
+.tw-forgot-link {
+    color: #3C91E6;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: text-decoration var(--tw-transition-fast);
+    white-space: nowrap;
+}
+
+.tw-forgot-link:hover {
+    text-decoration: underline;
+}
+
+
+/* === SUBMIT BUTTON ========================================
+ * Primary action. Loading state swaps text → spinner.
+ * ============================================================ */
+.tw-submit-btn {
+    width: 100%;
+    height: 48px;
+    background: #3C91E6;
+    color: #ffffff;
+    border: none;
+    border-radius: var(--tw-radius-sm);
+    font-size: 15px;
+    font-weight: 600;
+    font-family: var(--tw-font-primary);
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 14px rgba(60, 145, 230, 0.35);
+    transition: background var(--tw-transition-fast),
+                transform var(--tw-transition-fast),
+                box-shadow var(--tw-transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.tw-submit-btn:hover {
+    background: #2a7fd4;
+    box-shadow: 0 6px 20px rgba(60, 145, 230, 0.45);
+    transform: translateY(-1px);
+}
+
+.tw-submit-btn:active {
+    transform: translateY(0px);
+    box-shadow: 0 2px 8px rgba(60, 145, 230, 0.30);
+}
+
+.tw-submit-btn.loading {
+    background: #2a7fd4;
+    pointer-events: none;
+}
+
+.tw-submit-btn.loading .tw-submit-text {
+    display: none;
+}
+
+.tw-submit-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: tw-auth-spin 0.65s linear infinite;
+    display: none;
+    flex-shrink: 0;
+}
+
+.tw-submit-btn.loading .tw-submit-spinner {
+    display: block;
+}
+
+@keyframes tw-auth-spin {
+    to { transform: rotate(360deg); }
+}
+
+
+/* === GOOGLE AUTH SECTION ==================================
+ * Stub — entire section hidden via inline feature flag.
+ * ============================================================ */
+.tw-auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0;
+    color: var(--tw-text-muted);
+    font-size: 12px;
+}
+
+.tw-auth-divider::before,
+.tw-auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--tw-border);
+}
+
+.tw-btn-google {
+    width: 100%;
+    height: 46px;
+    background: #ffffff;
+    border: 1.5px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: var(--tw-font-primary);
+    color: var(--tw-text-primary);
+    cursor: pointer;
+    transition: border-color var(--tw-transition-fast),
+                box-shadow var(--tw-transition-fast);
+}
+
+.tw-btn-google:hover {
+    border-color: #3C91E6;
+    box-shadow: 0 0 0 3px rgba(60, 145, 230, 0.10);
+}
+
+
+/* === FORM FOOTER ==========================================
+ * Help text below the form. Links open email / support page.
+ * ============================================================ */
+.tw-auth-form-footer {
+    margin-top: 28px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--tw-text-muted);
+    line-height: 1.7;
+}
+
+.tw-auth-form-footer a {
+    color: #3C91E6;
+    text-decoration: none;
+}
+
+.tw-auth-form-footer a:hover {
+    text-decoration: underline;
+}
+
+
+/* ============================================================
+ * OTP VERIFY PAGE ADDITIONS
+ * ============================================================ */
+
+/* "Back to sign in" link above the OTP form */
+.tw-otp-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--tw-text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    margin-bottom: 28px;
+    transition: color var(--tw-transition-fast);
+}
+
+.tw-otp-back-link:hover {
+    color: var(--tw-text-primary);
+}
+
+/* Bold email shown in subheading */
+.tw-otp-email-hint {
+    color: #3C91E6;
+    font-weight: 600;
+}
+
+/* 6-input row */
+.tw-otp-inputs {
+    display: flex;
+    gap: 10px;
+    margin: 28px 0 20px;
+}
+
+.tw-otp-input {
+    width: 52px;
+    height: 58px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    border: 1.5px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    background: var(--tw-bg-surface);
+    font-family: var(--tw-font-primary);
+    color: var(--tw-text-primary);
+    outline: none;
+    transition: border-color var(--tw-transition-fast),
+                box-shadow var(--tw-transition-fast);
+    caret-color: #3C91E6;
+}
+
+.tw-otp-input:focus {
+    border-color: #3C91E6;
+    box-shadow: 0 0 0 3px rgba(60, 145, 230, 0.15);
+}
+
+/* Filled input has a very faint blue tint */
+.tw-otp-input.filled {
+    border-color: #3C91E6;
+    background: rgba(60, 145, 230, 0.04);
+}
+
+/* Timer row */
+.tw-otp-timer-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 28px;
+    font-size: 13px;
+    color: var(--tw-text-muted);
+}
+
+.tw-otp-timer-row .tw-otp-timer {
+    font-weight: 600;
+}
+
+.tw-otp-timer.expired {
+    color: var(--tw-danger);
+}
+
+.tw-resend-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: #3C91E6;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: var(--tw-font-primary);
+    cursor: pointer;
+    padding: 0;
+    margin-left: 8px;
+    text-decoration: underline;
+}
+
+.tw-resend-btn.visible {
+    display: inline;
+}
+
+
+/* === RESPONSIVE — 768px ====================================
+ * Left panel: 320px. Pills hidden. Right padding: 36px.
+ * ============================================================ */
+@media screen and (max-width: 768px) {
+    .tw-auth-card {
+        grid-template-columns: 320px 1fr;
+    }
+
+    .tw-auth-left {
+        padding: 36px 32px;
+    }
+
+    .tw-auth-pills {
+        display: none;
+    }
+
+    .tw-auth-right {
+        padding: 48px 36px;
+    }
+}
+
+
+/* === RESPONSIVE — 576px ====================================
+ * Card goes vertical. Left panel → 72px top banner.
+ * Body background drops the split — clean white behind form.
+ * ============================================================ */
+@media screen and (max-width: 576px) {
+    body {
+        background: #ffffff;
+    }
+
+    .tw-auth-page {
+        padding: 0;
+        align-items: flex-start;
+    }
+
+    .tw-auth-card {
+        grid-template-columns: 1fr;
+        width: 100%;
+        max-width: 100%;
+        min-height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    /* Collapse to narrow top banner */
+    .tw-auth-left {
+        height: 72px;
+        min-height: 0;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+    }
+
+    .tw-auth-brand-logo {
+        width: 100px;
+    }
+
+    .tw-auth-brand-name {
+        display: block;
+    }
+
+    .tw-auth-brand-mid,
+    .tw-auth-brand-bottom {
+        display: none;
+    }
+
+    .tw-auth-right {
+        padding: 32px 24px;
+        border-top: 4px solid #3C91E6;
+        justify-content: flex-start;
+    }
+
+    /* Tighter OTP inputs on small screens */
+    .tw-otp-inputs {
+        gap: 7px;
+    }
+
+    .tw-otp-input {
+        width: 44px;
+        height: 52px;
+        font-size: 20px;
+    }
+}
