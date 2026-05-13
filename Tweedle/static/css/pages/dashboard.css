@@ -54,6 +54,19 @@ body > main {
 }
 
 
+/* === TAB CONTENT PANELS ====================================
+ * Each tab has its own .tab-content div wrapping its table.
+ * Only the .active tab-content is shown. Switched by JS.
+ * ============================================================ */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+
 /* === TICKET TABS =========================================== */
 .ticket-tabs {
     display: flex;

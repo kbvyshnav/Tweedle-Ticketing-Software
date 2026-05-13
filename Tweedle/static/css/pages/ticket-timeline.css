@@ -1,7 +1,8 @@
 /*
  * ============================================================
  * FILE:        ticket-timeline.css
- * PURPOSE:     Ticket timeline (Outlook view) — page-specific styles.
+ * PURPOSE:     Ticket timeline — full-page Outlook view + floating
+ *              side panel variant (embedded in dashboard.html).
  * LOAD ORDER:  5 of 5
  * DJANGO PATH: <!-- Django: {% static 'css/pages/ticket-timeline.css' %} -->
  * DEPENDS ON:  tweedle-tokens.css
@@ -264,5 +265,147 @@ body > main {
 
     .tl-timeline::before {
         display: none;
+    }
+}
+
+
+/* ============================================================
+ * FLOATING TIMELINE PANEL
+ * Fixed right-side panel embedded in dashboard.html.
+ * Slides in from the right via transform on .open class.
+ * ============================================================ */
+.tw-timeline-panel {
+    position: fixed;
+    top: var(--tw-topbar-height);
+    right: 0;
+    width: 360px;
+    height: calc(100vh - var(--tw-topbar-height));
+    background: var(--tw-bg-surface);
+    border-left: 1px solid var(--tw-border);
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    z-index: calc(var(--tw-z-sticky) + 1);
+    transform: translateX(100%);
+    transition: transform var(--tw-transition-base);
+}
+
+.tw-timeline-panel.open {
+    transform: translateX(0);
+}
+
+.tw-timeline-panel-header {
+    background: var(--tw-primary);
+    color: #ffffff;
+    padding: var(--tw-space-3) var(--tw-space-4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    gap: var(--tw-space-3);
+}
+
+.tw-timeline-panel-ticket-id {
+    font-size: var(--tw-text-xs);
+    opacity: 0.85;
+    margin-bottom: 2px;
+}
+
+.tw-timeline-panel-subject {
+    font-size: var(--tw-text-md);
+    font-weight: var(--tw-weight-semibold);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 260px;
+}
+
+.tw-timeline-panel-close {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #ffffff;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--tw-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    flex-shrink: 0;
+    transition: background var(--tw-transition-fast);
+}
+
+.tw-timeline-panel-close:hover {
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.tw-timeline-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--tw-space-5) var(--tw-space-4);
+}
+
+/* Timeline entries within the floating panel */
+.tw-tl-panel-entry {
+    display: flex;
+    gap: var(--tw-space-3);
+    padding-bottom: var(--tw-space-5);
+    position: relative;
+}
+
+.tw-tl-panel-entry:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    bottom: 0;
+    width: 2px;
+    background: var(--tw-border);
+}
+
+.tw-tl-panel-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 14px;
+    flex-shrink: 0;
+    border: 2px solid var(--tw-bg-surface);
+}
+
+.tw-tl-panel-dot--created  { background: var(--tw-success); }
+.tw-tl-panel-dot--accepted { background: var(--tw-info); }
+.tw-tl-panel-dot--assigned { background: var(--tw-primary); }
+.tw-tl-panel-dot--testing  { background: #8b5cf6; }
+.tw-tl-panel-dot--current  { background: var(--tw-warning); }
+
+.tw-tl-panel-content {
+    flex: 1;
+    padding-top: 4px;
+}
+
+.tw-tl-panel-event {
+    font-size: var(--tw-text-md);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    line-height: 1.3;
+    margin-bottom: 2px;
+}
+
+.tw-tl-panel-meta {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    line-height: 1.4;
+}
+
+@media screen and (max-width: 576px) {
+    .tw-timeline-panel {
+        width: 100%;
+        top: 0;
+        height: 100vh;
     }
 }

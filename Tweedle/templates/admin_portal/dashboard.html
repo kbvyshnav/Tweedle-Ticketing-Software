@@ -1,98 +1,39 @@
 <!--
   File: templates/admin_portal/dashboard.html
   Moved from: cAdmin_dashboard.html (Phase 6 restructure)
+  Phase 9: converted to partial + fully wired (Tasks 1-5)
+    Task 1: stripped HTML wrapper, added Django block structure
+    Task 2: tab-content sections with separate tables per tab
+    Task 3: ticket row → modal (ticketDetailsModal / newTicketModal)
+    Task 4: chat panel embedded and wired to .tw-action-icon--chat
+    Task 5: timeline panel embedded and wired to .tw-action-icon--timeline
   Django template: extends 'base.html'
   Django view: admin_portal.views.dashboard
   Django url:  admin:dashboard
 -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Django: {% extends 'base.html' %} -->
 
-    <!-- Django: {% block page_title %}Dashboard — Tweedle{% endblock %} -->
-    <title>Dashboard — Tweedle</title>
+<!-- Django: {% block page_css %}
+<link rel="stylesheet" href="{% static 'css/pages/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/ticket-details.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/chat.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/ticket-timeline.css' %}">
+{% endblock %} -->
 
-    <!-- Google Fonts: Poppins (UI) + Lato (sidebar/nav) -->
-    <!-- Django: move to base template <head> -->
-    <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap">
-
-    <!-- Boxicons -->
-    <!-- Django: <link rel="stylesheet" href="{% static 'vendors/boxicons/css/boxicons.min.css' %}"> -->
-    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
-
-    <!-- Bootstrap 5 -->
-    <!-- Django: <link rel="stylesheet" href="{% static 'vendors/bootstrap/css/bootstrap.min.css' %}"> -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-
-    <!-- =====================================================
-         CSS LOAD ORDER
-         1. Design tokens  — all CSS custom properties
-         2. Role theme     — Admin blue (#3C91E6)
-         3. Base layout    — sidebar, topbar, typography
-         4. UI Components  — buttons, tables, modals, etc.
-         5. Page CSS       — dashboard-only rules
-         ===================================================== -->
-
-    <!-- 1. Tokens -->
-    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-tokens.css' %}"> -->
-    <link rel="stylesheet" href="../../static/css/tweedle-tokens.css">
-
-    <!-- 2. Admin theme -->
-    <!-- Django: <link rel="stylesheet" href="{% static 'css/themes/theme-admin.css' %}"> -->
-    <link rel="stylesheet" href="../../static/css/themes/theme-admin.css">
-
-    <!-- 3. Base -->
-    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-base.css' %}"> -->
-    <link rel="stylesheet" href="../../static/css/tweedle-base.css">
-
-    <!-- 4. Components -->
-    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-components.css' %}"> -->
-    <link rel="stylesheet" href="../../static/css/tweedle-components.css">
-
-    <!-- 5. Dashboard page CSS -->
-    <!-- Django: <link rel="stylesheet" href="{% static 'css/pages/dashboard.css' %}"> -->
-    <link rel="stylesheet" href="../../static/css/pages/dashboard.css">
-</head>
-
-<!--
-    body.role-admin activates the Admin (blue) theme tokens.
-    Django: class="role-{% block body_role %}admin{% endblock %}"
-    When injected via {% block content %}, this class is on the
-    <body> tag in cAdmin_baseUI.html instead.
--->
-<body class="role-admin">
-
-
-<!-- ==============================================================
-     MAIN CONTENT
-     Django: this entire <main> block becomes {% block content %}
-     in cAdmin_baseUI.html when the project is Django-integrated.
-     ============================================================== -->
-<main>
+<!-- Django: {% block content %} -->
 
     <!-- === PAGE HEADER ======================================== -->
-    <!-- Django: {% block page_title %}Dashboard{% endblock %} -->
     <div class="page-head">
         <h1>Dashboard</h1>
     </div>
 
 
-    <!-- === FILTER BAR ========================================
-         Contains: company sort dropdown, date range picker,
-         and global ticket-ID search.
-         Django: filter values passed as GET params to the view.
-         Django: populated via API or view context.
-         ======================================================= -->
+    <!-- === FILTER BAR ========================================= -->
     <div class="filter-bar">
 
         <div class="filter-bar__controls">
 
             <!-- Company sort dropdown -->
-            <!-- Django: active company from request.GET.get('company', 'all') -->
             <div class="filter-btn-wrap">
                 <button
                     class="tw-filter-btn"
@@ -116,7 +57,6 @@
             </div>
 
             <!-- Date range picker dropdown -->
-            <!-- Django: active date range from request.GET.get('from') / request.GET.get('to') -->
             <div class="filter-btn-wrap">
                 <button
                     class="tw-filter-btn"
@@ -173,13 +113,9 @@
     <!-- END FILTER BAR -->
 
 
-    <!-- === STAT TILES =========================================
-         Counts come from view context.
-         Colors are STATUS tokens — not role --tw-primary.
-         ======================================================= -->
+    <!-- === STAT TILES ========================================= -->
     <ul class="stat-tiles" aria-label="Ticket status summary">
 
-        <!-- Inbox -->
         <li class="stat-tile stat-tile--inbox">
             <div class="stat-tile__icon" aria-hidden="true">
                 <i class="bx bxs-envelope"></i>
@@ -191,7 +127,6 @@
             </span>
         </li>
 
-        <!-- In Progress -->
         <li class="stat-tile stat-tile--progress">
             <div class="stat-tile__icon" aria-hidden="true">
                 <i class="bx bxs-hourglass"></i>
@@ -203,7 +138,6 @@
             </span>
         </li>
 
-        <!-- Forwarded -->
         <li class="stat-tile stat-tile--forwarded">
             <div class="stat-tile__icon" aria-hidden="true">
                 <i class="bx bx-send"></i>
@@ -215,7 +149,6 @@
             </span>
         </li>
 
-        <!-- Closed -->
         <li class="stat-tile stat-tile--closed">
             <div class="stat-tile__icon" aria-hidden="true">
                 <i class="bx bx-check-circle"></i>
@@ -231,14 +164,10 @@
     <!-- END STAT TILES -->
 
 
-    <!-- === TICKET TABLE CARD ================================= -->
+    <!-- === TICKET TABLE CARD ================================== -->
     <div class="tw-table-card">
 
-        <!-- --- Ticket Tabs ----------------------------------- -->
-        <!--
-            Django: active tab driven by {% url %} and view context.
-            e.g. class="ticket-tab {% if active_tab == 'progress' %}active{% endif %}"
-        -->
+        <!-- --- Ticket Tabs ------------------------------------ -->
         <div class="ticket-tabs" role="tablist" aria-label="Ticket status tabs">
 
             <button
@@ -246,7 +175,7 @@
                 role="tab"
                 aria-selected="true"
                 data-tab="progress"
-                aria-controls="ticketTable">
+                aria-controls="tab-progress">
                 In Progress
                 <span class="tab-count">28</span>
             </button>
@@ -256,7 +185,7 @@
                 role="tab"
                 aria-selected="false"
                 data-tab="inbox"
-                aria-controls="ticketTable">
+                aria-controls="tab-inbox">
                 Inbox
                 <span class="tab-count">10</span>
             </button>
@@ -266,7 +195,7 @@
                 role="tab"
                 aria-selected="false"
                 data-tab="forwarded"
-                aria-controls="ticketTable">
+                aria-controls="tab-forwarded">
                 Forwarded
                 <span class="tab-count">34</span>
             </button>
@@ -276,24 +205,22 @@
                 role="tab"
                 aria-selected="false"
                 data-tab="closed"
-                aria-controls="ticketTable">
+                aria-controls="tab-closed">
                 Closed
                 <span class="tab-count">243</span>
             </button>
 
         </div>
 
-        <!-- --- Table header row ----------------------------- -->
+        <!-- --- Table header row ------------------------------ -->
         <div class="tw-table-head-row">
 
             <div class="tw-table-head-left">
 
-                <!-- Section title with left-border accent via .tw-table-title -->
                 <h3 class="tw-table-title" id="tableHeading">
                     Tickets <span class="highlight-status" id="highlightStatus">INPROGRESS</span>
                 </h3>
 
-                <!-- Inline table search -->
                 <div class="tw-table-search" role="search" aria-label="Filter visible tickets">
                     <i class="bx bx-search search-icon" aria-hidden="true"></i>
                     <input
@@ -301,8 +228,7 @@
                         id="tableSearchInput"
                         placeholder="Search ticket id or subject..."
                         aria-label="Filter tickets by ID or subject"
-                        aria-controls="ticketTable">
-                    <!-- Accessible live region for search result count -->
+                        aria-describedby="searchFeedback">
                     <div id="searchFeedback" class="search-feedback" aria-live="polite" aria-atomic="true"></div>
                 </div>
 
@@ -323,13 +249,14 @@
 
         </div>
 
-        <!-- --- Ticket table --------------------------------- -->
-        <!--
-            Django: {% for ticket in tickets %}...{% endfor %}
-            Django: active tab data fetched by view and passed as context.
-        -->
+        <!-- ==================================================
+             TAB CONTENT — IN PROGRESS (shown by default)
+             Rows 1-6: assigned, in-progress tickets.
+             data-ticket-type="existing" → opens ticketDetailsModal.
+             ================================================== -->
+        <div class="tab-content active" id="tab-progress" data-tab-content="progress" role="tabpanel" aria-labelledby="tableHeading">
         <div class="table-scroll-wrapper">
-        <table class="tw-table" id="ticketTable" aria-labelledby="tableHeading" aria-describedby="searchFeedback">
+        <table class="tw-table" aria-labelledby="tableHeading" aria-describedby="searchFeedback">
             <thead>
                 <tr>
                     <th scope="col">Ticket ID</th>
@@ -342,11 +269,9 @@
                 </tr>
             </thead>
             <tbody>
+                <!-- Django: {% for ticket in inprogress_tickets %} -->
 
-                <!-- Django: {% for ticket in tickets %} -->
-
-                <!-- Row 1 -->
-                <tr data-ticket-id="GMEC25010001">
+                <tr data-ticket-id="GMEC25010001" data-ticket-type="existing" data-subject="Wallet Option Agents" data-status="Testing" data-allottee="Manju">
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="ticket-id-cell">GMEC25010001</span>
@@ -376,8 +301,7 @@
                     </td>
                 </tr>
 
-                <!-- Row 2 -->
-                <tr data-ticket-id="GMEC25010002">
+                <tr data-ticket-id="GMEC25010002" data-ticket-type="existing" data-subject="Terra pay" data-status="Development" data-allottee="Arun">
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="ticket-id-cell">GMEC25010002</span>
@@ -407,8 +331,7 @@
                     </td>
                 </tr>
 
-                <!-- Row 3 -->
-                <tr data-ticket-id="GMEC25010003">
+                <tr data-ticket-id="GMEC25010003" data-ticket-type="existing" data-subject="Recon issue" data-status="Development" data-allottee="Sanoop">
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="ticket-id-cell">GMEC25010003</span>
@@ -434,8 +357,7 @@
                     </td>
                 </tr>
 
-                <!-- Row 4 -->
-                <tr data-ticket-id="GMEC25010004">
+                <tr data-ticket-id="GMEC25010004" data-ticket-type="existing" data-subject="Kumari API Integration" data-status="Testing" data-allottee="Akhil">
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="ticket-id-cell">GMEC25010004</span>
@@ -461,8 +383,7 @@
                     </td>
                 </tr>
 
-                <!-- Row 5 -->
-                <tr data-ticket-id="GMEC25010005">
+                <tr data-ticket-id="GMEC25010005" data-ticket-type="existing" data-subject="Missing March Data" data-status="Development" data-allottee="Rithik">
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="ticket-id-cell">GMEC25010005</span>
@@ -488,8 +409,7 @@
                     </td>
                 </tr>
 
-                <!-- Row 6 -->
-                <tr data-ticket-id="GMEC25010006">
+                <tr data-ticket-id="GMEC25010006" data-ticket-type="existing" data-subject="Federal bank API failure" data-status="Development" data-allottee="Rithik">
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="ticket-id-cell">GMEC25010006</span>
@@ -515,8 +435,37 @@
                     </td>
                 </tr>
 
-                <!-- Row 7 -->
-                <tr data-ticket-id="GMEC25010007">
+                <!-- Django: {% endfor %} -->
+            </tbody>
+        </table>
+        </div>
+        </div>
+        <!-- END TAB: INPROGRESS -->
+
+
+        <!-- ==================================================
+             TAB CONTENT — INBOX (hidden by default)
+             Rows 7-8: new unassigned tickets.
+             data-ticket-type="new" → opens newTicketModal (assignment flow).
+             ================================================== -->
+        <div class="tab-content" id="tab-inbox" data-tab-content="inbox" role="tabpanel" aria-labelledby="tableHeading">
+        <div class="table-scroll-wrapper">
+        <table class="tw-table" aria-labelledby="tableHeading" aria-describedby="searchFeedback">
+            <thead>
+                <tr>
+                    <th scope="col">Ticket ID</th>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Issue Date</th>
+                    <th scope="col">Client</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Allottee</th>
+                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Django: {% for ticket in inbox_tickets %} -->
+
+                <tr data-ticket-id="GMEC25010007" data-ticket-type="new" data-subject="Federal bank API failure" data-status="New Ticket">
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="ticket-id-cell">GMEC25010007</span>
@@ -527,9 +476,7 @@
                     <td>10-12-2025</td>
                     <td>BGEX</td>
                     <td><span class="tw-status-badge tw-status-badge--new">New</span></td>
-                    <td>
-                        <div class="allottee-cell unassigned">—</div>
-                    </td>
+                    <td><div class="allottee-cell unassigned">—</div></td>
                     <td>
                         <div class="tw-row-actions">
                             <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
@@ -539,8 +486,7 @@
                     </td>
                 </tr>
 
-                <!-- Row 8 -->
-                <tr data-ticket-id="GMEC25010008">
+                <tr data-ticket-id="GMEC25010008" data-ticket-type="new" data-subject="Bank transfer UI fix" data-status="New Ticket">
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="ticket-id-cell">GMEC25010008</span>
@@ -551,8 +497,106 @@
                     <td>12-12-2025</td>
                     <td>GMEC</td>
                     <td><span class="tw-status-badge tw-status-badge--new">New</span></td>
+                    <td><div class="allottee-cell unassigned">—</div></td>
                     <td>
-                        <div class="allottee-cell unassigned">—</div>
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Django: {% endfor %} -->
+            </tbody>
+        </table>
+        </div>
+        </div>
+        <!-- END TAB: INBOX -->
+
+
+        <!-- ==================================================
+             TAB CONTENT — FORWARDED (hidden by default)
+             ================================================== -->
+        <div class="tab-content" id="tab-forwarded" data-tab-content="forwarded" role="tabpanel" aria-labelledby="tableHeading">
+        <div class="table-scroll-wrapper">
+        <table class="tw-table" aria-labelledby="tableHeading" aria-describedby="searchFeedback">
+            <thead>
+                <tr>
+                    <th scope="col">Ticket ID</th>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Issue Date</th>
+                    <th scope="col">Client</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Allottee</th>
+                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Django: {% for ticket in forwarded_tickets %} -->
+
+                <tr data-ticket-id="BGEX25020001" data-ticket-type="existing" data-subject="Payment Gateway Integration" data-status="Forwarded" data-allottee="Arun">
+                    <td>
+                        <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                        <span class="ticket-id-cell">BGEX25020001</span>
+                    </td>
+                    <td><div title="Payment Gateway Integration">Payment Gateway Integration</div></td>
+                    <td>05-02-2025</td>
+                    <td>BGEX</td>
+                    <td><span class="tw-status-badge tw-status-badge--forwarded">Forwarded</span></td>
+                    <td>
+                        <div class="allottee-cell">
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">A</div>
+                            Arun
+                        </div>
+                    </td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr data-ticket-id="GMEC25020002" data-ticket-type="existing" data-subject="Report Generation Bug" data-status="Forwarded" data-allottee="Rithik">
+                    <td>
+                        <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                        <span class="ticket-id-cell">GMEC25020002</span>
+                    </td>
+                    <td><div title="Report Generation Bug">Report Generation Bug</div></td>
+                    <td>14-02-2025</td>
+                    <td>GMEC</td>
+                    <td><span class="tw-status-badge tw-status-badge--forwarded">Forwarded</span></td>
+                    <td>
+                        <div class="allottee-cell">
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--rose" aria-hidden="true">R</div>
+                            Rithik
+                        </div>
+                    </td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr data-ticket-id="BGEX25020003" data-ticket-type="existing" data-subject="Mobile App Crash on Login" data-status="Forwarded" data-allottee="Sanoop">
+                    <td>
+                        <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                        <span class="ticket-id-cell">BGEX25020003</span>
+                    </td>
+                    <td><div title="Mobile App Crash on Login">Mobile App Crash on Login</div></td>
+                    <td>21-02-2025</td>
+                    <td>BGEX</td>
+                    <td><span class="tw-status-badge tw-status-badge--forwarded">Forwarded</span></td>
+                    <td>
+                        <div class="allottee-cell">
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--teal" aria-hidden="true">S</div>
+                            Sanoop
+                        </div>
                     </td>
                     <td>
                         <div class="tw-row-actions">
@@ -564,42 +608,618 @@
                 </tr>
 
                 <!-- Django: {% endfor %} -->
-
             </tbody>
         </table>
         </div>
-        <!-- END TICKET TABLE -->
+        </div>
+        <!-- END TAB: FORWARDED -->
+
+
+        <!-- ==================================================
+             TAB CONTENT — CLOSED (hidden by default)
+             ================================================== -->
+        <div class="tab-content" id="tab-closed" data-tab-content="closed" role="tabpanel" aria-labelledby="tableHeading">
+        <div class="table-scroll-wrapper">
+        <table class="tw-table" aria-labelledby="tableHeading" aria-describedby="searchFeedback">
+            <thead>
+                <tr>
+                    <th scope="col">Ticket ID</th>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Issue Date</th>
+                    <th scope="col">Client</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Allottee</th>
+                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Django: {% for ticket in closed_tickets %} -->
+
+                <tr data-ticket-id="GMEC25010099" data-ticket-type="existing" data-subject="Authentication Flow Fix" data-status="Closed" data-allottee="Manju">
+                    <td>
+                        <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                        <span class="ticket-id-cell">GMEC25010099</span>
+                    </td>
+                    <td><div title="Authentication Flow Fix">Authentication Flow Fix</div></td>
+                    <td>10-10-2024</td>
+                    <td>GMEC</td>
+                    <td><span class="tw-status-badge tw-status-badge--closed">Closed</span></td>
+                    <td>
+                        <div class="allottee-cell">
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--purple" aria-hidden="true">M</div>
+                            Manju
+                        </div>
+                    </td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr data-ticket-id="BGEX25010098" data-ticket-type="existing" data-subject="DB Connection Pooling" data-status="Closed" data-allottee="Akhil">
+                    <td>
+                        <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                        <span class="ticket-id-cell">BGEX25010098</span>
+                    </td>
+                    <td><div title="DB Connection Pooling">DB Connection Pooling</div></td>
+                    <td>22-10-2024</td>
+                    <td>BGEX</td>
+                    <td><span class="tw-status-badge tw-status-badge--closed">Closed</span></td>
+                    <td>
+                        <div class="allottee-cell">
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--violet" aria-hidden="true">A</div>
+                            Akhil
+                        </div>
+                    </td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr data-ticket-id="GMEC25010097" data-ticket-type="existing" data-subject="UI Responsive Fix" data-status="Closed" data-allottee="Arun">
+                    <td>
+                        <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                        <span class="ticket-id-cell">GMEC25010097</span>
+                    </td>
+                    <td><div title="UI Responsive Fix">UI Responsive Fix</div></td>
+                    <td>31-10-2024</td>
+                    <td>GMEC</td>
+                    <td><span class="tw-status-badge tw-status-badge--closed">Closed</span></td>
+                    <td>
+                        <div class="allottee-cell">
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">A</div>
+                            Arun
+                        </div>
+                    </td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Django: {% endfor %} -->
+            </tbody>
+        </table>
+        </div>
+        </div>
+        <!-- END TAB: CLOSED -->
 
     </div>
-    <!-- END TABLE CARD -->
-
-</main>
-<!-- END MAIN CONTENT -->
+    <!-- END TICKET TABLE CARD -->
 
 
-<!-- Bootstrap 5 JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- ==============================================================
+         TICKET DETAILS MODAL (Task 3)
+         Embedded from ticket-details.html.
+         ID renamed: ticketModal → ticketDetailsModal
+         Inner IDs renamed: modalClose → detailsModalClose,
+                            chatBtn → detailsChatBtn,
+                            timelineBtn → detailsTimelineBtn
+         Django: {% include 'components/ticket_details_modal.html' %}
+         ============================================================== -->
+    <div class="tw-modal-overlay" id="ticketDetailsModal" role="dialog" aria-modal="true" aria-labelledby="modalTicketId">
+    <div class="tw-modal-container">
 
-<!-- Django: cAdmin_script.js is loaded by the base template (cAdmin_baseUI.html).
-     When this file is opened standalone, shared utilities are not available.
-     Django: <script src="{% static 'js/cAdmin_script.js' %}" defer></script> -->
+        <div class="tw-modal-header">
+            <div class="tw-modal-header-left">
+
+                <h2 class="tw-modal-title">
+                    <i class="bx bx-receipt" aria-hidden="true"></i>
+                    <!-- Django: {{ ticket.id }} -->
+                    <span id="modalTicketId">GMEC25010001</span>
+                </h2>
+
+                <!-- Django: {{ ticket.subject }} -->
+                <p class="tw-modal-subtitle" id="modalSubject">Wallet Option Agents</p>
+
+                <div class="tw-modal-header-meta">
+                    <span class="tw-modal-status-pill" id="modalStatus">Testing</span>
+                    <span class="tw-modal-allottee-tag">
+                        <i class="bx bx-user" aria-hidden="true"></i>
+                        <!-- Django: {{ ticket.allottee.get_full_name }} -->
+                        <span id="modalAllottee">Manju</span>
+                    </span>
+                </div>
+
+                <div class="tw-modal-header-actions">
+                    <button class="tw-modal-action-btn" id="detailsChatBtn" aria-label="Open chat for this ticket">
+                        <i class="bx bx-chat" aria-hidden="true"></i>
+                        Chat
+                    </button>
+                    <button class="tw-modal-action-btn" id="detailsTimelineBtn" aria-label="View ticket timeline">
+                        <i class="bx bx-time-five" aria-hidden="true"></i>
+                        Timeline
+                    </button>
+                </div>
+
+            </div>
+
+            <button class="tw-modal-close" id="detailsModalClose" aria-label="Close ticket details">
+                <i class="bx bx-x" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <div class="tw-modal-body">
+
+            <div class="tw-info-grid">
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Ticket Maker</div>
+                    <div class="tw-info-value">John Doe</div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Issue Date</div>
+                    <div class="tw-info-value">11-09-2021</div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Priority</div>
+                    <div class="tw-info-value">
+                        <span class="tw-priority-badge tw-priority-badge--high">High</span>
+                    </div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Est. Completion</div>
+                    <div class="tw-info-value">25-12-2025</div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Allottee Date</div>
+                    <div class="tw-info-value">12-09-2021</div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Category</div>
+                    <div class="tw-info-value">Integration</div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Client</div>
+                    <div class="tw-info-value">GMEC</div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Department</div>
+                    <div class="tw-info-value">Development</div>
+                </div>
+            </div>
+
+            <div class="tw-modal-section">
+                <h3 class="section-title">Description</h3>
+                <div class="tw-description-box">
+                    Need to implement wallet payment options for agents in the system. This includes integration with multiple payment gateways, transaction history tracking, and automated reconciliation features.
+                </div>
+            </div>
+
+            <div class="tw-modal-section">
+                <h3 class="section-title">Attachments</h3>
+                <div class="tw-attachments-area">
+                    <div class="tw-attachment-item">
+                        <div class="tw-attachment-icon tw-attachment-icon--pdf" aria-hidden="true">
+                            <i class="bx bxs-file-pdf"></i>
+                        </div>
+                        <div class="tw-attachment-info">
+                            <div class="tw-attachment-name">wallet_specifications.pdf</div>
+                            <div class="tw-attachment-meta">Uploaded on 11-09-2021 at 10:30 AM &bull; 2.4 MB</div>
+                        </div>
+                        <div class="tw-attachment-actions">
+                            <button class="tw-icon-btn" title="Download" aria-label="Download wallet_specifications.pdf">
+                                <i class="bx bx-download" aria-hidden="true"></i>
+                            </button>
+                            <button class="tw-icon-btn" title="View" aria-label="View wallet_specifications.pdf">
+                                <i class="bx bx-show" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+    <!-- END TICKET DETAILS MODAL -->
 
 
+    <!-- ==============================================================
+         NEW TICKET ASSIGNMENT MODAL (Task 3)
+         Embedded from ticket-details-new.html.
+         ID renamed: ticketModal → newTicketModal
+         Inner IDs renamed: modalClose → newModalClose,
+                            modalTicketId → newModalTicketId,
+                            modalSubject  → newModalSubject,
+                            modalStatus   → newModalStatus
+         Django: {% include 'components/new_ticket_modal.html' %}
+         ============================================================== -->
+    <div class="tw-modal-overlay" id="newTicketModal" role="dialog" aria-modal="true" aria-labelledby="newModalTicketId">
+    <div class="tw-modal-container tw-modal-container--wide">
+
+        <div class="tw-modal-header tw-modal-header--new">
+            <div class="tw-modal-header-left">
+
+                <h2 class="tw-modal-title">
+                    <i class="bx bx-receipt" aria-hidden="true"></i>
+                    <span id="newModalTicketId">GMEC25010007</span>
+                </h2>
+
+                <p class="tw-modal-subtitle" id="newModalSubject">Federal bank API failure</p>
+
+                <div class="tw-modal-header-meta">
+                    <span class="tw-modal-status-pill" id="newModalStatus">New Ticket</span>
+                </div>
+
+            </div>
+
+            <button class="tw-modal-close" id="newModalClose" aria-label="Close ticket">
+                <i class="bx bx-x" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <div class="tw-modal-body">
+
+            <div class="tw-info-grid tw-info-grid--6">
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Ticket Maker</div>
+                    <div class="tw-info-value">Rahul R Nair</div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Issue Date</div>
+                    <div class="tw-info-value">10-12-2025</div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Priority</div>
+                    <div class="tw-info-value">
+                        <span class="tw-priority-badge tw-priority-badge--high">High</span>
+                    </div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Category</div>
+                    <div class="tw-info-value">Integration</div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Client</div>
+                    <div class="tw-info-value">BGEX</div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Department</div>
+                    <div class="tw-info-value">Development</div>
+                </div>
+            </div>
+
+            <div class="tw-modal-section">
+                <h3 class="section-title">Description</h3>
+                <div class="tw-description-box">
+                    Federal bank API is returning 500 errors intermittently. Needs investigation and hotfix before the payment window closes at end of month.
+                </div>
+            </div>
+
+            <div class="tw-assignment-section">
+
+                <div class="tw-assignment-title">
+                    <i class="bx bx-user-check" aria-hidden="true"></i>
+                    Assign Developer
+                </div>
+
+                <div class="tw-form-group">
+                    <label class="tw-form-label" for="developerSelect">
+                        Select Developer <span class="tw-required">*</span>
+                    </label>
+                    <!-- Django: populated from {{ developers }} -->
+                    <select class="tw-developer-select" id="developerSelect" onchange="showDeveloperInfo()">
+                        <option value="">-- Choose Developer --</option>
+                        <option value="dev1" data-tickets="5" data-completed="23" data-pending="5">Rajesh Kumar (5 tickets)</option>
+                        <option value="dev2" data-tickets="3" data-completed="31" data-pending="3">Priya Sharma (3 tickets)</option>
+                        <option value="dev3" data-tickets="7" data-completed="18" data-pending="7">Amit Patel (7 tickets)</option>
+                        <option value="dev4" data-tickets="4" data-completed="27" data-pending="4">Sarah Johnson (4 tickets)</option>
+                        <option value="dev5" data-tickets="2" data-completed="35" data-pending="2">Michael Chen (2 tickets)</option>
+                    </select>
+
+                    <div class="tw-developer-info" id="developerInfo" aria-live="polite">
+                        <div class="tw-workload-grid">
+                            <div class="tw-dev-stat">
+                                <span class="tw-dev-stat-value" id="devPending">0</span>
+                                <span class="tw-dev-stat-label">Pending</span>
+                            </div>
+                            <div class="tw-dev-stat">
+                                <span class="tw-dev-stat-value" id="devCompleted">0</span>
+                                <span class="tw-dev-stat-label">Completed</span>
+                            </div>
+                            <div class="tw-dev-stat">
+                                <span class="tw-dev-stat-value" id="devTotal">0</span>
+                                <span class="tw-dev-stat-label">Total Assigned</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tw-form-group">
+                    <label class="tw-form-label" for="assignComment">Comments / Remarks</label>
+                    <textarea
+                        class="tw-comment-textarea"
+                        id="assignComment"
+                        placeholder="Add any notes or instructions for the developer…"
+                        aria-label="Comments for developer"></textarea>
+                </div>
+
+                <div class="tw-form-group">
+                    <div class="tw-email-checkbox-group">
+                        <input type="checkbox" id="sendEmail" checked aria-label="Send email notification to assigned developer">
+                        <label for="sendEmail">Send email notification to assigned developer</label>
+                    </div>
+                </div>
+
+                <div class="tw-modal-action-buttons">
+                    <button class="tw-btn-assign" id="assignBtn" onclick="confirmAssignment()" disabled aria-label="Assign ticket to selected developer">
+                        <i class="bx bx-check-circle" aria-hidden="true"></i>
+                        Assign Ticket
+                    </button>
+                    <button class="tw-btn-reject" id="rejectBtn" onclick="confirmRejection()" aria-label="Reject or close ticket">
+                        <i class="bx bx-x-circle" aria-hidden="true"></i>
+                        Reject / Close Ticket
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+    <!-- END NEW TICKET MODAL -->
+
+
+    <!-- ==============================================================
+         CONFIRM MODAL COMPONENT
+         Django: {% include 'components/confirm-modal.html' %}
+         ============================================================== -->
+    <div class="tw-confirm-overlay" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+        <div class="tw-confirm-box">
+            <div class="tw-confirm-icon" id="confirmIcon">
+                <i class="bx bx-check" aria-hidden="true"></i>
+            </div>
+            <h3 class="tw-confirm-title" id="confirmModalTitle">Confirm Action</h3>
+            <p class="tw-confirm-message" id="confirmMessage">Are you sure you want to proceed?</p>
+            <div class="tw-confirm-details" id="confirmDetails"></div>
+            <div class="tw-confirm-buttons">
+                <button class="tw-btn tw-btn-outline" id="confirmCancelBtn" onclick="closeConfirmModal()">Cancel</button>
+                <button class="tw-btn tw-btn-success" id="confirmActionBtn" onclick="executeConfirmAction()">Confirm</button>
+            </div>
+        </div>
+    </div>
+    <!-- END CONFIRM MODAL -->
+
+
+    <!-- ==============================================================
+         CHAT PANEL (Task 4)
+         Embedded from chat.html. Hidden by default (.open shows it).
+         Ticket ID + subject injected by JS from row data attributes.
+         Django: {% include 'components/chat_panel.html' %}
+         ============================================================== -->
+    <div class="tw-chat-panel" id="chatPanel" role="dialog" aria-modal="false" aria-label="Ticket chat">
+
+        <div class="tw-chat-header">
+            <div class="chat-header-info">
+                <div class="chat-ticket-id" id="chatTicketId">Ticket ID: —</div>
+                <div class="chat-ticket-subject" id="chatTicketSubject">—</div>
+            </div>
+            <button class="chat-close-btn" id="chatCloseBtn" aria-label="Close chat">
+                <i class="bx bx-x" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <div class="tw-messages-area" id="messagesArea">
+
+            <div class="tw-chat-status-msg">
+                Ticket created
+                <span class="tw-chat-status-time">• Jan 15, 2025 at 10:30 AM</span>
+            </div>
+
+            <div class="tw-message received">
+                <div class="tw-avatar tw-avatar--sm tw-avatar--chat-user" aria-hidden="true">K</div>
+                <div>
+                    <div class="tw-message-sender">
+                        KINGSHUK DEBNATH
+                        <span class="tw-role-pill tw-role-pill--user">User</span>
+                    </div>
+                    <div class="tw-message-bubble">
+                        <div class="tw-message-text">Team please enable the UPI Services for Federal bank API.</div>
+                        <div class="tw-message-time">Jan 15, 2025 at 10:32 AM</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tw-chat-status-msg">
+                Admin accepted ticket
+                <span class="tw-chat-status-time">• Jan 15, 2025 at 11:15 AM</span>
+            </div>
+
+            <div class="tw-message received">
+                <div class="tw-avatar tw-avatar--sm tw-avatar--chat-developer" aria-hidden="true">R</div>
+                <div>
+                    <div class="tw-message-sender">
+                        RITHIK SUNIL <span class="tw-role-pill tw-role-pill--developer">Developer</span>
+                    </div>
+                    <div class="tw-message-bubble">
+                        <div class="tw-message-text">Waiting for the approval of Federal API Team</div>
+                        <div class="tw-message-time">Jan 15, 2025 at 2:02 PM</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tw-message sent">
+                <div class="tw-avatar tw-avatar--sm tw-avatar--chat-admin" aria-hidden="true">A</div>
+                <div>
+                    <div class="tw-message-sender">
+                        RAJAGOPAL P <span class="tw-role-pill tw-role-pill--admin">Admin</span>
+                    </div>
+                    <div class="tw-message-bubble">
+                        <div class="tw-message-text">GMEC team, please contact the Federal bank API team for approval.</div>
+                        <div class="tw-message-time">Jan 15, 2025 at 4:18 PM</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="tw-chat-footer">
+
+            <div class="tw-attach-preview-strip" id="attachPreviewStrip" aria-live="polite">
+                <i class="bx bx-file" aria-hidden="true"></i>
+                <span id="attachFileName"></span>
+                <button class="tw-file-chip-remove" onclick="removeAttachment()" aria-label="Remove attachment">
+                    <i class="bx bx-x" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div class="tw-chat-input-row">
+                <textarea
+                    class="tw-chat-textarea"
+                    id="chatTextarea"
+                    placeholder="Type your message…"
+                    rows="1"
+                    aria-label="Message input"></textarea>
+
+                <input
+                    type="file"
+                    id="chat-file-input"
+                    multiple
+                    accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
+                    aria-hidden="true"
+                    tabindex="-1"
+                    style="display:none">
+
+                <button class="tw-chat-attach-btn" id="attach-btn" aria-label="Attach file">
+                    <i class="bx bx-paperclip" aria-hidden="true"></i>
+                </button>
+
+                <button class="tw-chat-send-btn" id="sendBtn" onclick="sendMessage()" aria-label="Send message">
+                    <i class="bx bx-send" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div class="tw-chat-email-row">
+                <input type="checkbox" id="emailNotification" aria-label="Send email notification to client">
+                <label for="emailNotification">Send email notification to Client</label>
+            </div>
+
+        </div>
+
+    </div>
+    <!-- END CHAT PANEL -->
+
+
+    <!-- ==============================================================
+         TIMELINE PANEL (Task 5)
+         Fixed right-side sliding panel. Opens on .tw-action-icon--timeline.
+         CSS: .tw-timeline-panel in ticket-timeline.css
+         Django: {% include 'components/timeline_panel.html' %}
+         ============================================================== -->
+    <div class="tw-timeline-panel" id="timelinePanel" role="dialog" aria-modal="false" aria-label="Ticket timeline">
+
+        <div class="tw-timeline-panel-header">
+            <div>
+                <div class="tw-timeline-panel-ticket-id" id="timelineTicketId">Ticket ID: —</div>
+                <div class="tw-timeline-panel-subject" id="timelineSubject">—</div>
+            </div>
+            <button class="tw-timeline-panel-close" id="timelineCloseBtn" aria-label="Close timeline">
+                <i class="bx bx-x" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <div class="tw-timeline-panel-body">
+
+            <div class="tw-tl-panel-entry">
+                <div class="tw-tl-panel-dot tw-tl-panel-dot--created">
+                    <i class="bx bx-plus" aria-hidden="true"></i>
+                </div>
+                <div class="tw-tl-panel-content">
+                    <div class="tw-tl-panel-event">Ticket Created</div>
+                    <div class="tw-tl-panel-meta">Jan 15, 2025 at 10:30 AM</div>
+                </div>
+            </div>
+
+            <div class="tw-tl-panel-entry">
+                <div class="tw-tl-panel-dot tw-tl-panel-dot--accepted">
+                    <i class="bx bx-check" aria-hidden="true"></i>
+                </div>
+                <div class="tw-tl-panel-content">
+                    <div class="tw-tl-panel-event">Admin Accepted</div>
+                    <div class="tw-tl-panel-meta">Jan 15, 2025 at 11:15 AM · RAJAGOPAL P</div>
+                </div>
+            </div>
+
+            <div class="tw-tl-panel-entry">
+                <div class="tw-tl-panel-dot tw-tl-panel-dot--assigned">
+                    <i class="bx bx-user" aria-hidden="true"></i>
+                </div>
+                <div class="tw-tl-panel-content">
+                    <div class="tw-tl-panel-event">Assigned to Developer</div>
+                    <div class="tw-tl-panel-meta">Jan 15, 2025 at 11:30 AM · RITHIK SUNIL</div>
+                </div>
+            </div>
+
+            <div class="tw-tl-panel-entry">
+                <div class="tw-tl-panel-dot tw-tl-panel-dot--testing">
+                    <i class="bx bx-test-tube" aria-hidden="true"></i>
+                </div>
+                <div class="tw-tl-panel-content">
+                    <div class="tw-tl-panel-event">Moved to Testing</div>
+                    <div class="tw-tl-panel-meta">Jan 15, 2025 at 2:45 PM · AKHIL SAGAR</div>
+                </div>
+            </div>
+
+            <div class="tw-tl-panel-entry">
+                <div class="tw-tl-panel-dot tw-tl-panel-dot--current">
+                    <i class="bx bx-revision" aria-hidden="true"></i>
+                </div>
+                <div class="tw-tl-panel-content">
+                    <div class="tw-tl-panel-event">Back to Development</div>
+                    <div class="tw-tl-panel-meta">Jan 16, 2025 at 8:49 PM</div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <!-- END TIMELINE PANEL -->
+
+<!-- Django: {% endblock %} -->
+
+
+<!-- Django: {% block page_js %} -->
 <script>
     /* ============================================================
      * STAR TOGGLE
-     * ============================================================
-     * Toggles the star icon between hollow (☆) and filled (★)
-     * on click or keyboard activation. Supports both click and
-     * keyboard (Enter / Space) for accessibility.
      * ============================================================ */
-    document.addEventListener('DOMContentLoaded', function () {
-        const starIcons = document.querySelectorAll('.tw-star-icon');
-
-        starIcons.forEach(star => {
+    /* Run immediately — DOMContentLoaded has already fired when router injects this */
+    (function () {
+        document.querySelectorAll('.tw-star-icon').forEach(function(star) {
             const handleStarAction = function () {
                 this.classList.toggle('active');
-
                 if (this.classList.contains('active')) {
                     this.classList.replace('bx-star', 'bxs-star');
                     this.setAttribute('aria-label', 'Remove from favourites');
@@ -610,7 +1230,7 @@
             };
 
             star.addEventListener('click', function (e) {
-                e.stopPropagation(); /* prevent row-click handler firing */
+                e.stopPropagation();
                 handleStarAction.call(this);
             });
 
@@ -622,23 +1242,18 @@
                 }
             });
         });
-    });
+    }());
 
 
     /* ============================================================
      * COMPANY FILTER DROPDOWN
-     * ============================================================
-     * Opens/closes the company dropdown and updates the button
-     * label with the selected company name.
-     * Django: in production, selection is a GET param — this JS
-     * handles the UX only; the form submit drives filtering.
      * ============================================================ */
     const companyBtn      = document.getElementById('companyBtn');
     const companyDropdown = document.getElementById('companyDropdown');
     const companyText     = document.getElementById('companyText');
     const companyOptions  = document.querySelectorAll('.tw-company-option');
 
-    companyBtn.addEventListener('click', (e) => {
+    companyBtn.addEventListener('click', function(e) {
         e.stopPropagation();
         const isOpen = companyDropdown.classList.toggle('active');
         companyBtn.setAttribute('aria-expanded', isOpen);
@@ -646,9 +1261,9 @@
         dateBtn.setAttribute('aria-expanded', 'false');
     });
 
-    companyOptions.forEach(option => {
-        option.addEventListener('click', () => {
-            companyOptions.forEach(opt => {
+    companyOptions.forEach(function(option) {
+        option.addEventListener('click', function() {
+            companyOptions.forEach(function(opt) {
                 opt.classList.remove('selected');
                 opt.setAttribute('aria-selected', 'false');
             });
@@ -663,10 +1278,6 @@
 
     /* ============================================================
      * DATE RANGE PICKER
-     * ============================================================
-     * Opens/closes the date dropdown and keeps quick-filter
-     * buttons and the date inputs in sync. JS is kept as-is from
-     * the original — only the event structure is unchanged.
      * ============================================================ */
     const dateBtn      = document.getElementById('dateBtn');
     const dateDropdown = document.getElementById('dateDropdown');
@@ -675,7 +1286,7 @@
     const toDate       = document.getElementById('toDate');
     const quickFilters = document.querySelectorAll('.tw-quick-filter');
 
-    dateBtn.addEventListener('click', (e) => {
+    dateBtn.addEventListener('click', function(e) {
         e.stopPropagation();
         const isOpen = dateDropdown.classList.toggle('active');
         dateBtn.setAttribute('aria-expanded', isOpen);
@@ -683,9 +1294,9 @@
         companyBtn.setAttribute('aria-expanded', 'false');
     });
 
-    quickFilters.forEach(filter => {
-        filter.addEventListener('click', () => {
-            quickFilters.forEach(f => f.classList.remove('selected'));
+    quickFilters.forEach(function(filter) {
+        filter.addEventListener('click', function() {
+            quickFilters.forEach(function(f) { f.classList.remove('selected'); });
             filter.classList.add('selected');
 
             const period  = filter.dataset.period;
@@ -712,7 +1323,7 @@
             fromDate.value = startDate.toISOString().split('T')[0];
             toDate.value   = endDate.toISOString().split('T')[0];
 
-            setTimeout(() => {
+            setTimeout(function() {
                 dateDropdown.classList.remove('active');
                 dateBtn.setAttribute('aria-expanded', 'false');
             }, 200);
@@ -724,43 +1335,88 @@
 
     function updateCustomDateText() {
         if (fromDate.value && toDate.value) {
-            quickFilters.forEach(f => f.classList.remove('selected'));
+            quickFilters.forEach(function(f) { f.classList.remove('selected'); });
             const from = new Date(fromDate.value).toLocaleDateString();
             const to   = new Date(toDate.value).toLocaleDateString();
             dateText.innerHTML = `<i class="bx bx-calendar-alt"></i> ${from} – ${to}`;
         }
     }
 
-    /* Close both dropdowns when clicking anywhere outside */
-    document.addEventListener('click', () => {
+    document.addEventListener('click', function() {
         companyDropdown.classList.remove('active');
         dateDropdown.classList.remove('active');
         companyBtn.setAttribute('aria-expanded', 'false');
         dateBtn.setAttribute('aria-expanded', 'false');
     });
 
-    companyDropdown.addEventListener('click', (e) => e.stopPropagation());
-    dateDropdown.addEventListener('click', (e) => e.stopPropagation());
+    companyDropdown.addEventListener('click', function(e) { e.stopPropagation(); });
+    dateDropdown.addEventListener('click', function(e) { e.stopPropagation(); });
+
+
+    /* ============================================================
+     * DASHBOARD: TAB SWITCHING (Task 2)
+     * ============================================================
+     * Shows/hides .tab-content sections by matching data-tab-content
+     * to the clicked tab's data-tab. Also resets the search field.
+     * ============================================================ */
+    const ticketTabs     = document.querySelectorAll('.ticket-tab');
+    const tabContents    = document.querySelectorAll('.tab-content');
+    const highlightStatus = document.getElementById('highlightStatus');
+    const tableSearchInput = document.getElementById('tableSearchInput');
+    const searchFeedback   = document.getElementById('searchFeedback');
+
+    const TAB_LABEL_MAP = {
+        progress:  'INPROGRESS',
+        inbox:     'INBOX',
+        forwarded: 'FORWARDED',
+        closed:    'CLOSED',
+    };
+
+    ticketTabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            ticketTabs.forEach(function(t) {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
+            });
+            tab.classList.add('active');
+            tab.setAttribute('aria-selected', 'true');
+
+            const target = tab.dataset.tab;
+
+            tabContents.forEach(function(content) {
+                content.classList.toggle('active', content.dataset.tabContent === target);
+            });
+
+            if (highlightStatus) {
+                highlightStatus.textContent = TAB_LABEL_MAP[target] ?? target.toUpperCase();
+            }
+
+            /* Reset search when switching tabs */
+            if (tableSearchInput) {
+                tableSearchInput.value   = '';
+                searchFeedback.textContent = '';
+                document.querySelectorAll('.tab-content.active tbody tr').forEach(function(row) {
+                    row.classList.remove('row-hidden');
+                });
+            }
+        });
+    });
 
 
     /* ============================================================
      * TABLE SEARCH
      * ============================================================
-     * Filters visible table rows by matching the search value
-     * against each row's text content. Uses .row-hidden class
-     * (defined in dashboard.css) — no inline style manipulation.
-     * Announces match count to screen readers via aria-live region.
+     * Searches only rows inside the currently active tab-content.
      * ============================================================ */
-    const tableSearchInput = document.getElementById('tableSearchInput');
-    const searchFeedback   = document.getElementById('searchFeedback');
-    const ticketTable      = document.getElementById('ticketTable');
-
     tableSearchInput.addEventListener('input', function () {
-        const filter = this.value.trim().toLowerCase();
-        const rows   = ticketTable.querySelectorAll('tbody tr');
+        const filter       = this.value.trim().toLowerCase();
+        const activeTab    = document.querySelector('.tab-content.active');
+        if (!activeTab) return;
+
+        const rows   = activeTab.querySelectorAll('tbody tr');
         let visible  = 0;
 
-        rows.forEach(row => {
+        rows.forEach(function(row) {
             const matches = row.textContent.toLowerCase().includes(filter);
             row.classList.toggle('row-hidden', !matches);
             if (matches) visible++;
@@ -773,64 +1429,411 @@
 
 
     /* ============================================================
-     * TICKET TAB SWITCHING
+     * DASHBOARD: TICKET ROW CLICK → MODAL (Task 3)
      * ============================================================
-     * Switches the active tab and updates the highlight-status
-     * badge text in the table heading.
-     * Django: active tab driven by {% url %} and view context —
-     * this JS is a static-dev fallback only. In production,
-     * each tab links to a URL that returns filtered data.
+     * data-ticket-type="existing" → openTicketDetailsModal()
+     * data-ticket-type="new"      → openNewTicketModal()
+     * Star icons and row action icons stop propagation themselves.
      * ============================================================ */
-    const ticketTabs      = document.querySelectorAll('.ticket-tab');
-    const highlightStatus = document.getElementById('highlightStatus');
+    document.querySelectorAll('.tab-content tbody tr').forEach(function(row) {
+        row.addEventListener('click', function(e) {
+            if (e.target.closest('.tw-star-icon') || e.target.closest('.tw-row-actions')) return;
 
-    const TAB_LABEL_MAP = {
-        progress:  'INPROGRESS',
-        inbox:     'INBOX',
-        forwarded: 'FORWARDED',
-        closed:    'CLOSED',
-    };
-
-    ticketTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            ticketTabs.forEach(t => {
-                t.classList.remove('active');
-                t.setAttribute('aria-selected', 'false');
+            document.querySelectorAll('.tab-content tbody tr').forEach(function(r) {
+                r.classList.remove('row-selected');
             });
-            tab.classList.add('active');
-            tab.setAttribute('aria-selected', 'true');
+            this.classList.add('row-selected');
 
-            if (highlightStatus) {
-                highlightStatus.textContent = TAB_LABEL_MAP[tab.dataset.tab] ?? tab.dataset.tab.toUpperCase();
+            const ticketId = this.dataset.ticketId  || '';
+            const type     = this.dataset.ticketType || 'existing';
+            const subject  = this.dataset.subject    || '';
+            const status   = this.dataset.status     || '';
+            const allottee = this.dataset.allottee   || '';
+
+            if (type === 'new') {
+                openNewTicketModal(ticketId, subject, status || 'New Ticket');
+            } else {
+                openTicketDetailsModal(ticketId, subject, status, allottee);
             }
         });
     });
 
 
     /* ============================================================
-     * TICKET ROW CLICK — will open modal in Phase 6
-     * ============================================================
-     * Marks the clicked row as selected (.row-selected) and logs
-     * the ticket ID. Phase 6 will replace console.log with the
-     * ticket-details modal open call.
+     * TICKET DETAILS MODAL
      * ============================================================ */
-    const allRows = ticketTable.querySelectorAll('tbody tr');
+    function openTicketDetailsModal(ticketId, subject, status, allottee) {
+        document.getElementById('modalTicketId').textContent  = ticketId;
+        document.getElementById('modalSubject').textContent   = subject;
+        document.getElementById('modalStatus').textContent    = status;
+        document.getElementById('modalAllottee').textContent  = allottee || '—';
+        document.getElementById('ticketDetailsModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
 
-    allRows.forEach(row => {
-        row.addEventListener('click', (e) => {
-            /* Star icon and action icons handle their own clicks */
-            if (e.target.closest('.tw-star-icon') || e.target.closest('.tw-row-actions')) return;
+    function closeTicketDetailsModal() {
+        document.getElementById('ticketDetailsModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
 
-            allRows.forEach(r => r.classList.remove('row-selected'));
-            row.classList.add('row-selected');
+    document.getElementById('detailsModalClose').addEventListener('click', closeTicketDetailsModal);
 
-            const ticketId = row.dataset.ticketId;
-            console.log('[Phase 6] Open ticket modal for:', ticketId);
-            /* Phase 6: openTicketModal(ticketId); */
+    document.getElementById('ticketDetailsModal').addEventListener('click', function(e) {
+        if (e.target === this) closeTicketDetailsModal();
+    });
+
+    /* Chat and Timeline buttons inside ticket details modal */
+    document.getElementById('detailsChatBtn').addEventListener('click', function() {
+        const ticketId = document.getElementById('modalTicketId').textContent;
+        const subject  = document.getElementById('modalSubject').textContent;
+        closeTicketDetailsModal();
+        openChatPanel(ticketId, subject);
+    });
+
+    document.getElementById('detailsTimelineBtn').addEventListener('click', function() {
+        const ticketId = document.getElementById('modalTicketId').textContent;
+        const subject  = document.getElementById('modalSubject').textContent;
+        closeTicketDetailsModal();
+        openTimelinePanel(ticketId, subject);
+    });
+
+
+    /* ============================================================
+     * NEW TICKET ASSIGNMENT MODAL
+     * ============================================================ */
+    let _selectedDeveloper = '';
+
+    function openNewTicketModal(ticketId, subject, status) {
+        document.getElementById('newModalTicketId').textContent = ticketId;
+        document.getElementById('newModalSubject').textContent  = subject;
+        document.getElementById('newModalStatus').textContent   = status || 'New Ticket';
+        document.getElementById('newTicketModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeNewTicketModal() {
+        document.getElementById('newTicketModal').classList.remove('active');
+        document.body.style.overflow = '';
+        resetNewTicketForm();
+    }
+
+    document.getElementById('newModalClose').addEventListener('click', closeNewTicketModal);
+
+    document.getElementById('newTicketModal').addEventListener('click', function(e) {
+        if (e.target === this) closeNewTicketModal();
+    });
+
+    function showDeveloperInfo() {
+        const select    = document.getElementById('developerSelect');
+        const infoPanel = document.getElementById('developerInfo');
+        const assignBtn = document.getElementById('assignBtn');
+        const option    = select.options[select.selectedIndex];
+
+        if (select.value) {
+            document.getElementById('devPending').textContent   = option.getAttribute('data-pending');
+            document.getElementById('devCompleted').textContent = option.getAttribute('data-completed');
+            document.getElementById('devTotal').textContent     = option.getAttribute('data-tickets');
+            infoPanel.classList.add('active');
+            assignBtn.disabled  = false;
+            _selectedDeveloper  = option.text;
+        } else {
+            infoPanel.classList.remove('active');
+            assignBtn.disabled  = true;
+            _selectedDeveloper  = '';
+        }
+    }
+
+    function confirmAssignment() {
+        const ticketId = document.getElementById('newModalTicketId').textContent;
+
+        openConfirmModal({
+            type:    'success',
+            title:   'Confirm Assignment',
+            message: 'You are about to assign this ticket to:',
+            details: `<p><strong>Ticket:</strong> ${ticketId}</p><p><strong>Developer:</strong> ${_selectedDeveloper}</p>`,
+            onConfirm: function () {
+                /* Django: POST to {% url 'admin:assign_ticket' %} */
+                console.log('[NewTicket] Assigned:', ticketId, 'to', _selectedDeveloper);
+                closeNewTicketModal();
+            }
+        });
+    }
+
+    function confirmRejection() {
+        const ticketId = document.getElementById('newModalTicketId').textContent;
+        const subject  = document.getElementById('newModalSubject').textContent;
+
+        openConfirmModal({
+            type:    'danger',
+            title:   'Reject Ticket',
+            message: 'Are you sure you want to reject this ticket? This action cannot be undone.',
+            details: `
+                <p><strong>Ticket:</strong> ${ticketId}</p>
+                <p><strong>Subject:</strong> ${subject}</p>
+                <label class="tw-form-label" for="rejectReason">
+                    Rejection Reason <span class="tw-required">*</span>
+                </label>
+                <textarea
+                    id="rejectReason"
+                    class="tw-comment-textarea tw-comment-textarea--sm"
+                    placeholder="Why is this ticket being rejected?"
+                    aria-label="Rejection reason"></textarea>
+                <p id="rejectError" class="tw-error-text">Reason is required to proceed.</p>`,
+            onConfirm: function () {
+                const reason    = document.getElementById('rejectReason').value.trim();
+                const errorText = document.getElementById('rejectError');
+                const textarea  = document.getElementById('rejectReason');
+
+                if (!reason) {
+                    errorText.classList.add('show');
+                    textarea.classList.add('tw-input--error');
+                    return false;
+                }
+
+                /* Django: POST to {% url 'admin:reject_ticket' %} */
+                console.log('[NewTicket] Rejected:', ticketId, 'Reason:', reason);
+                closeNewTicketModal();
+            }
+        });
+    }
+
+    function resetNewTicketForm() {
+        const select    = document.getElementById('developerSelect');
+        const infoPanel = document.getElementById('developerInfo');
+        const assignBtn = document.getElementById('assignBtn');
+
+        select.value = '';
+        infoPanel.classList.remove('active');
+        document.getElementById('assignComment').value = '';
+        assignBtn.disabled    = true;
+        document.getElementById('sendEmail').checked = true;
+        _selectedDeveloper    = '';
+    }
+
+
+    /* ============================================================
+     * CONFIRM MODAL — JS API
+     * ============================================================
+     * Django: this is replaced by the included component's script.
+     * ============================================================ */
+    let _confirmCallback = null;
+
+    function openConfirmModal(config) {
+        const overlay   = document.getElementById('confirmModal');
+        const icon      = document.getElementById('confirmIcon');
+        const title     = document.getElementById('confirmModalTitle');
+        const msg       = document.getElementById('confirmMessage');
+        const details   = document.getElementById('confirmDetails');
+        const actionBtn = document.getElementById('confirmActionBtn');
+
+        icon.className = `tw-confirm-icon ${config.type === 'danger' ? 'danger' : 'success'}`;
+        icon.innerHTML = config.type === 'danger'
+            ? `<i class="bx bx-error-circle" aria-hidden="true"></i>`
+            : `<i class="bx bx-check" aria-hidden="true"></i>`;
+
+        actionBtn.className = config.type === 'danger' ? 'tw-btn tw-btn-danger' : 'tw-btn tw-btn-success';
+
+        title.textContent = config.title   || 'Confirm Action';
+        msg.textContent   = config.message || 'Are you sure?';
+        details.innerHTML = config.details || '';
+        _confirmCallback  = config.onConfirm || null;
+
+        overlay.classList.add('active');
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirmModal').classList.remove('active');
+        _confirmCallback = null;
+    }
+
+    function executeConfirmAction() {
+        if (typeof _confirmCallback === 'function') {
+            const result = _confirmCallback();
+            if (result === false) return;
+        }
+        closeConfirmModal();
+    }
+
+    document.getElementById('confirmModal').addEventListener('click', function(e) {
+        if (e.target === this) closeConfirmModal();
+    });
+
+
+    /* ============================================================
+     * DASHBOARD: OPEN CHAT PANEL (Task 4)
+     * ============================================================ */
+    function openChatPanel(ticketId, subject) {
+        document.getElementById('chatTicketId').textContent      = 'Ticket ID: ' + ticketId;
+        document.getElementById('chatTicketSubject').textContent = subject || '';
+        document.getElementById('chatPanel').classList.add('open');
+        const area = document.getElementById('messagesArea');
+        if (area) area.scrollTop = area.scrollHeight;
+    }
+
+    function closeChatPanel() {
+        document.getElementById('chatPanel').classList.remove('open');
+    }
+
+    document.querySelectorAll('.tw-action-icon--chat').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const row = this.closest('tr');
+            openChatPanel(
+                row ? (row.dataset.ticketId || '') : '',
+                row ? (row.dataset.subject  || '') : ''
+            );
         });
     });
 
-</script>
+    document.getElementById('chatCloseBtn').addEventListener('click', closeChatPanel);
 
-</body>
-</html>
+
+    /* ============================================================
+     * CHAT: AUTO-RESIZE TEXTAREA
+     * ============================================================ */
+    const chatTextarea = document.getElementById('chatTextarea');
+
+    chatTextarea.addEventListener('input', function () {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 80) + 'px';
+    });
+
+    chatTextarea.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+
+    /* ============================================================
+     * CHAT: FILE ATTACHMENT HANDLER
+     * ============================================================ */
+    const chatFileInput = document.getElementById('chat-file-input');
+    const attachBtn     = document.getElementById('attach-btn');
+
+    attachBtn.addEventListener('click', function () {
+        chatFileInput.click();
+    });
+
+    chatFileInput.addEventListener('change', function () {
+        if (!this.files || this.files.length === 0) return;
+        const file     = this.files[0];
+        const strip    = document.getElementById('attachPreviewStrip');
+        const nameSpan = document.getElementById('attachFileName');
+        nameSpan.textContent = file.name;
+        strip.classList.add('show');
+    });
+
+    function removeAttachment() {
+        chatFileInput.value = '';
+        document.getElementById('attachPreviewStrip').classList.remove('show');
+    }
+
+
+    /* ============================================================
+     * CHAT: SEND MESSAGE
+     * ============================================================ */
+    function sendMessage() {
+        const text      = chatTextarea.value.trim();
+        const strip     = document.getElementById('attachPreviewStrip');
+        const area      = document.getElementById('messagesArea');
+
+        if (!text && !strip.classList.contains('show')) return;
+
+        const time = new Date().toLocaleString('en-US', {
+            month: 'short', day: 'numeric', year: 'numeric',
+            hour: 'numeric', minute: '2-digit', hour12: true
+        });
+
+        let attachHTML = '';
+        if (chatFileInput.files.length > 0) {
+            const file = chatFileInput.files[0];
+            if (file.type.startsWith('image/')) {
+                const url  = URL.createObjectURL(file);
+                attachHTML = `<img src="${url}" alt="${file.name}" class="tw-chat-img-attachment">`;
+            } else {
+                attachHTML = `
+                    <div class="tw-file-chip">
+                        <i class="bx bx-paperclip" aria-hidden="true"></i>
+                        <span class="tw-file-chip-name">${file.name}</span>
+                    </div>`;
+            }
+        }
+
+        const msgEl = document.createElement('div');
+        msgEl.className = 'tw-message sent';
+        msgEl.innerHTML = `
+            <div class="tw-avatar tw-avatar--sm tw-avatar--chat-admin" aria-hidden="true">A</div>
+            <div>
+                <div class="tw-message-sender">RAJAGOPAL P <span class="tw-role-pill tw-role-pill--admin">Admin</span></div>
+                <div class="tw-message-bubble">
+                    ${text ? `<div class="tw-message-text">${text.replace(/\n/g, '<br>')}</div>` : ''}
+                    ${attachHTML}
+                    <div class="tw-message-time">${time}</div>
+                </div>
+            </div>`;
+
+        area.appendChild(msgEl);
+        chatTextarea.value        = '';
+        chatTextarea.style.height = 'auto';
+        chatFileInput.value       = '';
+        strip.classList.remove('show');
+        area.scrollTop = area.scrollHeight;
+    }
+
+
+    /* ============================================================
+     * DASHBOARD: OPEN TIMELINE PANEL (Task 5)
+     * ============================================================ */
+    function openTimelinePanel(ticketId, subject) {
+        document.getElementById('timelineTicketId').textContent  = 'Ticket ID: ' + ticketId;
+        document.getElementById('timelineSubject').textContent   = subject || '';
+        document.getElementById('timelinePanel').classList.add('open');
+    }
+
+    function closeTimelinePanel() {
+        document.getElementById('timelinePanel').classList.remove('open');
+    }
+
+    document.querySelectorAll('.tw-action-icon--timeline').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const row = this.closest('tr');
+            openTimelinePanel(
+                row ? (row.dataset.ticketId || '') : '',
+                row ? (row.dataset.subject  || '') : ''
+            );
+        });
+    });
+
+    document.getElementById('timelineCloseBtn').addEventListener('click', closeTimelinePanel);
+
+
+    /* ============================================================
+     * GLOBAL ESCAPE KEY HANDLER
+     * ============================================================
+     * Closes the topmost active panel/modal on Escape.
+     * Priority: confirm > ticket details > new ticket > chat > timeline
+     * ============================================================ */
+    document.addEventListener('keydown', function(e) {
+        if (e.key !== 'Escape') return;
+
+        if (document.getElementById('confirmModal').classList.contains('active')) {
+            closeConfirmModal(); return;
+        }
+        if (document.getElementById('ticketDetailsModal').classList.contains('active')) {
+            closeTicketDetailsModal(); return;
+        }
+        if (document.getElementById('newTicketModal').classList.contains('active')) {
+            closeNewTicketModal(); return;
+        }
+        if (document.getElementById('chatPanel').classList.contains('open')) {
+            closeChatPanel(); return;
+        }
+        if (document.getElementById('timelinePanel').classList.contains('open')) {
+            closeTimelinePanel();
+        }
+    });
+</script>
+<!-- Django: {% endblock %} -->

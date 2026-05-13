@@ -13,6 +13,9 @@
 
 /* === CHAT PANEL CONTAINER ===================================
  * Floating panel, fixed bottom-right of screen.
+ * When embedded in dashboard (id="chatPanel"), hidden by default.
+ * JS adds .open to show; removes .open to hide.
+ * Standalone chat.html keeps display:flex via .open on the element.
  * ============================================================ */
 .tw-chat-panel {
     position: fixed;
@@ -24,10 +27,14 @@
     background: var(--tw-bg-surface);
     border-radius: var(--tw-radius-xl);
     box-shadow: var(--tw-shadow-lg);
-    display: flex;
+    display: none;
     flex-direction: column;
     overflow: hidden;
     z-index: var(--tw-z-modal);
+}
+
+.tw-chat-panel.open {
+    display: flex;
 }
 
 

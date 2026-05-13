@@ -294,6 +294,21 @@
     color: var(--tw-status-inbox-text);
 }
 
+.tw-status-badge--forwarded {
+    background: var(--tw-status-forwarded-bg);
+    color: var(--tw-status-forwarded-text);
+}
+
+.tw-status-badge--closed {
+    background: var(--tw-status-closed-bg);
+    color: var(--tw-status-closed-text);
+}
+
+.tw-status-badge--active {
+    background: var(--tw-status-closed-bg);
+    color: var(--tw-status-closed-text);
+}
+
 /* --- Smaller square-corner status tag (used in reports table) */
 .tw-status-tag {
     display: inline-block;

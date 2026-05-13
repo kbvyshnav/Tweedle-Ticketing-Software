@@ -4,6 +4,10 @@
   Django template: base shell — extended by all admin_portal templates
   Django view: N/A (base template, not rendered directly)
   Django url:  N/A
+  Phase 9 (Architecture fix): base.html is now the SINGLE entry point
+  for standalone preview. A JS page router fetches admin_portal partials
+  and injects them into <main id="main-content">.
+  Django: {% block content %} replaces the router at deploy time.
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -19,8 +23,6 @@
 
     <!-- ============================================================
          GOOGLE FONTS — Poppins (UI) + Lato (sidebar/nav)
-         Django: move this link to the base template <head> block.
-         Combined URL keeps a single HTTP request.
          ============================================================ -->
     <link
         rel="stylesheet"
@@ -44,11 +46,15 @@
 
     <!-- ============================================================
          CSS LOAD ORDER
-         1. tweedle-tokens.css   — all CSS custom properties (no rules)
-         2. theme-{role}.css     — role color overrides (4 tokens only)
-         3. tweedle-base.css     — layout shell, typography, sidebar/nav
+         1. tweedle-tokens.css   — all CSS custom properties
+         2. theme-admin.css      — role color overrides
+         3. tweedle-base.css     — layout shell, sidebar/topbar
          4. tweedle-components.css — all UI components
-         5. page-specific CSS    — only when a page needs extra rules
+         5. notification.css     — bell dropdown component
+         6. Page CSS (all preloaded for standalone preview)
+         Django: page-specific CSS is loaded via
+                 {% block page_css %}{% endblock %} in production.
+                 For standalone preview, all page CSS is preloaded here.
          ============================================================ -->
 
     <!-- 1. Design tokens -->
@@ -67,15 +73,25 @@
     <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-components.css' %}"> -->
     <link rel="stylesheet" href="../static/css/tweedle-components.css">
 
-    <!-- 5. Page-specific CSS slot -->
-    <!-- Django: {% block page_css %}{% endblock %} -->
+    <!-- 5. Notification bell component -->
+    <!-- Django: <link rel="stylesheet" href="{% static 'css/pages/notification.css' %}"> -->
+    <link rel="stylesheet" href="../static/css/pages/notification.css">
+
+    <!-- 6. All page-specific CSS (preloaded for standalone preview router) -->
+    <!-- Django: {% block page_css %}{% endblock %} — in production only active
+         page CSS loads via the block; the lines below are removed. -->
+    <link rel="stylesheet" href="../static/css/pages/dashboard.css">
+    <link rel="stylesheet" href="../static/css/pages/clients.css">
+    <link rel="stylesheet" href="../static/css/pages/team.css">
+    <link rel="stylesheet" href="../static/css/pages/reports.css">
+    <link rel="stylesheet" href="../static/css/pages/chat.css">
+    <link rel="stylesheet" href="../static/css/pages/ticket-details.css">
+    <link rel="stylesheet" href="../static/css/pages/ticket-timeline.css">
 </head>
 
 <!--
     BODY CLASS controls the active role theme.
     Django: class="role-{% block body_role %}admin{% endblock %}"
-    The matching theme file (loaded above) overrides --tw-primary
-    for this role. Do NOT set color values inline on <body>.
 -->
 <body class="role-admin">
 
@@ -95,50 +111,65 @@
     </div>
 
     <!-- Navigation -->
-    <!-- Django active state: add class="nav-link active" on the matching <a>
-         and class="nav-item active-item" on the matching <li> server-side -->
+    <!-- Django active state: server-side adds class="nav-link active" /
+         class="nav-item active-item". The router manages this for preview. -->
     <ul class="sidebar-nav">
 
         <!-- Dashboard -->
-        <!-- Django: {% url 'admin_dashboard' %} -->
+        <!-- Django: href="{% url 'admin_dashboard' %}" -->
         <li class="nav-item active-item">
-            <a href="#" class="nav-link active" title="Dashboard">
+            <a href="#dashboard"
+               class="nav-link active"
+               data-page="admin_portal/dashboard.html"
+               title="Dashboard">
                 <i class="bx bx-grid-alt"></i>
                 <span class="nav-label">Dashboard</span>
             </a>
         </li>
 
-        <!-- Inbox -->
-        <!-- Django: {% url 'admin_inbox' %} -->
+        <!-- Inbox (tab within Dashboard) -->
+        <!-- Django: href="{% url 'admin_inbox' %}" -->
         <li class="nav-item">
-            <a href="#" class="nav-link" title="Inbox">
+            <a href="#inbox"
+               class="nav-link"
+               data-page="admin_portal/dashboard.html#inbox"
+               title="Inbox">
                 <i class="bx bx-envelope"></i>
                 <span class="nav-label">Inbox</span>
             </a>
         </li>
 
         <!-- Clients -->
-        <!-- Django: {% url 'admin_clients' %} -->
+        <!-- Django: href="{% url 'admin_clients' %}" -->
         <li class="nav-item">
-            <a href="#" class="nav-link" title="Clients">
+            <a href="#clients"
+               class="nav-link"
+               data-page="admin_portal/clients.html"
+               title="Clients">
                 <i class="bx bx-buildings"></i>
                 <span class="nav-label">Clients</span>
             </a>
         </li>
 
         <!-- Team -->
-        <!-- Django: {% url 'admin_team' %} -->
+        <!-- Django: href="{% url 'admin_team' %}" -->
         <li class="nav-item">
-            <a href="#" class="nav-link" title="Team">
+            <a href="#team"
+               class="nav-link"
+               data-page="admin_portal/team.html"
+               title="Team">
                 <i class="bx bx-group"></i>
                 <span class="nav-label">Team</span>
             </a>
         </li>
 
         <!-- Reports -->
-        <!-- Django: {% url 'admin_reports' %} -->
+        <!-- Django: href="{% url 'admin_reports' %}" -->
         <li class="nav-item">
-            <a href="#" class="nav-link" title="Reports">
+            <a href="#reports"
+               class="nav-link"
+               data-page="admin_portal/reports.html"
+               title="Reports">
                 <i class="bx bx-bar-chart-alt-2"></i>
                 <span class="nav-label">Reports</span>
             </a>
@@ -152,15 +183,11 @@
 
 <!-- ==============================================================
      MAIN CONTENT WRAPPER
-     Positioned to the right of the sidebar.
-     Width = 100% minus sidebar width (handled by tweedle-base.css).
      ============================================================== -->
 <section id="content">
 
     <!-- ==========================================================
          TOPBAR
-         Fixed top navigation bar. CSS: .topbar in tweedle-base.css
-         Contains: hamburger toggle, search, notifications, profile.
          ========================================================== -->
     <nav class="topbar">
 
@@ -168,9 +195,7 @@
         <i class="bx bx-menu" id="hamburger-btn" role="button" aria-label="Toggle sidebar"></i>
 
         <!-- Global ticket search -->
-        <!--
-            Django: <form action="{% url 'admin_search' %}" method="get">
-        -->
+        <!-- Django: <form action="{% url 'admin_search' %}" method="get"> -->
         <form action="#" class="topbar-search-form">
             <div class="topbar-search">
                 <input
@@ -185,28 +210,90 @@
         </form>
 
         <!-- COMPONENT: notification_bell -->
-        <!--
-            Django: {% include 'components/notification_bell.html' %}
-            Displays the bell icon, unread count badge, and the
-            notification dropdown panel (notification.html component).
-            The count is injected from context: {{ unread_notification_count }}
-        -->
-        <a href="#" class="notification" id="notificationBell" aria-label="Notifications">
-            <i class="bx bxs-bell"></i>
-            <!-- Django: {% if unread_notification_count %} -->
-            <span class="num">8</span>
-            <!-- Django: {% endif %} -->
-        </a>
+        <!-- Django: {% include 'components/notification_bell.html' %} -->
+        <div class="tw-notif-bell-wrap" id="notifBellWrap">
+            <button
+                class="tw-notif-bell-btn"
+                id="notifBellBtn"
+                aria-label="Notifications"
+                aria-expanded="false"
+                aria-controls="notifPanel">
+                <i class="bx bxs-bell" aria-hidden="true"></i>
+                <!-- Django: {% if unread_notification_count %} -->
+                <span class="tw-notif-count-badge" id="notifCount">8</span>
+                <!-- Django: {% endif %} -->
+            </button>
+
+            <div class="tw-notif-panel" id="notifPanel" role="dialog" aria-label="Notifications">
+                <div class="tw-notif-panel-header">
+                    <span class="tw-notif-panel-title">Notifications</span>
+                    <button
+                        class="tw-btn tw-btn-outline tw-btn--sm"
+                        id="markAllReadBtn"
+                        aria-label="Mark all notifications as read">
+                        Mark all read
+                    </button>
+                </div>
+
+                <div class="tw-notif-list">
+                    <!-- Django: {% for notification in notifications %} -->
+
+                    <div class="tw-notif-item unread">
+                        <div class="tw-notif-item-body">
+                            <div class="tw-notif-type-icon tw-notif-type-icon--info">
+                                <i class="bx bx-chat" aria-hidden="true"></i>
+                            </div>
+                            <div class="tw-notif-item-text">
+                                <div class="tw-notif-item-title">New message on GMEC25010002</div>
+                                <div class="tw-notif-item-msg">
+                                    <span class="tw-notif-user-name">Rithik</span> sent a message in Terra pay
+                                </div>
+                                <div class="tw-notif-item-time">5 minutes ago</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tw-notif-item unread">
+                        <div class="tw-notif-item-body">
+                            <div class="tw-notif-type-icon tw-notif-type-icon--warning">
+                                <i class="bx bx-user-check" aria-hidden="true"></i>
+                            </div>
+                            <div class="tw-notif-item-text">
+                                <div class="tw-notif-item-title">Ticket assigned — GMEC25010008</div>
+                                <div class="tw-notif-item-msg">
+                                    Bank transfer UI fix assigned to <span class="tw-notif-user-name">Arun</span>
+                                </div>
+                                <div class="tw-notif-item-time">1 hour ago</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tw-notif-item">
+                        <div class="tw-notif-item-body">
+                            <div class="tw-notif-type-icon tw-notif-type-icon--success">
+                                <i class="bx bx-check-circle" aria-hidden="true"></i>
+                            </div>
+                            <div class="tw-notif-item-text">
+                                <div class="tw-notif-item-title">Ticket closed — BGEX25010098</div>
+                                <div class="tw-notif-item-msg">DB Connection Pooling ticket was closed</div>
+                                <div class="tw-notif-item-time">Yesterday</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Django: {% endfor %} -->
+                </div>
+
+                <div class="tw-notif-panel-footer">
+                    <!-- Django: href="{% url 'admin_notifications' %}" -->
+                    <a href="#" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
+                </div>
+            </div>
+        </div>
         <!-- END COMPONENT: notification_bell -->
 
         <!-- COMPONENT: profile_dropdown -->
-        <!--
-            Django: {% include 'components/profile_dropdown.html' %}
-            Shows the logged-in user's avatar. On click, shows a
-            dropdown with: View Profile, Settings, Logout.
-            Django: <img src="{{ request.user.profile.avatar.url }}"
-                         alt="{{ request.user.get_full_name }}">
-        -->
+        <!-- Django: {% include 'components/profile_dropdown.html' %} -->
         <a href="#" class="profile" aria-label="Profile">
             <img
                 src="../static/images/jinoy.jpg"
@@ -220,11 +307,11 @@
 
     <!-- ==========================================================
          MAIN PAGE CONTENT
-         Each page injects its own content here via Django template
-         inheritance. The <main> padding is defined in tweedle-base.css
-         via var(--tw-content-padding) = 36px 24px.
+         Router injects partial HTML here for standalone preview.
+         Django: {% block content %}{% endblock %} at deploy time.
          ========================================================== -->
     <main id="main-content">
+        <!-- Content loaded by page router on startup -->
         <!-- Django: {% block content %}{% endblock %} -->
     </main>
     <!-- END MAIN PAGE CONTENT -->
@@ -235,14 +322,10 @@
 
 <!-- ==============================================================
      VENDOR SCRIPTS
-     Bootstrap 5 bundle (includes Popper.js for dropdowns/tooltips).
+     Bootstrap 5 bundle (includes Popper.js).
      Django: {% static 'vendors/bootstrap/js/bootstrap.bundle.min.js' %}
      ============================================================== -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Shared admin JS (search, star toggle, filter dropdowns) -->
-<!-- Django: <script src="{% static 'js/cAdmin_script.js' %}" defer></script> -->
-<script src="../static/js/cAdmin_script.js" defer></script>
 
 <!-- Page-specific JS slot -->
 <!-- Django: {% block page_js %}{% endblock %} -->
@@ -250,8 +333,8 @@
 
 <!-- ==============================================================
      SHELL JAVASCRIPT
-     Self-contained scripts for the base layout only.
-     Page-level JS goes in {% block page_js %} above.
+     Base layout JS only (sidebar, topbar, notifications).
+     The page router is appended below.
      ============================================================== -->
 <script>
     /* === SIDEBAR TOGGLE === */
@@ -269,36 +352,6 @@
     });
 
 
-    /* === ACTIVE NAV ITEM === */
-    /* Django: active state is set server-side — add class="nav-link active"
-     * on the matching <a> and class="nav-item active-item" on the matching <li>.
-     * This fallback handles active state for static-file development only.
-     * Django: remove or guard with {% if debug %} when deploying. */
-    const navLinks   = document.querySelectorAll('.nav-link');
-    const currentPath = window.location.pathname;
-
-    navLinks.forEach(function (link) {
-        const href = link.getAttribute('href');
-        if (href && href !== '#' && currentPath.includes(href)) {
-            navLinks.forEach(function (l) {
-                l.classList.remove('active');
-                l.closest('.nav-item').classList.remove('active-item');
-            });
-            link.classList.add('active');
-            link.closest('.nav-item').classList.add('active-item');
-        }
-    });
-
-    /* Fallback: if no URL match, keep first item (Dashboard) active */
-    if (!document.querySelector('.nav-link.active')) {
-        const first = document.querySelector('.nav-link');
-        if (first) {
-            first.classList.add('active');
-            first.closest('.nav-item').classList.add('active-item');
-        }
-    }
-
-
     /* === RESPONSIVE === */
     function handleResize() {
         if (isMobile()) {
@@ -307,6 +360,149 @@
         }
     }
     window.addEventListener('resize', handleResize);
+
+
+    /* === NOTIFICATION BELL TOGGLE === */
+    const notifBellBtn = document.getElementById('notifBellBtn');
+    const notifPanel   = document.getElementById('notifPanel');
+
+    notifBellBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const isOpen = notifPanel.classList.toggle('open');
+        notifBellBtn.setAttribute('aria-expanded', isOpen);
+    });
+
+    document.getElementById('markAllReadBtn').addEventListener('click', function () {
+        document.querySelectorAll('.tw-notif-item.unread').forEach(function (item) {
+            item.classList.remove('unread');
+        });
+        const badge = document.getElementById('notifCount');
+        if (badge) badge.remove();
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!notifBellBtn.contains(e.target) && !notifPanel.contains(e.target)) {
+            notifPanel.classList.remove('open');
+            notifBellBtn.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+
+    /* ============================================================
+     * PAGE ROUTER (standalone preview only)
+     * Django: remove this entire block — Django views handle routing.
+     * Fetches admin_portal partial pages and injects their content
+     * into <main id="main-content">, then re-executes any inline
+     * scripts so page-level JS initialises correctly.
+     * ============================================================ */
+    const mainContent  = document.getElementById('main-content');
+    const routerLinks  = document.querySelectorAll('.nav-link[data-page]');
+
+    /* Loading state shown during fetch */
+    function showLoader() {
+        mainContent.innerHTML = `
+            <div class="tw-router-loader">
+                <i class="bx bx-loader-alt bx-spin" aria-hidden="true"></i>
+            </div>`;
+    }
+
+    /* Extract only the meaningful page content from a fetched HTML string.
+     * For our partials (no html/head/body), the parser wraps everything in
+     * <body> — we return that body's innerHTML directly. */
+    function extractContent(html) {
+        const parser = new DOMParser();
+        const doc    = parser.parseFromString(html, 'text/html');
+
+        /* Standalone pages with <main> — e.g. chat.html dev view */
+        const main = doc.querySelector('main');
+        if (main) return main.innerHTML;
+
+        /* Partials: browser wraps fragment in <body> */
+        const body = doc.querySelector('body');
+        return body ? body.innerHTML : html;
+    }
+
+    /* Inject HTML into main content and re-execute any inline scripts
+     * (innerHTML does not run scripts; replacement does). */
+    function injectContent(html) {
+        mainContent.innerHTML = html;
+
+        mainContent.querySelectorAll('script').forEach(function (oldScript) {
+            const newScript = document.createElement('script');
+            if (oldScript.src) {
+                newScript.src   = oldScript.src;
+                newScript.defer = oldScript.defer;
+            } else {
+                newScript.textContent = oldScript.textContent;
+            }
+            oldScript.parentNode.replaceChild(newScript, oldScript);
+        });
+    }
+
+    /* Load a page partial into main content.
+     * pagePath may include a hash to target a specific tab:
+     *   "admin_portal/dashboard.html#inbox" → loads dashboard, then clicks
+     *   the [data-tab="inbox"] button after the content is ready. */
+    async function loadPage(pagePath) {
+        showLoader();
+
+        try {
+            const [path, tabHash] = pagePath.split('#');
+
+            const response = await fetch(path);
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${path}`);
+
+            const html    = await response.text();
+            const content = extractContent(html);
+            injectContent(content);
+
+            /* If a tab hash was specified, click that tab */
+            if (tabHash) {
+                setTimeout(function () {
+                    const tabBtn = mainContent.querySelector(`[data-tab="${tabHash}"]`);
+                    if (tabBtn) tabBtn.click();
+                }, 80);
+            }
+
+            /* Scroll main area back to top on page change */
+            mainContent.scrollTop = 0;
+
+        } catch (err) {
+            mainContent.innerHTML = `
+                <div class="tw-router-error">
+                    <i class="bx bx-error-circle" aria-hidden="true"></i>
+                    <p>Could not load page.</p>
+                    <p class="tw-router-error-detail">${err.message}</p>
+                    <p class="tw-router-error-hint">
+                        Serve this project via HTTP (e.g. <code>python -m http.server</code>
+                        from the project root) — fetch() requires a server, not file://.
+                    </p>
+                </div>`;
+            console.error('[Router]', err);
+        }
+    }
+
+    /* Wire each nav link to the router */
+    routerLinks.forEach(function (link) {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            /* Update sidebar active state */
+            routerLinks.forEach(function (l) {
+                l.classList.remove('active');
+                l.closest('.nav-item').classList.remove('active-item');
+            });
+            this.classList.add('active');
+            this.closest('.nav-item').classList.add('active-item');
+
+            loadPage(this.dataset.page);
+        });
+    });
+
+    /* Load the default page (Dashboard) on startup */
+    loadPage('admin_portal/dashboard.html');
+
+    /* === END PAGE ROUTER === */
 </script>
 
 </body>

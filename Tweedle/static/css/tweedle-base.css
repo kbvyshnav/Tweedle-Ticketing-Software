@@ -787,3 +787,64 @@ textarea:focus-visible,
         max-width: 140px;
     }
 }
+
+
+/* ============================================================
+ * PAGE ROUTER — LOADER AND ERROR STATES
+ * Shown inside <main id="main-content"> while fetching or on error.
+ * ============================================================ */
+.tw-router-loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    font-size: 36px;
+    color: var(--tw-primary);
+}
+
+.tw-router-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    text-align: center;
+    gap: var(--tw-space-3);
+    padding: var(--tw-space-6);
+    color: var(--tw-text-muted);
+}
+
+.tw-router-error i {
+    font-size: 52px;
+    color: var(--tw-danger);
+}
+
+.tw-router-error p {
+    font-size: var(--tw-text-lg);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-primary);
+    margin: 0;
+}
+
+.tw-router-error-detail {
+    font-size: var(--tw-text-sm) !important;
+    font-weight: var(--tw-weight-regular) !important;
+    color: var(--tw-text-muted) !important;
+    font-family: 'Courier New', monospace;
+}
+
+.tw-router-error-hint {
+    font-size: var(--tw-text-sm) !important;
+    font-weight: var(--tw-weight-regular) !important;
+    color: var(--tw-text-secondary) !important;
+    max-width: 480px;
+    line-height: 1.6;
+}
+
+.tw-router-error-hint code {
+    background: var(--tw-bg-sidebar);
+    padding: 2px 6px;
+    border-radius: var(--tw-radius-sm);
+    font-size: var(--tw-text-xs);
+    color: var(--tw-primary);
+}

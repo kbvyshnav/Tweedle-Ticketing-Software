@@ -276,13 +276,21 @@
             return;
         }
 
-        /* Valid — trigger loading state */
+        /* Valid — trigger loading state then redirect to dashboard */
         /* === LOGIN: SUBMIT LOADING STATE === */
         const btn = document.getElementById('submitBtn');
         btn.classList.add('loading');
         btn.setAttribute('aria-busy', 'true');
 
-        /* Safety timeout: 8 s max — removes loading if redirect stalls */
+        /* Django: this.submit() — let the form POST naturally.
+         * Standalone preview: redirect to base.html (the router loads
+         * Dashboard automatically on startup). */
+        setTimeout(function () {
+            /* Django: window.location.href = "{% url 'admin_dashboard' %}"; */
+            window.location.href = 'base.html';
+        }, 1500);
+
+        /* Safety fallback: remove loading if redirect stalls beyond 8 s */
         setTimeout(function () {
             btn.classList.remove('loading');
             btn.setAttribute('aria-busy', 'false');
