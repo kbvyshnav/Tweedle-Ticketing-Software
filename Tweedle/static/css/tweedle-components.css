@@ -2489,3 +2489,45 @@
         flex-direction: column;
     }
 }
+
+
+/* ============================================================
+ * SECTION 20: TOAST NOTIFICATIONS
+ * Bottom-right transient status messages.
+ * === TOAST NOTIFICATIONS ===
+ * ============================================================ */
+.tw-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: var(--tw-text-primary);
+    color: #ffffff;
+    border-radius: var(--tw-radius-md);
+    font-family: var(--tw-font-primary);
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-medium);
+    box-shadow: var(--tw-shadow-lg);
+    z-index: var(--tw-z-toast);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform var(--tw-transition-base),
+                opacity var(--tw-transition-base);
+    pointer-events: none;
+}
+
+.tw-toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.tw-toast i {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.tw-toast--success i { color: var(--tw-success); }
+.tw-toast--error   i { color: var(--tw-danger); }

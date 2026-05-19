@@ -623,6 +623,354 @@ body {
 }
 
 
+/* ============================================================
+ * === TASK 4: STATUS-SPECIFIC MODAL SECTIONS ===============
+ * Forwarded and Closure details sections.
+ * Shown only when the modal's data-status matches.
+ * ============================================================ */
+
+/* Section title with left-border accent */
+.tw-modal-section-title {
+    font-size: var(--tw-text-md);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin-bottom: var(--tw-space-3);
+    padding-left: var(--tw-space-3);
+    border-left: 4px solid var(--tw-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+}
+
+/* Info grid column modifiers */
+.tw-info-grid--3col {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.tw-info-grid--4col {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* Status-driven section visibility */
+.tw-forwarded-section { display: none; }
+[data-status="forwarded"] .tw-forwarded-section { display: block; }
+
+.tw-closure-section { display: none; }
+[data-status="closed"] .tw-closure-section { display: block; }
+
+
+/* ============================================================
+ * === TASK 5: MODAL FOOTER (Close Ticket) ==================
+ * ============================================================ */
+
+.tw-modal-footer {
+    border-top: 1px solid var(--tw-border);
+    padding: var(--tw-space-4) var(--tw-space-6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--tw-bg-body);
+    border-radius: 0 0 var(--tw-radius-xl) var(--tw-radius-xl);
+    flex-shrink: 0;
+}
+
+/* Hide footer for already-closed tickets */
+[data-status="closed"] .tw-modal-footer { display: none; }
+
+.tw-modal-footer-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-4);
+    width: 100%;
+    justify-content: space-between;
+}
+
+.tw-modal-footer-status {
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+}
+
+/* Close Ticket button — danger-light outlined */
+.tw-btn-close-ticket {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    padding: var(--tw-space-2) var(--tw-space-5);
+    background: var(--tw-danger-light);
+    color: var(--tw-danger);
+    border: 1px solid var(--tw-danger);
+    border-radius: var(--tw-radius-sm);
+    font-family: var(--tw-font-primary);
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-medium);
+    cursor: pointer;
+    transition: background var(--tw-transition-fast),
+                color var(--tw-transition-fast);
+    white-space: nowrap;
+}
+
+.tw-btn-close-ticket:hover {
+    background: var(--tw-danger);
+    color: #ffffff;
+}
+
+
+/* ============================================================
+ * === TASK 4: MODAL ACTION BUTTONS (Reassign / Forward) ====
+ * ============================================================ */
+
+/* Warning-tint header button variant */
+.tw-modal-action-btn--warning {
+    background: rgba(253, 114, 56, 0.20);
+    border: 1px solid rgba(253, 114, 56, 0.40);
+}
+
+.tw-modal-action-btn--warning:hover {
+    background: rgba(253, 114, 56, 0.40);
+    transform: translateY(-2px);
+}
+
+
+/* ============================================================
+ * === TASK 4: SLIDE-UP ACTION PANELS =======================
+ * Panels slide up from the bottom of the modal container.
+ * ============================================================ */
+
+/* Required: makes modal container the positioning parent */
+.tw-modal-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.tw-action-panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--tw-bg-surface);
+    border-top: 2px solid var(--tw-primary);
+    border-radius: 0 0 var(--tw-radius-xl) var(--tw-radius-xl);
+    transform: translateY(100%);
+    transition: transform var(--tw-transition-base);
+    z-index: 10;
+    max-height: 85%;
+    overflow-y: auto;
+}
+
+.tw-action-panel.open {
+    transform: translateY(0);
+}
+
+.tw-action-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--tw-space-4) var(--tw-space-6);
+    border-bottom: 1px solid var(--tw-border);
+    position: sticky;
+    top: 0;
+    background: var(--tw-bg-surface);
+    z-index: 1;
+}
+
+.tw-action-panel__header h4 {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    font-size: var(--tw-text-md);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin: 0;
+}
+
+.tw-action-panel__header button {
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: var(--tw-text-muted);
+    cursor: pointer;
+    padding: var(--tw-space-1);
+    border-radius: var(--tw-radius-sm);
+    transition: color var(--tw-transition-fast),
+                background var(--tw-transition-fast);
+}
+
+.tw-action-panel__header button:hover {
+    color: var(--tw-danger);
+    background: var(--tw-danger-light);
+}
+
+.tw-action-panel__body {
+    padding: var(--tw-space-5) var(--tw-space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--tw-space-4);
+}
+
+.tw-action-panel__footer {
+    display: flex;
+    gap: var(--tw-space-3);
+    justify-content: flex-end;
+    padding-top: var(--tw-space-4);
+    border-top: 1px solid var(--tw-border);
+}
+
+/* Field group inside panel */
+.tw-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--tw-space-2);
+}
+
+.tw-field-group > label {
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+}
+
+/* Checkbox label */
+.tw-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-secondary);
+    cursor: pointer;
+}
+
+.tw-checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--tw-primary);
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+/* Developer/Tester toggle button group */
+.tw-toggle-group {
+    display: flex;
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    overflow: hidden;
+}
+
+.tw-toggle-btn {
+    flex: 1;
+    padding: var(--tw-space-2) var(--tw-space-4);
+    background: none;
+    border: none;
+    font-family: var(--tw-font-primary);
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-secondary);
+    cursor: pointer;
+    transition: all var(--tw-transition-fast);
+}
+
+.tw-toggle-btn.active {
+    background: var(--tw-primary);
+    color: #ffffff;
+}
+
+/* Forwarding info box */
+.tw-forward-info-box {
+    display: flex;
+    gap: var(--tw-space-3);
+    background: var(--tw-status-forwarded-bg);
+    border: 1px solid var(--tw-status-forwarded-text);
+    border-radius: var(--tw-radius-md);
+    padding: var(--tw-space-3) var(--tw-space-4);
+    font-size: var(--tw-text-sm);
+    color: var(--tw-status-forwarded-text);
+    line-height: 1.5;
+}
+
+.tw-forward-info-box i {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+/* Select input (action panels) */
+.tw-select {
+    width: 100%;
+    height: 40px;
+    padding: 0 var(--tw-space-3);
+    border: 1.5px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    font-family: var(--tw-font-primary);
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-primary);
+    background: var(--tw-bg-surface);
+    cursor: pointer;
+    transition: border-color var(--tw-transition-fast),
+                box-shadow var(--tw-transition-fast);
+}
+
+.tw-select:focus {
+    border-color: var(--tw-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--tw-primary-light);
+}
+
+/* Textarea (action panels) */
+.tw-textarea {
+    width: 100%;
+    padding: var(--tw-space-3);
+    border: 1.5px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    font-family: var(--tw-font-primary);
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-primary);
+    background: var(--tw-bg-surface);
+    resize: vertical;
+    min-height: 80px;
+    transition: border-color var(--tw-transition-fast),
+                box-shadow var(--tw-transition-fast);
+}
+
+.tw-textarea:focus {
+    border-color: var(--tw-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--tw-primary-light);
+}
+
+/* Primary action button (used in panel footer) */
+.tw-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    padding: var(--tw-space-2) var(--tw-space-5);
+    background: var(--tw-primary);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--tw-radius-sm);
+    font-family: var(--tw-font-primary);
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-medium);
+    cursor: pointer;
+    transition: background var(--tw-transition-fast),
+                transform var(--tw-transition-fast);
+}
+
+.tw-btn-primary:hover {
+    background: var(--tw-primary-dark);
+    transform: translateY(-1px);
+}
+
+/* Warning-filled variant (Forward button) */
+.tw-btn--warning-filled {
+    background: var(--tw-status-forwarded-text) !important;
+}
+
+.tw-btn--warning-filled:hover {
+    background: var(--tw-warning-dark) !important;
+}
+
+
 /* === RESPONSIVE =============================================
  * 768px + 576px breakpoints.
  * ============================================================ */
@@ -639,12 +987,23 @@ body {
         padding: var(--tw-space-5);
     }
 
-    .tw-info-grid {
+    .tw-info-grid,
+    .tw-info-grid--3col,
+    .tw-info-grid--4col {
         grid-template-columns: repeat(2, 1fr);
     }
 
     .tw-info-grid--6 {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tw-modal-footer {
+        padding: var(--tw-space-3) var(--tw-space-4);
+    }
+
+    .tw-modal-footer-actions {
+        flex-wrap: wrap;
+        gap: var(--tw-space-2);
     }
 
     .tw-modal-header-actions {
@@ -667,6 +1026,8 @@ body {
 
 @media screen and (max-width: 576px) {
     .tw-info-grid,
+    .tw-info-grid--3col,
+    .tw-info-grid--4col,
     .tw-info-grid--6 {
         grid-template-columns: 1fr;
     }

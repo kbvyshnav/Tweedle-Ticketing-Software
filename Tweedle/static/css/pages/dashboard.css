@@ -1,15 +1,12 @@
 /*
  * ============================================================
  * FILE:        dashboard.css
- * PURPOSE:     Dashboard page — styles unique to this page only.
- *              Classes moved to tweedle-components.css in Phase 6:
- *              .table-scroll-wrapper, .row-hidden,
- *              .tw-status-badge + --testing/--development/--uat
- *              (those are now in components with proper tokens)
+ * PURPOSE:     Dashboard page — Phase 10 redesign.
+ *              Compact stat strip, underline tabs, unified
+ *              table card with toolbar, global search overlay.
  * LOAD ORDER:  5 of 5
  * DJANGO PATH: <!-- Django: {% static 'css/pages/dashboard.css' %} -->
  * DEPENDS ON:  tweedle-tokens.css
- * MODIFIED:    <!-- Last modified: {{date}} -->
  * ============================================================
  */
 
@@ -20,13 +17,505 @@ body > main {
 }
 
 
-/* === FILTER BAR — dropdown wrapper ========================= */
-.filter-btn-wrap {
-    position: relative;
+/* === PAGE HEADER ============================================
+ * Left: "Dashboard" h1. Right: global search input (280px).
+ * =========================================================== */
+.tw-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--tw-space-5);
+    gap: var(--tw-space-4);
+    flex-wrap: wrap;
+}
+
+.tw-page-header h1 {
+    font-size: var(--tw-text-3xl);
+    font-weight: var(--tw-weight-bold);
+    color: var(--tw-text-primary);
+    margin: 0;
 }
 
 
-/* === DATE DROPDOWN — separator ============================= */
+/* === DASHBOARD: GLOBAL SEARCH ===============================
+ * Positioned wrapper holds the input + floating overlay.
+ * =========================================================== */
+.tw-global-search-wrap {
+    position: relative;
+    width: 280px;
+    flex-shrink: 0;
+}
+
+.tw-global-search {
+    position: relative;
+}
+
+.tw-global-search input {
+    width: 100%;
+    height: 38px;
+    padding: 0 var(--tw-space-4) 0 36px;
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    font-size: var(--tw-text-base);
+    font-family: var(--tw-font-primary);
+    background: var(--tw-bg-surface);
+    color: var(--tw-text-primary);
+    outline: none;
+    transition: border-color var(--tw-transition-fast),
+                box-shadow var(--tw-transition-fast);
+}
+
+.tw-global-search input:focus {
+    border-color: var(--tw-primary);
+    box-shadow: 0 0 0 3px rgba(60, 145, 230, 0.10);
+}
+
+.tw-global-search input::placeholder {
+    color: var(--tw-text-muted);
+    font-size: var(--tw-text-sm);
+}
+
+.tw-global-search-icon {
+    position: absolute;
+    left: var(--tw-space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--tw-text-muted);
+    font-size: 18px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Floating results overlay */
+.tw-search-overlay {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 480px;
+    background: var(--tw-bg-surface);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-lg);
+    box-shadow: var(--tw-shadow-lg);
+    z-index: var(--tw-z-dropdown);
+    max-height: 400px;
+    overflow-y: auto;
+    display: none;
+}
+
+.tw-search-overlay-header {
+    font-size: 12px;
+    color: var(--tw-text-muted);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--tw-border);
+}
+
+.tw-search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--tw-border);
+    transition: background var(--tw-transition-fast);
+}
+
+.tw-search-result-item:last-child {
+    border-bottom: none;
+}
+
+.tw-search-result-item:hover {
+    background: var(--tw-bg-body);
+}
+
+.tw-badge-primary--sm {
+    display: inline-block;
+    background: var(--tw-primary-light);
+    color: var(--tw-primary-text);
+    font-size: 11px;
+    font-weight: var(--tw-weight-semibold);
+    padding: 2px var(--tw-space-2);
+    border-radius: var(--tw-radius-sm);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.tw-search-result-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.tw-search-result-subject {
+    font-weight: var(--tw-weight-semibold);
+    font-size: 13px;
+    color: var(--tw-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tw-search-result-client {
+    font-size: 12px;
+    color: var(--tw-text-muted);
+    margin-top: 2px;
+}
+
+.tw-search-no-results {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--tw-space-3);
+    padding: 32px;
+    color: var(--tw-text-muted);
+    font-size: 13px;
+    text-align: center;
+}
+
+.tw-search-no-results i {
+    font-size: 36px;
+    opacity: 0.4;
+}
+
+/* Brief highlight flash on a result-clicked row */
+@keyframes tw-row-highlight-flash {
+    0%, 100% { background: transparent; }
+    30%       { background: var(--tw-status-progress-bg); }
+}
+
+.row-highlight {
+    animation: tw-row-highlight-flash 0.6s ease 3;
+}
+
+
+/* === STAT STRIP =============================================
+ * 4 rich cards: icon | count+label | trend indicator.
+ * Left-border accent identifies status at a glance.
+ * =========================================================== */
+.tw-stat-strip {
+    display: flex;
+    gap: var(--tw-space-4);
+    margin-bottom: var(--tw-space-5);
+}
+
+.tw-stat-card {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-4);
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-lg);
+    padding: var(--tw-space-4) var(--tw-space-5);
+    border: 1px solid var(--tw-border);
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    overflow: hidden;
+    transition: all var(--tw-transition-fast);
+    box-shadow: var(--tw-shadow-sm);
+    user-select: none;
+}
+
+.tw-stat-card:hover {
+    box-shadow: var(--tw-shadow-md);
+    transform: translateY(-1px);
+}
+
+.tw-stat-card.active {
+    box-shadow: var(--tw-shadow-md);
+    transform: translateY(-1px);
+}
+
+/* Per-status left-border accent */
+.tw-stat-card--inbox     { border-left-color: var(--tw-status-inbox-text); }
+.tw-stat-card--progress  { border-left-color: var(--tw-status-progress-text); }
+.tw-stat-card--forwarded { border-left-color: var(--tw-status-forwarded-text); }
+.tw-stat-card--closed    { border-left-color: var(--tw-status-closed-text); }
+
+/* Active state — tinted background */
+.tw-stat-card--inbox.active     { background: var(--tw-status-inbox-bg);     border-color: var(--tw-status-inbox-text);     border-left-color: var(--tw-status-inbox-text); }
+.tw-stat-card--progress.active  { background: var(--tw-status-progress-bg);  border-color: var(--tw-status-progress-text);  border-left-color: var(--tw-status-progress-text); }
+.tw-stat-card--forwarded.active { background: var(--tw-status-forwarded-bg); border-color: var(--tw-status-forwarded-text); border-left-color: var(--tw-status-forwarded-text); }
+.tw-stat-card--closed.active    { background: var(--tw-status-closed-bg);    border-color: var(--tw-status-closed-text);    border-left-color: var(--tw-status-closed-text); }
+
+/* Left slot (icon) */
+.tw-stat-card__left { flex-shrink: 0; }
+
+.tw-stat-card__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--tw-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.tw-stat-card--inbox     .tw-stat-card__icon { background: var(--tw-status-inbox-bg);     color: var(--tw-status-inbox-text); }
+.tw-stat-card--progress  .tw-stat-card__icon { background: var(--tw-status-progress-bg);  color: var(--tw-status-progress-text); }
+.tw-stat-card--forwarded .tw-stat-card__icon { background: var(--tw-status-forwarded-bg); color: var(--tw-status-forwarded-text); }
+.tw-stat-card--closed    .tw-stat-card__icon { background: var(--tw-status-closed-bg);    color: var(--tw-status-closed-text); }
+
+/* Body (count + label) */
+.tw-stat-card__body { flex: 1; min-width: 0; }
+
+.tw-stat-card__count {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--tw-text-primary);
+    line-height: 1;
+    font-family: var(--tw-font-primary);
+}
+
+.tw-stat-card__label {
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-muted);
+    margin-top: 2px;
+    font-weight: var(--tw-weight-medium);
+}
+
+/* Right slot (trend) */
+.tw-stat-card__right { flex-shrink: 0; }
+
+.tw-stat-card__trend {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.tw-stat-card__trend i { font-size: 14px; }
+
+/* Per-status trend color */
+.tw-stat-card--inbox     .tw-stat-card__trend { color: var(--tw-status-inbox-text); }
+.tw-stat-card--progress  .tw-stat-card__trend { color: var(--tw-status-progress-text); }
+.tw-stat-card--forwarded .tw-stat-card__trend { color: var(--tw-status-forwarded-text); }
+.tw-stat-card--closed    .tw-stat-card__trend { color: var(--tw-status-closed-text); }
+
+/* Down-trend variant (e.g. Forwarded -2) */
+.tw-stat-card__trend--down { color: var(--tw-danger) !important; }
+
+
+/* === TAB STATUS BAR =========================================
+ * Dynamic heading + meta row between the tab row and toolbar.
+ * === DASHBOARD: TAB HEADING UPDATE ===
+ * =========================================================== */
+.tw-tab-status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--tw-space-3) var(--tw-space-5);
+    border-bottom: 1px solid var(--tw-border);
+    background: var(--tw-bg-surface);
+}
+
+.tw-tab-status-bar__left {
+    display: flex;
+    align-items: center;
+}
+
+.tw-tab-heading {
+    font-size: var(--tw-text-lg);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin: 0;
+}
+
+.tw-tab-meta {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    margin-left: var(--tw-space-3);
+}
+
+
+/* === TABLE CARD — DASHBOARD VARIANT =========================
+ * Override components: no outer padding, overflow visible so
+ * filter dropdowns can escape the card boundary.
+ * =========================================================== */
+.tw-table-card--dashboard {
+    overflow: visible;
+    padding: 0;
+}
+
+.tw-table-card--dashboard:hover {
+    transform: none;
+}
+
+
+/* === TAB ROW ================================================
+ * Underline-style tabs at the top of the table card.
+ * =========================================================== */
+.tw-ticket-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--tw-border);
+    padding: 0 var(--tw-space-5);
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex-shrink: 0;
+}
+
+.tw-ticket-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.tw-ticket-tab {
+    padding: 14px 20px;
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-medium);
+    font-family: var(--tw-font-primary);
+    color: var(--tw-text-muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color var(--tw-transition-fast),
+                border-bottom-color var(--tw-transition-fast);
+}
+
+.tw-ticket-tab:hover {
+    color: var(--tw-primary);
+    border-bottom-color: rgba(60, 145, 230, 0.4);
+}
+
+.tw-ticket-tab.active {
+    color: var(--tw-primary);
+    border-bottom-color: var(--tw-primary);
+    font-weight: var(--tw-weight-semibold);
+}
+
+/* Count badge inside each tab */
+.tw-tab-count {
+    display: inline-block;
+    background: var(--tw-bg-body);
+    color: var(--tw-text-secondary);
+    border-radius: var(--tw-radius-pill);
+    font-size: 11px;
+    padding: 1px 7px;
+    margin-left: 6px;
+}
+
+.tw-ticket-tab.active .tw-tab-count {
+    background: var(--tw-primary-light);
+    color: var(--tw-primary-text);
+}
+
+
+/* === TABLE TOOLBAR ==========================================
+ * Filter + search row inside the table card.
+ * =========================================================== */
+.tw-table-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+    padding: var(--tw-space-4) var(--tw-space-5);
+    border-bottom: 1px solid var(--tw-border);
+    flex-wrap: wrap;
+    position: relative;
+}
+
+.tw-toolbar-filters {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    flex-wrap: wrap;
+}
+
+/* Compact toolbar filter button */
+.tw-toolbar-btn {
+    height: 34px;
+    padding: 0 12px;
+    font-size: var(--tw-text-sm);
+    font-family: var(--tw-font-primary);
+    color: var(--tw-text-secondary);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    background: var(--tw-bg-surface);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    transition: border-color var(--tw-transition-fast),
+                color var(--tw-transition-fast);
+    white-space: nowrap;
+}
+
+.tw-toolbar-btn:hover,
+.tw-toolbar-btn[aria-expanded="true"] {
+    border-color: var(--tw-primary);
+    color: var(--tw-primary);
+}
+
+/* Right-side cluster (search + sort + more) */
+.tw-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    margin-left: auto;
+}
+
+/* Icon-only toolbar button (sort, more-options) */
+.tw-toolbar-icon-btn {
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    background: var(--tw-bg-surface);
+    color: var(--tw-text-muted);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color var(--tw-transition-fast),
+                color var(--tw-transition-fast);
+}
+
+.tw-toolbar-icon-btn:hover {
+    border-color: var(--tw-primary);
+    color: var(--tw-primary);
+}
+
+/* Table search inside toolbar (200px × 34px) */
+.tw-table-search {
+    position: relative;
+    width: 200px;
+}
+
+.tw-table-search input {
+    width: 100%;
+    height: 34px;
+    padding: 0 var(--tw-space-3) 0 32px;
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    font-size: var(--tw-text-sm);
+    font-family: var(--tw-font-primary);
+    background: var(--tw-bg-surface);
+    color: var(--tw-text-primary);
+    outline: none;
+    transition: border-color var(--tw-transition-fast);
+}
+
+.tw-table-search input:focus {
+    border-color: var(--tw-primary);
+}
+
+.tw-table-search .search-icon {
+    position: absolute;
+    left: var(--tw-space-2);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--tw-text-muted);
+    font-size: 16px;
+    pointer-events: none;
+}
+
+
+/* === DATE DROPDOWN separator ================================ */
 .date-separator {
     color: var(--tw-text-secondary);
     margin-top: var(--tw-space-5);
@@ -36,28 +525,7 @@ body > main {
 }
 
 
-/* === STAT TILES — overrides ================================
- * Override base.css: spec requires tw-text-3xl / tw-weight-bold
- * for the count number (base uses tw-text-2xl / semibold).
- * ============================================================ */
-.stat-tile__text {
-    display: flex;
-    flex-direction: column;
-    gap: var(--tw-space-1);
-}
-
-.stat-tile__count {
-    font-size: var(--tw-text-3xl);
-    font-weight: var(--tw-weight-bold);
-    color: var(--tw-text-primary);
-    line-height: 1.1;
-}
-
-
-/* === TAB CONTENT PANELS ====================================
- * Each tab has its own .tab-content div wrapping its table.
- * Only the .active tab-content is shown. Switched by JS.
- * ============================================================ */
+/* === TAB CONTENT PANELS ===================================== */
 .tab-content {
     display: none;
 }
@@ -67,80 +535,7 @@ body > main {
 }
 
 
-/* === TICKET TABS =========================================== */
-.ticket-tabs {
-    display: flex;
-    gap: var(--tw-space-2);
-    margin-bottom: var(--tw-space-5);
-    flex-wrap: wrap;
-}
-
-.ticket-tab {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--tw-space-2);
-    padding: var(--tw-space-2) var(--tw-space-4);
-    border-radius: var(--tw-radius-pill);
-    border: 1.5px solid var(--tw-border);
-    background: var(--tw-bg-surface);
-    color: var(--tw-text-secondary);
-    font-family: var(--tw-font-primary);
-    font-size: var(--tw-text-base);
-    font-weight: var(--tw-weight-medium);
-    cursor: pointer;
-    transition: border-color var(--tw-transition-fast),
-                color var(--tw-transition-fast),
-                background var(--tw-transition-fast),
-                box-shadow var(--tw-transition-fast);
-}
-
-.ticket-tab:hover:not(.active) {
-    border-color: var(--tw-primary);
-    color: var(--tw-primary);
-    background: var(--tw-primary-light);
-}
-
-.ticket-tab.active {
-    background: var(--tw-primary);
-    color: #ffffff;
-    border-color: var(--tw-primary);
-    box-shadow: var(--tw-shadow-primary);
-}
-
-.tab-count {
-    font-size: var(--tw-text-xs);
-    font-weight: var(--tw-weight-bold);
-    padding: 1px var(--tw-space-2);
-    border-radius: var(--tw-radius-pill);
-    line-height: 1.4;
-    background: rgba(255, 255, 255, 0.25);
-    color: inherit;
-}
-
-.ticket-tab:not(.active) .tab-count {
-    background: var(--tw-bg-body);
-    color: var(--tw-text-muted);
-}
-
-
-/* === HIGHLIGHT STATUS BADGE (table title) ================== */
-.highlight-status {
-    display: inline-block;
-    background: var(--tw-status-progress-bg);
-    color: var(--tw-status-progress-text);
-    font-weight: var(--tw-weight-bold);
-    font-size: var(--tw-text-sm);
-    font-family: var(--tw-font-primary);
-    padding: var(--tw-space-1) var(--tw-space-3);
-    border-radius: var(--tw-space-1);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    vertical-align: middle;
-    margin-left: var(--tw-space-2);
-}
-
-
-/* === TABLE CELLS =========================================== */
+/* === TABLE CELL HELPERS ===================================== */
 .ticket-id-cell {
     font-weight: var(--tw-weight-semibold);
     font-family: 'Courier New', Courier, monospace;
@@ -163,13 +558,40 @@ body > main {
 }
 
 
-/* === SELECTED ROW ========================================== */
+/* === TICKET ID PILL (Task 3) ================================ */
+.tw-ticket-id-cell {
+    white-space: nowrap;
+}
+
+.tw-ticket-id {
+    font-family: 'Courier New', 'Consolas', 'SF Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--tw-primary);
+    background: var(--tw-primary-light);
+    padding: 3px 8px;
+    border-radius: var(--tw-radius-sm);
+    letter-spacing: 0.3px;
+    border: 1px solid rgba(60, 145, 230, 0.2);
+    display: inline-block;
+    transition: background var(--tw-transition-fast),
+                color var(--tw-transition-fast);
+}
+
+.tw-ticket-id:hover {
+    background: var(--tw-primary);
+    color: #ffffff;
+    cursor: pointer;
+}
+
+
+/* === SELECTED ROW =========================================== */
 .row-selected {
     background: var(--tw-primary-light) !important;
 }
 
 
-/* === SEARCH FEEDBACK ======================================= */
+/* === SEARCH FEEDBACK (SR-only) ============================== */
 .search-feedback {
     position: absolute;
     width: 1px;
@@ -183,22 +605,17 @@ body > main {
 }
 
 
-/* === RESPONSIVE ============================================
+/* === RESPONSIVE =============================================
  * 1024px (bp-lg), 768px (bp-md), 576px (bp-sm)
- * ============================================================ */
+ * =========================================================== */
 
 @media screen and (max-width: 1024px) {
-    .ticket-tabs {
-        gap: var(--tw-space-1);
+    .tw-global-search-wrap {
+        width: 220px;
     }
 
-    .ticket-tab {
-        padding: var(--tw-space-2) var(--tw-space-3);
-        font-size: var(--tw-text-sm);
-    }
-
-    .tw-date-dropdown {
-        width: 320px;
+    .tw-search-overlay {
+        width: 360px;
     }
 }
 
@@ -207,47 +624,68 @@ body > main {
         padding: var(--tw-content-padding-mobile);
     }
 
-    .ticket-tabs {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        padding-bottom: var(--tw-space-1);
-        scrollbar-width: none;
+    .tw-page-header {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
-    .ticket-tabs::-webkit-scrollbar {
+    .tw-global-search-wrap {
+        width: 100%;
+    }
+
+    .tw-search-overlay {
+        width: 100%;
+        left: 0;
+        right: 0;
+    }
+
+    /* 2×2 grid at 768px */
+    .tw-stat-strip {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--tw-space-3);
+    }
+
+    .tw-stat-card {
+        flex: none;
+        min-width: 0;
+    }
+
+    .tw-table-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .tw-toolbar-right {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .tw-table-search {
+        width: 100%;
+    }
+
+    .tw-tab-meta {
         display: none;
-    }
-
-    .tw-table {
-        min-width: 720px;
-    }
-
-    .tw-date-dropdown {
-        width: 280px;
     }
 }
 
 @media screen and (max-width: 576px) {
-    .tab-count {
-        display: none;
+    /* 1 col at 576px */
+    .tw-stat-strip {
+        grid-template-columns: 1fr;
     }
 
-    .filter-btn-wrap {
+    .tw-toolbar-filters {
+        flex-wrap: wrap;
         width: 100%;
     }
 
-    .tw-filter-btn {
-        width: 100%;
-        justify-content: space-between;
+    .tw-toolbar-btn {
+        font-size: var(--tw-text-xs);
     }
 
-    .filter-bar__search {
-        width: 100%;
-        max-width: none;
-        margin-left: 0;
-    }
-
-    .search-input-group input {
-        max-width: none;
+    .tw-ticket-tab {
+        padding: 12px 14px;
     }
 }

@@ -74,7 +74,7 @@
      injected into the DOM on demand.
      Django: {% block content %}
      ============================================================ -->
-<div class="tw-modal-overlay" id="ticketModal" role="dialog" aria-modal="true" aria-labelledby="modalTicketId">
+<div class="tw-modal-overlay" id="ticketModal" role="dialog" aria-modal="true" aria-labelledby="modalTicketId" data-status=""  data-ticket-id="">
 <div class="tw-modal-container">
 
     <!-- === MODAL HEADER ====================================
@@ -111,6 +111,14 @@
                 <button class="tw-modal-action-btn" id="timelineBtn" aria-label="View ticket timeline">
                     <i class="bx bx-time-five" aria-hidden="true"></i>
                     Timeline
+                </button>
+                <button class="tw-modal-action-btn" id="reassignBtn" onclick="openReassignPanel()" title="Reassign Developer or Tester" aria-label="Reassign ticket">
+                    <i class='bx bx-transfer' aria-hidden="true"></i>
+                    Reassign
+                </button>
+                <button class="tw-modal-action-btn tw-modal-action-btn--warning" id="forwardBtn" onclick="openForwardPanel()" title="Forward ticket to client" aria-label="Forward ticket">
+                    <i class='bx bx-share' aria-hidden="true"></i>
+                    Forward
                 </button>
             </div>
 
@@ -194,6 +202,90 @@
         </div>
 
 
+        <!-- Forwarding Details — shown only when data-status="forwarded" -->
+        <div class="tw-modal-section tw-forwarded-section">
+            <div class="tw-modal-section-title">
+                <i class='bx bx-share'></i> Forwarding Details
+            </div>
+            <div class="tw-info-grid tw-info-grid--3col">
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Forwarded By</div>
+                    <div class="tw-info-value">
+                        <!-- Django: {{ ticket.forwarded_by.get_full_name }} -->
+                        Rajagopal P
+                    </div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Forwarded To</div>
+                    <div class="tw-info-value">
+                        <!-- Django: {{ ticket.forwarded_to }} -->
+                        External Support Team
+                    </div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Forwarded On</div>
+                    <div class="tw-info-value">
+                        <!-- Django: {{ ticket.forwarded_at|date:"d-m-Y" }} -->
+                        18-01-2025
+                    </div>
+                </div>
+            </div>
+            <div class="tw-info-item" style="width:100%">
+                <div class="tw-info-label">Reason for Forwarding</div>
+                <div class="tw-description-box">
+                    <!-- Django: {{ ticket.forwarding_reason }} -->
+                    Issue requires escalation to the payment gateway provider for API-level access.
+                </div>
+            </div>
+        </div>
+
+        <!-- Closure Details — shown only when data-status="closed" -->
+        <div class="tw-modal-section tw-closure-section">
+            <div class="tw-modal-section-title">
+                <i class='bx bx-check-shield'></i> Closure Details
+            </div>
+            <div class="tw-info-grid tw-info-grid--4col">
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Closed By</div>
+                    <div class="tw-info-value">
+                        <!-- Django: {{ ticket.closed_by.get_full_name }} -->
+                        Rajagopal P
+                    </div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Closed On</div>
+                    <div class="tw-info-value">
+                        <!-- Django: {{ ticket.closed_at|date:"d-m-Y" }} -->
+                        20-01-2025
+                    </div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Resolution Time</div>
+                    <div class="tw-info-value">
+                        <!-- Django: {{ ticket.resolution_days }} days -->
+                        5 days
+                    </div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">TAT Status</div>
+                    <div class="tw-info-value">
+                        <span class="tw-tat-badge tw-tat-badge--met">
+                            <!-- Django: {{ ticket.tat_status }} -->
+                            Met
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="tw-info-item" style="width:100%">
+                <div class="tw-info-label">Resolution Summary</div>
+                <div class="tw-description-box">
+                    <!-- Django: {{ ticket.resolution_summary }} -->
+                    IBAN validation issue was resolved by updating the bank API endpoint configuration.
+                    Client confirmed resolution on 20-01-2025.
+                </div>
+            </div>
+        </div>
+
         <!-- Attachments Section -->
         <!-- Django: {% if ticket.attachments.exists %} -->
         <div class="tw-modal-section">
@@ -269,6 +361,137 @@
     </div>
     <!-- END MODAL BODY -->
 
+    <!-- === MODAL FOOTER (Close Ticket) =========================
+         Hidden automatically when data-status="closed" via CSS.
+         Django: {% if ticket.status != 'closed' %} show footer {% endif %}
+         ========================================================= -->
+    <div class="tw-modal-footer">
+        <div class="tw-modal-footer-actions">
+            <span class="tw-modal-footer-status">
+                Current Status:
+                <span class="tw-status-badge tw-status-badge--progress" id="footerStatusBadge">In Progress</span>
+            </span>
+            <!-- Django: {% if ticket.status != 'closed' %} -->
+            <button
+                class="tw-btn-close-ticket"
+                id="closeTicketBtn"
+                onclick="openCloseTicketConfirm()">
+                <i class='bx bx-x-circle'></i>
+                Close Ticket
+            </button>
+            <!-- Django: {% endif %} -->
+        </div>
+    </div>
+    <!-- END MODAL FOOTER -->
+
+    <!-- === REASSIGN PANEL =====================================
+         Slides up from modal bottom on Reassign button click.
+         Django: POST to /api/tickets/{id}/reassign/
+         ========================================================= -->
+    <div class="tw-action-panel" id="reassignPanel" role="dialog" aria-label="Reassign ticket">
+        <div class="tw-action-panel__header">
+            <h4><i class='bx bx-transfer'></i> Reassign Ticket</h4>
+            <button onclick="closeActionPanel('reassignPanel')" aria-label="Close reassign panel">
+                <i class='bx bx-x'></i>
+            </button>
+        </div>
+        <div class="tw-action-panel__body">
+
+            <div class="tw-field-group">
+                <label>Reassign Type</label>
+                <div class="tw-toggle-group">
+                    <button class="tw-toggle-btn active" data-type="developer">Developer</button>
+                    <button class="tw-toggle-btn" data-type="tester">Tester</button>
+                </div>
+            </div>
+
+            <div class="tw-field-group">
+                <label for="reassignSelect">Select New Assignee *</label>
+                <select class="tw-select" id="reassignSelect">
+                    <option value="">Choose developer...</option>
+                    <option value="dev1">Arun Kumar (3 active tickets)</option>
+                    <option value="dev2">Rithik S (5 active tickets)</option>
+                    <option value="dev3">John Mathew (2 active tickets)</option>
+                </select>
+            </div>
+
+            <div class="tw-field-group">
+                <label for="reassignReason">Reason for Reassignment *</label>
+                <textarea class="tw-textarea" id="reassignReason" rows="3"
+                    placeholder="Explain why this ticket is being reassigned..."></textarea>
+            </div>
+
+            <div class="tw-field-group">
+                <label class="tw-checkbox-label">
+                    <input type="checkbox" id="reassignNotify" checked>
+                    <span>Notify new assignee via email</span>
+                </label>
+            </div>
+
+            <div class="tw-action-panel__footer">
+                <button class="tw-btn-outline" onclick="closeActionPanel('reassignPanel')">Cancel</button>
+                <button class="tw-btn-primary" onclick="confirmReassign()">
+                    <i class='bx bx-check'></i>
+                    Confirm Reassignment
+                </button>
+            </div>
+
+        </div>
+    </div>
+    <!-- END REASSIGN PANEL -->
+
+    <!-- === FORWARD PANEL =====================================
+         Slides up from modal bottom on Forward button click.
+         Django: POST to /api/tickets/{id}/forward/
+         ========================================================= -->
+    <div class="tw-action-panel" id="forwardPanel" role="dialog" aria-label="Forward ticket">
+        <div class="tw-action-panel__header">
+            <h4><i class='bx bx-share'></i> Forward Ticket to Client</h4>
+            <button onclick="closeActionPanel('forwardPanel')" aria-label="Close forward panel">
+                <i class='bx bx-x'></i>
+            </button>
+        </div>
+        <div class="tw-action-panel__body">
+
+            <div class="tw-forward-info-box">
+                <i class='bx bx-info-circle'></i>
+                <p>Forwarding this ticket will change its status to <strong>Forwarded</strong> and notify the client to provide additional information or clarification.</p>
+            </div>
+
+            <div class="tw-field-group">
+                <label for="forwardToSelect">Forward To (Client Contact) *</label>
+                <select class="tw-select" id="forwardToSelect">
+                    <option value="">Select client contact...</option>
+                    <option value="gmec1">GMEC — contact@gmec.com.np</option>
+                    <option value="bgex1">BGEX — info@bgex.com.bd</option>
+                </select>
+            </div>
+
+            <div class="tw-field-group">
+                <label for="forwardReason">Reason / Message to Client *</label>
+                <textarea class="tw-textarea" id="forwardReason" rows="4"
+                    placeholder="Describe what information or action is needed from the client..."></textarea>
+            </div>
+
+            <div class="tw-field-group">
+                <label class="tw-checkbox-label">
+                    <input type="checkbox" id="forwardNotify" checked>
+                    <span>Send email notification to client</span>
+                </label>
+            </div>
+
+            <div class="tw-action-panel__footer">
+                <button class="tw-btn-outline" onclick="closeActionPanel('forwardPanel')">Cancel</button>
+                <button class="tw-btn-primary tw-btn--warning-filled" onclick="confirmForward()">
+                    <i class='bx bx-share'></i>
+                    Forward Ticket
+                </button>
+            </div>
+
+        </div>
+    </div>
+    <!-- END FORWARD PANEL -->
+
 </div>
 </div>
 <!-- END TICKET DETAILS MODAL -->
@@ -290,11 +513,19 @@
      *             '{{ ticket.allottee }}')"
      * ============================================================ */
     function openTicketModal(ticketId, subject, status, allottee) {
+        const modal = document.getElementById('ticketModal');
+        const statusKey = status.toLowerCase().replace(/\s+/g, '');
+        modal.dataset.status   = statusKey;
+        modal.dataset.ticketId = ticketId;
+
         document.getElementById('modalTicketId').textContent = ticketId;
         document.getElementById('modalSubject').textContent  = subject;
         document.getElementById('modalStatus').textContent   = status;
         document.getElementById('modalAllottee').textContent = allottee;
-        const modal = document.getElementById('ticketModal');
+
+        const footerBadge = document.getElementById('footerStatusBadge');
+        if (footerBadge) footerBadge.textContent = status;
+
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
@@ -344,17 +575,139 @@
 
     /* ============================================================
      * TICKET DETAILS: TIMELINE BUTTON
-     * ============================================================
-     * Django: dispatch a custom event so the parent view can
-     *         open the timeline overlay for this ticket.
      * ============================================================ */
     document.getElementById('timelineBtn').addEventListener('click', function () {
         const ticketId = document.getElementById('modalTicketId').textContent;
-        /* Django: document.dispatchEvent(new CustomEvent('ticket:open-timeline', {
-                       detail: { ticketId }
-                   })); */
+        /* Django: dispatch open-timeline event */
         console.log('[TicketDetails] Open timeline for ticket:', ticketId);
     });
+
+
+    /* ============================================================
+     * TICKET DETAILS: HIDE REASSIGN/FORWARD ON CLOSED STATUS
+     * ============================================================ */
+    /* Called inside openTicketModal — already sets modal.dataset.status.
+     * Show/hide action buttons based on status. */
+    (function patchOpenTicketModal() {
+        const orig = window.openTicketModal;
+        window.openTicketModal = function(ticketId, subject, status, allottee) {
+            orig(ticketId, subject, status, allottee);
+            const isClosed = status.toLowerCase().replace(/\s+/g,'') === 'closed';
+            const reassignBtn = document.getElementById('reassignBtn');
+            const forwardBtn  = document.getElementById('forwardBtn');
+            if (reassignBtn) reassignBtn.style.display = isClosed ? 'none' : '';
+            if (forwardBtn)  forwardBtn.style.display  = isClosed ? 'none' : '';
+            /* Close any open panels on modal open */
+            closeActionPanel('reassignPanel');
+            closeActionPanel('forwardPanel');
+        };
+    }());
+
+
+    /* ============================================================
+     * REASSIGN TYPE TOGGLE
+     * ============================================================ */
+    document.querySelectorAll('.tw-toggle-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            this.closest('.tw-toggle-group')
+                .querySelectorAll('.tw-toggle-btn')
+                .forEach(function(b) { b.classList.remove('active'); });
+            this.classList.add('active');
+        });
+    });
+
+
+    /* ============================================================
+     * MODAL: ACTION PANELS
+     * === MODAL: ACTION PANELS ===
+     * ============================================================ */
+    function openReassignPanel() {
+        closeActionPanel('forwardPanel');
+        document.getElementById('reassignPanel').classList.add('open');
+    }
+
+    function openForwardPanel() {
+        closeActionPanel('reassignPanel');
+        document.getElementById('forwardPanel').classList.add('open');
+    }
+
+    function closeActionPanel(panelId) {
+        const panel = document.getElementById(panelId);
+        if (panel) panel.classList.remove('open');
+    }
+
+
+    /* ============================================================
+     * MODAL: REASSIGN LOGIC
+     * === MODAL: REASSIGN LOGIC ===
+     * ============================================================ */
+    function confirmReassign() {
+        const assignee = document.getElementById('reassignSelect').value;
+        const reason   = document.getElementById('reassignReason').value;
+        if (!assignee || !reason.trim()) {
+            alert('Please select an assignee and provide a reason.');
+            return;
+        }
+        /* Django: POST to /api/tickets/{id}/reassign/ */
+        console.log('Reassigning to:', assignee, 'Reason:', reason);
+        closeActionPanel('reassignPanel');
+        showToast('Ticket reassigned successfully');
+    }
+
+
+    /* ============================================================
+     * MODAL: FORWARD LOGIC
+     * === MODAL: FORWARD LOGIC ===
+     * ============================================================ */
+    function confirmForward() {
+        const forwardTo = document.getElementById('forwardToSelect').value;
+        const reason    = document.getElementById('forwardReason').value;
+        if (!forwardTo || !reason.trim()) {
+            alert('Please select a recipient and provide a reason.');
+            return;
+        }
+        /* Django: POST to /api/tickets/{id}/forward/ */
+        console.log('Forwarding to:', forwardTo, 'Reason:', reason);
+        closeActionPanel('forwardPanel');
+        showToast('Ticket forwarded to client');
+    }
+
+
+    /* ============================================================
+     * TOAST NOTIFICATION
+     * === TOAST NOTIFICATION ===
+     * ============================================================ */
+    function showToast(message, type) {
+        type = type || 'success';
+        const toast = document.createElement('div');
+        toast.className = 'tw-toast tw-toast--' + type;
+        toast.innerHTML = '<i class=\'bx ' +
+            (type === 'success' ? 'bx-check-circle' : 'bx-error-circle') +
+            '\'></i><span>' + message + '</span>';
+        document.body.appendChild(toast);
+        setTimeout(function() { toast.classList.add('show'); }, 10);
+        setTimeout(function() {
+            toast.classList.remove('show');
+            setTimeout(function() { toast.remove(); }, 300);
+        }, 3000);
+    }
+
+
+    /* ============================================================
+     * MODAL: CLOSE TICKET CONFIRM
+     * ============================================================ */
+    function openCloseTicketConfirm() {
+        const modal    = document.getElementById('ticketModal');
+        const ticketId = modal.dataset.ticketId || 'this ticket';
+
+        /* Inline confirm dialog — standalone ticket-details.html */
+        if (!confirm('Close ticket ' + ticketId + '? This will mark it as resolved.')) return;
+
+        /* Django: fetch(`/api/tickets/${ticketId}/close/`, { method: 'POST', ... }) */
+        console.log('[TicketDetails] Ticket closed:', ticketId);
+        modal.dataset.status = 'closed';
+        closeTicketModal();
+    }
 </script>
 
 </body>

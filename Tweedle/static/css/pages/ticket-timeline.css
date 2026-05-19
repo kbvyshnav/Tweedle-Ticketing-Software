@@ -270,6 +270,87 @@ body > main {
 
 
 /* ============================================================
+ * TASK 5: FULL TIMELINE MODAL
+ * Large modal opened from the mini timeline panel.
+ * "View Full Timeline" button triggers openFullTimeline().
+ * ============================================================ */
+@keyframes tw-slide-up {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.tw-timeline-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.60);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: var(--tw-z-modal);
+    align-items: center;
+    justify-content: center;
+    padding: var(--tw-space-6);
+}
+
+.tw-timeline-modal-overlay.active {
+    display: flex;
+}
+
+.tw-timeline-modal-container {
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-xl);
+    width: 100%;
+    max-width: 860px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--tw-shadow-xl);
+    animation: tw-slide-up 0.35s ease;
+}
+
+.tw-timeline-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--tw-space-5) var(--tw-space-6);
+    border-bottom: 1px solid var(--tw-border);
+    flex-shrink: 0;
+}
+
+.tw-timeline-modal-header h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    font-size: var(--tw-text-xl);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin: 0;
+}
+
+.tw-timeline-modal-header h3 i {
+    color: var(--tw-primary);
+    font-size: 22px;
+}
+
+.tw-timeline-modal-body {
+    overflow-y: auto;
+    flex: 1;
+    padding: var(--tw-space-6);
+}
+
+@media screen and (max-width: 768px) {
+    .tw-timeline-modal-overlay {
+        padding: var(--tw-space-3);
+    }
+
+    .tw-timeline-modal-container {
+        max-height: 95vh;
+    }
+}
+
+
+/* ============================================================
  * FLOATING TIMELINE PANEL
  * Fixed right-side panel embedded in dashboard.html.
  * Slides in from the right via transform on .open class.
@@ -339,6 +420,37 @@ body > main {
 .tw-timeline-panel-close:hover {
     background: rgba(255, 255, 255, 0.28);
 }
+
+/* === TIMELINE: VIEW FULL LINK ===
+ * "View Full Timeline" link below panel header.
+ * Updates href dynamically via JS openTimelinePanel().
+ * ===================================================== */
+.tw-view-full-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--tw-text-sm);
+    font-family: var(--tw-font-primary);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-primary);
+    padding: 10px var(--tw-space-5);
+    border-bottom: 1px solid var(--tw-border);
+    text-decoration: none;
+    background: var(--tw-primary-light);
+    transition: background var(--tw-transition-fast),
+                color var(--tw-transition-fast);
+    flex-shrink: 0;
+}
+
+.tw-view-full-link:hover {
+    background: #b8d9ff;
+    color: var(--tw-primary-dark);
+}
+
+.tw-view-full-link i {
+    font-size: 16px;
+}
+
 
 .tw-timeline-panel-body {
     flex: 1;
