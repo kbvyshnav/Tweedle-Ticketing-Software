@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="64" viewBox="0 0 260 64" fill="none">
+  <rect x="6" y="10" width="16" height="20" rx="3" fill="#0F1924" opacity="0.45"></rect>
+  <rect x="24" y="10" width="16" height="20" rx="3" fill="#0F1924"></rect>
+  <rect x="42" y="10" width="16" height="20" rx="3" fill="#0F1924" opacity="0.7"></rect>
+  <rect x="24" y="32" width="16" height="22" rx="3" fill="#0F1924"></rect>
+  <text x="78" y="42" font-family="Inter, &#39;Helvetica Neue&#39;, Arial, sans-serif" font-weight="600" font-size="32" fill="#0F1924" letter-spacing="-0.6">Tweedle</text>
+</svg>

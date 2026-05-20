@@ -274,29 +274,6 @@ body > main {
     font-weight: var(--tw-weight-medium);
 }
 
-/* Right slot (trend) */
-.tw-stat-card__right { flex-shrink: 0; }
-
-.tw-stat-card__trend {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 2px;
-    font-size: 11px;
-    white-space: nowrap;
-}
-
-.tw-stat-card__trend i { font-size: 14px; }
-
-/* Per-status trend color */
-.tw-stat-card--inbox     .tw-stat-card__trend { color: var(--tw-status-inbox-text); }
-.tw-stat-card--progress  .tw-stat-card__trend { color: var(--tw-status-progress-text); }
-.tw-stat-card--forwarded .tw-stat-card__trend { color: var(--tw-status-forwarded-text); }
-.tw-stat-card--closed    .tw-stat-card__trend { color: var(--tw-status-closed-text); }
-
-/* Down-trend variant (e.g. Forwarded -2) */
-.tw-stat-card__trend--down { color: var(--tw-danger) !important; }
-
 
 /* === TAB STATUS BAR =========================================
  * Dynamic heading + meta row between the tab row and toolbar.

@@ -106,11 +106,13 @@
     <!-- Brand -->
     <!-- Django: <a href="{% url 'admin_dashboard' %}"> -->
     <div class="sidebar-brand">
-        <i class="bx bxs-layer brand-icon" aria-hidden="true"></i>
+        <img src="../static/images/Tweedle Logo/tweedle-mark-blue.svg"
+             alt="Tweedle"
+             class="sidebar-logo-img">
         <span class="brand-text">Tweedle</span>
     </div>
 
-    <!-- Navigation -->
+    <!-- Main Nav -->
     <!-- Django active state: server-side adds class="nav-link active" /
          class="nav-item active-item". The router manages this for preview. -->
     <ul class="sidebar-nav">
@@ -122,8 +124,19 @@
                class="nav-link active"
                data-page="admin_portal/dashboard.html"
                title="Dashboard">
-                <i class="bx bx-grid-alt"></i>
+                <i class='bx bx-grid-alt'></i>
                 <span class="nav-label">Dashboard</span>
+            </a>
+        </li>
+
+        <!-- Tickets -->
+        <li class="nav-item">
+            <a href="#tickets"
+               class="nav-link"
+               data-page="admin_portal/dashboard.html"
+               title="Tickets">
+                <i class='bx bx-receipt'></i>
+                <span class="nav-label">Tickets</span>
             </a>
         </li>
 
@@ -163,6 +176,18 @@
             </a>
         </li>
 
+    </ul>
+
+    <!-- Bottom Nav -->
+    <ul class="sidebar-nav sidebar-nav--bottom">
+        <li class="nav-item">
+            <a href="#settings"
+               class="nav-link"
+               title="Settings">
+                <i class='bx bx-cog'></i>
+                <span class="nav-label">Settings</span>
+            </a>
+        </li>
     </ul>
 
 </nav>

@@ -187,10 +187,9 @@ p {
 .sidebar-brand {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 18px 16px;
+    gap: 12px;
+    padding: 20px 20px 16px;
     border-bottom: 1px solid var(--tw-border);
-    min-height: var(--tw-topbar-height);
     overflow: hidden;
     white-space: nowrap;
     flex-shrink: 0;
@@ -201,6 +200,18 @@ p {
     color: var(--tw-primary);
     flex-shrink: 0;
     min-width: 24px;
+}
+
+.sidebar-logo-img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.sidebar.hide .sidebar-logo-img {
+    width: 28px;
+    height: 28px;
 }
 
 .sidebar-brand .brand-text {
@@ -218,6 +229,7 @@ p {
     opacity: 0;
     width: 0;
     pointer-events: none;
+    overflow: hidden;
 }
 
 
@@ -225,35 +237,46 @@ p {
 
 .sidebar-nav {
     flex: 1;
-    padding: 12px 0;
+    padding: 12px 10px;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: none;
+    list-style: none;
+    margin: 0;
 }
 
 .sidebar-nav::-webkit-scrollbar {
     display: none;
 }
 
+.sidebar-nav--bottom {
+    flex: 0;
+    padding: 8px 10px 16px;
+    border-top: 1px solid var(--tw-border);
+    list-style: none;
+    margin: 0;
+}
+
 .nav-item {
     position: relative;
     list-style: none;
+    margin-bottom: 2px;
 }
 
 .nav-link {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 16px;
+    padding: 10px 12px;
     color: var(--tw-text-secondary);
     text-decoration: none;
-    font-size: var(--tw-text-base);
+    font-size: 14px;
     font-weight: var(--tw-weight-medium);
     font-family: var(--tw-font-primary);
+    border-radius: 8px;
     white-space: nowrap;
     overflow: hidden;
-    transition: background var(--tw-transition-fast),
-                color var(--tw-transition-fast);
+    transition: all var(--tw-transition-fast);
     cursor: pointer;
 }
 
@@ -290,34 +313,18 @@ p {
     color: var(--tw-primary);
 }
 
-/* Curved corner cutout on active item */
+/* Remove curved corner cutout — replaced by simple rounded rect active state */
 .nav-item.active-item::before,
 .nav-item.active-item::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    width: 20px;
-    height: 20px;
-    background: var(--tw-bg-body);
-}
-
-.nav-item.active-item::before {
-    top: -20px;
-    border-bottom-right-radius: 20px;
-    box-shadow: 8px 8px 0 8px var(--tw-primary-light);
-}
-
-.nav-item.active-item::after {
-    bottom: -20px;
-    border-top-right-radius: 20px;
-    box-shadow: 8px -8px 0 8px var(--tw-primary-light);
+    display: none;
 }
 
 /* Collapsed state nav */
 .sidebar.hide .nav-link {
-    padding: 14px 0;
+    padding: 10px;
     justify-content: center;
     gap: 0;
+    border-radius: 8px;
     overflow: visible;
 }
 

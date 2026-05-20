@@ -78,12 +78,6 @@
                 <div class="tw-stat-card__count">10</div>
                 <div class="tw-stat-card__label">Inbox</div>
             </div>
-            <div class="tw-stat-card__right">
-                <div class="tw-stat-card__trend">
-                    <i class='bx bx-trending-up' aria-hidden="true"></i>
-                    <span>+3 today</span>
-                </div>
-            </div>
         </div>
 
         <div class="tw-stat-card tw-stat-card--progress" data-tab="progress" role="button" tabindex="0" aria-label="In Progress: 28 tickets">
@@ -96,12 +90,6 @@
                 <!-- Django: {{ inprogress_count }} -->
                 <div class="tw-stat-card__count">28</div>
                 <div class="tw-stat-card__label">In Progress</div>
-            </div>
-            <div class="tw-stat-card__right">
-                <div class="tw-stat-card__trend">
-                    <i class='bx bx-trending-up' aria-hidden="true"></i>
-                    <span>+5 today</span>
-                </div>
             </div>
         </div>
 
@@ -116,12 +104,6 @@
                 <div class="tw-stat-card__count">34</div>
                 <div class="tw-stat-card__label">Forwarded</div>
             </div>
-            <div class="tw-stat-card__right">
-                <div class="tw-stat-card__trend tw-stat-card__trend--down">
-                    <i class='bx bx-trending-down' aria-hidden="true"></i>
-                    <span>-2 today</span>
-                </div>
-            </div>
         </div>
 
         <div class="tw-stat-card tw-stat-card--closed" data-tab="closed" role="button" tabindex="0" aria-label="Closed: 243 tickets">
@@ -134,12 +116,6 @@
                 <!-- Django: {{ closed_count }} -->
                 <div class="tw-stat-card__count">243</div>
                 <div class="tw-stat-card__label">Closed</div>
-            </div>
-            <div class="tw-stat-card__right">
-                <div class="tw-stat-card__trend">
-                    <i class='bx bx-trending-up' aria-hidden="true"></i>
-                    <span>+12 today</span>
-                </div>
             </div>
         </div>
 
@@ -1464,7 +1440,10 @@
                     <i class='bx bx-time-five'></i>
                     Full Ticket Timeline
                 </h3>
-                <button class="tw-modal-close" onclick="closeFullTimeline()" aria-label="Close timeline modal">
+                <button class="tw-modal-close"
+                        id="fullTimelineCloseBtn"
+                        onclick="closeFullTimeline()"
+                        aria-label="Close timeline modal">
                     <i class='bx bx-x'></i>
                 </button>
             </div>
@@ -1472,6 +1451,12 @@
                 <!-- Content injected by openFullTimeline() via fetch -->
                 <!-- Django: {% include 'admin_portal/ticket-timeline.html' %} -->
             </div>
+            <button class="tw-scroll-top-btn"
+                    id="timelineScrollTop"
+                    title="Scroll to top"
+                    aria-label="Scroll to top">
+                <i class='bx bx-up-arrow-alt'></i>
+            </button>
         </div>
     </div>
     <!-- END FULL TIMELINE MODAL -->
@@ -2256,10 +2241,34 @@
         document.body.style.overflow = '';
     }
 
+    /* Wire close button via event listener (belt-and-suspenders with onclick) */
+    var fullTimelineCloseBtn = document.getElementById('fullTimelineCloseBtn');
+    if (fullTimelineCloseBtn) {
+        fullTimelineCloseBtn.addEventListener('click', closeFullTimeline);
+    }
+
     /* Close full timeline on backdrop click */
     document.getElementById('fullTimelineModal').addEventListener('click', function(e) {
         if (e.target === this) closeFullTimeline();
     });
+
+    /* === TIMELINE MODAL: SCROLL TO TOP === */
+    var timelineModalBody = document.getElementById('fullTimelineContent');
+    var scrollTopBtn = document.getElementById('timelineScrollTop');
+
+    if (timelineModalBody && scrollTopBtn) {
+        timelineModalBody.addEventListener('scroll', function() {
+            if (this.scrollTop > 200) {
+                scrollTopBtn.classList.add('visible');
+            } else {
+                scrollTopBtn.classList.remove('visible');
+            }
+        });
+
+        scrollTopBtn.addEventListener('click', function() {
+            timelineModalBody.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
 
     function closeTimelinePanel() {
         document.getElementById('timelinePanel').classList.remove('open');

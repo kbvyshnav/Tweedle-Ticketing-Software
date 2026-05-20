@@ -309,34 +309,66 @@ body > main {
     animation: tw-slide-up 0.35s ease;
 }
 
+.tw-timeline-modal-container {
+    position: relative;
+}
+
 .tw-timeline-modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--tw-space-5) var(--tw-space-6);
+    padding: 16px 24px;
     border-bottom: 1px solid var(--tw-border);
     flex-shrink: 0;
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-xl) var(--tw-radius-xl) 0 0;
+    position: sticky;
+    top: 0;
+    z-index: 2;
 }
 
 .tw-timeline-modal-header h3 {
     display: flex;
     align-items: center;
-    gap: var(--tw-space-2);
-    font-size: var(--tw-text-xl);
-    font-weight: var(--tw-weight-semibold);
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 600;
     color: var(--tw-text-primary);
     margin: 0;
 }
 
 .tw-timeline-modal-header h3 i {
     color: var(--tw-primary);
-    font-size: 22px;
+    font-size: 20px;
+}
+
+/* FIX 2: Modal header close button — visible, styled */
+.tw-timeline-modal-header .tw-modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--tw-border);
+    background: var(--tw-bg-surface);
+    color: var(--tw-text-secondary);
+    cursor: pointer;
+    font-size: 20px;
+    flex-shrink: 0;
+    transition: all var(--tw-transition-fast);
+}
+
+.tw-timeline-modal-header .tw-modal-close:hover {
+    background: var(--tw-danger-light, #fff0f0);
+    color: var(--tw-danger);
+    border-color: var(--tw-danger);
 }
 
 .tw-timeline-modal-body {
     overflow-y: auto;
     flex: 1;
-    padding: var(--tw-space-6);
+    padding: var(--tw-space-4) var(--tw-space-5);
 }
 
 @media screen and (max-width: 768px) {
@@ -435,11 +467,26 @@ body > main {
     color: var(--tw-primary);
     padding: 10px var(--tw-space-5);
     border-bottom: 1px solid var(--tw-border);
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    outline: none;
     text-decoration: none;
     background: var(--tw-primary-light);
     transition: background var(--tw-transition-fast),
                 color var(--tw-transition-fast);
     flex-shrink: 0;
+    cursor: pointer;
+}
+
+button.tw-view-full-link {
+    border: none;
+    outline: none;
+}
+
+button.tw-view-full-link:focus {
+    outline: none;
+    box-shadow: none;
 }
 
 .tw-view-full-link:hover {
@@ -520,4 +567,108 @@ body > main {
         top: 0;
         height: 100vh;
     }
+}
+
+
+/* ============================================================
+ * FULL TIMELINE MODAL: TICKET HEADER CARD OVERRIDE
+ * Remove left/top/right borders when rendered inside the modal
+ * ============================================================ */
+.tw-timeline-modal-body .tw-ticket-header-card {
+    border-left: none;
+    border-top: none;
+    border-right: none;
+    border-bottom: 1px solid var(--tw-border);
+    border-radius: 0;
+    box-shadow: none;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding: var(--tw-space-4) var(--tw-space-5);
+}
+
+/* FIX 3-D: Compact ticket title inside modal */
+.tw-timeline-modal-body .tw-ticket-header-card__title {
+    font-size: 16px;
+    margin: var(--tw-space-2) 0;
+}
+
+.tw-timeline-modal-body .tw-ticket-header-card__meta {
+    gap: var(--tw-space-2);
+}
+
+/* FIX 3-B: First child of modal body — no top gap */
+.tw-timeline-modal-body .ticket-box,
+.tw-timeline-modal-body > div:first-child {
+    margin-top: 0;
+    padding-top: var(--tw-space-4);
+}
+
+/* FIX 3-C: Stats bar and timeline section spacing */
+.tw-timeline-modal-body .tw-stats-bar,
+.tw-timeline-modal-body .ticket-stats {
+    margin-top: var(--tw-space-3);
+    margin-bottom: var(--tw-space-3);
+}
+
+.tw-timeline-modal-body .tw-timeline-section,
+.tw-timeline-modal-body .timeline-section,
+.tw-timeline-modal-body .tl-section-header {
+    margin-top: var(--tw-space-4);
+}
+
+/* FIX 3-E: Timeline items — slightly tighter spacing */
+.tw-timeline-modal-body .tl-item,
+.tw-timeline-modal-body .timeline-item,
+.tw-timeline-modal-body .tw-timeline-item {
+    margin-bottom: var(--tw-space-4);
+}
+
+/* FIX 1: Hide standalone close button injected from ticket-timeline.html */
+.tw-timeline-modal-body .tl-close-btn,
+.tw-timeline-modal-body .tw-close-btn,
+.tw-timeline-modal-body .close-btn,
+.tw-timeline-modal-body [onclick="closeTimeline()"],
+.tw-timeline-modal-body [onclick*="close"] {
+    display: none !important;
+}
+
+
+/* ============================================================
+ * TIMELINE MODAL: SCROLL TO TOP BUTTON
+ * Positioned absolute inside .tw-timeline-modal-container
+ * ============================================================ */
+.tw-scroll-top-btn {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: var(--tw-primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: var(--tw-shadow-md);
+    transition: all var(--tw-transition-fast);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.tw-scroll-top-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.tw-scroll-top-btn:hover {
+    background: var(--tw-primary-dark);
+    transform: translateY(-2px);
+}
+
+.tw-scroll-top-btn:focus {
+    outline: none;
+    box-shadow: var(--tw-shadow-md);
 }
