@@ -93,7 +93,8 @@
             </div>
         </div>
 
-        <div class="tw-stat-card tw-stat-card--forwarded" data-tab="forwarded" role="button" tabindex="0" aria-label="Forwarded: 34 tickets">
+        <!-- Django: rename data-tab to "pending_client" when backend is wired -->
+        <div class="tw-stat-card tw-stat-card--forwarded" data-tab="forwarded" role="button" tabindex="0" aria-label="Pending Client Response: 34 tickets">
             <div class="tw-stat-card__left">
                 <div class="tw-stat-card__icon" aria-hidden="true">
                     <i class='bx bx-share'></i>
@@ -102,7 +103,8 @@
             <div class="tw-stat-card__body">
                 <!-- Django: {{ forwarded_count }} -->
                 <div class="tw-stat-card__count">34</div>
-                <div class="tw-stat-card__label">Forwarded</div>
+                <div class="tw-stat-card__label">Pending</div>
+                <span class="tw-stat-card__sublabel" style="display:block;font-size:10px;color:var(--tw-text-muted);font-weight:500;margin-top:1px;">Client Response</span>
             </div>
         </div>
 
@@ -163,13 +165,14 @@
                 In Progress
             </button>
 
+            <!-- Django: rename data-tab to "pending_client" when backend is wired -->
             <button
                 class="tw-ticket-tab"
                 role="tab"
                 aria-selected="false"
                 data-tab="forwarded"
                 aria-controls="tab-forwarded">
-                Forwarded
+                Pending Client
             </button>
 
             <button
@@ -593,7 +596,7 @@
                     <td><div title="Payment Gateway Integration">Payment Gateway Integration</div></td>
                     <td>05-02-2025</td>
                     <td>BGEX</td>
-                    <td><span class="tw-status-badge tw-status-badge--forwarded">Forwarded</span></td>
+                    <td><span class="tw-status-badge tw-status-badge--forwarded">Pending Client</span></td>
                     <td>
                         <div class="allottee-cell">
                             <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">A</div>
@@ -604,6 +607,7 @@
                         <div class="tw-row-actions">
                             <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
                             <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                            <i class="bx bx-play-circle tw-action-icon tw-action-icon--resume" role="button" tabindex="0" aria-label="Resume ticket — client has responded" title="Resume — client has responded" onclick="resumeTicket(this)" style="color:var(--tw-success)"></i>
                             <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
                         </div>
                     </td>
@@ -617,7 +621,7 @@
                     <td><div title="Report Generation Bug">Report Generation Bug</div></td>
                     <td>14-02-2025</td>
                     <td>GMEC</td>
-                    <td><span class="tw-status-badge tw-status-badge--forwarded">Forwarded</span></td>
+                    <td><span class="tw-status-badge tw-status-badge--forwarded">Pending Client</span></td>
                     <td>
                         <div class="allottee-cell">
                             <div class="tw-avatar tw-avatar--sm tw-avatar--rose" aria-hidden="true">R</div>
@@ -628,6 +632,7 @@
                         <div class="tw-row-actions">
                             <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
                             <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                            <i class="bx bx-play-circle tw-action-icon tw-action-icon--resume" role="button" tabindex="0" aria-label="Resume ticket — client has responded" title="Resume — client has responded" onclick="resumeTicket(this)" style="color:var(--tw-success)"></i>
                             <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
                         </div>
                     </td>
@@ -641,7 +646,7 @@
                     <td><div title="Mobile App Crash on Login">Mobile App Crash on Login</div></td>
                     <td>21-02-2025</td>
                     <td>BGEX</td>
-                    <td><span class="tw-status-badge tw-status-badge--forwarded">Forwarded</span></td>
+                    <td><span class="tw-status-badge tw-status-badge--forwarded">Pending Client</span></td>
                     <td>
                         <div class="allottee-cell">
                             <div class="tw-avatar tw-avatar--sm tw-avatar--teal" aria-hidden="true">S</div>
@@ -652,6 +657,7 @@
                         <div class="tw-row-actions">
                             <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
                             <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                            <i class="bx bx-play-circle tw-action-icon tw-action-icon--resume" role="button" tabindex="0" aria-label="Resume ticket — client has responded" title="Resume — client has responded" onclick="resumeTicket(this)" style="color:var(--tw-success)"></i>
                             <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
                         </div>
                     </td>
@@ -890,9 +896,9 @@
                         <i class='bx bx-transfer' aria-hidden="true"></i>
                         Reassign
                     </button>
-                    <button class="tw-modal-action-btn tw-modal-action-btn--warning" id="detailsForwardBtn" onclick="openDashForwardPanel()" title="Forward ticket to client" aria-label="Forward ticket">
+                    <button class="tw-modal-action-btn tw-modal-action-btn--warning" id="detailsForwardBtn" onclick="openDashForwardPanel()" title="Request client information" aria-label="Request client information">
                         <i class='bx bx-share' aria-hidden="true"></i>
-                        Forward
+                        Request Info
                     </button>
                 </div>
 
@@ -1132,9 +1138,9 @@
     </div>
 
     <!-- Forward panel (dashboard copy) -->
-    <div class="tw-action-panel" id="dashForwardPanel" role="dialog" aria-label="Forward ticket">
+    <div class="tw-action-panel" id="dashForwardPanel" role="dialog" aria-label="Request client information">
         <div class="tw-action-panel__header">
-            <h4><i class='bx bx-share'></i> Forward Ticket to Client</h4>
+            <h4><i class='bx bx-share'></i> Request Client Information</h4>
             <button onclick="closeDashActionPanel('dashForwardPanel')" aria-label="Close">
                 <i class='bx bx-x'></i>
             </button>
@@ -1142,7 +1148,7 @@
         <div class="tw-action-panel__body">
             <div class="tw-forward-info-box">
                 <i class='bx bx-info-circle'></i>
-                <p>Forwarding this ticket will change its status to <strong>Forwarded</strong> and notify the client to provide additional information or clarification.</p>
+                <p>Sending this request will move the ticket to <strong>Pending Client Response</strong> and notify the client to provide additional information or clarification.</p>
             </div>
             <div class="tw-field-group">
                 <label for="dashForwardToSelect">Forward To (Client Contact) *</label>
@@ -1166,7 +1172,7 @@
             <div class="tw-action-panel__footer">
                 <button class="tw-btn tw-btn-outline" onclick="closeDashActionPanel('dashForwardPanel')">Cancel</button>
                 <button class="tw-btn tw-btn-danger" onclick="confirmDashForward()">
-                    <i class='bx bx-share'></i> Forward Ticket
+                    <i class='bx bx-share'></i> Send Request
                 </button>
             </div>
         </div>
@@ -1755,7 +1761,7 @@
     var tabHeadings = {
         inbox:     { heading: 'Inbox Tickets',       meta: '10 tickets · New and unassigned' },
         progress:  { heading: 'In Progress Tickets',  meta: '28 tickets · Currently being worked on' },
-        forwarded: { heading: 'Forwarded Tickets',    meta: '34 tickets · Awaiting external response' },
+        forwarded: { heading: 'Pending Client Response', meta: 'Waiting for information from the client. TAT clock is paused.' },
         closed:    { heading: 'Closed Tickets',       meta: '243 tickets · Successfully resolved' },
         rejected:  { heading: 'Rejected Tickets',     meta: 'Tickets declined by admin — client has been notified.' },
     };
@@ -1978,7 +1984,63 @@
         /* Django: POST /api/tickets/{id}/forward/ */
         console.log('[Dashboard] Forward to:', forwardTo, 'Reason:', reason);
         closeDashActionPanel('dashForwardPanel');
-        showDashToast('Ticket forwarded to client');
+        showDashToast('Request sent — client notified.');
+    }
+
+    /* ============================================================
+     * RESUME TICKET — moves a Pending Client row back to In Progress.
+     * Django: POST /api/tickets/<id>/resume/
+     *   ticket.status = 'in_progress', ticket.sub_status = 'development'
+     *   TicketEvent created with event_type='client_responded'
+     * ============================================================ */
+    function resumeTicket(btn) {
+        var row      = btn.closest('tr');
+        var ticketId = row.dataset.ticketId || '';
+        var subject  = row.cells[1] ? row.cells[1].textContent.trim() : '';
+
+        openConfirmModal({
+            type:    'success',
+            title:   'Resume Ticket',
+            message: 'Move this ticket back to In Progress?',
+            details: 'Confirm that the client has provided the needed information. The ticket will return to the assigned developer and the TAT clock will resume.',
+            onConfirm: function() {
+                var inProgressTbody = document.querySelector('#tab-progress tbody');
+                if (!inProgressTbody) return;
+
+                /* Update row data attributes */
+                row.dataset.status    = 'In Progress';
+                row.dataset.subStatus = 'development';
+
+                /* Update Status cell (index 4): Pending Client → In Progress */
+                if (row.cells[4]) {
+                    row.cells[4].innerHTML = '<span class="tw-status-badge tw-status-badge--progress">In Progress</span>';
+                }
+
+                /* Insert new Stage cell (index 5) before Dev/Tester cell */
+                var stageCell = document.createElement('td');
+                stageCell.innerHTML = '<span class="tw-status-badge tw-status-badge--development">Development</span>';
+                if (row.cells[5]) {
+                    row.insertBefore(stageCell, row.cells[5]);
+                } else {
+                    row.appendChild(stageCell);
+                }
+
+                /* Remove Resume icon from the Actions cell (now index 7) */
+                var resumeIcon = row.querySelector('.tw-action-icon--resume');
+                if (resumeIcon) resumeIcon.remove();
+
+                /* Move row from Pending Client tbody to In Progress tbody */
+                inProgressTbody.appendChild(row);
+
+                /* Update stat counts (frontend DOM only — Django uses context vars) */
+                var pendingCount  = document.querySelector('[data-tab="forwarded"] .tw-stat-card__count');
+                var progressCount = document.querySelector('[data-tab="progress"] .tw-stat-card__count');
+                if (pendingCount)  pendingCount.textContent  = Math.max(0, parseInt(pendingCount.textContent)  - 1);
+                if (progressCount) progressCount.textContent = parseInt(progressCount.textContent) + 1;
+
+                showDashToast('Ticket resumed — developer notified.', 'success');
+            }
+        });
     }
 
     /* === TOAST NOTIFICATION === */
