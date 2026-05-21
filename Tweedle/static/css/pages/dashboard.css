@@ -230,12 +230,14 @@ body > main {
 .tw-stat-card--progress  { border-left-color: var(--tw-status-progress-text); }
 .tw-stat-card--forwarded { border-left-color: var(--tw-status-forwarded-text); }
 .tw-stat-card--closed    { border-left-color: var(--tw-status-closed-text); }
+.tw-stat-card--rejected  { border-left-color: var(--tw-danger); }
 
 /* Active state — tinted background */
 .tw-stat-card--inbox.active     { background: var(--tw-status-inbox-bg);     border-color: var(--tw-status-inbox-text);     border-left-color: var(--tw-status-inbox-text); }
 .tw-stat-card--progress.active  { background: var(--tw-status-progress-bg);  border-color: var(--tw-status-progress-text);  border-left-color: var(--tw-status-progress-text); }
 .tw-stat-card--forwarded.active { background: var(--tw-status-forwarded-bg); border-color: var(--tw-status-forwarded-text); border-left-color: var(--tw-status-forwarded-text); }
 .tw-stat-card--closed.active    { background: var(--tw-status-closed-bg);    border-color: var(--tw-status-closed-text);    border-left-color: var(--tw-status-closed-text); }
+.tw-stat-card--rejected.active  { background: rgba(219, 80, 74, 0.08);       border-color: var(--tw-danger);               border-left-color: var(--tw-danger); }
 
 /* Left slot (icon) */
 .tw-stat-card__left { flex-shrink: 0; }
@@ -255,6 +257,7 @@ body > main {
 .tw-stat-card--progress  .tw-stat-card__icon { background: var(--tw-status-progress-bg);  color: var(--tw-status-progress-text); }
 .tw-stat-card--forwarded .tw-stat-card__icon { background: var(--tw-status-forwarded-bg); color: var(--tw-status-forwarded-text); }
 .tw-stat-card--closed    .tw-stat-card__icon { background: var(--tw-status-closed-bg);    color: var(--tw-status-closed-text); }
+.tw-stat-card--rejected  .tw-stat-card__icon { background: rgba(219, 80, 74, 0.10);       color: var(--tw-danger); }
 
 /* Body (count + label) */
 .tw-stat-card__body { flex: 1; min-width: 0; }
@@ -535,29 +538,21 @@ body > main {
 }
 
 
-/* === TICKET ID PILL (Task 3) ================================ */
+/* === TICKET ID ============================================== */
 .tw-ticket-id-cell {
     white-space: nowrap;
 }
 
 .tw-ticket-id {
-    font-family: 'Courier New', 'Consolas', 'SF Mono', monospace;
-    font-size: 12px;
+    font-family: var(--tw-font-primary);
+    font-size: 13px;
     font-weight: 600;
-    color: var(--tw-primary);
-    background: var(--tw-primary-light);
-    padding: 3px 8px;
-    border-radius: var(--tw-radius-sm);
-    letter-spacing: 0.3px;
-    border: 1px solid rgba(60, 145, 230, 0.2);
-    display: inline-block;
-    transition: background var(--tw-transition-fast),
-                color var(--tw-transition-fast);
+    color: var(--tw-text-primary);
+    letter-spacing: 0.2px;
 }
 
 .tw-ticket-id:hover {
-    background: var(--tw-primary);
-    color: #ffffff;
+    color: var(--tw-primary);
     cursor: pointer;
 }
 

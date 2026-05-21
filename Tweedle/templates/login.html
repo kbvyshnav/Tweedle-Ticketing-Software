@@ -24,6 +24,10 @@
     <!-- Django: <link rel="stylesheet" href="{% static 'vendors/boxicons/css/boxicons.min.css' %}"> -->
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
 
+    <!-- Django: {% static 'images/favicon.svg' %} -->
+    <link rel="icon" type="image/svg+xml" href="../static/images/favicon.svg">
+    <link rel="apple-touch-icon" href="../static/images/favicon.svg">
+
     <!-- 1. Tokens (no theme file — role unknown at login) -->
     <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-tokens.css' %}"> -->
     <link rel="stylesheet" href="../static/css/tweedle-tokens.css">
@@ -50,12 +54,19 @@
     <div class="tw-auth-left" aria-hidden="true">
 
         <!-- Wordmark -->
-        <div class="tw-auth-wordmark">Tweedle.</div>
+        <div class="tw-auth-brand-logo">
+            <img src="../static/images/Tweedle Logo/tweedle-mark-blue.svg"
+                 alt="Tweedle"
+                 class="tw-auth-logo-img">
+            <span class="tw-auth-logo-text">Tweedle</span>
+        </div>
 
         <!-- Middle: icon + tagline -->
         <div class="tw-auth-brand-mid">
             <div class="tw-auth-icon-circle">
-                <i class="bx bxs-layer"></i>
+                <img src="../static/images/Tweedle Logo/tweedle-mark-blue.svg"
+                     alt="Tweedle"
+                     class="tw-auth-icon-logo">
             </div>
             <p class="tw-auth-headline">Streamline your support.</p>
             <p class="tw-auth-sub">One platform for tickets,&nbsp;teams and clients.</p>
@@ -63,7 +74,7 @@
 
         <!-- Bottom: feature pills + copyright -->
         <div class="tw-auth-brand-bottom">
-<p class="tw-auth-copy">&#169; 2025 Tweedle. All rights reserved.</p>
+<p class="tw-auth-copy">&#169; 2026 Tweedle. All rights reserved.</p>
         </div>
 
     </div>

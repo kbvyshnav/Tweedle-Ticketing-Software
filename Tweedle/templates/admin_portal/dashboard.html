@@ -119,6 +119,19 @@
             </div>
         </div>
 
+        <div class="tw-stat-card tw-stat-card--rejected" data-tab="rejected" role="button" tabindex="0" aria-label="Rejected: 3 tickets">
+            <div class="tw-stat-card__left">
+                <div class="tw-stat-card__icon" aria-hidden="true">
+                    <i class='bx bx-x-circle'></i>
+                </div>
+            </div>
+            <div class="tw-stat-card__body">
+                <!-- Django: {{ rejected_count }} -->
+                <div class="tw-stat-card__count">3</div>
+                <div class="tw-stat-card__label">Rejected</div>
+            </div>
+        </div>
+
     </div>
     <!-- END STAT STRIP -->
 
@@ -166,6 +179,15 @@
                 data-tab="closed"
                 aria-controls="tab-closed">
                 Closed
+            </button>
+
+            <button
+                class="tw-ticket-tab"
+                role="tab"
+                aria-selected="false"
+                data-tab="rejected"
+                aria-controls="tab-rejected">
+                Rejected
             </button>
 
         </div>
@@ -734,6 +756,85 @@
         </div>
         </div>
         <!-- END TAB: CLOSED -->
+
+
+        <!-- ==================================================
+             C3 — TAB CONTENT: REJECTED
+             Tickets declined by admin. Row click does nothing
+             (no detail modal for rejected tickets — actions are
+             Timeline and Chat only).
+             Django: {% for ticket in rejected_tickets %}
+             ================================================== -->
+        <div class="tab-content" id="tab-rejected" data-tab-content="rejected" role="tabpanel" aria-label="Rejected tickets">
+        <div class="table-scroll-wrapper">
+        <table class="tw-table">
+            <thead>
+                <tr>
+                    <th scope="col">Ticket ID</th>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Client / Company</th>
+                    <th scope="col">Priority</th>
+                    <th scope="col">Rejected By</th>
+                    <th scope="col">Rejected On</th>
+                    <th scope="col">Rejection Reason</th>
+                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Django: {% for ticket in rejected_tickets %} -->
+
+                <tr data-ticket-id="TKT-00089" data-ticket-type="rejected" data-subject="Login page broken on Safari" data-status="rejected">
+                    <td>
+                        <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                        <span class="tw-ticket-id">TKT-00089</span>
+                    </td>
+                    <td><div title="Login page broken on Safari">Login page broken on Safari</div></td>
+                    <td>GMEC</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
+                    <td>Rajagopal P</td>
+                    <td>15-01-2025</td>
+                    <td>
+                        <div title="Duplicate of TKT-00071 — already resolved">
+                            Duplicate of TKT-00071 — already resolved
+                        </div>
+                    </td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr data-ticket-id="TKT-00063" data-ticket-type="rejected" data-subject="Dashboard stats not loading for sub-users" data-status="rejected">
+                    <td>
+                        <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                        <span class="tw-ticket-id">TKT-00063</span>
+                    </td>
+                    <td><div title="Dashboard stats not loading for sub-users">Dashboard stats not loading for sub-users</div></td>
+                    <td>BGEX</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
+                    <td>Rajagopal P</td>
+                    <td>08-01-2025</td>
+                    <td>
+                        <div title="Insufficient information provided — client did not respond to follow-up within 7 days">
+                            Insufficient information provided — client did not…
+                        </div>
+                    </td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Django: {% endfor %} -->
+            </tbody>
+        </table>
+        </div>
+        </div>
+        <!-- END TAB: REJECTED -->
 
     </div>
     <!-- END TICKET TABLE CARD -->
@@ -1643,6 +1744,7 @@
         progress:  { heading: 'In Progress Tickets',  meta: '28 tickets · Currently being worked on' },
         forwarded: { heading: 'Forwarded Tickets',    meta: '34 tickets · Awaiting external response' },
         closed:    { heading: 'Closed Tickets',       meta: '243 tickets · Successfully resolved' },
+        rejected:  { heading: 'Rejected Tickets',     meta: 'Tickets declined by admin — client has been notified.' },
     };
 
     function updateTabHeading(tabId) {
@@ -1959,8 +2061,8 @@
     }
 
     function confirmRejection() {
-        const ticketId = document.getElementById('newModalTicketId').textContent;
-        const subject  = document.getElementById('newModalSubject').textContent;
+        var ticketId = document.getElementById('newModalTicketId').textContent;
+        var subject  = document.getElementById('newModalSubject').textContent;
 
         openConfirmModal({
             type:    'danger',
@@ -1979,9 +2081,9 @@
                     aria-label="Rejection reason"></textarea>
                 <p id="rejectError" class="tw-error-text">Reason is required to proceed.</p>`,
             onConfirm: function () {
-                const reason    = document.getElementById('rejectReason').value.trim();
-                const errorText = document.getElementById('rejectError');
-                const textarea  = document.getElementById('rejectReason');
+                var reason    = document.getElementById('rejectReason').value.trim();
+                var errorText = document.getElementById('rejectError');
+                var textarea  = document.getElementById('rejectReason');
 
                 if (!reason) {
                     errorText.classList.add('show');
@@ -1989,9 +2091,51 @@
                     return false;
                 }
 
-                /* Django: POST to {% url 'admin:reject_ticket' %} */
-                console.log('[NewTicket] Rejected:', ticketId, 'Reason:', reason);
+                /* Move row from Inbox table into Rejected table */
+                var inboxRow      = document.querySelector('#tab-inbox tbody tr[data-ticket-id="' + ticketId + '"]');
+                var rejectedTbody = document.querySelector('#tab-rejected tbody');
+
+                if (inboxRow && rejectedTbody) {
+                    var clientText   = inboxRow.cells[3] ? inboxRow.cells[3].textContent.trim() : '—';
+                    var priorityEl   = document.querySelector('#newTicketModal .tw-priority-badge');
+                    var priorityHTML = priorityEl ? priorityEl.outerHTML : '<span>—</span>';
+                    var today        = new Date();
+                    var rejectedOn   = today.getDate().toString().padStart(2, '0') + '-' +
+                                       (today.getMonth() + 1).toString().padStart(2, '0') + '-' +
+                                       today.getFullYear();
+                    var reasonTrunc  = reason.length > 60 ? reason.substring(0, 60) + '…' : reason;
+
+                    var newRow = document.createElement('tr');
+                    newRow.setAttribute('data-ticket-id', ticketId);
+                    newRow.setAttribute('data-ticket-type', 'rejected');
+                    newRow.setAttribute('data-subject', subject);
+                    newRow.setAttribute('data-status', 'rejected');
+                    newRow.innerHTML =
+                        '<td>' +
+                            '<i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>' +
+                            '<span class="tw-ticket-id">' + ticketId + '</span>' +
+                        '</td>' +
+                        '<td><div title="' + subject + '">' + subject + '</div></td>' +
+                        '<td>' + clientText + '</td>' +
+                        '<td>' + priorityHTML + '</td>' +
+                        '<td>Rajagopal P</td>' +
+                        '<td>' + rejectedOn + '</td>' +
+                        '<td><div title="' + reason + '">' + reasonTrunc + '</div></td>' +
+                        '<td>' +
+                            '<div class="tw-row-actions">' +
+                                '<i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>' +
+                                '<i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>' +
+                            '</div>' +
+                        '</td>';
+
+                    rejectedTbody.appendChild(newRow);
+                    inboxRow.remove();
+                }
+
+                /* Django: POST to /api/tickets/<id>/reject/ with { reason: reason }
+                   On success, refresh inbox_count and rejected_count stat cards via fetch. */
                 closeNewTicketModal();
+                showDashToast('Ticket rejected and client notified.');
             }
         });
     }
