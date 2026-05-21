@@ -94,7 +94,7 @@
         </div>
 
         <!-- Django: rename data-tab to "pending_client" when backend is wired -->
-        <div class="tw-stat-card tw-stat-card--forwarded" data-tab="forwarded" role="button" tabindex="0" aria-label="Pending Client Response: 34 tickets">
+        <div class="tw-stat-card tw-stat-card--forwarded" data-tab="forwarded" role="button" tabindex="0" aria-label="Awaiting Client: 34 tickets">
             <div class="tw-stat-card__left">
                 <div class="tw-stat-card__icon" aria-hidden="true">
                     <i class='bx bx-share'></i>
@@ -103,8 +103,8 @@
             <div class="tw-stat-card__body">
                 <!-- Django: {{ forwarded_count }} -->
                 <div class="tw-stat-card__count">34</div>
-                <div class="tw-stat-card__label">Pending</div>
-                <span class="tw-stat-card__sublabel" style="display:block;font-size:10px;color:var(--tw-text-muted);font-weight:500;margin-top:1px;">Client Response</span>
+                <div class="tw-stat-card__label">Awaiting</div>
+                <span class="tw-stat-card__sublabel" style="display:block;font-size:10px;color:var(--tw-text-muted);font-weight:500;margin-top:1px;">Client</span>
             </div>
         </div>
 
@@ -172,7 +172,7 @@
                 aria-selected="false"
                 data-tab="forwarded"
                 aria-controls="tab-forwarded">
-                Pending Client
+                Awaiting Client
             </button>
 
             <button
@@ -596,7 +596,7 @@
                     <td><div title="Payment Gateway Integration">Payment Gateway Integration</div></td>
                     <td>05-02-2025</td>
                     <td>BGEX</td>
-                    <td><span class="tw-status-badge tw-status-badge--forwarded">Pending Client</span></td>
+                    <td><span class="tw-status-badge tw-status-badge--forwarded">Awaiting Client</span></td>
                     <td>
                         <div class="allottee-cell">
                             <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">A</div>
@@ -621,7 +621,7 @@
                     <td><div title="Report Generation Bug">Report Generation Bug</div></td>
                     <td>14-02-2025</td>
                     <td>GMEC</td>
-                    <td><span class="tw-status-badge tw-status-badge--forwarded">Pending Client</span></td>
+                    <td><span class="tw-status-badge tw-status-badge--forwarded">Awaiting Client</span></td>
                     <td>
                         <div class="allottee-cell">
                             <div class="tw-avatar tw-avatar--sm tw-avatar--rose" aria-hidden="true">R</div>
@@ -646,7 +646,7 @@
                     <td><div title="Mobile App Crash on Login">Mobile App Crash on Login</div></td>
                     <td>21-02-2025</td>
                     <td>BGEX</td>
-                    <td><span class="tw-status-badge tw-status-badge--forwarded">Pending Client</span></td>
+                    <td><span class="tw-status-badge tw-status-badge--forwarded">Awaiting Client</span></td>
                     <td>
                         <div class="allottee-cell">
                             <div class="tw-avatar tw-avatar--sm tw-avatar--teal" aria-hidden="true">S</div>
@@ -1288,6 +1288,48 @@
                     </div>
                 </div>
 
+                <hr class="tw-modal-divider" style="border:none;border-top:1px solid var(--tw-border);margin:var(--tw-space-4) 0">
+
+                <p class="tw-modal-section-label" style="font-size:var(--tw-text-sm);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--tw-text-secondary);margin-bottom:var(--tw-space-3)">Assign Tester</p>
+
+                <label class="tw-assign-tester-toggle" for="assignTesterNow" style="display:flex;align-items:center;gap:var(--tw-space-2);font-size:var(--tw-text-base);color:var(--tw-text-primary);margin-bottom:var(--tw-space-3);cursor:pointer">
+                    <input type="checkbox" id="assignTesterNow" checked onchange="document.getElementById('testerAssignSection').style.display = this.checked ? 'block' : 'none'">
+                    <span>Assign tester now</span>
+                </label>
+
+                <div id="testerAssignSection">
+                    <div class="tw-form-group">
+                        <label class="tw-form-label" for="testerSelect">
+                            Select Tester <span class="tw-required">*</span>
+                        </label>
+                        <!-- Django: populated from {{ testers }} -->
+                        <select class="tw-select" id="testerSelect" onchange="showTesterInfo()">
+                            <option value="">Select a tester</option>
+                            <option value="t1" data-tickets-pending="3" data-tickets-completed="18" data-tickets-total="21">Arjun Menon</option>
+                            <option value="t2" data-tickets-pending="1" data-tickets-completed="24" data-tickets-total="25">Priya Nair</option>
+                            <option value="t3" data-tickets-pending="5" data-tickets-completed="12" data-tickets-total="17">Rahul Sharma</option>
+                            <option value="t4" data-tickets-pending="0" data-tickets-completed="30" data-tickets-total="30">Sneha Das</option>
+                        </select>
+
+                        <div class="tw-developer-info" id="testerWorkloadStats" aria-live="polite" style="display:none">
+                            <div class="tw-workload-grid">
+                                <div class="tw-dev-stat">
+                                    <span class="tw-dev-stat-value" id="testerPendingCount">0</span>
+                                    <span class="tw-dev-stat-label">Pending</span>
+                                </div>
+                                <div class="tw-dev-stat">
+                                    <span class="tw-dev-stat-value" id="testerCompletedCount">0</span>
+                                    <span class="tw-dev-stat-label">Completed</span>
+                                </div>
+                                <div class="tw-dev-stat">
+                                    <span class="tw-dev-stat-value" id="testerTotalCount">0</span>
+                                    <span class="tw-dev-stat-label">Total Assigned</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="tw-form-group">
                     <label class="tw-form-label" for="assignComment">Comments / Remarks</label>
                     <textarea
@@ -1761,7 +1803,7 @@
     var tabHeadings = {
         inbox:     { heading: 'Inbox Tickets',       meta: '10 tickets · New and unassigned' },
         progress:  { heading: 'In Progress Tickets',  meta: '28 tickets · Currently being worked on' },
-        forwarded: { heading: 'Pending Client Response', meta: 'Waiting for information from the client. TAT clock is paused.' },
+        forwarded: { heading: 'Awaiting Client Response', meta: 'Waiting for information from the client. TAT clock is paused.' },
         closed:    { heading: 'Closed Tickets',       meta: '243 tickets · Successfully resolved' },
         rejected:  { heading: 'Rejected Tickets',     meta: 'Tickets declined by admin — client has been notified.' },
     };
@@ -2139,17 +2181,55 @@
         }
     }
 
+    function showTesterInfo() {
+        var select   = document.getElementById('testerSelect');
+        var opt      = select.options[select.selectedIndex];
+        var statsBox = document.getElementById('testerWorkloadStats');
+
+        if (!opt || !opt.value) {
+            statsBox.style.display = 'none';
+            return;
+        }
+
+        select.classList.remove('tw-input--error');
+        document.getElementById('testerPendingCount').textContent   = opt.dataset.ticketsPending;
+        document.getElementById('testerCompletedCount').textContent = opt.dataset.ticketsCompleted;
+        document.getElementById('testerTotalCount').textContent     = opt.dataset.ticketsTotal;
+        statsBox.style.display = 'block';
+    }
+
     function confirmAssignment() {
-        const ticketId = document.getElementById('newModalTicketId').textContent;
+        var ticketId        = document.getElementById('newModalTicketId').textContent;
+        var developerSelect = document.getElementById('developerSelect');
+        var devName         = developerSelect.options[developerSelect.selectedIndex].text;
+        var assignTesterNow = document.getElementById('assignTesterNow').checked;
+        var testerSelect    = document.getElementById('testerSelect');
+
+        /* Tester validation — only required when "Assign tester now" is checked */
+        if (assignTesterNow && !testerSelect.value) {
+            testerSelect.classList.add('tw-input--error');
+            testerSelect.focus();
+            return;
+        }
+
+        var testerName    = assignTesterNow
+            ? testerSelect.options[testerSelect.selectedIndex].text
+            : null;
+        var assignmentMsg = testerName
+            ? 'Assign ' + devName + ' (developer) and ' + testerName + ' (tester) to this ticket?'
+            : 'Assign ' + devName + ' as developer? A tester can be assigned later.';
 
         openConfirmModal({
             type:    'success',
             title:   'Confirm Assignment',
-            message: 'You are about to assign this ticket to:',
-            details: `<p><strong>Ticket:</strong> ${ticketId}</p><p><strong>Developer:</strong> ${_selectedDeveloper}</p>`,
+            message: assignmentMsg,
+            details: '<p><strong>Ticket:</strong> ' + ticketId + '</p>' +
+                     '<p><strong>Developer:</strong> ' + devName + '</p>' +
+                     (testerName ? '<p><strong>Tester:</strong> ' + testerName + '</p>' : ''),
             onConfirm: function () {
-                /* Django: POST to {% url 'admin:assign_ticket' %} */
-                console.log('[NewTicket] Assigned:', ticketId, 'to', _selectedDeveloper);
+                /* Django: POST to {% url 'admin:assign_ticket' %}
+                   Body: { developer_id, tester_id (null if skipped), comments, notify_email } */
+                console.log('[NewTicket] Assigned:', ticketId, 'dev:', devName, 'tester:', testerName || 'none');
                 closeNewTicketModal();
             }
         });
@@ -2236,16 +2316,27 @@
     }
 
     function resetNewTicketForm() {
-        const select    = document.getElementById('developerSelect');
-        const infoPanel = document.getElementById('developerInfo');
-        const assignBtn = document.getElementById('assignBtn');
+        var select    = document.getElementById('developerSelect');
+        var infoPanel = document.getElementById('developerInfo');
+        var assignBtn = document.getElementById('assignBtn');
 
         select.value = '';
         infoPanel.classList.remove('active');
         document.getElementById('assignComment').value = '';
-        assignBtn.disabled    = true;
+        assignBtn.disabled = true;
         document.getElementById('sendEmail').checked = true;
-        _selectedDeveloper    = '';
+        _selectedDeveloper = '';
+
+        /* Reset tester section */
+        var testerSelect    = document.getElementById('testerSelect');
+        var testerStats     = document.getElementById('testerWorkloadStats');
+        var testerSection   = document.getElementById('testerAssignSection');
+        var assignTesterNow = document.getElementById('assignTesterNow');
+
+        if (testerSelect)    { testerSelect.selectedIndex = 0; testerSelect.classList.remove('tw-input--error'); }
+        if (testerStats)     { testerStats.style.display = 'none'; }
+        if (testerSection)   { testerSection.style.display = 'block'; }
+        if (assignTesterNow) { assignTesterNow.checked = true; }
     }
 
 
