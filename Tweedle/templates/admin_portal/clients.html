@@ -85,7 +85,7 @@
             <tbody>
 
                 <!-- Row 1: GMEC -->
-                <tr data-status="active">
+                <tr data-status="active" data-client-id="GMEC">
                     <td>
                         <div class="client-name-cell">
                             <div class="tw-avatar tw-avatar--gmec" aria-hidden="true">G</div>
@@ -113,30 +113,20 @@
                     <td><span class="tw-count-badge">6</span></td>
                     <td>Mar 2023</td>
                     <td>
-                        <div class="tw-row-actions">
+                        <div class="clients-actions">
                             <!-- Django: {% url 'admin_manage_users' client.id %} -->
                             <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers('GMEC')">
-                                <i class="bx bx-user" aria-hidden="true"></i> Manage Users
+                                <i class='bx bx-group'></i> Manage Users
                             </button>
-                            <div class="client-more-wrap">
-                                <button class="tw-btn-icon" onclick="toggleClientMoreMenu(event, this)" aria-label="More options for GMEC">
-                                    <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
-                                </button>
-                                <div class="client-more-menu" style="display:none">
-                                    <button class="client-more-menu-item" onclick="showDetails('GMEC');closeClientMoreMenus()">
-                                        <i class="bx bx-info-circle" aria-hidden="true"></i> View Details
-                                    </button>
-                                    <button class="client-more-menu-item" onclick="showSettings('GMEC');closeClientMoreMenus()">
-                                        <i class="bx bx-cog" aria-hidden="true"></i> View Settings
-                                    </button>
-                                </div>
-                            </div>
+                            <button class="clients-more-btn" onclick="toggleClientMenu(event, this)" aria-label="More options for GMEC">
+                                <i class='bx bx-dots-vertical-rounded'></i>
+                            </button>
                         </div>
                     </td>
                 </tr>
 
                 <!-- Row 2: BGEX -->
-                <tr data-status="active">
+                <tr data-status="active" data-client-id="BGEX">
                     <td>
                         <div class="client-name-cell">
                             <div class="tw-avatar tw-avatar--bgex" aria-hidden="true">B</div>
@@ -157,29 +147,19 @@
                     <td><span class="tw-count-badge">4</span></td>
                     <td>Aug 2023</td>
                     <td>
-                        <div class="tw-row-actions">
+                        <div class="clients-actions">
                             <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers('BGEX')">
-                                <i class="bx bx-user" aria-hidden="true"></i> Manage Users
+                                <i class='bx bx-group'></i> Manage Users
                             </button>
-                            <div class="client-more-wrap">
-                                <button class="tw-btn-icon" onclick="toggleClientMoreMenu(event, this)" aria-label="More options for BGEX">
-                                    <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
-                                </button>
-                                <div class="client-more-menu" style="display:none">
-                                    <button class="client-more-menu-item" onclick="showDetails('BGEX');closeClientMoreMenus()">
-                                        <i class="bx bx-info-circle" aria-hidden="true"></i> View Details
-                                    </button>
-                                    <button class="client-more-menu-item" onclick="showSettings('BGEX');closeClientMoreMenus()">
-                                        <i class="bx bx-cog" aria-hidden="true"></i> View Settings
-                                    </button>
-                                </div>
-                            </div>
+                            <button class="clients-more-btn" onclick="toggleClientMenu(event, this)" aria-label="More options for BGEX">
+                                <i class='bx bx-dots-vertical-rounded'></i>
+                            </button>
                         </div>
                     </td>
                 </tr>
 
                 <!-- Row 3: TCS -->
-                <tr data-status="active">
+                <tr data-status="active" data-client-id="TCS">
                     <td>
                         <div class="client-name-cell">
                             <div class="tw-avatar tw-avatar--tcs" aria-hidden="true">T</div>
@@ -200,23 +180,13 @@
                     <td><span class="tw-count-badge">2</span></td>
                     <td>Jan 2024</td>
                     <td>
-                        <div class="tw-row-actions">
+                        <div class="clients-actions">
                             <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers('TCS')">
-                                <i class="bx bx-user" aria-hidden="true"></i> Manage Users
+                                <i class='bx bx-group'></i> Manage Users
                             </button>
-                            <div class="client-more-wrap">
-                                <button class="tw-btn-icon" onclick="toggleClientMoreMenu(event, this)" aria-label="More options for TCS">
-                                    <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
-                                </button>
-                                <div class="client-more-menu" style="display:none">
-                                    <button class="client-more-menu-item" onclick="showDetails('TCS');closeClientMoreMenus()">
-                                        <i class="bx bx-info-circle" aria-hidden="true"></i> View Details
-                                    </button>
-                                    <button class="client-more-menu-item" onclick="showSettings('TCS');closeClientMoreMenus()">
-                                        <i class="bx bx-cog" aria-hidden="true"></i> View Settings
-                                    </button>
-                                </div>
-                            </div>
+                            <button class="clients-more-btn" onclick="toggleClientMenu(event, this)" aria-label="More options for TCS">
+                                <i class='bx bx-dots-vertical-rounded'></i>
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -352,6 +322,16 @@
         </div>
     </div>
     <!-- END ONBOARD MODAL -->
+
+<!-- Shared context menu — positioned by JS via getBoundingClientRect() -->
+<div id="clientContextMenu" class="client-context-menu">
+    <button class="client-context-item" id="ctxViewDetails">
+        <i class='bx bx-info-circle'></i> View Details
+    </button>
+    <button class="client-context-item" id="ctxViewSettings">
+        <i class='bx bx-cog'></i> View Settings
+    </button>
+</div>
 
 <!-- Django: {% endblock %} -->
 
@@ -513,7 +493,8 @@
 
         /* Build and prepend new table row */
         var newRow = document.createElement('tr');
-        newRow.dataset.status = 'active';
+        newRow.dataset.status   = 'active';
+        newRow.dataset.clientId = 'NEW';
         newRow.innerHTML =
             '<td>' +
                 '<div class="client-name-cell">' +
@@ -535,23 +516,13 @@
             '<td><span class="tw-count-badge">0</span></td>' +
             '<td>Just now</td>' +
             '<td>' +
-                '<div class="tw-row-actions">' +
+                '<div class="clients-actions">' +
                     '<button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers(\'NEW\')">' +
-                        '<i class="bx bx-user" aria-hidden="true"></i> Manage Users' +
+                        '<i class=\'bx bx-group\'></i> Manage Users' +
                     '</button>' +
-                    '<div class="client-more-wrap">' +
-                        '<button class="tw-btn-icon" onclick="toggleClientMoreMenu(event,this)" aria-label="More options">' +
-                            '<i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>' +
-                        '</button>' +
-                        '<div class="client-more-menu" style="display:none">' +
-                            '<button class="client-more-menu-item" onclick="showDetails(\'NEW\');closeClientMoreMenus()">' +
-                                '<i class="bx bx-info-circle" aria-hidden="true"></i> View Details' +
-                            '</button>' +
-                            '<button class="client-more-menu-item" onclick="showSettings(\'NEW\');closeClientMoreMenus()">' +
-                                '<i class="bx bx-cog" aria-hidden="true"></i> View Settings' +
-                            '</button>' +
-                        '</div>' +
-                    '</div>' +
+                    '<button class="clients-more-btn" onclick="toggleClientMenu(event, this)" aria-label="More options">' +
+                        '<i class=\'bx bx-dots-vertical-rounded\'></i>' +
+                    '</button>' +
                 '</div>' +
             '</td>';
 
@@ -635,32 +606,77 @@
 
 
     /* ============================================================
-     * FIX 3: ⋮ DROPDOWN TOGGLE
+     * ⋮ CONTEXT MENU — viewport-fixed single shared element.
+     * JS positions via getBoundingClientRect(), escaping all table
+     * overflow, stacking contexts, and transform layers entirely.
      * ============================================================ */
-    function toggleClientMoreMenu(e, btn) {
+    var _activeClientId = null;
+
+    function toggleClientMenu(e, btn) {
         e.stopPropagation();
-        var wrap = btn.closest('.client-more-wrap');
-        var menu = wrap ? wrap.querySelector('.client-more-menu') : null;
-        if (!menu) return;
-        var isOpen = menu.style.display === 'block';
-        closeClientMoreMenus();
-        if (!isOpen) {
-            menu.style.display = 'block';
-        } else {
-            menu.style.display = 'none';
+        var menu = document.getElementById('clientContextMenu');
+
+        /* If already open for this same button, close it */
+        if (menu.classList.contains('open') && menu._sourceBtn === btn) {
+            closeClientMenu();
+            return;
+        }
+
+        /* Read client ID from the row's data attribute */
+        var row = btn.closest('tr');
+        _activeClientId = (row && row.dataset.clientId) ? row.dataset.clientId : null;
+
+        /* Position menu below-right of the ⋮ button */
+        var rect     = btn.getBoundingClientRect();
+        var menuLeft = rect.right - 160;
+        var menuTop  = rect.bottom + 4;
+
+        /* Keep within viewport bounds */
+        if (menuLeft < 8) menuLeft = 8;
+        if (menuTop + 120 > window.innerHeight) {
+            menuTop = rect.top - 120 - 4; /* flip upward if too close to bottom */
+        }
+
+        menu.style.left    = menuLeft + 'px';
+        menu.style.top     = menuTop  + 'px';
+        menu._sourceBtn    = btn;
+        menu.classList.add('open');
+    }
+
+    function closeClientMenu() {
+        var menu = document.getElementById('clientContextMenu');
+        if (menu) {
+            menu.classList.remove('open');
+            menu._sourceBtn = null;
         }
     }
 
-    function closeClientMoreMenus() {
-        document.querySelectorAll('.client-more-menu').forEach(function(m) {
-            m.style.display = 'none';
-        });
-    }
-
-    /* Close ⋮ menus on outside click */
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.client-more-wrap')) closeClientMoreMenus();
+    /* Wire menu item actions */
+    document.getElementById('ctxViewDetails').addEventListener('click', function() {
+        closeClientMenu();
+        showDetails(_activeClientId);
     });
+
+    document.getElementById('ctxViewSettings').addEventListener('click', function() {
+        closeClientMenu();
+        showSettings(_activeClientId);
+    });
+
+    /* Close on outside click */
+    document.addEventListener('click', function(e) {
+        var menu = document.getElementById('clientContextMenu');
+        if (menu && menu.classList.contains('open')) {
+            if (!e.target.closest('.clients-more-btn') &&
+                !e.target.closest('#clientContextMenu')) {
+                closeClientMenu();
+            }
+        }
+    });
+
+    /* Close on scroll so menu doesn't float away from its button */
+    document.addEventListener('scroll', function() {
+        closeClientMenu();
+    }, true);
 
 
     /* ============================================================
