@@ -682,3 +682,85 @@ body > main {
     margin-left: var(--tw-space-2);
     vertical-align: middle;
 }
+
+
+/* === BULK SELECTION ========================================= */
+
+/* Checkbox column — narrow, no padding interference */
+.tw-bulk-col {
+    width: 36px;
+    min-width: 36px;
+    padding-left: var(--tw-space-3) !important;
+    padding-right: 0 !important;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.tw-bulk-col input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    accent-color: var(--tw-primary);
+    vertical-align: middle;
+}
+
+/* Bulk action bar — sticky bottom, slides up on .visible */
+.tw-bulk-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: var(--tw-text-primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+    padding: 0 var(--tw-space-6);
+    z-index: 600;
+    transform: translateY(100%);
+    transition: transform 0.22s ease;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.18);
+}
+
+.tw-bulk-bar.visible {
+    transform: translateY(0);
+}
+
+.tw-bulk-count {
+    font-size: var(--tw-text-sm);
+    font-weight: 600;
+    white-space: nowrap;
+    min-width: 90px;
+}
+
+.tw-bulk-actions {
+    display: flex;
+    gap: var(--tw-space-2);
+    flex: 1;
+}
+
+.tw-bulk-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tw-space-1);
+    padding: 6px 14px;
+    border-radius: var(--tw-radius-md);
+    font-size: var(--tw-text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transition: background 0.15s;
+}
+
+.tw-bulk-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.tw-bulk-btn--clear {
+    margin-left: auto;
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.2);
+}

@@ -325,6 +325,7 @@
         <table class="tw-table">
             <thead>
                 <tr>
+                    <th scope="col" class="tw-bulk-col"><input type="checkbox" class="tw-bulk-select-all" data-tab="inbox" aria-label="Select all"></th>
                     <th scope="col">Ticket ID</th>
                     <th scope="col">Subject</th>
                     <th scope="col">Issue Date</th>
@@ -338,6 +339,7 @@
                 <!-- Django: {% for ticket in inbox_tickets %} -->
 
                 <tr data-ticket-id="GMEC25010007" data-ticket-type="new" data-subject="Federal bank API failure" data-status="new">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010007" aria-label="Select GMEC25010007"></td>
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">GMEC25010007</span>
@@ -357,6 +359,7 @@
                 </tr>
 
                 <tr data-ticket-id="GMEC25010008" data-ticket-type="new" data-subject="Bank transfer UI fix" data-status="new">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010008" aria-label="Select GMEC25010008"></td>
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">GMEC25010008</span>
@@ -392,6 +395,7 @@
         <table class="tw-table">
             <thead>
                 <tr>
+                    <th scope="col" class="tw-bulk-col"><input type="checkbox" class="tw-bulk-select-all" data-tab="progress" aria-label="Select all"></th>
                     <th scope="col">Ticket ID</th>
                     <th scope="col">Subject</th>
                     <th scope="col">Issue Date</th>
@@ -406,6 +410,7 @@
                 <!-- Django: {% for ticket in inprogress_tickets %} -->
 
                 <tr data-ticket-id="GMEC25010001" data-ticket-type="existing" data-subject="Wallet Option Agents" data-status="In Progress" data-sub-status="testing" data-allottee="Manju" data-est-date="2026-04-10">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010001" aria-label="Select GMEC25010001"></td>
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">GMEC25010001</span>
@@ -437,6 +442,7 @@
                 </tr>
 
                 <tr data-ticket-id="GMEC25010002" data-ticket-type="existing" data-subject="Terra pay" data-status="In Progress" data-sub-status="development" data-allottee="Arun" data-est-date="2026-04-28">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010002" aria-label="Select GMEC25010002"></td>
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">GMEC25010002</span>
@@ -468,6 +474,7 @@
                 </tr>
 
                 <tr data-ticket-id="GMEC25010003" data-ticket-type="existing" data-subject="Recon issue" data-status="In Progress" data-sub-status="uat" data-allottee="Sanoop" data-est-date="2026-07-15">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010003" aria-label="Select GMEC25010003"></td>
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">GMEC25010003</span>
@@ -493,6 +500,7 @@
                 </tr>
 
                 <tr data-ticket-id="GMEC25010004" data-ticket-type="existing" data-subject="Kumari API Integration" data-status="In Progress" data-sub-status="testing" data-allottee="Akhil" data-est-date="2026-08-01">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010004" aria-label="Select GMEC25010004"></td>
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">GMEC25010004</span>
@@ -518,6 +526,7 @@
                 </tr>
 
                 <tr data-ticket-id="GMEC25010005" data-ticket-type="existing" data-subject="Missing March Data" data-status="In Progress" data-sub-status="development" data-allottee="Rithik" data-est-date="2026-09-10">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010005" aria-label="Select GMEC25010005"></td>
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">GMEC25010005</span>
@@ -543,6 +552,7 @@
                 </tr>
 
                 <tr data-ticket-id="GMEC25010006" data-ticket-type="existing" data-subject="Federal bank API failure" data-status="In Progress" data-sub-status="uat" data-allottee="Rithik" data-est-date="2026-10-20">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010006" aria-label="Select GMEC25010006"></td>
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">GMEC25010006</span>
@@ -583,6 +593,7 @@
         <table class="tw-table">
             <thead>
                 <tr>
+                    <th scope="col" class="tw-bulk-col"><input type="checkbox" class="tw-bulk-select-all" data-tab="forwarded" aria-label="Select all"></th>
                     <th scope="col">Ticket ID</th>
                     <th scope="col">Subject</th>
                     <th scope="col">Issue Date</th>
@@ -596,6 +607,7 @@
                 <!-- Django: {% for ticket in forwarded_tickets %} -->
 
                 <tr data-ticket-id="BGEX25020001" data-ticket-type="existing" data-subject="Payment Gateway Integration" data-status="forwarded" data-allottee="Arun">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="BGEX25020001" aria-label="Select BGEX25020001"></td>
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">BGEX25020001</span>
@@ -621,6 +633,7 @@
                 </tr>
 
                 <tr data-ticket-id="GMEC25020002" data-ticket-type="existing" data-subject="Report Generation Bug" data-status="forwarded" data-allottee="Rithik">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25020002" aria-label="Select GMEC25020002"></td>
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">GMEC25020002</span>
@@ -646,6 +659,7 @@
                 </tr>
 
                 <tr data-ticket-id="BGEX25020003" data-ticket-type="existing" data-subject="Mobile App Crash on Login" data-status="forwarded" data-allottee="Sanoop">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="BGEX25020003" aria-label="Select BGEX25020003"></td>
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">BGEX25020003</span>
@@ -686,6 +700,7 @@
         <table class="tw-table">
             <thead>
                 <tr>
+                    <th scope="col" class="tw-bulk-col"><input type="checkbox" class="tw-bulk-select-all" data-tab="closed" aria-label="Select all"></th>
                     <th scope="col">Ticket ID</th>
                     <th scope="col">Subject</th>
                     <th scope="col">Issue Date</th>
@@ -699,6 +714,7 @@
                 <!-- Django: {% for ticket in closed_tickets %} -->
 
                 <tr data-ticket-id="GMEC25010099" data-ticket-type="existing" data-subject="Authentication Flow Fix" data-status="closed" data-allottee="Manju">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010099" aria-label="Select GMEC25010099"></td>
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">GMEC25010099</span>
@@ -723,6 +739,7 @@
                 </tr>
 
                 <tr data-ticket-id="BGEX25010098" data-ticket-type="existing" data-subject="DB Connection Pooling" data-status="closed" data-allottee="Akhil">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="BGEX25010098" aria-label="Select BGEX25010098"></td>
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">BGEX25010098</span>
@@ -747,6 +764,7 @@
                 </tr>
 
                 <tr data-ticket-id="GMEC25010097" data-ticket-type="existing" data-subject="UI Responsive Fix" data-status="closed" data-allottee="Arun">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010097" aria-label="Select GMEC25010097"></td>
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">GMEC25010097</span>
@@ -790,6 +808,7 @@
         <table class="tw-table">
             <thead>
                 <tr>
+                    <th scope="col" class="tw-bulk-col"><input type="checkbox" class="tw-bulk-select-all" data-tab="rejected" aria-label="Select all"></th>
                     <th scope="col">Ticket ID</th>
                     <th scope="col">Subject</th>
                     <th scope="col">Client / Company</th>
@@ -804,6 +823,7 @@
                 <!-- Django: {% for ticket in rejected_tickets %} -->
 
                 <tr data-ticket-id="TKT-00089" data-ticket-type="rejected" data-subject="Login page broken on Safari" data-status="rejected">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="TKT-00089" aria-label="Select TKT-00089"></td>
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">TKT-00089</span>
@@ -827,6 +847,7 @@
                 </tr>
 
                 <tr data-ticket-id="TKT-00063" data-ticket-type="rejected" data-subject="Dashboard stats not loading for sub-users" data-status="rejected">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="TKT-00063" aria-label="Select TKT-00063"></td>
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">TKT-00063</span>
@@ -858,6 +879,33 @@
 
     </div>
     <!-- END TICKET TABLE CARD -->
+
+
+    <!-- ==============================================================
+         BULK ACTION BAR
+         Slides up from the bottom when one or more rows are checked.
+         ============================================================== -->
+    <div class="tw-bulk-bar" id="bulkActionBar" role="toolbar" aria-label="Bulk actions" aria-hidden="true">
+        <span class="tw-bulk-count" id="bulkCount">0 selected</span>
+        <div class="tw-bulk-actions">
+            <button type="button" class="tw-bulk-btn" onclick="bulkClose()">
+                <i class="bx bx-check-circle" aria-hidden="true"></i> Close
+            </button>
+            <button type="button" class="tw-bulk-btn" onclick="bulkAssign()">
+                <i class="bx bx-user-check" aria-hidden="true"></i> Assign
+            </button>
+            <button type="button" class="tw-bulk-btn" onclick="bulkForward()">
+                <i class="bx bx-transfer" aria-hidden="true"></i> Forward
+            </button>
+            <button type="button" class="tw-bulk-btn" onclick="bulkExport()">
+                <i class="bx bx-export" aria-hidden="true"></i> Export
+            </button>
+        </div>
+        <button type="button" class="tw-bulk-btn tw-bulk-btn--clear" onclick="clearBulkSelection()" aria-label="Clear selection">
+            <i class="bx bx-x" aria-hidden="true"></i> Clear
+        </button>
+    </div>
+    <!-- END BULK ACTION BAR -->
 
 
     <!-- ==============================================================
@@ -2902,5 +2950,106 @@
 
     /* Run on initial load — dashboard starts on Inbox tab but mark any overdue rows now */
     markOverdueRows();
+
+
+    /* === BULK SELECTION === */
+
+    var selectedTicketIds = new Set();
+
+    /* Wire up all select-all checkboxes and row checkboxes on page load */
+    document.querySelectorAll('.tw-bulk-select-all').forEach(function(cb) {
+        cb.addEventListener('change', function() {
+            var tab = this.dataset.tab;
+            var panel = document.querySelector('[data-tab-content="' + tab + '"]');
+            if (!panel) return;
+            panel.querySelectorAll('.tw-row-check').forEach(function(rowCb) {
+                var id = rowCb.dataset.ticketId;
+                rowCb.checked = cb.checked;
+                if (cb.checked) {
+                    selectedTicketIds.add(id);
+                } else {
+                    selectedTicketIds.delete(id);
+                }
+            });
+            updateBulkBar();
+        });
+    });
+
+    document.querySelectorAll('.tw-row-check').forEach(function(cb) {
+        cb.addEventListener('change', function() {
+            var id = this.dataset.ticketId;
+            if (this.checked) {
+                selectedTicketIds.add(id);
+            } else {
+                selectedTicketIds.delete(id);
+            }
+            updateSelectAllState(this);
+            updateBulkBar();
+        });
+    });
+
+    function updateBulkBar() {
+        var bar = document.getElementById('bulkActionBar');
+        var count = selectedTicketIds.size;
+        document.getElementById('bulkCount').textContent = count + (count === 1 ? ' selected' : ' selected');
+        if (count > 0) {
+            bar.classList.add('visible');
+            bar.setAttribute('aria-hidden', 'false');
+        } else {
+            bar.classList.remove('visible');
+            bar.setAttribute('aria-hidden', 'true');
+        }
+    }
+
+    function updateSelectAllState(changedCb) {
+        /* Find the tab this checkbox belongs to */
+        var panel = changedCb.closest('[data-tab-content]');
+        if (!panel) return;
+        var tab = panel.dataset.tabContent;
+        var allChecks = panel.querySelectorAll('.tw-row-check');
+        var checkedCount = panel.querySelectorAll('.tw-row-check:checked').length;
+        var selectAll = document.querySelector('.tw-bulk-select-all[data-tab="' + tab + '"]');
+        if (!selectAll) return;
+        if (checkedCount === 0) {
+            selectAll.checked = false;
+            selectAll.indeterminate = false;
+        } else if (checkedCount === allChecks.length) {
+            selectAll.checked = true;
+            selectAll.indeterminate = false;
+        } else {
+            selectAll.checked = false;
+            selectAll.indeterminate = true;
+        }
+    }
+
+    function clearBulkSelection() {
+        selectedTicketIds.clear();
+        document.querySelectorAll('.tw-row-check').forEach(function(cb) { cb.checked = false; });
+        document.querySelectorAll('.tw-bulk-select-all').forEach(function(cb) {
+            cb.checked = false;
+            cb.indeterminate = false;
+        });
+        updateBulkBar();
+    }
+
+    function bulkClose() {
+        showDashToast('Closing ' + selectedTicketIds.size + ' ticket(s)…');
+        clearBulkSelection();
+    }
+
+    function bulkAssign() {
+        showDashToast('Assigning ' + selectedTicketIds.size + ' ticket(s)…');
+        clearBulkSelection();
+    }
+
+    function bulkForward() {
+        showDashToast('Forwarding ' + selectedTicketIds.size + ' ticket(s)…');
+        clearBulkSelection();
+    }
+
+    function bulkExport() {
+        showDashToast('Exporting ' + selectedTicketIds.size + ' ticket(s)…');
+        clearBulkSelection();
+    }
 </script>
 <!-- Django: {% endblock %} -->
