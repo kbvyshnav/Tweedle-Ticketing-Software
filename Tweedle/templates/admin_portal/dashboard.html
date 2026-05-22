@@ -2920,6 +2920,7 @@
      * CHAT PANEL
      * ============================================================ */
     function openChatPanel(ticketId, subject) {
+        closeTimelinePanel(); /* Fix 3: ensure Timeline panel is closed first */
         document.getElementById('chatTicketId').textContent      = 'Ticket ID: ' + ticketId;
         document.getElementById('chatTicketSubject').textContent = subject || '';
         document.getElementById('chatPanel').classList.add('open');
@@ -3072,6 +3073,7 @@
     var currentTimelineTicketId = '';
 
     function openTimelinePanel(ticketId, subject) {
+        closeChatPanel(); /* Fix 3: ensure Chat panel is closed first */
         currentTimelineTicketId = ticketId;
 
         document.getElementById('timelineTicketId').textContent = 'Ticket ID: ' + ticketId;
@@ -3250,13 +3252,39 @@
                     const tabBtn = document.querySelector(`.tw-ticket-tab[data-tab="${ticket.tab}"]`);
                     if (tabBtn) tabBtn.click();
 
-                    /* Briefly highlight the matching row */
+                    /* Highlight the matching row then open the correct modal */
                     setTimeout(function() {
                         const row = document.querySelector(`tr[data-ticket-id="${ticket.id}"]`);
-                        if (row) {
-                            row.classList.add('row-highlight');
-                            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            setTimeout(function() { row.classList.remove('row-highlight'); }, 1800);
+                        if (!row) return;
+
+                        row.classList.add('row-highlight');
+                        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        setTimeout(function() { row.classList.remove('row-highlight'); }, 1800);
+
+                        /* Fix 1: open the appropriate modal for this ticket */
+                        var type      = row.dataset.ticketType || 'existing';
+                        var status    = row.dataset.status     || '';
+                        var allottee  = row.dataset.allottee   || '';
+                        var subStatus = row.dataset.subStatus  || '';
+                        if (type === 'new') {
+                            openNewTicketModal(ticket.id, ticket.subject, status || 'New Ticket');
+                        } else if (type === 'rejected') {
+                            var cells     = row.cells;
+                            var reasonDiv = cells[7] ? cells[7].querySelector('div') : null;
+                            var reason    = reasonDiv
+                                ? (reasonDiv.getAttribute('title') || reasonDiv.textContent.trim())
+                                : '—';
+                            openRejectedModal(
+                                ticket.id, ticket.subject,
+                                cells[3] ? cells[3].textContent.trim() : '—',
+                                cells[4] ? cells[4].textContent.trim() : '—',
+                                '—',
+                                cells[5] ? cells[5].textContent.trim() : '—',
+                                cells[6] ? cells[6].textContent.trim() : '—',
+                                '—', reason
+                            );
+                        } else {
+                            openTicketDetailsModal(ticket.id, ticket.subject, status, allottee, subStatus);
                         }
                     }, 120);
                 });
@@ -3485,5 +3513,67 @@
     document.getElementById('rejectedTicketModal').addEventListener('click', function(e) {
         if (e.target === this) closeRejectedModal();
     });
+
+
+    /* ============================================================
+     * FIX 2: NOTIFICATION → TICKET NAVIGATION
+     * Listens for 'tweedle:openTicket' events fired by notification
+     * items in base.html. Re-registers on each dashboard load to
+     * avoid stale closures if the user navigates away and back.
+     * ============================================================ */
+    function _handleTweedleOpenTicket(e) {
+        var ticketId = e.detail.ticketId;
+        var tab      = e.detail.tab;
+        var tabBtn   = document.querySelector('.tw-ticket-tab[data-tab="' + tab + '"]');
+        if (tabBtn) tabBtn.click();
+        setTimeout(function() {
+            var row = document.querySelector('.tab-content tbody tr[data-ticket-id="' + ticketId + '"]');
+            if (!row) return;
+            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            var type      = row.dataset.ticketType || 'existing';
+            var status    = row.dataset.status     || '';
+            var allottee  = row.dataset.allottee   || '';
+            var subStatus = row.dataset.subStatus  || '';
+            if (type === 'new') {
+                openNewTicketModal(ticketId, row.dataset.subject || '', status || 'New Ticket');
+            } else if (type === 'rejected') {
+                var cells     = row.cells;
+                var reasonDiv = cells[7] ? cells[7].querySelector('div') : null;
+                var reason    = reasonDiv
+                    ? (reasonDiv.getAttribute('title') || reasonDiv.textContent.trim())
+                    : '—';
+                openRejectedModal(
+                    ticketId, row.dataset.subject || '',
+                    cells[3] ? cells[3].textContent.trim() : '—',
+                    cells[4] ? cells[4].textContent.trim() : '—',
+                    '—',
+                    cells[5] ? cells[5].textContent.trim() : '—',
+                    cells[6] ? cells[6].textContent.trim() : '—',
+                    '—', reason
+                );
+            } else {
+                openTicketDetailsModal(ticketId, row.dataset.subject || '', status, allottee, subStatus);
+            }
+        }, 150);
+    }
+
+    /* Remove any previously registered handler before re-adding */
+    if (window._tweedleOpenTicketHandler) {
+        window.removeEventListener('tweedle:openTicket', window._tweedleOpenTicketHandler);
+    }
+    window._tweedleOpenTicketHandler = _handleTweedleOpenTicket;
+    window.addEventListener('tweedle:openTicket', window._tweedleOpenTicketHandler);
+
+
+    /* ============================================================
+     * FIX 4: HIDE TOPBAR SEARCH WHILE DASHBOARD IS ACTIVE
+     * The dashboard has its own full-featured global search.
+     * The topbar search is restored by loadPage() in base.html
+     * whenever the user navigates to any other page.
+     * ============================================================ */
+    (function() {
+        var tsf = document.getElementById('topbarSearchForm');
+        if (tsf) tsf.style.display = 'none';
+    }());
 </script>
 <!-- Django: {% endblock %} -->

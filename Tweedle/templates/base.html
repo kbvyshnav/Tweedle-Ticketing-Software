@@ -251,44 +251,67 @@
                 <div class="tw-notif-list">
                     <!-- Django: {% for notification in notifications %} -->
 
-                    <div class="tw-notif-item unread">
+                    <!-- Notification 1: GMEC25010001 → In Progress -->
+                    <div class="tw-notif-item unread" role="button" style="cursor:pointer"
+                         onclick="this.classList.remove('unread'); document.getElementById('notifPanel').classList.remove('open'); document.getElementById('notifBellBtn').setAttribute('aria-expanded','false'); window.dispatchEvent(new CustomEvent('tweedle:openTicket', {detail:{ticketId:'GMEC25010001',tab:'progress'}}));">
                         <div class="tw-notif-item-body">
-                            <div class="tw-notif-type-icon tw-notif-type-icon--info">
-                                <i class="bx bx-chat" aria-hidden="true"></i>
+                            <div class="tw-notif-type-icon tw-notif-type-icon--warning">
+                                <i class="bx bx-user-check" aria-hidden="true"></i>
                             </div>
                             <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">New message on GMEC25010002</div>
+                                <div class="tw-notif-item-title">Ticket assigned — GMEC25010001</div>
                                 <div class="tw-notif-item-msg">
-                                    <span class="tw-notif-user-name">Rithik</span> sent a message in Terra pay
+                                    <span class="tw-notif-user-name">Manju</span> assigned to Wallet Option Agents
                                 </div>
                                 <div class="tw-notif-item-time">5 minutes ago</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="tw-notif-item unread">
+                    <!-- Notification 2: GMEC25010003 → In Progress (overdue) -->
+                    <div class="tw-notif-item unread" role="button" style="cursor:pointer"
+                         onclick="this.classList.remove('unread'); document.getElementById('notifPanel').classList.remove('open'); document.getElementById('notifBellBtn').setAttribute('aria-expanded','false'); window.dispatchEvent(new CustomEvent('tweedle:openTicket', {detail:{ticketId:'GMEC25010003',tab:'progress'}}));">
                         <div class="tw-notif-item-body">
                             <div class="tw-notif-type-icon tw-notif-type-icon--warning">
-                                <i class="bx bx-user-check" aria-hidden="true"></i>
+                                <i class="bx bx-time-five" aria-hidden="true"></i>
                             </div>
                             <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">Ticket assigned — GMEC25010008</div>
+                                <div class="tw-notif-item-title">Overdue alert — GMEC25010003</div>
                                 <div class="tw-notif-item-msg">
-                                    Bank transfer UI fix assigned to <span class="tw-notif-user-name">Arun</span>
+                                    Recon issue has passed its estimated close date
+                                </div>
+                                <div class="tw-notif-item-time">30 minutes ago</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notification 3: BGEX25020001 → Awaiting Client (client replied) -->
+                    <div class="tw-notif-item" role="button" style="cursor:pointer"
+                         onclick="this.classList.remove('unread'); document.getElementById('notifPanel').classList.remove('open'); document.getElementById('notifBellBtn').setAttribute('aria-expanded','false'); window.dispatchEvent(new CustomEvent('tweedle:openTicket', {detail:{ticketId:'BGEX25020001',tab:'forwarded'}}));">
+                        <div class="tw-notif-item-body">
+                            <div class="tw-notif-type-icon tw-notif-type-icon--info">
+                                <i class="bx bx-chat" aria-hidden="true"></i>
+                            </div>
+                            <div class="tw-notif-item-text">
+                                <div class="tw-notif-item-title">Client responded — BGEX25020001</div>
+                                <div class="tw-notif-item-msg">
+                                    <span class="tw-notif-user-name">BGEX</span> replied on Payment Gateway Integration
                                 </div>
                                 <div class="tw-notif-item-time">1 hour ago</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="tw-notif-item">
+                    <!-- Notification 4: GMEC25010099 → Closed -->
+                    <div class="tw-notif-item" role="button" style="cursor:pointer"
+                         onclick="this.classList.remove('unread'); document.getElementById('notifPanel').classList.remove('open'); document.getElementById('notifBellBtn').setAttribute('aria-expanded','false'); window.dispatchEvent(new CustomEvent('tweedle:openTicket', {detail:{ticketId:'GMEC25010099',tab:'closed'}}));">
                         <div class="tw-notif-item-body">
                             <div class="tw-notif-type-icon tw-notif-type-icon--success">
                                 <i class="bx bx-check-circle" aria-hidden="true"></i>
                             </div>
                             <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">Ticket closed — BGEX25010098</div>
-                                <div class="tw-notif-item-msg">DB Connection Pooling ticket was closed</div>
+                                <div class="tw-notif-item-title">Ticket closed — GMEC25010099</div>
+                                <div class="tw-notif-item-msg">Authentication Flow Fix has been closed</div>
                                 <div class="tw-notif-item-time">Yesterday</div>
                             </div>
                         </div>
@@ -534,6 +557,9 @@
      *   "admin_portal/dashboard.html#inbox" → loads dashboard, then clicks
      *   the [data-tab="inbox"] button after the content is ready. */
     async function loadPage(pagePath) {
+        /* Fix 4: restore topbar search when navigating away from the dashboard */
+        var tsf = document.getElementById('topbarSearchForm');
+        if (tsf) tsf.style.display = '';
         showLoader();
 
         try {
