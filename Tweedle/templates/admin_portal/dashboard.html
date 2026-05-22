@@ -1061,6 +1061,12 @@
 
         <div class="tw-modal-body">
 
+            <!-- Fix 4: shown by JS only when data-status="closed" -->
+            <div id="modalReadOnlyNotice" style="display:none; background: var(--tw-status-closed-bg); color: var(--tw-status-closed-text); padding: 8px 14px; border-radius: var(--tw-radius-sm); font-size: var(--tw-text-sm); margin-bottom: 12px;">
+                <i class='bx bx-lock-alt' style="margin-right:6px;" aria-hidden="true"></i>
+                This ticket is closed — no further actions are available.
+            </div>
+
             <div class="tw-info-grid">
                 <div class="tw-info-item">
                     <div class="tw-info-label">Ticket Maker</div>
@@ -1118,25 +1124,25 @@
             <!-- Task 4: Forwarding Details — shown only when data-status="forwarded" -->
             <div class="tw-modal-section tw-forwarded-section">
                 <div class="tw-modal-section-title">
-                    <i class='bx bx-share'></i> Forwarding Details
+                    <i class='bx bx-share'></i> Info Request Details
                 </div>
                 <div class="tw-info-grid tw-info-grid--3col">
                     <div class="tw-info-item">
-                        <div class="tw-info-label">Forwarded By</div>
+                        <div class="tw-info-label">Requested By</div>
                         <div class="tw-info-value">
                             <!-- Django: {{ ticket.forwarded_by.get_full_name }} -->
                             Rajagopal P
                         </div>
                     </div>
                     <div class="tw-info-item">
-                        <div class="tw-info-label">Forwarded To</div>
+                        <div class="tw-info-label">Client Contact Notified</div>
                         <div class="tw-info-value">
                             <!-- Django: {{ ticket.forwarded_to }} -->
                             External Support Team
                         </div>
                     </div>
                     <div class="tw-info-item">
-                        <div class="tw-info-label">Forwarded On</div>
+                        <div class="tw-info-label">Requested On</div>
                         <div class="tw-info-value">
                             <!-- Django: {{ ticket.forwarded_at|date:"d-m-Y" }} -->
                             18-01-2025
@@ -1144,7 +1150,7 @@
                     </div>
                 </div>
                 <div class="tw-info-item" style="width:100%">
-                    <div class="tw-info-label">Reason for Forwarding</div>
+                    <div class="tw-info-label">Message Sent to Client</div>
                     <div class="tw-description-box">
                         <!-- Django: {{ ticket.forwarding_reason }} -->
                         Issue requires escalation to the payment gateway provider for API-level access.
@@ -1475,6 +1481,29 @@
                 <h3 class="section-title">Description</h3>
                 <div class="tw-description-box">
                     Federal bank API is returning 500 errors intermittently. Needs investigation and hotfix before the payment window closes at end of month.
+                </div>
+            </div>
+
+            <div class="tw-modal-section">
+                <h3 class="section-title">Attachments</h3>
+                <div class="tw-attachments-area">
+                    <div class="tw-attachment-item">
+                        <div class="tw-attachment-icon tw-attachment-icon--pdf" aria-hidden="true">
+                            <i class="bx bxs-file-pdf"></i>
+                        </div>
+                        <div class="tw-attachment-info">
+                            <div class="tw-attachment-name">wallet_specs.pdf</div>
+                            <div class="tw-attachment-meta">Uploaded on 10-12-2025 &bull; 245 KB</div>
+                        </div>
+                        <div class="tw-attachment-actions">
+                            <button class="tw-icon-btn" title="Download" aria-label="Download wallet_specs.pdf">
+                                <i class="bx bx-download" aria-hidden="true"></i>
+                            </button>
+                            <button class="tw-icon-btn" title="View" aria-label="View wallet_specs.pdf">
+                                <i class="bx bx-show" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -2513,6 +2542,10 @@
             var newClass = statusClassMap[statusKey];
             if (newClass) footerBadge.classList.add(newClass);
         }
+
+        /* Fix 4: show read-only banner only for closed tickets */
+        var roNotice = document.getElementById('modalReadOnlyNotice');
+        if (roNotice) roNotice.style.display = statusKey === 'closed' ? '' : 'none';
 
         closeDashActionPanel('dashReassignPanel');
         closeDashActionPanel('dashForwardPanel');

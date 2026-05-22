@@ -693,15 +693,15 @@ body {
     gap: var(--tw-space-2);
 }
 
-/* Close Ticket button — danger-light outlined */
+/* Close Ticket button — success/green (closing a Resolved ticket is affirmative) */
 .tw-btn-close-ticket {
     display: flex;
     align-items: center;
     gap: var(--tw-space-2);
     padding: var(--tw-space-2) var(--tw-space-5);
-    background: var(--tw-danger-light);
-    color: var(--tw-danger);
-    border: 1px solid var(--tw-danger);
+    background: var(--tw-success);
+    color: #ffffff;
+    border: 1px solid var(--tw-success);
     border-radius: var(--tw-radius-sm);
     font-family: var(--tw-font-primary);
     font-size: var(--tw-text-sm);
@@ -713,7 +713,7 @@ body {
 }
 
 .tw-btn-close-ticket:hover {
-    background: var(--tw-danger);
+    background: #218838;
     color: #ffffff;
 }
 
@@ -1031,4 +1031,31 @@ body {
     .tw-info-grid--6 {
         grid-template-columns: 1fr;
     }
+}
+
+
+/* ============================================================
+ * STATUS-DRIVEN LEFT BORDER ACCENT ON MODAL CONTAINER
+ * Gives immediate visual identity based on ticket state.
+ * ============================================================ */
+#ticketDetailsModal[data-status="progress"] .tw-modal-container,
+#ticketDetailsModal[data-status="inprogress"] .tw-modal-container,
+#ticketDetailsModal[data-status="inbox"] .tw-modal-container {
+    border-left: 4px solid var(--tw-status-progress-text);
+}
+
+#ticketDetailsModal[data-status="forwarded"] .tw-modal-container {
+    border-left: 4px solid var(--tw-status-forwarded-text);
+}
+
+#ticketDetailsModal[data-status="resolved"] .tw-modal-container {
+    border-left: 4px solid var(--tw-status-forwarded-text);
+}
+
+#ticketDetailsModal[data-status="closed"] .tw-modal-container {
+    border-left: 4px solid var(--tw-status-closed-text);
+}
+
+#rejectedTicketModal .tw-modal-container {
+    border-left: 4px solid var(--tw-danger);
 }
