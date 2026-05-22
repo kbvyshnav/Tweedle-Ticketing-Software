@@ -979,17 +979,29 @@
     <div class="tw-bulk-bar" id="bulkActionBar" role="toolbar" aria-label="Bulk actions" aria-hidden="true">
         <span class="tw-bulk-count" id="bulkCount">0 selected</span>
         <div class="tw-bulk-actions">
-            <button type="button" class="tw-bulk-btn" onclick="bulkClose()">
+            <button type="button" id="bulkCloseBtn" class="tw-bulk-btn" onclick="bulkClose()">
                 <i class="bx bx-check-circle" aria-hidden="true"></i> Close
             </button>
-            <button type="button" class="tw-bulk-btn" onclick="bulkAssign()">
+            <button type="button" id="bulkAssignBtn" class="tw-bulk-btn" onclick="bulkAssign()">
                 <i class="bx bx-user-check" aria-hidden="true"></i> Assign
             </button>
-            <button type="button" class="tw-bulk-btn" onclick="bulkForward()">
-                <i class="bx bx-transfer" aria-hidden="true"></i> Forward
+            <button type="button" id="bulkForwardBtn" class="tw-bulk-btn" onclick="bulkForward()">
+                <i class="bx bx-share" aria-hidden="true"></i> Request Info
             </button>
-            <button type="button" class="tw-bulk-btn" onclick="bulkExport()">
+            <button type="button" id="bulkExportBtn" class="tw-bulk-btn" onclick="bulkExport()">
                 <i class="bx bx-export" aria-hidden="true"></i> Export
+            </button>
+            <button type="button" id="bulkRejectBtn" class="tw-btn tw-btn-danger tw-btn--sm" onclick="showDashToast('Bulk action coming soon', 'info')">
+                <i class="bx bx-x-circle" aria-hidden="true"></i> Reject Selected
+            </button>
+            <button type="button" id="bulkReassignBtn" class="tw-btn tw-btn-outline tw-btn--sm" onclick="showDashToast('Bulk action coming soon', 'info')">
+                <i class="bx bx-transfer" aria-hidden="true"></i> Reassign
+            </button>
+            <button type="button" id="bulkRequestInfoBtn" class="tw-btn tw-btn-outline tw-btn--sm" onclick="showDashToast('Bulk action coming soon', 'info')">
+                <i class="bx bx-share" aria-hidden="true"></i> Request Info
+            </button>
+            <button type="button" id="bulkResumeBtn" class="tw-btn tw-btn-success tw-btn--sm" onclick="showDashToast('Bulk action coming soon', 'info')">
+                <i class="bx bx-play-circle" aria-hidden="true"></i> Resume Selected
             </button>
         </div>
         <button type="button" class="tw-bulk-btn tw-bulk-btn--clear" onclick="clearBulkSelection()" aria-label="Clear selection">
@@ -1942,6 +1954,7 @@
             companyText.innerHTML = `<i class="bx bx-buildings"></i> ${option.textContent}`;
             companyDropdown.classList.remove('active');
             companyBtn.setAttribute('aria-expanded', 'false');
+            applyCompanyFilter(option.dataset.company);
         });
     });
 
@@ -1996,6 +2009,8 @@
             fromDate.value = startDate.toISOString().split('T')[0];
             toDate.value   = endDate.toISOString().split('T')[0];
 
+            if (startDate && endDate) applyDateFilter(startDate, endDate);
+
             setTimeout(function() {
                 dateDropdown.classList.remove('active');
                 dateBtn.setAttribute('aria-expanded', 'false');
@@ -2012,7 +2027,57 @@
             const from = new Date(fromDate.value).toLocaleDateString();
             const to   = new Date(toDate.value).toLocaleDateString();
             dateText.innerHTML = `<i class="bx bx-calendar-alt"></i> ${from} – ${to}`;
+            applyDateFilter(new Date(fromDate.value), new Date(toDate.value));
         }
+    }
+
+    /* Fix 2: parse "DD-MM-YYYY" cell dates into JS Date objects */
+    function parseTwDate(str) {
+        if (!str) return null;
+        var parts = str.split('-');
+        if (parts.length !== 3) return null;
+        var d = parseInt(parts[0], 10);
+        var m = parseInt(parts[1], 10) - 1; /* 0-indexed month */
+        var y = parseInt(parts[2], 10);
+        var dt = new Date(y, m, d);
+        dt.setHours(0, 0, 0, 0);
+        return isNaN(dt.getTime()) ? null : dt;
+    }
+
+    /* Fix 2: date range filter — reads issue date from cells[3] for all non-rejected tabs */
+    function applyDateFilter(fromDt, toDt) {
+        if (!fromDt && !toDt) {
+            document.querySelectorAll('.tab-content tbody tr').forEach(function(row) {
+                row.style.removeProperty('display');
+            });
+            return;
+        }
+        var from = fromDt ? new Date(fromDt.getTime()) : null;
+        var to   = toDt   ? new Date(toDt.getTime())   : null;
+        if (from) from.setHours(0, 0, 0, 0);
+        if (to)   to.setHours(23, 59, 59, 999);
+
+        document.querySelectorAll('.tab-content tbody tr').forEach(function(row) {
+            /* Rejected tab has no issue date column — always show */
+            var tabPanel = row.closest('.tab-content');
+            if (tabPanel && tabPanel.id === 'tab-rejected') {
+                row.style.removeProperty('display');
+                return;
+            }
+            /* Issue date is in cells[3] for all other tabs */
+            var dateCell = row.cells[3];
+            var rowDate  = parseTwDate(dateCell ? dateCell.textContent.trim() : '');
+            if (!rowDate) {
+                row.style.removeProperty('display');
+                return;
+            }
+            var inRange = (!from || rowDate >= from) && (!to || rowDate <= to);
+            if (inRange) {
+                row.style.removeProperty('display');
+            } else {
+                row.style.display = 'none';
+            }
+        });
     }
 
     document.addEventListener('click', function() {
@@ -2099,6 +2164,22 @@
         });
     }
 
+    /* Fix 1: company filter — hide rows whose data-client doesn't match */
+    function applyCompanyFilter(companyValue) {
+        document.querySelectorAll('.tab-content tbody tr').forEach(function(row) {
+            if (!companyValue || companyValue === 'all') {
+                row.style.removeProperty('display');
+                return;
+            }
+            var rowClient = (row.dataset.client || '').toLowerCase();
+            if (rowClient === companyValue.toLowerCase()) {
+                row.style.removeProperty('display');
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
 
     /* ============================================================
      * STAT CARD CLICK → TAB ACTIVATION
@@ -2173,6 +2254,7 @@
 
             updateStatCardActiveState(target);
             updateTabHeading(target);
+            updateBulkBarActions(target);
 
             /* Re-check overdue status whenever In Progress tab becomes active */
             if (target === 'progress') markOverdueRows();
@@ -3244,6 +3326,35 @@
     markOverdueRows();
 
 
+    /* ============================================================
+     * FIX 3: BULK ACTION BAR — TAB-AWARE BUTTON VISIBILITY
+     * ============================================================ */
+    function updateBulkBarActions(activeTab) {
+        var allIds = ['bulkCloseBtn', 'bulkAssignBtn', 'bulkForwardBtn', 'bulkExportBtn',
+                      'bulkRejectBtn', 'bulkReassignBtn', 'bulkRequestInfoBtn', 'bulkResumeBtn'];
+        /* Hide every action button first */
+        allIds.forEach(function(id) {
+            var btn = document.getElementById(id);
+            if (btn) btn.style.display = 'none';
+        });
+        /* Show only the buttons relevant to this tab */
+        var show = [];
+        switch (activeTab) {
+            case 'inbox':     show = ['bulkAssignBtn', 'bulkRejectBtn'];            break;
+            case 'progress':  show = ['bulkReassignBtn', 'bulkRequestInfoBtn'];     break;
+            case 'forwarded': show = ['bulkResumeBtn'];                             break;
+            case 'resolved':  show = ['bulkCloseBtn', 'bulkExportBtn'];             break;
+            case 'closed':    show = ['bulkExportBtn'];                             break;
+            case 'rejected':  show = ['bulkExportBtn'];                             break;
+            default:          show = ['bulkExportBtn'];                             break;
+        }
+        show.forEach(function(id) {
+            var btn = document.getElementById(id);
+            if (btn) btn.style.display = '';
+        });
+    }
+
+
     /* === BULK SELECTION === */
 
     var selectedTicketIds = new Set();
@@ -3291,6 +3402,9 @@
             bar.classList.remove('visible');
             bar.setAttribute('aria-hidden', 'true');
         }
+        /* Keep bulk action buttons in sync with the active tab */
+        var activeTabBtn = document.querySelector('.tw-ticket-tab.active');
+        if (activeTabBtn) updateBulkBarActions(activeTabBtn.dataset.tab);
     }
 
     function updateSelectAllState(changedCb) {
