@@ -2566,3 +2566,83 @@
 
 .tw-toast--success i { color: var(--tw-success); }
 .tw-toast--error   i { color: var(--tw-danger); }
+
+
+/* ============================================================
+ * SECTION 21: PROFILE DROPDOWN
+ * Topbar avatar click → panel with user info + menu items.
+ * ============================================================ */
+.tw-profile-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.tw-profile-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 240px;
+    background: var(--tw-bg-surface);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-lg);
+    box-shadow: var(--tw-shadow-lg);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-6px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 200;
+}
+
+.tw-profile-panel.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.tw-profile-header {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+    padding: var(--tw-space-4);
+}
+
+.tw-profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+    padding: var(--tw-space-3) var(--tw-space-4);
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-primary);
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.tw-profile-menu-item:hover {
+    background: var(--tw-primary-light);
+}
+
+.tw-profile-menu-item i {
+    font-size: 18px;
+    color: var(--tw-text-secondary);
+    flex-shrink: 0;
+}
+
+.tw-profile-menu-item--danger {
+    color: var(--tw-danger);
+}
+
+.tw-profile-menu-item--danger i {
+    color: var(--tw-danger);
+}
+
+.tw-profile-menu-item--danger:hover {
+    background: #fff5f5;
+}
+
+.tw-profile-divider {
+    height: 1px;
+    background: var(--tw-border);
+    margin: var(--tw-space-1) 0;
+}
