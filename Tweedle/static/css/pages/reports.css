@@ -41,16 +41,19 @@ body > main {
 
 
 /* === FILTER CARD BUTTON GROUP ===============================
- * The "Show Report" filter group does not grow — it holds
- * the button flush to the other filter groups.
+ * The button group sits flush at the bottom of the filter row.
+ * flex-direction: row so Show Report + Clear Filters sit side-by-side.
  * ============================================================ */
 .filter-btn-group {
     flex-grow: 0 !important;
     min-width: auto !important;
     align-self: flex-end;
+    flex-direction: row !important;
+    gap: 8px !important;
+    align-items: center !important;
 }
 
-.filter-btn-group .tw-btn-primary {
+.filter-btn-group .tw-btn {
     height: 40px;
     white-space: nowrap;
 }
@@ -63,16 +66,17 @@ body > main {
 .report-summary-banner {
     background: var(--tw-primary-light);
     border-left: 5px solid var(--tw-primary);
-    padding: var(--tw-space-4);
+    padding: 10px var(--tw-space-4);
     border-radius: var(--tw-radius-md);
     margin-bottom: var(--tw-space-3);
-    font-size: var(--tw-text-md);
+    font-size: var(--tw-text-sm);
     color: var(--tw-text-primary);
     font-weight: var(--tw-weight-medium);
     line-height: 1.4;
 }
 
 .report-summary-banner strong {
+    font-size: var(--tw-text-base);
     font-weight: var(--tw-weight-bold);
     color: var(--tw-primary-text);
 }
@@ -90,7 +94,7 @@ body > main {
 
 .download-buttons {
     display: flex;
-    gap: var(--tw-space-3);
+    gap: 8px;
     flex-shrink: 0;
 }
 
@@ -127,6 +131,49 @@ body > main {
  * ============================================================ */
 .tw-tat-col {
     text-align: center !important;
+}
+
+/* Plain dash for Inbox/unallotted rows — no badge */
+.tw-tat-empty {
+    color: var(--tw-text-muted);
+}
+
+
+/* === REPORT EMPTY STATE =====================================
+ * Shown by generateReport() when no data rows exist.
+ * ============================================================ */
+#reportEmptyState {
+    display: none;
+}
+
+#reportEmptyState td {
+    text-align: center;
+    padding: 40px var(--tw-space-4);
+    color: var(--tw-text-muted);
+    cursor: default;
+}
+
+#reportEmptyState i {
+    font-size: 40px;
+    display: block;
+    margin-bottom: var(--tw-space-2);
+    opacity: 0.4;
+}
+
+#reportEmptyState p {
+    font-size: var(--tw-text-sm);
+    margin: 0;
+}
+
+
+/* === PAGE SUBTITLE ==========================================
+ * Descriptor line below the Reports h1.
+ * ============================================================ */
+.reports-subtitle {
+    font-size: var(--tw-text-md);
+    color: var(--tw-text-secondary);
+    margin-top: 4px;
+    margin-bottom: 0;
 }
 
 

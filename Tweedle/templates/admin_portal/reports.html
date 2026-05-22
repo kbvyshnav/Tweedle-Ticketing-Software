@@ -17,6 +17,7 @@
     <!-- === PAGE HEADER ======================================= -->
     <div class="page-head">
         <h1>Reports</h1>
+        <p class="reports-subtitle">View and export ticket activity across your team.</p>
     </div>
 
 
@@ -30,18 +31,18 @@
                 <div class="tw-filter-group">
                     <label for="fromDate">From Date</label>
                     <!-- Django: value="{{ request.GET.from|default:'' }}" -->
-                    <input type="date" id="fromDate" name="from" value="2025-10-13">
+                    <input type="date" class="tw-input" id="fromDate" name="from" value="2025-10-13">
                 </div>
 
                 <div class="tw-filter-group">
                     <label for="toDate">To Date</label>
                     <!-- Django: value="{{ request.GET.to|default:'' }}" -->
-                    <input type="date" id="toDate" name="to" value="2025-11-22">
+                    <input type="date" class="tw-input" id="toDate" name="to" value="2025-11-22">
                 </div>
 
                 <div class="tw-filter-group">
                     <label for="statusFilter">Status</label>
-                    <select id="statusFilter" name="status">
+                    <select class="tw-select" id="statusFilter" name="status">
                         <option value="all">All Tickets</option>
                         <option value="inprogress">In Progress</option>
                         <option value="inbox" selected>Inbox</option>
@@ -55,7 +56,7 @@
                 <div class="tw-filter-group">
                     <label for="developerFilter">Developer</label>
                     <!-- Django: {% for dev in developers %}<option value="{{ dev.id }}">{{ dev.name }}</option>{% endfor %} -->
-                    <select id="developerFilter" name="developer">
+                    <select class="tw-select" id="developerFilter" name="developer">
                         <option value="all">All Developers</option>
                         <option value="vyshnav" selected>Vyshnav (DEV)</option>
                         <option value="anurag">Anurag (QA)</option>
@@ -66,7 +67,7 @@
                 <div class="tw-filter-group">
                     <label for="clientFilter">Client</label>
                     <!-- Django: {% for client in clients %}<option>{{ client.name }}</option>{% endfor %} -->
-                    <select id="clientFilter" name="client">
+                    <select class="tw-select" id="clientFilter" name="client">
                         <option value="all">All Clients</option>
                         <option value="gmec" selected>GMEC</option>
                         <option value="bgex">BGEX</option>
@@ -75,8 +76,11 @@
 
                 <div class="tw-filter-group filter-btn-group">
                     <button type="button" class="tw-btn tw-btn-primary" onclick="generateReport()">
-                        <i class="bx bx-filter-alt" aria-hidden="true"></i>
+                        <i class="bx bx-search" aria-hidden="true"></i>
                         Show Report
+                    </button>
+                    <button type="button" class="tw-btn tw-btn-outline" onclick="clearReportFilters()">
+                        Clear Filters
                     </button>
                 </div>
 
@@ -128,10 +132,10 @@
                     <th scope="col">Subject</th>
                     <th scope="col">Priority</th>
                     <th scope="col">Status</th>
-                    <th scope="col">Client Issue Date</th>
-                    <th scope="col">Allotment Date</th>
+                    <th scope="col">Issue Date</th>
+                    <th scope="col">Assigned Date</th>
                     <th scope="col">Developer Assigned</th>
-                    <th scope="col">Closed Date</th>
+                    <th scope="col">Resolved Date</th>
                     <th scope="col" class="tw-tat-col">TAT (Days)</th>
                 </tr>
             </thead>
@@ -148,7 +152,7 @@
                     <td>N/A</td>
                     <td>Jinoy</td>
                     <td>N/A</td>
-                    <td class="tw-tat-col">—</td>
+                    <td class="tw-tat-col"><span class="tw-tat-empty">—</span></td>
                 </tr>
 
                 <!-- Row 2 (In Progress) -->
@@ -226,7 +230,15 @@
                     <td>—</td>
                     <td>—</td>
                     <td>—</td>
-                    <td class="tw-tat-col">—</td>
+                    <td class="tw-tat-col"><span class="tw-tat-empty">—</span></td>
+                </tr>
+
+                <!-- Empty state — shown by generateReport() when no rows exist -->
+                <tr id="reportEmptyState">
+                    <td colspan="10">
+                        <i class="bx bx-file" aria-hidden="true"></i>
+                        <p>Apply filters above and click Show Report to view results.</p>
+                    </td>
                 </tr>
 
             </tbody>
@@ -278,7 +290,8 @@
         const clientSel  = document.getElementById('clientFilter');
         const banner     = document.getElementById('reportSummary');
 
-        const allRows      = document.querySelectorAll('#reportsTable tbody tr');
+        /* Count data rows only — exclude the empty-state row */
+        const allRows      = document.querySelectorAll('#reportsTable tbody tr:not(#reportEmptyState)');
         const totalTickets = allRows.length || 0;
 
         const fmt = (dateStr) => dateStr
@@ -297,10 +310,30 @@
             Client: <strong>${selectedClient}</strong> &nbsp;|&nbsp;
             Total Tickets: <strong>${totalTickets}</strong>
         `;
+
+        /* Show empty state when no data rows exist */
+        const emptyState = document.getElementById('reportEmptyState');
+        if (emptyState) {
+            emptyState.style.display = totalTickets === 0 ? '' : 'none';
+        }
     }
 
     /* Call immediately — 'load' event has already fired when router injects this */
     generateReport();
+
+
+    /* ============================================================
+     * CLEAR FILTERS
+     * Resets all filter fields to default values and refreshes banner.
+     * ============================================================ */
+    function clearReportFilters() {
+        document.getElementById('fromDate').value    = '';
+        document.getElementById('toDate').value      = '';
+        document.getElementById('statusFilter').value    = 'all';
+        document.getElementById('developerFilter').value = 'all';
+        document.getElementById('clientFilter').value    = 'all';
+        generateReport();
+    }
 
 
     /* ============================================================
