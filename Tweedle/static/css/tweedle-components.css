@@ -304,6 +304,11 @@
     color: var(--tw-status-closed-text);
 }
 
+.tw-status-badge--resolved {
+    background: var(--tw-status-forwarded-bg);
+    color: var(--tw-status-forwarded-text);
+}
+
 .tw-status-badge--active {
     background: var(--tw-status-closed-bg);
     color: var(--tw-status-closed-text);
