@@ -3310,7 +3310,7 @@
             </div>`;
 
         /* Fetch timeline page and extract its content */
-        fetch('admin_portal/ticket-timeline.html')
+        fetch('admin_portal/dev/ticket-timeline.html')
             .then(function(r) { return r.text(); })
             .then(function(html) {
                 const parser = new DOMParser();
