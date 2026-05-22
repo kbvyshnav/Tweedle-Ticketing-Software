@@ -631,8 +631,10 @@
     vertical-align: middle;
 }
 
-/* First column (usually Ticket ID): flex with star icon */
-.tw-table tbody tr td:first-child {
+/* First column (usually Ticket ID): flex with star icon.
+   .tw-bulk-col is excluded so the checkbox column keeps
+   display: table-cell and vertical-align: middle works. */
+.tw-table tbody tr td:first-child:not(.tw-bulk-col) {
     display: flex;
     align-items: center;
     gap: var(--tw-space-3);

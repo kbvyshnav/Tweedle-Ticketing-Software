@@ -522,12 +522,27 @@ body > main {
 
 
 /* === TABLE CELL HELPERS ===================================== */
+
+/* Global vertical centering for all body cells */
+.tw-table tbody td {
+    vertical-align: middle;
+}
+
+/* Ticket-ID flex wrapper: star + ID badge + optional overdue badge sit inline */
+.tw-table tbody td:nth-child(2) .ticket-id-cell,
 .ticket-id-cell {
-    font-weight: var(--tw-weight-semibold);
-    font-family: 'Courier New', Courier, monospace;
-    font-size: var(--tw-text-sm);
-    color: var(--tw-text-primary);
-    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+/* Ticket-ID column — remove vertical padding so the flex content
+   centers at the same row midpoint as the checkbox column */
+.tw-table tbody td:nth-child(2) {
+    vertical-align: middle;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 .allottee-cell {
@@ -692,22 +707,28 @@ body > main {
 
 /* === BULK SELECTION ========================================= */
 
-/* Checkbox column — narrow, no padding interference */
+/* Checkbox column — no padding; vertical-align: middle is the only
+   centering mechanism (no flex — td:first-child:not(.tw-bulk-col)
+   in tweedle-components.css excludes this column from flex layout) */
 .tw-bulk-col {
-    width: 36px;
-    min-width: 36px;
-    padding-left: var(--tw-space-3) !important;
-    padding-right: 0 !important;
-    text-align: center;
+    width: 40px;
+    min-width: 40px;
     vertical-align: middle;
+    text-align: center;
+    padding: 0 !important;
+    margin: 0;
 }
 
 .tw-bulk-col input[type="checkbox"] {
+    display: block;
+    margin: 0 auto;
     width: 15px;
     height: 15px;
     cursor: pointer;
     accent-color: var(--tw-primary);
     vertical-align: middle;
+    position: static;
+    top: auto;
 }
 
 /* Bulk action bar — sticky bottom, slides up on .visible */
