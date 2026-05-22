@@ -405,7 +405,7 @@
             <tbody>
                 <!-- Django: {% for ticket in inprogress_tickets %} -->
 
-                <tr data-ticket-id="GMEC25010001" data-ticket-type="existing" data-subject="Wallet Option Agents" data-status="In Progress" data-sub-status="testing" data-allottee="Manju">
+                <tr data-ticket-id="GMEC25010001" data-ticket-type="existing" data-subject="Wallet Option Agents" data-status="In Progress" data-sub-status="testing" data-allottee="Manju" data-est-date="2026-04-10">
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">GMEC25010001</span>
@@ -436,7 +436,7 @@
                     </td>
                 </tr>
 
-                <tr data-ticket-id="GMEC25010002" data-ticket-type="existing" data-subject="Terra pay" data-status="In Progress" data-sub-status="development" data-allottee="Arun">
+                <tr data-ticket-id="GMEC25010002" data-ticket-type="existing" data-subject="Terra pay" data-status="In Progress" data-sub-status="development" data-allottee="Arun" data-est-date="2026-04-28">
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">GMEC25010002</span>
@@ -467,7 +467,7 @@
                     </td>
                 </tr>
 
-                <tr data-ticket-id="GMEC25010003" data-ticket-type="existing" data-subject="Recon issue" data-status="In Progress" data-sub-status="uat" data-allottee="Sanoop">
+                <tr data-ticket-id="GMEC25010003" data-ticket-type="existing" data-subject="Recon issue" data-status="In Progress" data-sub-status="uat" data-allottee="Sanoop" data-est-date="2026-07-15">
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">GMEC25010003</span>
@@ -492,7 +492,7 @@
                     </td>
                 </tr>
 
-                <tr data-ticket-id="GMEC25010004" data-ticket-type="existing" data-subject="Kumari API Integration" data-status="In Progress" data-sub-status="testing" data-allottee="Akhil">
+                <tr data-ticket-id="GMEC25010004" data-ticket-type="existing" data-subject="Kumari API Integration" data-status="In Progress" data-sub-status="testing" data-allottee="Akhil" data-est-date="2026-08-01">
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">GMEC25010004</span>
@@ -517,7 +517,7 @@
                     </td>
                 </tr>
 
-                <tr data-ticket-id="GMEC25010005" data-ticket-type="existing" data-subject="Missing March Data" data-status="In Progress" data-sub-status="development" data-allottee="Rithik">
+                <tr data-ticket-id="GMEC25010005" data-ticket-type="existing" data-subject="Missing March Data" data-status="In Progress" data-sub-status="development" data-allottee="Rithik" data-est-date="2026-09-10">
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">GMEC25010005</span>
@@ -542,7 +542,7 @@
                     </td>
                 </tr>
 
-                <tr data-ticket-id="GMEC25010006" data-ticket-type="existing" data-subject="Federal bank API failure" data-status="In Progress" data-sub-status="uat" data-allottee="Rithik">
+                <tr data-ticket-id="GMEC25010006" data-ticket-type="existing" data-subject="Federal bank API failure" data-status="In Progress" data-sub-status="uat" data-allottee="Rithik" data-est-date="2026-10-20">
                     <td>
                         <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                         <span class="tw-ticket-id">GMEC25010006</span>
@@ -960,6 +960,10 @@
                     <div class="tw-info-value" id="modalStage"></div>
                 </div>
             </div>
+
+            <!-- Overdue warning — JS shows/hides based on data-est-date vs today -->
+            <!-- Django: {% if ticket.is_overdue %}data-is-overdue="true"{% endif %} on the row tr -->
+            <div id="modalOverdueWarning" style="display:none;background:var(--tw-priority-high-bg);color:var(--tw-priority-high-text);border-radius:var(--tw-radius-md);padding:var(--tw-space-3) var(--tw-space-4);font-size:var(--tw-text-sm);font-weight:500;margin-bottom:var(--tw-space-4)"></div>
 
             <div class="tw-modal-section">
                 <h3 class="section-title">Description</h3>
@@ -1925,6 +1929,9 @@
             updateStatCardActiveState(target);
             updateTabHeading(target);
 
+            /* Re-check overdue status whenever In Progress tab becomes active */
+            if (target === 'progress') markOverdueRows();
+
             /* Reset table search when switching tabs */
             if (tableSearchInput) {
                 tableSearchInput.value     = '';
@@ -1935,6 +1942,34 @@
             }
         });
     });
+
+
+    /* ============================================================
+     * OVERDUE ROW MARKING
+     * Adds tw-row-overdue class and tw-overdue-badge to In Progress
+     * rows whose data-est-date is before today.
+     * Django: Ticket.is_overdue model property drives this at backend.
+     * ============================================================ */
+    function markOverdueRows() {
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        var rows = document.querySelectorAll('#tab-progress tbody tr');
+        rows.forEach(function(row) {
+            var estDateStr = row.dataset.estDate;
+            if (!estDateStr) return;
+            var estDate = new Date(estDateStr);
+            estDate.setHours(0, 0, 0, 0);
+            if (estDate < today && !row.querySelector('.tw-overdue-badge')) {
+                row.classList.add('tw-row-overdue');
+                var idCell = row.cells[0];
+                var badge  = document.createElement('span');
+                badge.className   = 'tw-overdue-badge';
+                badge.textContent = 'Overdue';
+                idCell.appendChild(badge);
+                row.dataset.isOverdue = 'true';
+            }
+        });
+    }
 
 
     /* ============================================================
@@ -2026,6 +2061,22 @@
 
         var footerBadge = document.getElementById('footerStatusBadge');
         if (footerBadge) footerBadge.textContent = status;
+
+        /* Overdue warning — look up the In Progress row by ticketId */
+        var overdueWarning = document.getElementById('modalOverdueWarning');
+        if (overdueWarning) {
+            var inProgressRow = document.querySelector('#tab-progress tbody tr[data-ticket-id="' + ticketId + '"]');
+            if (inProgressRow && inProgressRow.dataset.isOverdue === 'true') {
+                var estDate  = inProgressRow.dataset.estDate;
+                var diffDays = Math.floor((new Date() - new Date(estDate)) / (1000 * 60 * 60 * 24));
+                overdueWarning.textContent = '⚠ This ticket is overdue by ' + diffDays +
+                    ' day' + (diffDays !== 1 ? 's' : '') +
+                    '. Estimated close date was ' + estDate + '.';
+                overdueWarning.style.display = 'block';
+            } else {
+                overdueWarning.style.display = 'none';
+            }
+        }
 
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -2848,5 +2899,8 @@
             closeTimelinePanel();
         }
     });
+
+    /* Run on initial load — dashboard starts on Inbox tab but mark any overdue rows now */
+    markOverdueRows();
 </script>
 <!-- Django: {% endblock %} -->

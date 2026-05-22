@@ -661,3 +661,24 @@ body > main {
         padding: 12px 14px;
     }
 }
+
+
+/* === OVERDUE ROW SIGNALS ====================================
+ * Applied by markOverdueRows() when data-est-date < today.
+ * Django: driven by Ticket.is_overdue model property.
+ * =========================================================== */
+.tw-row-overdue {
+    border-left: 3px solid var(--tw-danger);
+}
+
+.tw-overdue-badge {
+    display: inline-block;
+    background: var(--tw-priority-high-bg);
+    color: var(--tw-priority-high-text);
+    font-size: var(--tw-text-xs);
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: var(--tw-radius-pill);
+    margin-left: var(--tw-space-2);
+    vertical-align: middle;
+}
