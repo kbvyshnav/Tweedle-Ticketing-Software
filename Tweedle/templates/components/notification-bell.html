@@ -1,227 +1,99 @@
 <!--
   File: templates/components/notification-bell.html
-  Extracted from: cAdmin/notification.html (Phase 6 restructure — full refactor)
+  Extracted from: base.html (Phase 10 cleanup)
   Django template: reusable {% include 'components/notification-bell.html' %}
-  Django view: Included in base.html; context provided via context processor
-  Django url:  N/A (component — parent template provides CSS)
-  Usage:       Django: {% include 'components/notification-bell.html' %}
+  Usage: Django: {% include 'components/notification-bell.html' %}
+  JS lives in: base.html — see "NOTIFICATION BELL TOGGLE" section
+  Context variables required:
+    - unread_notification_count → integer, count of unread notifications
+    - notifications             → queryset, recent notifications (max 10)
 -->
-
-<!--
-  STANDALONE PREVIEW NOTE:
-  When opened directly as a page, load CSS below.
-  When included via {% include %}, the parent template (base.html)
-  already loads these — the <link> tags below are ignored inside
-  a {% block %} if the parent already loaded them.
-  Django: when included, parent template provides CSS.
--->
-<!--
-<link rel="stylesheet" href="../../static/css/tweedle-tokens.css">
-<link rel="stylesheet" href="../../static/css/themes/theme-admin.css">
-<link rel="stylesheet" href="../../static/css/tweedle-base.css">
-<link rel="stylesheet" href="../../static/css/tweedle-components.css">
-<link rel="stylesheet" href="../../static/css/pages/notification.css">
--->
-
 
 <!-- === NOTIFICATION BELL COMPONENT ===========================
      Django: {% include 'components/notification-bell.html' %}
-     Context variables required:
-       - unread_count    → integer, count of unread notifications
-       - notifications   → queryset, recent notifications (max 10)
      ============================================================ -->
 <div class="tw-notif-bell-wrap" id="notifBellWrap">
-
-    <!-- Bell button -->
     <button
         class="tw-notif-bell-btn"
         id="notifBellBtn"
         aria-label="Notifications"
-        aria-haspopup="true"
         aria-expanded="false"
         aria-controls="notifPanel">
-        <!-- Django: {% if unread_count > 0 %}bxs-bell{% else %}bx-bell{% endif %} -->
+        <!-- Django: {% if unread_notification_count %}<i class="bx bxs-bell">{% else %}<i class="bx bx-bell">{% endif %} -->
         <i class="bx bxs-bell" aria-hidden="true"></i>
+        <!-- Django: {% if unread_notification_count %} -->
+        <span class="tw-notif-count-badge" id="notifCount">8</span>
+        <!-- Django: {% endif %} -->
     </button>
 
-    <!-- Unread count badge -->
-    <!-- Django: {% if unread_count > 0 %} -->
-    <span class="tw-notif-count-badge" id="notifCountBadge" aria-label="3 unread notifications">
-        <!-- Django: {{ unread_count }} -->
-        3
-    </span>
-    <!-- Django: {% endif %} -->
-
-
-    <!-- === DROPDOWN PANEL =================================== -->
-    <div class="tw-notif-panel" id="notifPanel" role="dialog" aria-label="Notifications" aria-modal="false">
-
-        <!-- Panel header -->
+    <div class="tw-notif-panel" id="notifPanel" role="dialog" aria-label="Notifications">
         <div class="tw-notif-panel-header">
             <span class="tw-notif-panel-title">Notifications</span>
-            <!-- Django: {% url 'admin:notifications_clear_all' %} -->
-            <a href="#" class="tw-link-primary" id="clearAllBtn" aria-label="Clear all notifications">Clear All</a>
+            <button
+                class="tw-btn tw-btn-outline tw-btn--sm"
+                id="markAllReadBtn"
+                aria-label="Mark all notifications as read">
+                Mark all read
+            </button>
         </div>
 
-        <!-- Notification list -->
-        <!-- Django: {% for notification in notifications %} -->
-        <div class="tw-notif-list" id="notifList" role="list">
+        <div class="tw-notif-list">
+            <!-- Django: {% for notification in notifications %} -->
 
-            <!-- Unread item (new message) -->
             <!-- Django: class="tw-notif-item {% if not notification.is_read %}unread{% endif %}" -->
-            <div class="tw-notif-item unread" role="listitem" data-id="1">
+            <div class="tw-notif-item unread">
                 <div class="tw-notif-item-body">
-                    <div class="tw-notif-type-icon tw-notif-type-icon--success" aria-hidden="true">
-                        <i class="bx bx-message-rounded-dots"></i>
+                    <div class="tw-notif-type-icon tw-notif-type-icon--info">
+                        <i class="bx bx-chat" aria-hidden="true"></i>
                     </div>
                     <div class="tw-notif-item-text">
                         <!-- Django: {{ notification.title }} -->
-                        <div class="tw-notif-item-title">New Message in Chat</div>
+                        <div class="tw-notif-item-title">New message on GMEC25010002</div>
                         <div class="tw-notif-item-msg">
-                            New message from
                             <!-- Django: {{ notification.actor.get_full_name }} -->
-                            <span class="tw-notif-user-name">Kingshuk (User)</span>
-                            in Ticket
-                            <!-- Django: {% url 'admin:ticket_detail' notification.ticket.id %} -->
-                            <span class="tw-badge tw-badge-primary">GMEC25060057</span>.
+                            <span class="tw-notif-user-name">Rithik</span> sent a message in Terra pay
                         </div>
                         <!-- Django: {{ notification.timesince }} -->
-                        <div class="tw-notif-item-time">2 minutes ago</div>
+                        <div class="tw-notif-item-time">5 minutes ago</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Read item (new message) -->
-            <div class="tw-notif-item" role="listitem" data-id="2">
+            <div class="tw-notif-item unread">
                 <div class="tw-notif-item-body">
-                    <div class="tw-notif-type-icon tw-notif-type-icon--info" aria-hidden="true">
-                        <i class="bx bx-message-rounded-dots"></i>
+                    <div class="tw-notif-type-icon tw-notif-type-icon--warning">
+                        <i class="bx bx-user-check" aria-hidden="true"></i>
                     </div>
                     <div class="tw-notif-item-text">
-                        <div class="tw-notif-item-title">New Message in Chat</div>
+                        <div class="tw-notif-item-title">Ticket assigned — GMEC25010008</div>
                         <div class="tw-notif-item-msg">
-                            New message from
-                            <span class="tw-notif-user-name">Arun (Developer)</span>
-                            in Ticket
-                            <span class="tw-badge tw-badge-primary">GMEC25060057</span>.
+                            Bank transfer UI fix assigned to <span class="tw-notif-user-name">Arun</span>
                         </div>
-                        <div class="tw-notif-item-time">1 day ago</div>
+                        <div class="tw-notif-item-time">1 hour ago</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Read item (remarks added) -->
-            <div class="tw-notif-item" role="listitem" data-id="3">
+            <div class="tw-notif-item">
                 <div class="tw-notif-item-body">
-                    <div class="tw-notif-type-icon tw-notif-type-icon--info" aria-hidden="true">
-                        <i class="bx bx-comment"></i>
+                    <div class="tw-notif-type-icon tw-notif-type-icon--success">
+                        <i class="bx bx-check-circle" aria-hidden="true"></i>
                     </div>
                     <div class="tw-notif-item-text">
-                        <div class="tw-notif-item-title">Remarks Added</div>
-                        <div class="tw-notif-item-msg">
-                            <span class="tw-notif-user-name">Manju (Tester)</span>
-                            added a remark to Ticket
-                            <span class="tw-badge tw-badge-primary">GMEC25060018</span>.
-                        </div>
-                        <div class="tw-notif-item-time">1 day ago</div>
+                        <div class="tw-notif-item-title">Ticket closed — BGEX25010098</div>
+                        <div class="tw-notif-item-msg">DB Connection Pooling ticket was closed</div>
+                        <div class="tw-notif-item-time">Yesterday</div>
                     </div>
                 </div>
             </div>
 
+            <!-- Django: {% endfor %} -->
         </div>
-        <!-- Django: {% endfor %} -->
 
-        <!-- Panel footer -->
         <div class="tw-notif-panel-footer">
-            <!-- Django: {% url 'admin:notifications' %} -->
-            <a href="#" class="tw-link-primary">View All Notifications</a>
+            <!-- Django: href="{% url 'admin_notifications' %}" -->
+            <a href="#" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
         </div>
-
     </div>
-    <!-- END DROPDOWN PANEL -->
-
 </div>
 <!-- END NOTIFICATION BELL COMPONENT -->
-
-
-<script>
-    /* ============================================================
-     * NOTIFICATION: BELL TOGGLE
-     * ============================================================ */
-    const bellBtn    = document.getElementById('notifBellBtn');
-    const notifPanel = document.getElementById('notifPanel');
-
-    function openNotifPanel() {
-        notifPanel.classList.add('open');
-        bellBtn.setAttribute('aria-expanded', 'true');
-    }
-
-    function closeNotifPanel() {
-        notifPanel.classList.remove('open');
-        bellBtn.setAttribute('aria-expanded', 'false');
-    }
-
-    bellBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        notifPanel.classList.contains('open') ? closeNotifPanel() : openNotifPanel();
-    });
-
-
-    /* ============================================================
-     * NOTIFICATION: MARK AS READ
-     * ============================================================
-     * Django: POST to {% url 'admin:notification_mark_read' notif.id %}
-     * ============================================================ */
-    document.querySelectorAll('.tw-notif-item').forEach(item => {
-        item.addEventListener('click', function () {
-            if (this.classList.contains('unread')) {
-                this.classList.remove('unread');
-                /* Django: fetch(`/admin/notifications/${this.dataset.id}/read/`, { method: 'POST' }); */
-                updateBadgeCount();
-            }
-        });
-    });
-
-    function updateBadgeCount() {
-        const unread = document.querySelectorAll('.tw-notif-item.unread').length;
-        const badge  = document.getElementById('notifCountBadge');
-        if (badge) {
-            badge.textContent = unread;
-            badge.style.display = unread > 0 ? '' : 'none';
-        }
-    }
-
-
-    /* ============================================================
-     * NOTIFICATION: CLEAR ALL
-     * ============================================================
-     * Django: POST to {% url 'admin:notifications_clear_all' %}
-     * ============================================================ */
-    const clearAllBtn = document.getElementById('clearAllBtn');
-    if (clearAllBtn) {
-        clearAllBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            document.querySelectorAll('.tw-notif-item.unread').forEach(el => {
-                el.classList.remove('unread');
-            });
-            updateBadgeCount();
-            /* Django: fetch('/admin/notifications/clear-all/', { method: 'POST' }); */
-        });
-    }
-
-
-    /* ============================================================
-     * NOTIFICATION: CLOSE ON OUTSIDE CLICK
-     * ============================================================ */
-    document.addEventListener('click', function (e) {
-        const wrap = document.getElementById('notifBellWrap');
-        if (wrap && !wrap.contains(e.target)) {
-            closeNotifPanel();
-        }
-    });
-
-    /* Close on Escape */
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeNotifPanel();
-    });
-</script>

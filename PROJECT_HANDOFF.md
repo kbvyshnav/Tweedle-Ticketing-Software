@@ -1,6 +1,6 @@
 # PROJECT HANDOFF — Tweedle Ticketing Software
 
-> **Status as of 2026-05-21** — Phase 10 complete (Admin Portal full UI). No backend wired yet.
+> **Status as of 2026-05-22** — Phase 12 complete (Admin Portal fully complete — all flows, forms, filters, interactions, and component cleanup). No backend wired yet.
 > This document is the single source of truth for any developer or AI continuing this project.
 
 ---
@@ -123,7 +123,7 @@ Tweedle-Ticketing-Software/
     │   │   │   ├── theme-user.css     — Orange role theme
     │   │   │   └── theme-subuser.css  — Amber role theme
     │   │   └── pages/
-    │   │       ├── dashboard.css      — Dashboard: stat strip, tabs, toolbar, global search
+    │   │       ├── dashboard.css      — Dashboard: stat strip, tabs, toolbar, global search, overdue, bulk bar
     │   │       ├── clients.css        — Clients table page
     │   │       ├── team.css           — Team management page
     │   │       ├── reports.css        — Reports filters and TAT badges
@@ -131,6 +131,7 @@ Tweedle-Ticketing-Software/
     │   │       ├── ticket-details.css — Ticket detail modal and action panels
     │   │       ├── ticket-timeline.css — Full timeline modal and panel styles
     │   │       ├── notification.css   — Notification bell dropdown
+    │   │       ├── settings.css       — Settings page sections and table (new in Phase 12)
     │   │       └── login.css          — Auth pages (shared by login + OTP)
     │   └── images/
     │       ├── favicon.svg
@@ -151,15 +152,16 @@ Tweedle-Ticketing-Software/
         │   ├── confirm-modal.html     — Reusable confirm/cancel dialog (partial)
         │   └── notification-bell.html — Notification bell component (partial)
         └── admin_portal/
-            ├── dashboard.html         — MAIN PAGE: stat strip + tabs + all modals
-            ├── clients.html           — Clients table + onboard modal stub
-            ├── team.html              — Team members table + add-member modal stub
+            ├── dashboard.html         — MAIN PAGE: 5 stat cards + 5 tab tables + all modals/panels
+            ├── clients.html           — Clients table + full Onboard New Client modal form
+            ├── team.html              — Team members table + full Add Developer/Tester modal form
             ├── reports.html           — Filter form + report table + download buttons
-            ├── chat.html              — Standalone dev view for chat panel
-            ├── notification.html      — Full notifications centre page
-            ├── ticket-details.html    — Standalone dev view for existing-ticket modal
-            ├── ticket-details-new.html — Standalone dev view for new-ticket assignment modal
-            └── ticket-timeline.html   — Standalone dev view for ticket timeline
+            ├── settings.html          — Settings page: Org form, Notification toggles, Branding (new in Phase 12)
+            ├── chat.html              — DEV-ONLY standalone view for chat panel
+            ├── notification.html      — Full notifications centre page (placeholder content)
+            ├── ticket-details.html    — DEV-ONLY standalone view for existing-ticket modal
+            ├── ticket-details-new.html — DEV-ONLY standalone view for new-ticket assignment modal
+            └── ticket-timeline.html   — DEV-ONLY standalone view for ticket timeline
 ```
 
 **File Classification:**
@@ -641,30 +643,43 @@ All components are in `tweedle-components.css`. Reference:
 
 ## 8. TICKET FLOW (CURRENT)
 
-### Lifecycle States
+### Lifecycle States (8 Statuses)
 
 ```
-INBOX → IN PROGRESS → FORWARDED → CLOSED
-                  ↘ (directly, bypassing In Progress)
+Submitted (client) → Inbox (admin reviews) → In Progress (dev/tester work)
+                                   ↓                       ↕ (Resume / Request Info)
+                                Rejected             Awaiting Client
+                                                          ↓
+                                                       Resolved (dev marks done)
+                                                          ↓
+                                                        Closed (admin confirms)
+
+From any pre-closed state → Cancelled (client withdraws, portal not built yet)
 ```
 
 **Status → Sub-status breakdown:**
 
 | Main Status | Sub-statuses | Who Acts |
 |------------|-------------|---------|
-| **Inbox** | New | Admin reviews and assigns to developer |
+| **Submitted** | — | Client creates ticket (portal not built yet) |
+| **Inbox** | New | Admin reviews and assigns developer (+ optional tester) |
 | **In Progress** | Development → Testing → UAT | Developer works; Tester verifies |
-| **Forwarded** | Forwarded (to client) | Waiting for client information |
-| **Closed** | Closed | Admin marks resolved |
+| **Awaiting Client** | — | Needs client info; TAT paused; Resume button moves back to In Progress |
+| **Resolved** | — | Developer marks work complete; pending admin closure |
+| **Closed** | — | Admin confirms resolution |
+| **Rejected** | — | Admin declines from Inbox (reason required); DOM row moves to Rejected table |
+| **Cancelled** | — | Client withdraws (not yet implemented in portal) |
 
 ### Who Does What at Each Stage
 
 | Stage | Actor | Action |
 |-------|-------|--------|
 | Ticket arrives in Inbox | User/Client | Submits ticket (portal not built yet) |
-| Admin reviews new ticket | Admin | Opens `newTicketModal`, selects developer, confirms assignment |
-| Developer works | Developer | Updates status to Development/Testing (portal not built) |
-| Needs client input | Admin | Opens `ticketDetailsModal` → Forward panel → selects client contact, reason |
+| Admin reviews new ticket | Admin | Opens `newTicketModal`, selects developer + optional tester, confirms |
+| Admin rejects ticket | Admin | Opens `newTicketModal` → "Reject" → `confirmRejection()` moves row to Rejected table |
+| Developer works | Developer | Updates sub-status: Development → Testing → UAT (portal not built) |
+| Needs client input | Admin | Opens `ticketDetailsModal` → Request Info panel → selects client contact |
+| Client responds | Client | Admin clicks Resume button in Awaiting Client row → `resumeTicket()` moves back to In Progress |
 | Tester verifies | Tester | Updates to UAT (portal not built) |
 | Close ticket | Admin | Opens `ticketDetailsModal` → "Close Ticket" button → confirm modal |
 | Reassign | Admin | Opens `ticketDetailsModal` → Reassign panel → new developer/tester |
@@ -673,27 +688,30 @@ INBOX → IN PROGRESS → FORWARDED → CLOSED
 
 | Modal / Panel | Trigger | Action |
 |--------------|---------|--------|
-| `#newTicketModal` | Click Inbox row (`data-ticket-type="new"`) | Assign developer; Reject ticket |
-| `#ticketDetailsModal` | Click In Progress/Forwarded/Closed row | View details; Forward; Reassign; Close |
+| `#newTicketModal` | Click Inbox row (`data-ticket-type="new"`) | Assign developer + optional tester; Reject ticket |
+| `#ticketDetailsModal` | Click In Progress / Awaiting Client / Closed row | View details; Request Info; Reassign; Close |
 | `#dashReassignPanel` | "Reassign" button in details modal header | Change developer or tester assignment |
-| `#dashForwardPanel` | "Forward" button in details modal header | Forward to client contact |
+| `#dashForwardPanel` | "Request Info" button in details modal header | Request client information |
+| Resume button (`bx-play-circle`) | Awaiting Client tab row | `resumeTicket()` moves row to In Progress, Development sub-status |
 | `#confirmModal` | Assignment / Rejection / Close / Reassign / Forward | Final confirmation before action executes |
 | `#chatPanel` | Chat icon in table row OR Chat button in modal | Per-ticket conversation |
 | `#timelinePanel` | Timeline icon in table row OR Timeline button in modal | Mini timeline view |
 | `#fullTimelineModal` | "View Full Timeline" button in mini panel | Full ticket history |
+| `#bulkActionBar` | Checking row checkboxes in any tab | Bulk close/assign/forward/export |
 
 ### Data Each Modal Shows / Collects
 
 **New Ticket Modal (Inbox):**
 - Shows: Ticket ID, Subject, Issue Date, Priority, Category, Client, Department, Description
-- Collects: Developer selection (shows workload: pending/completed/total), Comments, Email notification checkbox
+- Collects: Developer selection (shows workload: pending/completed/total), optional Tester selection (shown when "Assign tester now" toggle is checked), Comments, Email notification checkbox
 
 **Ticket Details Modal (existing):**
-- Shows: All info grid fields (Maker, Issue Date, Priority, Est. Completion, Allottee Date, Category, Client, Department), Description, Attachments
+- Shows: All info grid fields (Maker, Issue Date, Priority, Est. Completion, Allottee Date, Category, Client, Department), Stage (sub-status for In Progress), Description, Attachments
+- Shows: Overdue warning banner when ticket has passed Est. Completion date
 - Conditional: Forwarding Details section (only when `data-status="forwarded"`)
 - Conditional: Closure Details section (only when `data-status="closed"`) with Closed By, Closed On, Resolution Time, TAT Status, Resolution Summary
 - Collects (Reassign): Reassign type toggle, new assignee select, reason textarea, email checkbox
-- Collects (Forward): Client contact select, reason/message textarea, email checkbox
+- Collects (Request Info): Client contact select, reason/message textarea, email checkbox
 
 ---
 
@@ -788,31 +806,44 @@ Every `admin_portal/*.html` file needs:
 |------|---------|------|
 | `dashboard.html` | Inbox table `<tbody>` rows (×2 static rows) | `{% for ticket in inbox_tickets %}` |
 | `dashboard.html` | In Progress table rows (×6 static rows) | `{% for ticket in inprogress_tickets %}` |
-| `dashboard.html` | Forwarded/Closed table rows | `{% for ticket in forwarded_tickets/closed_tickets %}` |
+| `dashboard.html` | Awaiting Client table rows | `{% for ticket in awaiting_tickets %}` |
+| `dashboard.html` | Closed table rows | `{% for ticket in closed_tickets %}` |
+| `dashboard.html` | Rejected table rows (×2 static rows) | `{% for ticket in rejected_tickets %}` |
 | `dashboard.html` | Notification items | `{% for notification in notifications %}` |
 | `dashboard.html` | Company dropdown options | `{% for company in companies %}` |
-| `dashboard.html` | Developer select options | `{% for dev in developers %}` |
+| `dashboard.html` | Developer select options in newTicketModal | `{% for dev in developers %}` |
+| `dashboard.html` | Tester select options in newTicketModal | `{% for tester in testers %}` |
 | `dashboard.html` | Client select options | `{% for client in clients %}` |
 | `clients.html` | All `<tbody>` rows | `{% for client in clients %}` |
 | `team.html` | All `<tbody>` rows | `{% for member in team_members %}` |
 | `reports.html` | All `<tbody>` rows | `{% for report in reports %}` |
 | `reports.html` | Developer filter options | `{% for dev in developers %}` |
 | `reports.html` | Client filter options | `{% for client in clients %}` |
+| `settings.html` | Notification preference toggle rows | `{% for pref in notification_preferences %}` |
 
 ### Which JS Functions Become API Calls
 
 | Current (frontend only) | Django replacement |
 |------------------------|-------------------|
 | `confirmAssignment()` → `console.log` | `fetch('{% url "admin:assign_ticket" %}', {method:'POST', body: formData})` |
-| `confirmRejection()` → `console.log` | `fetch('{% url "admin:reject_ticket" %}', ...)` |
+| `confirmRejection()` → DOM move | `fetch('{% url "admin:reject_ticket" %}', ...)` then DOM move on success |
+| `resumeTicket()` → DOM move | `fetch('{% url "admin:resume_ticket" id %}', {method:'POST'})` then DOM move |
 | `confirmDashReassign()` → `console.log` | `fetch('{% url "admin:reassign_ticket" id %}', ...)` |
 | `confirmDashForward()` → `console.log` | `fetch('{% url "admin:forward_ticket" id %}', ...)` |
 | `openCloseTicketConfirm()` → `console.log` | `fetch('{% url "admin:close_ticket" id %}', ...)` |
+| `bulkClose()` → DOM remove | `fetch('{% url "admin:bulk_tickets" %}', {method:'POST', body: JSON.stringify({ids:[...], action:'close'})})` |
+| `bulkAssign()` → stub | `fetch('{% url "admin:bulk_tickets" %}', {method:'POST', body: JSON.stringify({ids:[...], action:'assign', developer_id:X})})` |
+| `submitOnboardForm()` → DOM prepend | `fetch('{% url "admin:onboard_client" %}', {method:'POST', body: formData})` |
+| `submitAddMemberForm()` → DOM prepend | `fetch('{% url "admin:add_member" %}', {method:'POST', body: formData})` |
+| `saveOrgSettings()` → `console.log` | `fetch('{% url "admin:settings_org" %}', {method:'POST', body: formData})` |
+| `saveNotificationSettings()` → `console.log` | `fetch('{% url "admin:settings_notifications" %}', {method:'POST', body: JSON.stringify(toggleStates)})` |
+| `saveBrandingSettings()` → `console.log` | `fetch('{% url "admin:settings_branding" %}', {method:'POST', body: formData})` multipart |
 | `openFullTimeline()` → fetches HTML file | `fetch('{% url "admin:ticket_timeline_api" id %}')` returning JSON or HTML fragment |
 | `sendMessage()` → local DOM append | `fetch('{% url "admin:send_message" %}', {method:'POST', body: formData})` |
 | `downloadReport()` → modal only | `window.location.href = "{% url 'admin:report_download' %}?format=pdf&…"` |
 | `toggleMemberStatus()` → `console.log` | `fetch('{% url "admin:toggle_member" username %}', {method:'POST'})` |
-| Stat counts in HTML | `{{ inbox_count }}` etc. from view context |
+| Profile dropdown Sign Out | `window.location.href = "{% url 'logout' %}"` |
+| Stat counts in HTML | `{{ inbox_count }}`, `{{ inprogress_count }}`, `{{ forwarded_count }}`, `{{ closed_count }}`, `{{ rejected_count }}` from view context |
 | Notification count badge | `{% if unread_count %}{{ unread_count }}{% endif %}` |
 
 ### Suggested Django App Structure
@@ -841,9 +872,15 @@ path('logout/',             LogoutView, name='account_logout'),
 # admin_portal/
 path('admin/dashboard/',    DashboardView, name='admin_dashboard'),
 path('admin/clients/',      ClientsView, name='admin_clients'),
+path('admin/clients/onboard/', OnboardClientView, name='admin_onboard_client'),
 path('admin/team/',         TeamView, name='admin_team'),
+path('admin/team/add/',     AddTeamMemberView, name='admin_add_member'),
 path('admin/reports/',      ReportsView, name='admin_reports'),
 path('admin/notifications/',NotificationsView, name='admin_notifications'),
+path('admin/settings/',     SettingsView, name='admin_settings'),
+path('admin/settings/org/', OrgSettingsView, name='admin_settings_org'),
+path('admin/settings/notifications/', NotifSettingsView, name='admin_settings_notifications'),
+path('admin/settings/branding/', BrandingSettingsView, name='admin_settings_branding'),
 
 # admin_portal/ API endpoints
 path('api/tickets/<id>/assign/',   AssignTicketView),
@@ -851,6 +888,10 @@ path('api/tickets/<id>/reject/',   RejectTicketView),
 path('api/tickets/<id>/close/',    CloseTicketView),
 path('api/tickets/<id>/reassign/', ReassignTicketView),
 path('api/tickets/<id>/forward/',  ForwardTicketView),
+path('api/tickets/<id>/resume/',   ResumeTicketView),     # Awaiting Client → In Progress
+path('api/tickets/<id>/resolve/',  ResolveTicketView),    # In Progress → Resolved
+path('api/tickets/<id>/cancel/',   CancelTicketView),     # Client cancels ticket
+path('api/tickets/bulk/',          BulkTicketActionView), # bulk close/assign/forward
 path('api/tickets/<id>/timeline/', TicketTimelineView),
 path('api/tickets/<id>/messages/', TicketMessagesView),
 path('api/reports/download/',      ReportDownloadView),
@@ -872,22 +913,43 @@ path('api/reports/download/',      ReportDownloadView),
 - [x] JS page router — fetch + inject + script re-execution, tab hash support, loader, error state
 
 ### Admin Portal — Dashboard
-- [x] Stat strip — 4 clickable cards with icon/count/label, active state synced with tabs
-- [x] Tab system — Inbox / In Progress / Forwarded / Closed with underline active indicator
-- [x] Tab status bar — dynamic heading and meta text
-- [x] Filter toolbar — Company dropdown, Date range picker with quick filters, Priority stub, table search
+- [x] Stat strip — 5 clickable cards: Inbox / In Progress / Awaiting Client / Closed / Rejected
+- [x] Rejected stat card with danger-red styling (`tw-stat-card--rejected`)
+- [x] Tab system — 5 tabs: Inbox / In Progress / Awaiting Client / Closed / Rejected with underline active indicator
+- [x] Rejected tab with 8-column table (Ticket ID, Subject, Client, Priority, Rejected By, Rejected On, Reason, Actions)
+- [x] Tab status bar — dynamic heading and meta text for all 5 tabs
+- [x] Filter toolbar — Company dropdown, Date range picker with quick filters, Priority dropdown, table search
+- [x] Priority filter dropdown with colored dots (High / Medium / Low / All); `applyPriorityFilter()` filters all 5 tabs
 - [x] Table search — live filter with SR feedback
-- [x] All 4 ticket tables with dummy data
+- [x] All 5 ticket tables with dummy data
 - [x] Star/favourite toggle per row
 - [x] Row attachment chips (PDF, DOC)
 - [x] Row action icons — Timeline, Chat, More
 - [x] Row click routing — new vs existing ticket type
+- [x] Sub-status Stage chip column in In Progress table (Development / Testing / UAT badges)
+- [x] `data-sub-status` attribute on all In Progress rows; `openTicketDetailsModal()` accepts 5th param `subStatus`
+- [x] Stage info-item shown in ticket details modal for In Progress tickets
+- [x] Awaiting Client tab (renamed from "Forwarded") with updated heading and meta text
+- [x] Resume button (`bx-play-circle`) in Awaiting Client rows; `resumeTicket()` moves row back to In Progress
+- [x] `confirmRejection()` moves row from Inbox to Rejected table via DOM manipulation, updates stat counts
+- [x] Overdue badge (`.tw-overdue-badge` red pill) on In Progress rows past `data-est-date`
+- [x] `markOverdueRows()` runs on load and on In Progress tab switch
+- [x] Overdue warning banner (`#modalOverdueWarning`) in ticket details modal
+- [x] Bulk selection checkboxes on all 5 tab tables (header select-all with indeterminate state + per-row)
+- [x] `onclick="event.stopPropagation()"` on checkbox cells prevents modal from opening
+- [x] `selectedTicketIds` Set persists selection; `updateSelectAllState()` sets indeterminate correctly
+- [x] Bulk action bar (`#bulkActionBar`) slides up from bottom with count, Close/Assign/Forward/Export buttons
+- [x] `clearBulkSelection()` resets all checkboxes and hides bulk bar
 
 ### Modals and Panels
 - [x] New Ticket Assignment modal — info grid, description, developer select with workload stats, confirm/reject
-- [x] Existing Ticket Details modal — full info grid, description, forwarding section, closure section, attachments
+- [x] Tester assignment section in `#newTicketModal` — optional, toggle-controlled ("Assign tester now" checkbox)
+- [x] `showTesterInfo()` mirrors developer workload stats for tester select
+- [x] `confirmAssignment()` validates tester if "Assign tester now" is checked
+- [x] Existing Ticket Details modal — full info grid (including Stage for In Progress), description, forwarding section, closure section, attachments
+- [x] Overdue warning banner in ticket details modal
 - [x] Reassign panel (slide-up inside modal) — developer/tester toggle, assignee select, reason
-- [x] Forward panel (slide-up inside modal) — client select, reason, notify checkbox
+- [x] Request Info panel (slide-up inside modal, `#dashForwardPanel`) — client select, reason, notify checkbox
 - [x] Confirm modal — reusable with dynamic icon/title/message/details, success/danger variants
 - [x] Close ticket confirm flow
 - [x] Chat panel — message history, attachment preview, send, file attach, email checkbox, auto-resize textarea
@@ -903,12 +965,27 @@ path('api/reports/download/',      ReportDownloadView),
 ### Clients Page
 - [x] Clients table with avatar, country tag, status badge, actions
 - [x] Live search filter
-- [x] "Onboard New Client" modal stub
+- [x] Full "Onboard New Client" modal form (3 sections: Company Details, Primary Contact, Account Setup)
+- [x] `submitOnboardForm()` validates required fields, prepends new row to clients table
+- [x] `showClientsToast()` local toast function
 
 ### Team Page
 - [x] Team members table with role badges, status toggle, view details button
 - [x] Live search filter
-- [x] "Add Developer / Tester" modal stub
+- [x] Full "Add Developer / Tester" modal form (3 sections: Personal Details, Role & Assignment, Access)
+- [x] Role toggle (Developer / Tester) using `tw-toggle-group` pattern; hidden input stores value
+- [x] `submitAddMemberForm()` validates, auto-generates initials/username, prepends new row with Pending Invite badge
+- [x] `showTeamToast()` local toast function
+
+### Settings Page (new in Phase 12)
+- [x] `settings.html` created at `Tweedle/templates/admin_portal/settings.html`
+- [x] `settings.css` created at `Tweedle/static/css/pages/settings.css`
+- [x] Section 1: Organisation form (name, industry, timezone select, default priority select)
+- [x] Section 2: Email Notifications table with 8 events × 2 role columns (Notify Admin / Notify Assignee) = 16 toggles
+- [x] Section 3: Portal Branding (logo upload with placeholder box, locked theme color, "Powered by Tweedle" toggle)
+- [x] `saveOrgSettings()`, `saveNotificationSettings()`, `saveBrandingSettings()`, `showSettingsToast()`
+- [x] Sidebar Settings nav link (`sidebar-nav--bottom`) wired with `data-page="admin_portal/settings.html"`
+- [x] `sidebar-nav--bottom` flex fix: `flex: 0 0 auto` so Settings link is always visible
 
 ### Reports Page
 - [x] Filter form — date range, status, developer, client
@@ -920,10 +997,21 @@ path('api/reports/download/',      ReportDownloadView),
 - [x] Ticket header card with stats bar (Issue Date, Priority, Close Date, Resolution Time)
 - [x] Full vertical timeline with typed event icons
 
+### Global / Base Shell
+- [x] Profile dropdown in topbar (`.tw-profile-panel`) with avatar initials, user info, menu items, Sign Out
+- [x] `toggleProfileDropdown()` with mutual exclusion (closes notification bell when opening)
+- [x] Topbar avatar replaced with `tw-avatar--admin` showing "JJ" initials
+- [x] Topbar search form has `id="topbarSearchForm"`, `id="topbarSearchInput"`, submit stub
+- [x] Notification bell and confirm modal markup: inline copies kept in original files; component files (`notification-bell.html`, `confirm-modal.html`) hold canonical markup for Django `{% include %}`
+- [x] Dev-only banner added to `chat.html`, `ticket-details.html`, `ticket-details-new.html`, `ticket-timeline.html`
+- [x] Standalone preview CSS block in `base.html` clearly marked with Django migration comment
+
 ### Design System
 - [x] Complete CSS token architecture (tweedle-tokens.css)
 - [x] 5 role themes (Admin, Developer, Tester, User, Sub-user)
 - [x] Full component library (tweedle-components.css)
+- [x] `.tw-input` class added with `width: 100%`, padding, border, focus ring (fixes all form field sizing)
+- [x] `.tw-profile-wrap`, `.tw-profile-panel`, `.tw-profile-menu-item`, `.tw-profile-divider` added to components
 - [x] Dark mode scaffold (body.dark class — not activated)
 
 ---
@@ -932,33 +1020,34 @@ path('api/reports/download/',      ReportDownloadView),
 
 ### Backend (None exists)
 - [ ] Django project scaffolding (apps, models, migrations)
-- [ ] Ticket model + TicketEvent model
-- [ ] User model with role field
+- [ ] All models: CustomUser (with role), Organisation, OrganisationContact, Ticket (8 statuses, 3 sub-statuses), TicketEvent, Notification, ChatMessage, Attachment, OrganisationSettings, NotificationPreference
 - [ ] Authentication views (login, logout, OTP)
+- [ ] Role middleware (redirects user to correct portal on login based on `request.user.role`)
 - [ ] All admin_portal Django views
 - [ ] All API endpoints for JS fetch() calls
-- [ ] File upload handling (attachments in chat and tickets)
+- [ ] File upload handling (attachments in chat, tickets, and org logo)
 - [ ] PostgreSQL setup and configuration
 - [ ] Email notification system
 
 ### Missing Portal UIs (Not Started)
-- [ ] Developer portal — assigned tickets list, status update, chat
-- [ ] Tester portal — testing queue, remarks, verification flow
-- [ ] User/Client portal — submit ticket form, ticket tracking, chat
+- [ ] Developer portal — assigned tickets list, sub-status updates (Development → Testing → UAT), chat
+- [ ] Tester portal — testing queue, remarks, pass/fail flow
+- [ ] User/Client portal — submit ticket form, ticket tracking, chat, UAT response (triggers Resume)
 - [ ] Sub-user portal — limited client-side view
 
-### Stub / Incomplete Features
-- [ ] "Onboard New Client" modal form (just a placeholder "coming soon")
-- [ ] "Add Developer / Tester" modal form (just a placeholder)
-- [ ] Priority filter dropdown in dashboard toolbar (button exists, no dropdown)
-- [ ] "More options" (⋮) button in table rows (no dropdown implemented)
-- [ ] Settings page (nav link exists, no page)
-- [ ] Full notification centre page (placeholder content only)
-- [ ] Profile dropdown (avatar exists, no dropdown menu)
-- [ ] Topbar global search form (search bar exists but is visual only — the Dashboard page has its own search with real functionality)
+### Remaining Stub Features
+- [ ] "Manage Users" action on Clients page (button exists, no modal)
+- [ ] "View Details" action on Clients page (button exists, no modal)
+- [ ] "View Details" action on Team page (button exists, no modal)
+- [ ] More options (⋮) row button dropdown on all tables
+- [ ] Full notification centre page (`notification.html` has placeholder content only)
 - [ ] Pagination for all tables
-- [ ] Real-time chat (WebSockets not considered yet)
-- [ ] Push notifications
+- [ ] Real-time chat (WebSockets via Django Channels — Phase 2)
+- [ ] Push notifications (Phase 2)
+- [ ] Google OAuth login button (hidden in `login.html`, ready for Phase 3 activation)
+- [ ] Dark mode (scaffold exists via `body.dark` class, not activated)
+- [ ] Profile page ("View Profile" menu item logs to console only)
+- [ ] Change Password page ("Change Password" menu item logs to console only)
 
 ---
 
@@ -1055,7 +1144,9 @@ python -m http.server 8080
 
 Tweedle is a multi-role B2B ticketing SaaS — **currently a pure frontend, no backend**. The entire codebase is plain HTML/CSS/JS, Django-ready but not yet connected to Django. All templates have `<!-- Django: … -->` comments showing exactly where to add template tags.
 
-**What's built:** The complete Admin Portal UI — login, OTP verify, dashboard (stat cards, 4 tab tables, all modals: new ticket assignment, existing ticket details, reassign, forward, close, confirm, chat, timeline), clients table, team management, reports with TAT, and a full CSS design system.
+**What's built:** The complete Admin Portal UI across 6 pages — login, OTP verify, dashboard (5 stat cards, 5 tab tables, all modals and panels), clients (full onboard form), team (full add-member form with role toggle), reports (TAT table, download stubs), notifications (placeholder), settings (org form, notification toggles, branding). Full CSS design system.
+
+**Ticket statuses (8 total):** Submitted → Inbox → In Progress (sub-statuses: Development / Testing / UAT) → Awaiting Client ↔ In Progress (Resume button). From In Progress → Resolved → Closed. Branch paths: Inbox → Rejected (with reason, DOM move), any pre-closed → Cancelled (not yet in UI).
 
 **Tech stack:** HTML5 + CSS3 (custom token system) + Vanilla JS + Bootstrap 5 + Boxicons + Google Fonts. Planned backend: Django + PostgreSQL + DRF. No build system, no npm.
 
@@ -1063,21 +1154,26 @@ Tweedle is a multi-role B2B ticketing SaaS — **currently a pure frontend, no b
 - 5-file CSS load order: tokens → theme → base → components → page CSS
 - Role theming via 4 CSS custom properties (`--tw-primary*`) — swap theme file, entire UI recolors
 - Admin = Blue #3C91E6 | Developer = Purple | Tester = Teal | User = Orange | Sub-user = Amber
-- base.html is the single entry point with a JS page router that fetches admin_portal partials via `fetch()` — **requires HTTP server, not file://**
+- `base.html` is the single entry point with a JS page router that fetches admin_portal partials via `fetch()` — **requires HTTP server, not file://**
 - Top-level script variables in injected partials must use `var` not `const`/`let` to avoid TDZ crashes on re-navigation
-
-**What needs to be done next:**
-1. Django project setup (apps: accounts, admin_portal, tickets, notifications)
-2. Models: CustomUser (with role), Ticket, TicketEvent, Notification, Attachment, ChatMessage
-3. Convert each template: add `{% extends %}`, `{% block content %}`, replace dummy data with `{{ }}` context vars and `{% for %}` loops
-4. Implement Django views + URL patterns for admin portal
-5. Wire up all JS `console.log` stubs to real `fetch()` POST calls
-6. Build Developer portal, Tester portal, User/Client portal (not started)
-7. Complete stub modals: Onboard Client form, Add Team Member form
+- **Critical**: Notification bell and confirm modal markup must remain **inline** in `base.html` and `dashboard.html` respectively for the standalone router. Component files (`notification-bell.html`, `confirm-modal.html`) hold canonical markup for Django `{% include %}` at deploy time only.
 
 **Key file locations:**
 - Shell: `Tweedle/templates/base.html`
-- Main page: `Tweedle/templates/admin_portal/dashboard.html` (2434 lines — all interactions here)
+- Main page: `Tweedle/templates/admin_portal/dashboard.html` (3000+ lines — all interactions here)
+- Settings page: `Tweedle/templates/admin_portal/settings.html` (new in Phase 12)
 - Design tokens: `Tweedle/static/css/tweedle-tokens.css`
-- All components: `Tweedle/static/css/tweedle-components.css`
+- All components: `Tweedle/static/css/tweedle-components.css` (`.tw-input` width:100% fix included)
 - Run: `python -m http.server 8080` from project root, open `Tweedle/templates/login.html`
+
+**Django build order (recommended):**
+1. `accounts` app — CustomUser model (with `role` field), login, OTP, role middleware (redirects to correct portal)
+2. `organisations` app — Organisation, OrganisationContact, OrganisationSettings models
+3. `tickets` app — Ticket (8 statuses, 3 sub-statuses), TicketEvent models
+4. `admin_portal` app — wire all 6 existing templates to Django views, replace dummy data with context vars and `{% for %}` loops, wire all `console.log` stubs to real `fetch()` calls
+5. `notifications` app — Notification model, real-time count badge
+6. `client_portal` app — submit ticket, track, UAT response, chat
+7. `developer_portal` app — assigned ticket queue, sub-status updates, chat
+8. `tester_portal` app — testing queue, pass/fail flow
+9. WebSockets via Django Channels (Phase 2 — real-time chat and notifications)
+10. Google OAuth (Phase 3 — button already hidden in `login.html`)

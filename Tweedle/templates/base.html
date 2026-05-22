@@ -85,9 +85,9 @@
     <!-- Django: <link rel="stylesheet" href="{% static 'css/pages/notification.css' %}"> -->
     <link rel="stylesheet" href="../static/css/pages/notification.css">
 
-    <!-- 6. All page-specific CSS (preloaded for standalone preview router) -->
-    <!-- Django: {% block page_css %}{% endblock %} — in production only active
-         page CSS loads via the block; the lines below are removed. -->
+    <!-- Django: {% block page_css %}{% endblock %} — each page loads only its own CSS here -->
+
+    <!-- STANDALONE PREVIEW ONLY: remove all lines below at Django deploy -->
     <link rel="stylesheet" href="../static/css/pages/dashboard.css">
     <link rel="stylesheet" href="../static/css/pages/clients.css">
     <link rel="stylesheet" href="../static/css/pages/team.css">
@@ -96,7 +96,7 @@
     <link rel="stylesheet" href="../static/css/pages/ticket-details.css">
     <link rel="stylesheet" href="../static/css/pages/ticket-timeline.css">
     <link rel="stylesheet" href="../static/css/pages/settings.css">
-    <!-- Django: move to {% block page_css %} in settings.html -->
+    <!-- END STANDALONE PREVIEW ONLY -->
 </head>
 
 <!--
@@ -208,12 +208,13 @@
         <i class="bx bx-menu" id="hamburger-btn" role="button" aria-label="Toggle sidebar"></i>
 
         <!-- Global ticket search -->
-        <!-- Django: <form action="{% url 'admin_search' %}" method="get"> -->
-        <form action="#" class="topbar-search-form">
+        <!-- Django: action="{% url 'admin:global_search' %}" method="GET" -->
+        <form action="#" class="topbar-search-form" id="topbarSearchForm">
             <div class="topbar-search">
                 <input
                     type="search"
                     name="q"
+                    id="topbarSearchInput"
                     placeholder="Search tickets..."
                     aria-label="Search tickets">
                 <button type="submit" aria-label="Submit search">
@@ -222,8 +223,7 @@
             </div>
         </form>
 
-        <!-- COMPONENT: notification_bell -->
-        <!-- Django: {% include 'components/notification_bell.html' %} -->
+        <!-- Django: replace this block with {% include 'components/notification-bell.html' %} -->
         <div class="tw-notif-bell-wrap" id="notifBellWrap">
             <button
                 class="tw-notif-bell-btn"
@@ -303,7 +303,7 @@
                 </div>
             </div>
         </div>
-        <!-- END COMPONENT: notification_bell -->
+        <!-- END NOTIFICATION BELL -->
 
         <!-- COMPONENT: profile_dropdown -->
         <!-- Django: {% include 'components/profile_dropdown.html' %} -->
@@ -593,6 +593,15 @@
     loadPage('admin_portal/dashboard.html');
 
     /* === END PAGE ROUTER === */
+
+
+    /* === TOPBAR SEARCH (standalone stub) === */
+    document.getElementById('topbarSearchForm') && document.getElementById('topbarSearchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var q = document.getElementById('topbarSearchInput').value.trim();
+        if (q) console.log('[Topbar search stub] Query:', q);
+        // Django: fetch('{% url "admin:global_search" %}?q=' + encodeURIComponent(q)).then(...)
+    });
 </script>
 
 </body>
