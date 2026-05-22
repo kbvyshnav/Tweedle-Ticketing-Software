@@ -1,0 +1,369 @@
+<!--
+  File: templates/admin_portal/settings.html
+  Phase 10: Settings page (new)
+  Django template: extends 'base.html'
+  Django view: admin_portal.views.settings
+  Django url:  admin:settings
+-->
+<!-- Django: {% extends 'base.html' %} -->
+
+<!-- Django: {% block page_css %}
+<link rel="stylesheet" href="{% static 'css/pages/settings.css' %}">
+{% endblock %} -->
+
+<!-- Django: {% block content %} -->
+
+    <!-- === PAGE HEADER ======================================= -->
+    <div class="tw-page-header">
+        <h1 class="tw-page-title">Settings</h1>
+    </div>
+
+
+    <div class="tw-settings-page">
+
+
+        <!-- ====================================================
+             SECTION 1: ORGANISATION
+             Django: OrganisationSettings model — org_name,
+             industry, timezone, default_priority fields
+             ==================================================== -->
+        <div class="tw-settings-section">
+            <div class="tw-table-card">
+
+                <div class="tw-settings-section-title">Organisation</div>
+                <div class="tw-settings-section-desc">Basic details about your organisation shown across the platform.</div>
+
+                <!-- Django: form action="{% url 'admin:settings_org' %}" method="POST" {% csrf_token %} -->
+                <form id="orgSettingsForm" novalidate>
+
+                    <!-- Row 1: Name + Industry -->
+                    <div class="tw-form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--tw-space-4);align-items:start">
+                        <div class="tw-form-group" style="width:100%">
+                            <label class="tw-form-label" for="orgName">Organisation Name</label>
+                            <input class="tw-input" id="orgName" type="text" value="Tweedle Demo Org" autocomplete="organization">
+                        </div>
+                        <div class="tw-form-group" style="width:100%">
+                            <label class="tw-form-label" for="orgIndustry">Industry</label>
+                            <input class="tw-input" id="orgIndustry" type="text" value="Software / SaaS">
+                        </div>
+                    </div>
+
+                    <!-- Timezone -->
+                    <div class="tw-form-group">
+                        <label class="tw-form-label" for="orgTimezone">Timezone</label>
+                        <!-- Django: value="{{ org_settings.timezone }}" -->
+                        <select class="tw-select" id="orgTimezone">
+                            <option value="UTC">UTC</option>
+                            <option value="Asia/Kolkata" selected>Asia/Kolkata (IST)</option>
+                            <option value="America/New_York">America/New_York (EST)</option>
+                            <option value="America/Los_Angeles">America/Los_Angeles (PST)</option>
+                            <option value="Asia/Dubai">Asia/Dubai (GST)</option>
+                            <option value="Asia/Singapore">Asia/Singapore (SGT)</option>
+                        </select>
+                    </div>
+
+                    <!-- Default Ticket Priority -->
+                    <div class="tw-form-group">
+                        <label class="tw-form-label" for="orgDefaultPriority">Default Ticket Priority</label>
+                        <!-- Django: value="{{ org_settings.default_priority }}" -->
+                        <select class="tw-select" id="orgDefaultPriority">
+                            <option value="high">High</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+
+                    <div class="tw-settings-save-row">
+                        <button type="button" class="tw-btn tw-btn-primary" onclick="saveOrgSettings()">Save Organisation Settings</button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+        <!-- END SECTION: ORGANISATION -->
+
+
+        <!-- ====================================================
+             SECTION 2: EMAIL NOTIFICATIONS
+             Django: NotificationPreference model — per-event,
+             per-audience (admin / assignee) toggle states
+             ==================================================== -->
+        <div class="tw-settings-section">
+            <div class="tw-table-card">
+
+                <div class="tw-settings-section-title">Email Notifications</div>
+                <div class="tw-settings-section-desc">Control which events trigger email notifications to your team members.</div>
+
+                <table class="tw-settings-table">
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th style="text-align:center;width:120px">Notify Admin</th>
+                            <th style="text-align:center;width:120px">Notify Assignee</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Django: {% for pref in notification_prefs %} -->
+
+                        <tr>
+                            <td>New ticket received</td>
+                            <td style="text-align:center">
+                                <label class="tw-status-toggle">
+                                    <input type="checkbox" id="notifNewTicket_admin" checked aria-label="Notify admin — new ticket received">
+                                    <span class="toggle-label">Enabled</span>
+                                </label>
+                            </td>
+                            <td style="text-align:center">
+                                <label class="tw-status-toggle">
+                                    <input type="checkbox" id="notifNewTicket_assignee" checked aria-label="Notify assignee — new ticket received">
+                                    <span class="toggle-label">Enabled</span>
+                                </label>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Ticket assigned to developer / tester</td>
+                            <td style="text-align:center">
+                                <label class="tw-status-toggle">
+                                    <input type="checkbox" id="notifAssigned_admin" checked aria-label="Notify admin — ticket assigned">
+                                    <span class="toggle-label">Enabled</span>
+                                </label>
+                            </td>
+                            <td style="text-align:center">
+                                <label class="tw-status-toggle">
+                                    <input type="checkbox" id="notifAssigned_assignee" checked aria-label="Notify assignee — ticket assigned">
+                                    <span class="toggle-label">Enabled</span>
+                                </label>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Ticket reassigned</td>
+                            <td style="text-align:center">
+                                <label class="tw-status-toggle">
+                                    <input type="checkbox" id="notifReassigned_admin" checked aria-label="Notify admin — ticket reassigned">
+                                    <span class="toggle-label">Enabled</span>
+                                </label>
+                            </td>
+                            <td style="text-align:center">
+                                <label class="tw-status-toggle">
+                                    <input type="checkbox" id="notifReassigned_assignee" checked aria-label="Notify assignee — ticket reassigned">
+                                    <span class="toggle-label">Enabled</span>
+                                </label>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Developer marks ticket ready for testing</td>
+                            <td style="text-align:center">
+                                <label class="tw-status-toggle">
+                                    <input type="checkbox" id="notifReadyForTest_admin" checked aria-label="Notify admin — ready for testing">
+                                    <span class="toggle-label">Enabled</span>
+                                </label>
+                            </td>
+                            <td style="text-align:center">
+                                <label class="tw-status-toggle">
+                                    <input type="checkbox" id="notifReadyForTest_assignee" checked aria-label="Notify assignee — ready for testing">
+                                    <span class="toggle-label">Enabled</span>
+                                </label>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Tester passes or fails a ticket</td>
+                            <td style="text-align:center">
+                                <label class="tw-status-toggle">
+                                    <input type="checkbox" id="notifTesterVerdict_admin" checked aria-label="Notify admin — tester verdict">
+                                    <span class="toggle-label">Enabled</span>
+                                </label>
+                            </td>
+                            <td style="text-align:center">
+                                <label class="tw-status-toggle">
+                                    <input type="checkbox" id="notifTesterVerdict_assignee" checked aria-label="Notify assignee — tester verdict">
+                                    <span class="toggle-label">Enabled</span>
+                                </label>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Client responds to awaiting-client request</td>
+                            <td style="text-align:center">
+                                <label class="tw-status-toggle">
+                                    <input type="checkbox" id="notifClientResponse_admin" checked aria-label="Notify admin — client response">
+                                    <span class="toggle-label">Enabled</span>
+                                </label>
+                            </td>
+                            <td style="text-align:center">
+                                <label class="tw-status-toggle">
+                                    <input type="checkbox" id="notifClientResponse_assignee" checked aria-label="Notify assignee — client response">
+                                    <span class="toggle-label">Enabled</span>
+                                </label>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Ticket closed</td>
+                            <td style="text-align:center">
+                                <label class="tw-status-toggle">
+                                    <input type="checkbox" id="notifClosed_admin" checked aria-label="Notify admin — ticket closed">
+                                    <span class="toggle-label">Enabled</span>
+                                </label>
+                            </td>
+                            <td style="text-align:center">
+                                <label class="tw-status-toggle">
+                                    <input type="checkbox" id="notifClosed_assignee" checked aria-label="Notify assignee — ticket closed">
+                                    <span class="toggle-label">Enabled</span>
+                                </label>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Ticket overdue (24-hour warning)</td>
+                            <td style="text-align:center">
+                                <label class="tw-status-toggle">
+                                    <input type="checkbox" id="notifOverdue_admin" checked aria-label="Notify admin — ticket overdue">
+                                    <span class="toggle-label">Enabled</span>
+                                </label>
+                            </td>
+                            <td style="text-align:center">
+                                <label class="tw-status-toggle">
+                                    <input type="checkbox" id="notifOverdue_assignee" checked aria-label="Notify assignee — ticket overdue">
+                                    <span class="toggle-label">Enabled</span>
+                                </label>
+                            </td>
+                        </tr>
+
+                        <!-- Django: {% endfor %} -->
+                    </tbody>
+                </table>
+
+                <div class="tw-settings-save-row">
+                    <button type="button" class="tw-btn tw-btn-primary" onclick="saveNotificationSettings()">Save Notification Settings</button>
+                </div>
+
+            </div>
+        </div>
+        <!-- END SECTION: EMAIL NOTIFICATIONS -->
+
+
+        <!-- ====================================================
+             SECTION 3: PORTAL BRANDING
+             Django: OrganisationSettings — logo, powered_by_tweedle
+             ==================================================== -->
+        <div class="tw-settings-section">
+            <div class="tw-table-card">
+
+                <div class="tw-settings-section-title">Portal Branding</div>
+                <div class="tw-settings-section-desc">Customise how Tweedle appears to your clients and team.</div>
+
+                <!-- Logo upload -->
+                <div class="tw-form-group">
+                    <label class="tw-form-label">Organisation Logo</label>
+                    <div style="display:flex;align-items:center;gap:var(--tw-space-4);margin-top:var(--tw-space-2)">
+                        <div style="width:80px;height:80px;border:2px dashed var(--tw-border);border-radius:var(--tw-radius-md);display:flex;align-items:center;justify-content:center;color:var(--tw-text-muted);flex-shrink:0">
+                            <i class="bx bx-image" style="font-size:28px"></i>
+                        </div>
+                        <div>
+                            <!-- Django: enctype="multipart/form-data" on form -->
+                            <input type="file" id="orgLogo" accept="image/*" class="tw-input" style="margin-bottom:var(--tw-space-2)">
+                            <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted)">PNG or SVG recommended. Max 2MB.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Theme color (locked) -->
+                <div class="tw-form-group">
+                    <label class="tw-form-label">Theme Color</label>
+                    <div class="tw-input" style="background:var(--tw-bg-body);cursor:default;color:var(--tw-text-muted)">Managed by your Tweedle plan — contact support to change role theme colors.</div>
+                </div>
+
+                <!-- Powered by Tweedle toggle -->
+                <div class="tw-form-group">
+                    <label class="tw-form-label" style="display:block;margin-bottom:var(--tw-space-2)">Branding Footer</label>
+                    <label class="tw-status-toggle">
+                        <input type="checkbox" id="poweredByTweedle" checked aria-label="Show 'Powered by Tweedle' in the client portal">
+                        <span class="toggle-label">Enabled</span>
+                    </label>
+                    <p style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin:6px 0 0 0">Show "Powered by Tweedle" in the client portal.</p>
+                </div>
+
+                <div class="tw-settings-save-row">
+                    <button type="button" class="tw-btn tw-btn-primary" onclick="saveBrandingSettings()">Save Branding Settings</button>
+                </div>
+
+            </div>
+        </div>
+        <!-- END SECTION: PORTAL BRANDING -->
+
+
+    </div>
+    <!-- END SETTINGS PAGE -->
+
+<!-- Django: {% endblock %} -->
+
+
+<!-- Django: {% block page_js %} -->
+<script>
+    /* ============================================================
+     * SAVE ORG SETTINGS
+     * Django: POST to /admin-portal/settings/org/
+     *   OrganisationSettings model — org_name, industry, timezone,
+     *   default_priority fields
+     * ============================================================ */
+    function saveOrgSettings() {
+        var name     = document.getElementById('orgName').value.trim();
+        var industry = document.getElementById('orgIndustry').value.trim();
+        var timezone = document.getElementById('orgTimezone').value;
+        var priority = document.getElementById('orgDefaultPriority').value;
+
+        if (!name) {
+            alert('Organisation name is required.');
+            document.getElementById('orgName').focus();
+            return;
+        }
+
+        console.log('Save org settings:', { name: name, industry: industry, timezone: timezone, default_priority: priority });
+        /* Django: POST to /admin-portal/settings/org/ with { name, industry, timezone, default_priority } */
+        showSettingsToast('Organisation settings saved.');
+    }
+
+
+    /* ============================================================
+     * SAVE NOTIFICATION SETTINGS
+     * Django: POST to /admin-portal/settings/notifications/
+     *   NotificationPreference model — per-event, per-audience states
+     * ============================================================ */
+    function saveNotificationSettings() {
+        console.log('Save notification settings');
+        /* Django: POST to /admin-portal/settings/notifications/ with toggle states as JSON */
+        showSettingsToast('Notification preferences saved.');
+    }
+
+
+    /* ============================================================
+     * SAVE BRANDING SETTINGS
+     * Django: POST to /admin-portal/settings/branding/
+     *   Multipart — logo file + powered_by_tweedle boolean
+     * ============================================================ */
+    function saveBrandingSettings() {
+        console.log('Save branding settings');
+        /* Django: POST to /admin-portal/settings/branding/ with form data (multipart for logo) */
+        showSettingsToast('Branding settings saved.');
+    }
+
+
+    /* ============================================================
+     * SETTINGS PAGE TOAST
+     * Local copy — showDashToast is scoped to dashboard.html only
+     * ============================================================ */
+    function showSettingsToast(message) {
+        var toast = document.createElement('div');
+        toast.className = 'tw-toast tw-toast--success show';
+        toast.innerHTML = '<i class="bx bx-check-circle"></i> ' + message;
+        toast.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:500;display:flex;align-items:center;gap:8px;background:var(--tw-success);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,0.15)';
+        document.body.appendChild(toast);
+        setTimeout(function() { toast.remove(); }, 3000);
+    }
+</script>
+<!-- Django: {% endblock %} -->

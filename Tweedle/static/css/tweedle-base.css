@@ -250,7 +250,7 @@ p {
 }
 
 .sidebar-nav--bottom {
-    flex: 0;
+    flex: 0 0 auto;
     padding: 8px 10px 16px;
     border-top: 1px solid var(--tw-border);
     list-style: none;

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Test-Path \"C:/Users/USER/OneDrive/Desktop/Vysh Codes/Tweedle-Ticketing-Software/Tweedle/templates/admin_portal/settings.html\")",
+      "Bash(Test-Path \"C:/Users/USER/OneDrive/Desktop/Vysh Codes/Tweedle-Ticketing-Software/Tweedle/static/css/pages/settings.css\")"
+    ]
+  }
+}
