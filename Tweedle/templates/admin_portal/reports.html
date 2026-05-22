@@ -45,8 +45,10 @@
                         <option value="all">All Tickets</option>
                         <option value="inprogress">In Progress</option>
                         <option value="inbox" selected>Inbox</option>
-                        <option value="forwarded">Forwarded</option>
+                        <option value="forwarded">Awaiting Client</option>
+                        <option value="resolved">Resolved</option>
                         <option value="closed">Closed Tickets</option>
+                        <option value="rejected">Rejected</option>
                     </select>
                 </div>
 
@@ -124,6 +126,7 @@
                     <th scope="col">Ticket ID</th>
                     <th scope="col">Client</th>
                     <th scope="col">Subject</th>
+                    <th scope="col">Priority</th>
                     <th scope="col">Status</th>
                     <th scope="col">Client Issue Date</th>
                     <th scope="col">Allotment Date</th>
@@ -139,14 +142,13 @@
                     <td>TWD-1005</td>
                     <td>GMEC</td>
                     <td>Failed transactions due to API timeout</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
                     <td><span class="tw-badge tw-status-tag tw-status-inbox">INBOX</span></td>
                     <td>2025-11-17</td>
                     <td>N/A</td>
                     <td>Jinoy</td>
                     <td>N/A</td>
-                    <td class="tw-tat-col">
-                        <span class="tw-tat-badge tw-tat-badge--pending">PENDING</span>
-                    </td>
+                    <td class="tw-tat-col">—</td>
                 </tr>
 
                 <!-- Row 2 (In Progress) -->
@@ -154,6 +156,7 @@
                     <td>TWD-1004</td>
                     <td>BGEX</td>
                     <td>Incorrect exchange rate calculation</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
                     <td><span class="tw-badge tw-status-tag tw-status-progress">IN PROGRESS</span></td>
                     <td>2025-11-08</td>
                     <td>2025-11-08</td>
@@ -169,6 +172,7 @@
                     <td>TWD-1003</td>
                     <td>GMEC</td>
                     <td>Authentication failure for new users</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
                     <td><span class="tw-badge tw-status-tag tw-status-forwarded">FORWARDED</span></td>
                     <td>2025-11-01</td>
                     <td>2025-11-01</td>
@@ -184,6 +188,7 @@
                     <td>TWD-1002</td>
                     <td>BGEX</td>
                     <td>UI bug on mobile login screen</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--low">Low</span></td>
                     <td><span class="tw-badge tw-status-tag tw-status-closed">CLOSED</span></td>
                     <td>2025-10-25</td>
                     <td>2025-10-25</td>
@@ -199,6 +204,7 @@
                     <td>TWD-1001</td>
                     <td>GMEC</td>
                     <td>Server latency investigation</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
                     <td><span class="tw-badge tw-status-tag tw-status-closed">CLOSED</span></td>
                     <td>2025-10-15</td>
                     <td>2025-10-16</td>
@@ -214,14 +220,13 @@
                     <td>TWD-1006</td>
                     <td>GMEC</td>
                     <td>Federal bank API failure</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
                     <td><span class="tw-badge tw-status-tag tw-status-inbox">INBOX</span></td>
                     <td>2025-12-10</td>
-                    <td>2025-12-10</td>
                     <td>—</td>
                     <td>—</td>
-                    <td class="tw-tat-col">
-                        <span class="tw-tat-badge tw-tat-badge--missed">1 / 5</span>
-                    </td>
+                    <td>—</td>
+                    <td class="tw-tat-col">—</td>
                 </tr>
 
             </tbody>
@@ -273,7 +278,8 @@
         const clientSel  = document.getElementById('clientFilter');
         const banner     = document.getElementById('reportSummary');
 
-        const totalTickets = 5;
+        const allRows      = document.querySelectorAll('#reportsTable tbody tr');
+        const totalTickets = allRows.length || 0;
 
         const fmt = (dateStr) => dateStr
             ? new Date(dateStr).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -334,8 +340,8 @@
      * ============================================================ */
     function downloadReport(format) {
         showModal(
-            `Initiating download for the report in ${format.toUpperCase()} format. Please wait.`,
-            'Request Acknowledged'
+            'PDF and Excel export will be available once the backend is connected. This feature is coming in a future update.',
+            'Export Not Yet Available'
         );
     }
 </script>

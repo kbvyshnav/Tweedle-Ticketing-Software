@@ -119,7 +119,7 @@
                                 <i class="bx bx-user" aria-hidden="true"></i> Manage Users
                             </button>
                             <div class="client-more-wrap">
-                                <button class="tw-btn-icon" onclick="toggleClientMoreMenu(this)" aria-label="More options for GMEC">
+                                <button class="tw-btn-icon" onclick="toggleClientMoreMenu(event, this)" aria-label="More options for GMEC">
                                     <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
                                 </button>
                                 <div class="client-more-menu" style="display:none">
@@ -162,7 +162,7 @@
                                 <i class="bx bx-user" aria-hidden="true"></i> Manage Users
                             </button>
                             <div class="client-more-wrap">
-                                <button class="tw-btn-icon" onclick="toggleClientMoreMenu(this)" aria-label="More options for BGEX">
+                                <button class="tw-btn-icon" onclick="toggleClientMoreMenu(event, this)" aria-label="More options for BGEX">
                                     <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
                                 </button>
                                 <div class="client-more-menu" style="display:none">
@@ -205,7 +205,7 @@
                                 <i class="bx bx-user" aria-hidden="true"></i> Manage Users
                             </button>
                             <div class="client-more-wrap">
-                                <button class="tw-btn-icon" onclick="toggleClientMoreMenu(this)" aria-label="More options for TCS">
+                                <button class="tw-btn-icon" onclick="toggleClientMoreMenu(event, this)" aria-label="More options for TCS">
                                     <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
                                 </button>
                                 <div class="client-more-menu" style="display:none">
@@ -540,7 +540,7 @@
                         '<i class="bx bx-user" aria-hidden="true"></i> Manage Users' +
                     '</button>' +
                     '<div class="client-more-wrap">' +
-                        '<button class="tw-btn-icon" onclick="toggleClientMoreMenu(this)" aria-label="More options">' +
+                        '<button class="tw-btn-icon" onclick="toggleClientMoreMenu(event,this)" aria-label="More options">' +
                             '<i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>' +
                         '</button>' +
                         '<div class="client-more-menu" style="display:none">' +
@@ -637,13 +637,18 @@
     /* ============================================================
      * FIX 3: ⋮ DROPDOWN TOGGLE
      * ============================================================ */
-    function toggleClientMoreMenu(btn) {
+    function toggleClientMoreMenu(e, btn) {
+        e.stopPropagation();
         var wrap = btn.closest('.client-more-wrap');
         var menu = wrap ? wrap.querySelector('.client-more-menu') : null;
         if (!menu) return;
         var isOpen = menu.style.display === 'block';
         closeClientMoreMenus();
-        if (!isOpen) menu.style.display = 'block';
+        if (!isOpen) {
+            menu.style.display = 'block';
+        } else {
+            menu.style.display = 'none';
+        }
     }
 
     function closeClientMoreMenus() {
