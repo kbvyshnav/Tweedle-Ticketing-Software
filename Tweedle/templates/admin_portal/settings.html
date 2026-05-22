@@ -41,6 +41,7 @@
                         <div class="tw-form-group" style="width:100%">
                             <label class="tw-form-label" for="orgName">Organisation Name</label>
                             <input class="tw-input" id="orgName" type="text" value="Tweedle Demo Org" autocomplete="organization">
+                            <span id="orgNameError" class="tw-field-error" style="display:none;color:var(--tw-danger);font-size:var(--tw-text-xs);margin-top:4px">Organisation name is required.</span>
                         </div>
                         <div class="tw-form-group" style="width:100%">
                             <label class="tw-form-label" for="orgIndustry">Industry</label>
@@ -261,7 +262,7 @@
                 <div class="tw-form-group">
                     <label class="tw-form-label">Organisation Logo</label>
                     <div style="display:flex;align-items:center;gap:var(--tw-space-4);margin-top:var(--tw-space-2)">
-                        <div style="width:80px;height:80px;border:2px dashed var(--tw-border);border-radius:var(--tw-radius-md);display:flex;align-items:center;justify-content:center;color:var(--tw-text-muted);flex-shrink:0">
+                        <div id="logoPreviewBox" style="width:80px;height:80px;border:2px dashed var(--tw-border);border-radius:var(--tw-radius-md);display:flex;align-items:center;justify-content:center;color:var(--tw-text-muted);flex-shrink:0">
                             <i class="bx bx-image" style="font-size:28px"></i>
                         </div>
                         <div>
@@ -318,14 +319,17 @@
         var priority = document.getElementById('orgDefaultPriority').value;
 
         if (!name) {
-            alert('Organisation name is required.');
-            document.getElementById('orgName').focus();
+            var nameInput = document.getElementById('orgName');
+            var errSpan   = document.getElementById('orgNameError');
+            if (nameInput) nameInput.classList.add('tw-input--error');
+            if (errSpan)   errSpan.style.display = '';
+            if (nameInput) nameInput.focus();
             return;
         }
 
         console.log('Save org settings:', { name: name, industry: industry, timezone: timezone, default_priority: priority });
         /* Django: POST to /admin-portal/settings/org/ with { name, industry, timezone, default_priority } */
-        showSettingsToast('Organisation settings saved.');
+        showSettingsToast('Organisation settings saved (demo — not saved).');
     }
 
 
@@ -337,7 +341,7 @@
     function saveNotificationSettings() {
         console.log('Save notification settings');
         /* Django: POST to /admin-portal/settings/notifications/ with toggle states as JSON */
-        showSettingsToast('Notification preferences saved.');
+        showSettingsToast('Notification preferences saved (demo — not saved).');
     }
 
 
@@ -349,8 +353,43 @@
     function saveBrandingSettings() {
         console.log('Save branding settings');
         /* Django: POST to /admin-portal/settings/branding/ with form data (multipart for logo) */
-        showSettingsToast('Branding settings saved.');
+        showSettingsToast('Branding settings saved (demo — not saved).');
     }
+
+
+    /* ============================================================
+     * ORG NAME — clear inline error on input
+     * ============================================================ */
+    document.getElementById('orgName').addEventListener('input', function() {
+        this.classList.remove('tw-input--error');
+        var errSpan = document.getElementById('orgNameError');
+        if (errSpan) errSpan.style.display = 'none';
+    });
+
+
+    /* ============================================================
+     * LOGO FILE INPUT — live image preview
+     * ============================================================ */
+    document.getElementById('orgLogo').addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        if (!file || !file.type.startsWith('image/')) return;
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+            var preview = document.getElementById('logoPreviewBox');
+            if (!preview) return;
+            if (preview.tagName === 'IMG') {
+                preview.src = ev.target.result;
+            } else {
+                preview.style.backgroundImage = 'url(' + ev.target.result + ')';
+                preview.style.backgroundSize = 'cover';
+                preview.style.backgroundPosition = 'center';
+                preview.style.border = 'none';
+                var icon = preview.querySelector('i, .bx');
+                if (icon) icon.style.display = 'none';
+            }
+        };
+        reader.readAsDataURL(file);
+    });
 
 
     /* ============================================================

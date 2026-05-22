@@ -767,3 +767,34 @@ body > main {
     background: transparent;
     border-color: rgba(255, 255, 255, 0.2);
 }
+
+
+/* === PRIORITY FILTER DROPDOWN ============================== */
+#priorityDropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    background: var(--tw-bg-surface);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-md);
+    box-shadow: var(--tw-shadow-md);
+    min-width: 140px;
+    z-index: 200;
+    padding: 4px 0;
+}
+
+.tw-priority-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-primary);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.tw-priority-option:hover {
+    background: var(--tw-primary-light);
+}

@@ -300,11 +300,11 @@
                         <i class="bx bx-flag"></i><span id="priorityBtnText"> Priority</span>
                         <span class="tw-dropdown-arrow" aria-hidden="true"></span>
                     </button>
-                    <div id="priorityDropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--tw-bg-surface);border:1px solid var(--tw-border);border-radius:var(--tw-radius-md);box-shadow:var(--tw-shadow-md);min-width:180px;z-index:100;padding:var(--tw-space-2) 0;">
-                        <div class="tw-priority-option" data-value="" style="padding:var(--tw-space-2) var(--tw-space-4);cursor:pointer;font-size:var(--tw-text-base);color:var(--tw-text-primary);display:flex;align-items:center;transition:background 0.1s">All Priorities</div>
-                        <div class="tw-priority-option" data-value="high" style="padding:var(--tw-space-2) var(--tw-space-4);cursor:pointer;font-size:var(--tw-text-base);color:var(--tw-text-primary);display:flex;align-items:center;transition:background 0.1s"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--tw-priority-high-text);margin-right:6px;flex-shrink:0"></span>High</div>
-                        <div class="tw-priority-option" data-value="medium" style="padding:var(--tw-space-2) var(--tw-space-4);cursor:pointer;font-size:var(--tw-text-base);color:var(--tw-text-primary);display:flex;align-items:center;transition:background 0.1s"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--tw-priority-medium-text);margin-right:6px;flex-shrink:0"></span>Medium</div>
-                        <div class="tw-priority-option" data-value="low" style="padding:var(--tw-space-2) var(--tw-space-4);cursor:pointer;font-size:var(--tw-text-base);color:var(--tw-text-primary);display:flex;align-items:center;transition:background 0.1s"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--tw-priority-low-text);margin-right:6px;flex-shrink:0"></span>Low</div>
+                    <div id="priorityDropdown">
+                        <div class="tw-priority-option" data-value="">All Priorities</div>
+                        <div class="tw-priority-option" data-value="high"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--tw-priority-high-text);flex-shrink:0"></span>High</div>
+                        <div class="tw-priority-option" data-value="medium"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--tw-priority-medium-text);flex-shrink:0"></span>Medium</div>
+                        <div class="tw-priority-option" data-value="low"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--tw-priority-low-text);flex-shrink:0"></span>Low</div>
                     </div>
                 </div>
 
@@ -1896,6 +1896,19 @@
 <!-- Django: {% block page_js %} -->
 <script>
     /* ============================================================
+     * CURRENT USER IDENTITY
+     * Single source of truth for all hardcoded names/initials.
+     * Django: replace with server-rendered JSON or data-* attribute.
+     * ============================================================ */
+    var CURRENT_USER = {
+        name:     'Jinoy Jose',
+        initials: 'JJ',
+        email:    'jinoy@tweedle.io',
+        role:     'Admin'
+    };
+
+
+    /* ============================================================
      * STAR TOGGLE
      * ============================================================ */
     (function () {
@@ -2116,12 +2129,6 @@
     }
 
     document.querySelectorAll('.tw-priority-option').forEach(function(opt) {
-        opt.addEventListener('mouseover', function() {
-            this.style.background = 'var(--tw-primary-light)';
-        });
-        opt.addEventListener('mouseout', function() {
-            this.style.background = 'transparent';
-        });
         opt.addEventListener('click', function() {
             var value = this.dataset.value;
             activePriorityFilter = value;
@@ -2822,7 +2829,7 @@
                         '<td><div title="' + subject + '">' + subject + '</div></td>' +
                         '<td>' + clientText + '</td>' +
                         '<td>' + priorityHTML + '</td>' +
-                        '<td>Rajagopal P</td>' +
+                        '<td>' + CURRENT_USER.name + '</td>' +
                         '<td>' + rejectedOn + '</td>' +
                         '<td><div title="' + reason + '">' + reasonTrunc + '</div></td>' +
                         '<td>' +
@@ -3047,9 +3054,9 @@
         const msgEl = document.createElement('div');
         msgEl.className = 'tw-message sent';
         msgEl.innerHTML = `
-            <div class="tw-avatar tw-avatar--sm tw-avatar--chat-admin" aria-hidden="true">A</div>
+            <div class="tw-avatar tw-avatar--sm tw-avatar--chat-admin" aria-hidden="true">${CURRENT_USER.initials}</div>
             <div>
-                <div class="tw-message-sender">RAJAGOPAL P <span class="tw-role-pill tw-role-pill--admin">Admin</span></div>
+                <div class="tw-message-sender">${CURRENT_USER.name} <span class="tw-role-pill tw-role-pill--admin">Admin</span></div>
                 <div class="tw-message-bubble">
                     ${text ? `<div class="tw-message-text">${text.replace(/\n/g, '<br>')}</div>` : ''}
                     ${attachHTML}

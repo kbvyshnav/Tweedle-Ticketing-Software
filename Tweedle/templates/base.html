@@ -352,15 +352,15 @@
                 <div class="tw-profile-divider"></div>
 
                 <!-- Menu items -->
-                <div class="tw-profile-menu-item" role="menuitem" onclick="console.log('View Profile')">
+                <div class="tw-profile-menu-item" role="menuitem" onclick="closeProfileDropdown(); showProfileToast('Profile page coming in a future update.')">
                     <i class="bx bx-user" aria-hidden="true"></i>
                     <span>View Profile</span>
                 </div>
-                <div class="tw-profile-menu-item" role="menuitem" onclick="console.log('Change Password')">
+                <div class="tw-profile-menu-item" role="menuitem" onclick="closeProfileDropdown(); showProfileToast('Password settings coming in a future update.')">
                     <i class="bx bx-lock-alt" aria-hidden="true"></i>
                     <span>Change Password</span>
                 </div>
-                <div class="tw-profile-menu-item" role="menuitem" onclick="console.log('Notification Preferences')">
+                <div class="tw-profile-menu-item" role="menuitem" onclick="closeProfileDropdown(); loadPage('admin_portal/settings.html')">
                     <i class="bx bx-bell" aria-hidden="true"></i>
                     <span>Notification Preferences</span>
                 </div>
@@ -368,7 +368,7 @@
                 <div class="tw-profile-divider"></div>
 
                 <!-- Sign out -->
-                <div class="tw-profile-menu-item tw-profile-menu-item--danger" role="menuitem" onclick="console.log('Sign Out')">
+                <div class="tw-profile-menu-item tw-profile-menu-item--danger" role="menuitem" onclick="window.location.href = 'login.html'">
                     <i class="bx bx-log-out" aria-hidden="true"></i>
                     <span>Sign Out</span>
                 </div>
@@ -458,6 +458,34 @@
         profilePanelOpen = !profilePanelOpen;
         panel.classList.toggle('open', profilePanelOpen);
         panel.setAttribute('aria-hidden', profilePanelOpen ? 'false' : 'true');
+    }
+
+
+    function closeProfileDropdown() {
+        var panel = document.getElementById('profilePanel');
+        if (panel) {
+            panel.classList.remove('open');
+            profilePanelOpen = false;
+            panel.setAttribute('aria-hidden', 'true');
+        }
+    }
+
+    function showProfileToast(message) {
+        var t = document.getElementById('profileToast');
+        if (!t) {
+            t = document.createElement('div');
+            t.id = 'profileToast';
+            t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:500;' +
+                'background:var(--tw-text-primary);color:#fff;padding:10px 18px;' +
+                'border-radius:var(--tw-radius-md);font-size:var(--tw-text-base);' +
+                'box-shadow:var(--tw-shadow-md);opacity:0;transition:opacity 0.2s;' +
+                'pointer-events:none;';
+            document.body.appendChild(t);
+        }
+        t.textContent = message;
+        t.style.opacity = '1';
+        clearTimeout(t._hideTimer);
+        t._hideTimer = setTimeout(function() { t.style.opacity = '0'; }, 3000);
     }
 
 
