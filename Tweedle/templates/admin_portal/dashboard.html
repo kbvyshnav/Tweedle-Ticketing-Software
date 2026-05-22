@@ -955,6 +955,10 @@
                         <i class='bx bx-share' aria-hidden="true"></i>
                         Request Info
                     </button>
+                    <button class="tw-btn tw-btn-success tw-btn--sm" id="detailsResumeBtn" style="display:none" aria-label="Resume ticket — client has responded">
+                        <i class='bx bx-play-circle' aria-hidden="true"></i>
+                        Resume Ticket
+                    </button>
                 </div>
 
             </div>
@@ -1412,7 +1416,7 @@
                     </button>
                     <button class="tw-btn-reject" id="rejectBtn" onclick="confirmRejection()" aria-label="Reject or close ticket">
                         <i class="bx bx-x-circle" aria-hidden="true"></i>
-                        Reject / Close Ticket
+                        Reject Ticket
                     </button>
                 </div>
 
@@ -2281,18 +2285,61 @@
         }, 3000);
     }
 
-    /* Hide Reassign/Forward buttons when ticket is closed */
+    /* Show/hide header action buttons and footer per ticket status */
     var _origOpenDetails = openTicketDetailsModal;
     openTicketDetailsModal = function(ticketId, subject, status, allottee, subStatus) {
         _origOpenDetails(ticketId, subject, status, allottee, subStatus);
-        var isClosed = (status || '').toLowerCase().replace(/\s+/g,'') === 'closed';
-        var rb = document.getElementById('detailsReassignBtn');
-        var fb = document.getElementById('detailsForwardBtn');
-        if (rb) rb.style.display = isClosed ? 'none' : '';
-        if (fb) fb.style.display = isClosed ? 'none' : '';
+        var statusKey = (status || '').toLowerCase().replace(/\s+/g, '');
+
+        var rb  = document.getElementById('detailsReassignBtn');
+        var fb  = document.getElementById('detailsForwardBtn');
+        var rsb = document.getElementById('detailsResumeBtn');
+        var ctb = document.getElementById('closeTicketBtn');
+
+        /* Fix 1: hide Forward/Request Info for forwarded (Awaiting Client) and closed */
+        if (fb) fb.style.display = (statusKey === 'closed' || statusKey === 'forwarded') ? 'none' : '';
+
+        /* Reassign: hide only for closed */
+        if (rb) rb.style.display = statusKey === 'closed' ? 'none' : '';
+
+        /* Fix 2: show Resume only for forwarded (Awaiting Client) */
+        if (rsb) rsb.style.display = statusKey === 'forwarded' ? '' : 'none';
+
+        /* Fix 4: show Close Ticket only for resolved */
+        if (ctb) ctb.style.display = statusKey === 'resolved' ? '' : 'none';
+
+        /* Fix 3: update footer badge CSS class to match actual status */
+        var footerBadge = document.getElementById('footerStatusBadge');
+        if (footerBadge) {
+            var statusClassMap = {
+                inbox:      'tw-status-badge--new',
+                progress:   'tw-status-badge--progress',
+                forwarded:  'tw-status-badge--forwarded',
+                closed:     'tw-status-badge--closed',
+                resolved:   'tw-status-badge--resolved'
+            };
+            /* Remove any existing tw-status-badge--* modifier */
+            footerBadge.className = footerBadge.className
+                .split(' ')
+                .filter(function(c) { return !c.startsWith('tw-status-badge--'); })
+                .join(' ');
+            var newClass = statusClassMap[statusKey];
+            if (newClass) footerBadge.classList.add(newClass);
+        }
+
         closeDashActionPanel('dashReassignPanel');
         closeDashActionPanel('dashForwardPanel');
     };
+
+    /* Fix 2: wire Resume button — finds the matching row and calls resumeTicket() */
+    document.getElementById('detailsResumeBtn').addEventListener('click', function() {
+        var ticketId = document.getElementById('modalTicketId').textContent;
+        var row = document.querySelector('.tab-content tbody tr[data-ticket-id="' + ticketId + '"]');
+        if (row) {
+            closeTicketDetailsModal();
+            resumeTicket(row.querySelector('.tw-action-icon--resume'));
+        }
+    });
 
 
     /* ============================================================
