@@ -1855,6 +1855,41 @@
     margin-left: 2px;
 }
 
+/* General text / email / url / tel / number input */
+.tw-input {
+    width: 100%;
+    padding: var(--tw-space-3) var(--tw-space-4);
+    border: 2px solid var(--tw-border);
+    border-radius: var(--tw-radius-md);
+    font-size: var(--tw-text-md);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-primary);
+    background: var(--tw-bg-surface);
+    font-family: var(--tw-font-primary);
+    box-sizing: border-box;
+    transition: border-color var(--tw-transition-fast),
+                box-shadow var(--tw-transition-fast);
+    outline: none;
+}
+
+.tw-input::placeholder {
+    color: var(--tw-text-muted);
+    font-weight: var(--tw-weight-normal);
+}
+
+.tw-input:focus {
+    border-color: var(--tw-primary);
+    box-shadow: 0 0 0 3px rgba(60, 145, 230, 0.10);
+}
+
+.tw-input--error {
+    border-color: var(--tw-danger) !important;
+}
+
+.tw-input--error:focus {
+    box-shadow: 0 0 0 3px rgba(219, 80, 74, 0.15);
+}
+
 /* Styled select dropdown */
 .tw-select {
     width: 100%;

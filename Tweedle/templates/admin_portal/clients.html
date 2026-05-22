@@ -195,7 +195,7 @@
 
     <!-- === ONBOARD CLIENT MODAL STUB ========================= -->
     <div class="tw-modal-overlay" id="onboardModal" role="dialog" aria-modal="true" aria-labelledby="onboardModalTitle">
-        <div class="tw-modal tw-modal--sm">
+        <div class="tw-modal tw-modal--lg">
 
             <div class="tw-modal-header tw-header-gradient">
                 <div>
@@ -209,10 +209,107 @@
                 </button>
             </div>
 
-            <div class="tw-modal-body modal-placeholder-body">
-                <i class="bx bx-building-house" aria-hidden="true"></i>
-                <p>Onboard Client form coming soon.</p>
-                <p>This modal will contain the client registration form in Phase 7.</p>
+            <div class="tw-modal-body">
+                <!-- Django: form action="{% url 'admin_onboard_client' %}" method="POST" {% csrf_token %} -->
+                <form id="onboardForm" novalidate>
+
+                    <!-- SECTION 1: Company Details -->
+                    <p class="tw-modal-section-label" style="font-size:var(--tw-text-sm);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--tw-text-secondary);margin-bottom:var(--tw-space-3);margin-top:var(--tw-space-2);display:block">Company Details</p>
+
+                    <div class="tw-form-group">
+                        <label class="tw-form-label" for="onboardCompanyName">Company Name <span class="tw-required">*</span></label>
+                        <input class="tw-input" id="onboardCompanyName" type="text" placeholder="e.g. Acme Corporation" autocomplete="organization">
+                        <span class="tw-field-error" id="onboardCompanyNameError" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
+                    </div>
+
+                    <div class="tw-form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--tw-space-4);align-items:start">
+                        <div class="tw-form-group" style="width:100%">
+                            <label class="tw-form-label" for="onboardIndustry">Industry / Sector</label>
+                            <input class="tw-input" id="onboardIndustry" type="text" placeholder="e.g. Healthcare, Fintech">
+                        </div>
+                        <div class="tw-form-group" style="width:100%">
+                            <label class="tw-form-label" for="onboardCountry">Country <span class="tw-required">*</span></label>
+                            <select class="tw-select" id="onboardCountry">
+                                <option value="">Select country</option>
+                                <option value="India">India</option>
+                                <option value="United States">United States</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="United Arab Emirates">United Arab Emirates</option>
+                                <option value="Singapore">Singapore</option>
+                                <option value="Australia">Australia</option>
+                                <option value="Canada">Canada</option>
+                                <option value="Germany">Germany</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span class="tw-field-error" id="onboardCountryError" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
+                        </div>
+                    </div>
+
+                    <div class="tw-form-group">
+                        <label class="tw-form-label" for="onboardWebsite">Company Website</label>
+                        <input class="tw-input" id="onboardWebsite" type="url" placeholder="https://">
+                    </div>
+
+                    <!-- SECTION 2: Primary Contact -->
+                    <p class="tw-modal-section-label" style="font-size:var(--tw-text-sm);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--tw-text-secondary);margin-bottom:var(--tw-space-3);margin-top:var(--tw-space-2);display:block">Primary Contact</p>
+
+                    <div class="tw-form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--tw-space-4);align-items:start">
+                        <div class="tw-form-group" style="width:100%">
+                            <label class="tw-form-label" for="onboardContactName">Full Name <span class="tw-required">*</span></label>
+                            <input class="tw-input" id="onboardContactName" type="text" placeholder="Primary contact's full name" autocomplete="name">
+                            <span class="tw-field-error" id="onboardContactNameError" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
+                        </div>
+                        <div class="tw-form-group" style="width:100%">
+                            <label class="tw-form-label" for="onboardJobTitle">Job Title</label>
+                            <input class="tw-input" id="onboardJobTitle" type="text" placeholder="e.g. CTO, Project Manager">
+                        </div>
+                    </div>
+
+                    <div class="tw-form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--tw-space-4);align-items:start">
+                        <div class="tw-form-group" style="width:100%">
+                            <label class="tw-form-label" for="onboardEmail">Email Address <span class="tw-required">*</span></label>
+                            <input class="tw-input" id="onboardEmail" type="email" placeholder="contact@company.com" autocomplete="email">
+                            <span class="tw-field-error" id="onboardEmailError" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
+                        </div>
+                        <div class="tw-form-group" style="width:100%">
+                            <label class="tw-form-label" for="onboardPhone">Phone Number</label>
+                            <input class="tw-input" id="onboardPhone" type="tel" placeholder="+91 98765 43210" autocomplete="tel">
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: Account Setup -->
+                    <p class="tw-modal-section-label" style="font-size:var(--tw-text-sm);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--tw-text-secondary);margin-bottom:var(--tw-space-3);margin-top:var(--tw-space-2);display:block">Account Setup</p>
+
+                    <div class="tw-form-group">
+                        <label class="tw-form-label" for="onboardNotes">Notes / Special Instructions</label>
+                        <textarea class="tw-comment-textarea" id="onboardNotes" rows="3" placeholder="Any onboarding notes, special requirements, or context for the team."></textarea>
+                    </div>
+
+                    <div class="tw-form-group">
+                        <label class="tw-checkbox-label">
+                            <input type="checkbox" id="onboardSendEmail" checked>
+                            <span>Send welcome email to client</span>
+                        </label>
+                    </div>
+
+                    <div class="tw-form-group">
+                        <label class="tw-checkbox-label">
+                            <input type="checkbox" id="onboardGrantAccess" checked>
+                            <span>Grant portal access immediately</span>
+                        </label>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="tw-modal-footer">
+                <div class="tw-modal-footer-actions">
+                    <button class="tw-btn tw-btn-outline" type="button" onclick="closeOnboardModal()">Cancel</button>
+                    <button class="tw-btn tw-btn-primary" type="button" id="onboardSubmitBtn" onclick="submitOnboardForm()">
+                        <i class="bx bx-plus-circle" aria-hidden="true"></i>
+                        Onboard Client
+                    </button>
+                </div>
             </div>
 
         </div>
@@ -256,6 +353,7 @@
     function closeOnboardModal() {
         onboardModal.classList.remove('active');
         document.body.style.overflow = '';
+        resetOnboardForm();
     }
 
     onboardBtn.addEventListener('click', openOnboardModal);
@@ -270,6 +368,206 @@
             closeOnboardModal();
         }
     });
+
+
+    /* ============================================================
+     * ONBOARD FORM — VALIDATION HELPERS
+     * ============================================================ */
+    function showOnboardError(inputEl, message) {
+        inputEl.classList.add('tw-input--error');
+        var errorEl = document.getElementById(inputEl.id + 'Error');
+        if (errorEl) {
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+    }
+
+    function clearOnboardError(inputEl) {
+        inputEl.classList.remove('tw-input--error');
+        var errorEl = document.getElementById(inputEl.id + 'Error');
+        if (errorEl) {
+            errorEl.textContent = '';
+            errorEl.style.display = 'none';
+        }
+    }
+
+
+    /* ============================================================
+     * ONBOARD FORM — SUBMIT
+     * Django: POST to {% url 'admin_onboard_client' %}
+     *   Creates Organisation + OrganisationContact + CustomUser(role='client')
+     *   onboardSendEmail → queue welcome email Celery task
+     *   onboardGrantAccess → user.is_active = True (default)
+     *   Returns JSON { success: true, client_id: '...' }
+     * ============================================================ */
+    function submitOnboardForm() {
+        var companyNameEl = document.getElementById('onboardCompanyName');
+        var countryEl     = document.getElementById('onboardCountry');
+        var contactNameEl = document.getElementById('onboardContactName');
+        var emailEl       = document.getElementById('onboardEmail');
+
+        clearOnboardError(companyNameEl);
+        clearOnboardError(countryEl);
+        clearOnboardError(contactNameEl);
+        clearOnboardError(emailEl);
+
+        var valid        = true;
+        var firstInvalid = null;
+
+        if (!companyNameEl.value.trim()) {
+            showOnboardError(companyNameEl, 'Company name is required.');
+            if (!firstInvalid) firstInvalid = companyNameEl;
+            valid = false;
+        }
+
+        if (!countryEl.value) {
+            showOnboardError(countryEl, 'Please select a country.');
+            if (!firstInvalid) firstInvalid = countryEl;
+            valid = false;
+        }
+
+        if (!contactNameEl.value.trim()) {
+            showOnboardError(contactNameEl, 'Contact name is required.');
+            if (!firstInvalid) firstInvalid = contactNameEl;
+            valid = false;
+        }
+
+        if (!emailEl.value.trim()) {
+            showOnboardError(emailEl, 'Email address is required.');
+            if (!firstInvalid) firstInvalid = emailEl;
+            valid = false;
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim())) {
+            showOnboardError(emailEl, 'Please enter a valid email address.');
+            if (!firstInvalid) firstInvalid = emailEl;
+            valid = false;
+        }
+
+        if (!valid) {
+            if (firstInvalid) firstInvalid.focus();
+            return;
+        }
+
+        /* Collect form values */
+        var companyName = companyNameEl.value.trim();
+        var country     = countryEl.options[countryEl.selectedIndex].text;
+        var contactName = contactNameEl.value.trim();
+        var email       = emailEl.value.trim();
+        var industry    = document.getElementById('onboardIndustry').value.trim();
+        var website     = document.getElementById('onboardWebsite').value.trim();
+        var jobTitle    = document.getElementById('onboardJobTitle').value.trim();
+        var phone       = document.getElementById('onboardPhone').value.trim();
+        var notes       = document.getElementById('onboardNotes').value.trim();
+        var sendEmail   = document.getElementById('onboardSendEmail').checked;
+        var grantAccess = document.getElementById('onboardGrantAccess').checked;
+
+        /* Django: replace with fetch() POST */
+        console.log('[Onboard] New client:', {
+            company_name: companyName, country: country,
+            industry: industry, website: website,
+            contact_name: contactName, job_title: jobTitle,
+            email: email, phone: phone,
+            notes: notes, send_email: sendEmail, grant_access: grantAccess
+        });
+
+        /* Build avatar initials from first two words of company name */
+        var words    = companyName.replace(/[^a-zA-Z\s]/g, '').trim().split(/\s+/);
+        var initials = ((words[0] || '')[0] || '').toUpperCase() +
+                       ((words[1] || '')[0] || '').toUpperCase();
+
+        /* Build and prepend new table row */
+        var newRow = document.createElement('tr');
+        newRow.innerHTML =
+            '<td>' +
+                '<div class="client-name-cell">' +
+                    '<div class="tw-avatar tw-avatar--teal" aria-hidden="true">' + initials + '</div>' +
+                    '<div class="client-info">' +
+                        '<span class="client-company">' + companyName + '</span>' +
+                        '<span class="client-id-label">New Client</span>' +
+                    '</div>' +
+                '</div>' +
+            '</td>' +
+            '<td>' +
+                '<span class="tw-country-tag">' +
+                    '<i class="bx bx-flag" aria-hidden="true"></i> ' + country +
+                '</span>' +
+            '</td>' +
+            '<td>' + (contactName || '—') + '</td>' +
+            '<td>' + email + '</td>' +
+            '<td><span class="tw-status-badge tw-status-badge--active">Active</span></td>' +
+            '<td>' +
+                '<div class="tw-row-actions">' +
+                    '<button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers(\'NEW\')">' +
+                        '<i class="bx bx-user" aria-hidden="true"></i> Manage Users' +
+                    '</button>' +
+                    '<button class="tw-btn tw-btn-outline tw-btn--sm" onclick="showDetails(\'NEW\')">' +
+                        '<i class="bx bx-info-circle" aria-hidden="true"></i> Details' +
+                    '</button>' +
+                    '<button class="tw-btn-icon" onclick="showSettings(\'NEW\')" aria-label="More options">' +
+                        '<i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>' +
+                    '</button>' +
+                '</div>' +
+            '</td>';
+
+        var tbody = document.querySelector('#clientsTable tbody');
+        if (tbody) tbody.insertBefore(newRow, tbody.firstChild);
+
+        /* Update client count badge */
+        var countBadge = document.getElementById('clientCount');
+        if (countBadge) countBadge.textContent = parseInt(countBadge.textContent) + 1;
+
+        closeOnboardModal();
+
+        var toastMsg = sendEmail
+            ? 'Client onboarded successfully. Welcome email sent.'
+            : 'Client onboarded successfully.';
+        showClientsToast(toastMsg, 'success');
+    }
+
+
+    /* ============================================================
+     * ONBOARD FORM — RESET
+     * ============================================================ */
+    function resetOnboardForm() {
+        var textIds = ['onboardCompanyName', 'onboardIndustry', 'onboardWebsite',
+                       'onboardContactName', 'onboardJobTitle', 'onboardEmail', 'onboardPhone'];
+
+        textIds.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) { el.value = ''; clearOnboardError(el); }
+        });
+
+        var countryEl = document.getElementById('onboardCountry');
+        if (countryEl) { countryEl.selectedIndex = 0; clearOnboardError(countryEl); }
+
+        var notesEl = document.getElementById('onboardNotes');
+        if (notesEl) notesEl.value = '';
+
+        var sendEmailEl = document.getElementById('onboardSendEmail');
+        if (sendEmailEl) sendEmailEl.checked = true;
+
+        var grantAccessEl = document.getElementById('onboardGrantAccess');
+        if (grantAccessEl) grantAccessEl.checked = true;
+    }
+
+
+    /* ============================================================
+     * CLIENTS PAGE TOAST
+     * Local copy — showDashToast is scoped to dashboard.html only
+     * ============================================================ */
+    function showClientsToast(message, type) {
+        type = type || 'success';
+        var toast = document.createElement('div');
+        toast.className = 'tw-toast tw-toast--' + type;
+        toast.innerHTML = '<i class=\'bx ' +
+            (type === 'success' ? 'bx-check-circle' : 'bx-error-circle') +
+            '\'></i><span>' + message + '</span>';
+        document.body.appendChild(toast);
+        setTimeout(function() { toast.classList.add('show'); }, 10);
+        setTimeout(function() {
+            toast.classList.remove('show');
+            setTimeout(function() { toast.remove(); }, 300);
+        }, 3000);
+    }
 
 
     /* ============================================================
