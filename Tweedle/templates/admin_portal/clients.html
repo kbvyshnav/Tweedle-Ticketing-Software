@@ -20,6 +20,15 @@
     </div>
 
 
+    <!-- === STATUS FILTER BAR ================================ -->
+    <div class="clients-status-filter" style="display:flex;align-items:center;gap:var(--tw-space-2);margin-bottom:var(--tw-space-4)">
+        <button class="tw-btn tw-btn-primary tw-btn--sm" data-status="all" onclick="filterClientsByStatus('all', this)">All Clients</button>
+        <button class="tw-btn tw-btn-outline tw-btn--sm" data-status="active" onclick="filterClientsByStatus('active', this)">Active</button>
+        <button class="tw-btn tw-btn-outline tw-btn--sm" data-status="inactive" onclick="filterClientsByStatus('inactive', this)">Inactive</button>
+        <button class="tw-btn tw-btn-outline tw-btn--sm" data-status="pending" onclick="filterClientsByStatus('pending', this)">Pending</button>
+    </div>
+
+
     <!-- === CLIENTS TABLE CARD ================================ -->
     <div class="tw-table-card">
 
@@ -68,13 +77,15 @@
                     <th scope="col">Contact</th>
                     <th scope="col">Email</th>
                     <th scope="col">Status</th>
+                    <th scope="col">Active Tickets</th>
+                    <th scope="col">Since</th>
                     <th scope="col">Actions</th>
                 </tr>
             </thead>
             <tbody>
 
                 <!-- Row 1: GMEC -->
-                <tr>
+                <tr data-status="active">
                     <td>
                         <div class="client-name-cell">
                             <div class="tw-avatar tw-avatar--gmec" aria-hidden="true">G</div>
@@ -99,25 +110,33 @@
                         <!-- Django: class="tw-status-badge tw-status-badge--{{ client.status }}" -->
                         <span class="tw-status-badge tw-status-badge--active">Active</span>
                     </td>
+                    <td><span class="tw-count-badge">6</span></td>
+                    <td>Mar 2023</td>
                     <td>
                         <div class="tw-row-actions">
                             <!-- Django: {% url 'admin_manage_users' client.id %} -->
                             <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers('GMEC')">
                                 <i class="bx bx-user" aria-hidden="true"></i> Manage Users
                             </button>
-                            <!-- Django: {% url 'admin_client_detail' client.id %} -->
-                            <button class="tw-btn tw-btn-outline tw-btn--sm" onclick="showDetails('GMEC')">
-                                <i class="bx bx-info-circle" aria-hidden="true"></i> Details
-                            </button>
-                            <button class="tw-btn-icon" onclick="showSettings('GMEC')" aria-label="More options for GMEC">
-                                <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
-                            </button>
+                            <div class="client-more-wrap" style="position:relative">
+                                <button class="tw-btn-icon" onclick="toggleClientMoreMenu(this)" aria-label="More options for GMEC">
+                                    <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
+                                </button>
+                                <div class="client-more-menu" style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--tw-bg-surface);border:1px solid var(--tw-border);border-radius:var(--tw-radius-md);box-shadow:var(--tw-shadow-md);min-width:160px;z-index:100;padding:var(--tw-space-2) 0">
+                                    <button onclick="showDetails('GMEC');closeClientMoreMenus()" style="display:flex;align-items:center;gap:var(--tw-space-2);width:100%;padding:var(--tw-space-2) var(--tw-space-4);background:none;border:none;cursor:pointer;font-size:var(--tw-text-sm);color:var(--tw-text-primary);text-align:left" onmouseover="this.style.background='var(--tw-bg-body)'" onmouseout="this.style.background='none'">
+                                        <i class="bx bx-info-circle" aria-hidden="true"></i> View Details
+                                    </button>
+                                    <button onclick="showSettings('GMEC');closeClientMoreMenus()" style="display:flex;align-items:center;gap:var(--tw-space-2);width:100%;padding:var(--tw-space-2) var(--tw-space-4);background:none;border:none;cursor:pointer;font-size:var(--tw-text-sm);color:var(--tw-text-primary);text-align:left" onmouseover="this.style.background='var(--tw-bg-body)'" onmouseout="this.style.background='none'">
+                                        <i class="bx bx-cog" aria-hidden="true"></i> View Settings
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </td>
                 </tr>
 
                 <!-- Row 2: BGEX -->
-                <tr>
+                <tr data-status="active">
                     <td>
                         <div class="client-name-cell">
                             <div class="tw-avatar tw-avatar--bgex" aria-hidden="true">B</div>
@@ -135,23 +154,32 @@
                     <td>+880-9876543210</td>
                     <td>info@bgex.com.bd</td>
                     <td><span class="tw-status-badge tw-status-badge--active">Active</span></td>
+                    <td><span class="tw-count-badge">4</span></td>
+                    <td>Aug 2023</td>
                     <td>
                         <div class="tw-row-actions">
                             <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers('BGEX')">
                                 <i class="bx bx-user" aria-hidden="true"></i> Manage Users
                             </button>
-                            <button class="tw-btn tw-btn-outline tw-btn--sm" onclick="showDetails('BGEX')">
-                                <i class="bx bx-info-circle" aria-hidden="true"></i> Details
-                            </button>
-                            <button class="tw-btn-icon" onclick="showSettings('BGEX')" aria-label="More options for BGEX">
-                                <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
-                            </button>
+                            <div class="client-more-wrap" style="position:relative">
+                                <button class="tw-btn-icon" onclick="toggleClientMoreMenu(this)" aria-label="More options for BGEX">
+                                    <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
+                                </button>
+                                <div class="client-more-menu" style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--tw-bg-surface);border:1px solid var(--tw-border);border-radius:var(--tw-radius-md);box-shadow:var(--tw-shadow-md);min-width:160px;z-index:100;padding:var(--tw-space-2) 0">
+                                    <button onclick="showDetails('BGEX');closeClientMoreMenus()" style="display:flex;align-items:center;gap:var(--tw-space-2);width:100%;padding:var(--tw-space-2) var(--tw-space-4);background:none;border:none;cursor:pointer;font-size:var(--tw-text-sm);color:var(--tw-text-primary);text-align:left" onmouseover="this.style.background='var(--tw-bg-body)'" onmouseout="this.style.background='none'">
+                                        <i class="bx bx-info-circle" aria-hidden="true"></i> View Details
+                                    </button>
+                                    <button onclick="showSettings('BGEX');closeClientMoreMenus()" style="display:flex;align-items:center;gap:var(--tw-space-2);width:100%;padding:var(--tw-space-2) var(--tw-space-4);background:none;border:none;cursor:pointer;font-size:var(--tw-text-sm);color:var(--tw-text-primary);text-align:left" onmouseover="this.style.background='var(--tw-bg-body)'" onmouseout="this.style.background='none'">
+                                        <i class="bx bx-cog" aria-hidden="true"></i> View Settings
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </td>
                 </tr>
 
                 <!-- Row 3: TCS -->
-                <tr>
+                <tr data-status="active">
                     <td>
                         <div class="client-name-cell">
                             <div class="tw-avatar tw-avatar--tcs" aria-hidden="true">T</div>
@@ -169,17 +197,26 @@
                     <td>+91-987654321</td>
                     <td>info@tcs.com.in</td>
                     <td><span class="tw-status-badge tw-status-badge--active">Active</span></td>
+                    <td><span class="tw-count-badge">2</span></td>
+                    <td>Jan 2024</td>
                     <td>
                         <div class="tw-row-actions">
                             <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers('TCS')">
                                 <i class="bx bx-user" aria-hidden="true"></i> Manage Users
                             </button>
-                            <button class="tw-btn tw-btn-outline tw-btn--sm" onclick="showDetails('TCS')">
-                                <i class="bx bx-info-circle" aria-hidden="true"></i> Details
-                            </button>
-                            <button class="tw-btn-icon" onclick="showSettings('TCS')" aria-label="More options for TCS">
-                                <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
-                            </button>
+                            <div class="client-more-wrap" style="position:relative">
+                                <button class="tw-btn-icon" onclick="toggleClientMoreMenu(this)" aria-label="More options for TCS">
+                                    <i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>
+                                </button>
+                                <div class="client-more-menu" style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--tw-bg-surface);border:1px solid var(--tw-border);border-radius:var(--tw-radius-md);box-shadow:var(--tw-shadow-md);min-width:160px;z-index:100;padding:var(--tw-space-2) 0">
+                                    <button onclick="showDetails('TCS');closeClientMoreMenus()" style="display:flex;align-items:center;gap:var(--tw-space-2);width:100%;padding:var(--tw-space-2) var(--tw-space-4);background:none;border:none;cursor:pointer;font-size:var(--tw-text-sm);color:var(--tw-text-primary);text-align:left" onmouseover="this.style.background='var(--tw-bg-body)'" onmouseout="this.style.background='none'">
+                                        <i class="bx bx-info-circle" aria-hidden="true"></i> View Details
+                                    </button>
+                                    <button onclick="showSettings('TCS');closeClientMoreMenus()" style="display:flex;align-items:center;gap:var(--tw-space-2);width:100%;padding:var(--tw-space-2) var(--tw-space-4);background:none;border:none;cursor:pointer;font-size:var(--tw-text-sm);color:var(--tw-text-primary);text-align:left" onmouseover="this.style.background='var(--tw-bg-body)'" onmouseout="this.style.background='none'">
+                                        <i class="bx bx-cog" aria-hidden="true"></i> View Settings
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -476,6 +513,7 @@
 
         /* Build and prepend new table row */
         var newRow = document.createElement('tr');
+        newRow.dataset.status = 'active';
         newRow.innerHTML =
             '<td>' +
                 '<div class="client-name-cell">' +
@@ -494,17 +532,26 @@
             '<td>' + (contactName || '—') + '</td>' +
             '<td>' + email + '</td>' +
             '<td><span class="tw-status-badge tw-status-badge--active">Active</span></td>' +
+            '<td><span class="tw-count-badge">0</span></td>' +
+            '<td>Just now</td>' +
             '<td>' +
                 '<div class="tw-row-actions">' +
                     '<button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers(\'NEW\')">' +
                         '<i class="bx bx-user" aria-hidden="true"></i> Manage Users' +
                     '</button>' +
-                    '<button class="tw-btn tw-btn-outline tw-btn--sm" onclick="showDetails(\'NEW\')">' +
-                        '<i class="bx bx-info-circle" aria-hidden="true"></i> Details' +
-                    '</button>' +
-                    '<button class="tw-btn-icon" onclick="showSettings(\'NEW\')" aria-label="More options">' +
-                        '<i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>' +
-                    '</button>' +
+                    '<div class="client-more-wrap" style="position:relative">' +
+                        '<button class="tw-btn-icon" onclick="toggleClientMoreMenu(this)" aria-label="More options">' +
+                            '<i class="bx bx-dots-vertical-rounded" aria-hidden="true"></i>' +
+                        '</button>' +
+                        '<div class="client-more-menu" style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--tw-bg-surface);border:1px solid var(--tw-border);border-radius:var(--tw-radius-md);box-shadow:var(--tw-shadow-md);min-width:160px;z-index:100;padding:var(--tw-space-2) 0">' +
+                            '<button onclick="showDetails(\'NEW\');closeClientMoreMenus()" style="display:flex;align-items:center;gap:var(--tw-space-2);width:100%;padding:var(--tw-space-2) var(--tw-space-4);background:none;border:none;cursor:pointer;font-size:var(--tw-text-sm);color:var(--tw-text-primary);text-align:left">' +
+                                '<i class="bx bx-info-circle" aria-hidden="true"></i> View Details' +
+                            '</button>' +
+                            '<button onclick="showSettings(\'NEW\');closeClientMoreMenus()" style="display:flex;align-items:center;gap:var(--tw-space-2);width:100%;padding:var(--tw-space-2) var(--tw-space-4);background:none;border:none;cursor:pointer;font-size:var(--tw-text-sm);color:var(--tw-text-primary);text-align:left">' +
+                                '<i class="bx bx-cog" aria-hidden="true"></i> View Settings' +
+                            '</button>' +
+                        '</div>' +
+                    '</div>' +
                 '</div>' +
             '</td>';
 
@@ -556,10 +603,10 @@
      * ============================================================ */
     function showClientsToast(message, type) {
         type = type || 'success';
+        var iconMap = { success: 'bx-check-circle', error: 'bx-error-circle', info: 'bx-info-circle' };
         var toast = document.createElement('div');
         toast.className = 'tw-toast tw-toast--' + type;
-        toast.innerHTML = '<i class=\'bx ' +
-            (type === 'success' ? 'bx-check-circle' : 'bx-error-circle') +
+        toast.innerHTML = '<i class=\'bx ' + (iconMap[type] || 'bx-info-circle') +
             '\'></i><span>' + message + '</span>';
         document.body.appendChild(toast);
         setTimeout(function() { toast.classList.add('show'); }, 10);
@@ -571,19 +618,67 @@
 
 
     /* ============================================================
-     * PLACEHOLDER ACTION HANDLERS
+     * PLACEHOLDER ACTION HANDLERS — Fix 5: show toast feedback
      * Django: replace with {% url %} redirects or fetch() calls
      * ============================================================ */
     function manageUsers(clientId) {
-        console.log('[Phase 7] Manage Users for:', clientId);
+        showClientsToast('Manage Users — coming in the next update', 'info');
     }
 
     function showDetails(clientId) {
-        console.log('[Phase 7] Show Details for:', clientId);
+        showClientsToast('Client details view — coming in the next update', 'info');
     }
 
     function showSettings(clientId) {
-        console.log('[Phase 7] Settings dropdown for:', clientId);
+        showClientsToast('Client settings — coming in the next update', 'info');
+    }
+
+
+    /* ============================================================
+     * FIX 3: ⋮ DROPDOWN TOGGLE
+     * ============================================================ */
+    function toggleClientMoreMenu(btn) {
+        var wrap = btn.closest('.client-more-wrap');
+        var menu = wrap ? wrap.querySelector('.client-more-menu') : null;
+        if (!menu) return;
+        var isOpen = menu.style.display === 'block';
+        closeClientMoreMenus();
+        if (!isOpen) menu.style.display = 'block';
+    }
+
+    function closeClientMoreMenus() {
+        document.querySelectorAll('.client-more-menu').forEach(function(m) {
+            m.style.display = 'none';
+        });
+    }
+
+    /* Close ⋮ menus on outside click */
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.client-more-wrap')) closeClientMoreMenus();
+    });
+
+
+    /* ============================================================
+     * FIX 4: STATUS FILTER
+     * ============================================================ */
+    function filterClientsByStatus(status, btn) {
+        /* Update active button styling */
+        document.querySelectorAll('.clients-status-filter .tw-btn').forEach(function(b) {
+            b.classList.remove('tw-btn-primary');
+            b.classList.add('tw-btn-outline');
+        });
+        if (btn) {
+            btn.classList.remove('tw-btn-outline');
+            btn.classList.add('tw-btn-primary');
+        }
+        /* Show/hide rows by data-status */
+        document.querySelectorAll('#clientsTable tbody tr').forEach(function(row) {
+            if (status === 'all') {
+                row.classList.remove('row-hidden');
+            } else {
+                row.classList.toggle('row-hidden', row.dataset.status !== status);
+            }
+        });
     }
 </script>
 <!-- Django: {% endblock %} -->

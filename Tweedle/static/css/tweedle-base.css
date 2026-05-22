@@ -382,7 +382,12 @@ body.sidebar-hidden .topbar {
 .topbar form {
     max-width: 400px;
     width: 100%;
-    margin-right: auto;
+}
+
+/* Bell/profile group always stays on the far right.
+   Works whether the search form is visible or hidden. */
+.topbar .tw-notif-bell-wrap {
+    margin-left: auto;
 }
 
 /* Topbar search input + button pill */
