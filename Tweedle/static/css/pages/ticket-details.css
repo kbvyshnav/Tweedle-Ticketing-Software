@@ -1052,6 +1052,10 @@ body {
     border-left: 4px solid var(--tw-status-forwarded-text);
 }
 
+#ticketDetailsModal[data-status="uat"] .tw-modal-container {
+    border-left: 4px solid var(--tw-status-uat-text);
+}
+
 #ticketDetailsModal[data-status="closed"] .tw-modal-container {
     border-left: 4px solid var(--tw-status-closed-text);
 }

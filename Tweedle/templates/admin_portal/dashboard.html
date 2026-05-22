@@ -108,16 +108,16 @@
             </div>
         </div>
 
-        <div class="tw-stat-card tw-stat-card--closed" data-tab="closed" role="button" tabindex="0" aria-label="Closed: 243 tickets">
+        <div class="tw-stat-card tw-stat-card--uat" data-tab="uat" role="button" tabindex="0" aria-label="UAT Approval: 2 tickets">
             <div class="tw-stat-card__left">
                 <div class="tw-stat-card__icon" aria-hidden="true">
-                    <i class='bx bx-check-circle'></i>
+                    <i class='bx bx-user-check'></i>
                 </div>
             </div>
             <div class="tw-stat-card__body">
-                <!-- Django: {{ closed_count }} -->
-                <div class="tw-stat-card__count">243</div>
-                <div class="tw-stat-card__label">Closed</div>
+                <!-- Django: {{ uat_count }} -->
+                <div class="tw-stat-card__count">2</div>
+                <div class="tw-stat-card__label">UAT Approval</div>
             </div>
         </div>
 
@@ -131,6 +131,19 @@
                 <!-- Django: {{ resolved_count }} -->
                 <div class="tw-stat-card__count">3</div>
                 <div class="tw-stat-card__label">Resolved</div>
+            </div>
+        </div>
+
+        <div class="tw-stat-card tw-stat-card--closed" data-tab="closed" role="button" tabindex="0" aria-label="Closed: 243 tickets">
+            <div class="tw-stat-card__left">
+                <div class="tw-stat-card__icon" aria-hidden="true">
+                    <i class='bx bx-check-circle'></i>
+                </div>
+            </div>
+            <div class="tw-stat-card__body">
+                <!-- Django: {{ closed_count }} -->
+                <div class="tw-stat-card__count">243</div>
+                <div class="tw-stat-card__label">Closed</div>
             </div>
         </div>
 
@@ -192,9 +205,9 @@
                 class="tw-ticket-tab"
                 role="tab"
                 aria-selected="false"
-                data-tab="closed"
-                aria-controls="tab-closed">
-                Closed
+                data-tab="uat"
+                aria-controls="tab-uat">
+                UAT Approval
             </button>
 
             <button
@@ -204,6 +217,15 @@
                 data-tab="resolved"
                 aria-controls="tab-resolved">
                 Resolved
+            </button>
+
+            <button
+                class="tw-ticket-tab"
+                role="tab"
+                aria-selected="false"
+                data-tab="closed"
+                aria-controls="tab-closed">
+                Closed
             </button>
 
             <button
@@ -713,6 +735,168 @@
 
 
         <!-- ==================================================
+             C3 — TAB CONTENT: UAT APPROVAL
+             Ticket is with the client for testing and sign-off.
+             Admin can only recall; client approves/rejects from
+             their portal (not yet built).
+             Django: {% for ticket in uat_tickets %}
+             ================================================== -->
+        <div class="tab-content" id="tab-uat" data-tab-content="uat" role="tabpanel" aria-label="UAT Approval tickets">
+        <div class="table-scroll-wrapper">
+        <table class="tw-table">
+            <thead>
+                <tr>
+                    <th scope="col" class="tw-bulk-col"><input type="checkbox" class="tw-bulk-select-all" data-tab="uat" aria-label="Select all"></th>
+                    <th scope="col">Ticket ID</th>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Issue Date</th>
+                    <th scope="col">Client</th>
+                    <th scope="col">Priority</th>
+                    <th scope="col">Dev / Tester</th>
+                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Django: {% for ticket in uat_tickets %} -->
+
+                <tr data-ticket-id="GMEC25010012" data-ticket-type="existing" data-subject="Invoice generation incorrect totals" data-status="uat" data-client="GMEC">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010012" aria-label="Select GMEC25010012"></td>
+                    <td>
+                        <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                        <span class="tw-ticket-id">GMEC25010012</span>
+                    </td>
+                    <td><div title="Invoice generation incorrect totals">Invoice generation incorrect totals</div></td>
+                    <td>02-05-2025</td>
+                    <td>GMEC</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
+                    <td>
+                        <div class="allottee-cell">
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--teal" aria-hidden="true">A</div>
+                            Arjun Mehta / Priya S
+                        </div>
+                    </td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr data-ticket-id="BGEX25010013" data-ticket-type="existing" data-subject="User role permissions not saving" data-status="uat" data-client="BGEX">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="BGEX25010013" aria-label="Select BGEX25010013"></td>
+                    <td>
+                        <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                        <span class="tw-ticket-id">BGEX25010013</span>
+                    </td>
+                    <td><div title="User role permissions not saving">User role permissions not saving</div></td>
+                    <td>05-05-2025</td>
+                    <td>BGEX</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
+                    <td>
+                        <div class="allottee-cell">
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">K</div>
+                            Kiran Das
+                        </div>
+                    </td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Django: {% endfor %} -->
+            </tbody>
+        </table>
+        </div>
+        </div>
+        <!-- END TAB: UAT APPROVAL -->
+
+
+        <!-- ==================================================
+             C3 — TAB CONTENT: RESOLVED
+             Developer has marked work complete; admin confirms
+             closure. data-ticket-type="existing" → opens
+             ticketDetailsModal with Close Ticket visible.
+             Django: {% for ticket in resolved_tickets %}
+             ================================================== -->
+        <div class="tab-content" id="tab-resolved" data-tab-content="resolved" role="tabpanel" aria-label="Resolved tickets">
+        <div class="table-scroll-wrapper">
+        <table class="tw-table">
+            <thead>
+                <tr>
+                    <th scope="col" class="tw-bulk-col"><input type="checkbox" class="tw-bulk-select-all" data-tab="resolved" aria-label="Select all"></th>
+                    <th scope="col">Ticket ID</th>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Issue Date</th>
+                    <th scope="col">Client</th>
+                    <th scope="col">Priority</th>
+                    <th scope="col">Dev / Tester</th>
+                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Django: {% for ticket in resolved_tickets %} -->
+
+                <tr data-ticket-id="GMEC25010010" data-ticket-type="existing" data-subject="Payment gateway timeout on checkout" data-status="resolved" data-client="GMEC">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010010" aria-label="Select GMEC25010010"></td>
+                    <td>
+                        <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                        <span class="tw-ticket-id">GMEC25010010</span>
+                    </td>
+                    <td><div title="Payment gateway timeout on checkout">Payment gateway timeout on checkout</div></td>
+                    <td>14-04-2025</td>
+                    <td>GMEC</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
+                    <td>
+                        <div class="allottee-cell">
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--teal" aria-hidden="true">A</div>
+                            Arjun Mehta / Priya S
+                        </div>
+                    </td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr data-ticket-id="BGEX25010011" data-ticket-type="existing" data-subject="Bulk export CSV missing columns" data-status="resolved" data-client="BGEX">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="BGEX25010011" aria-label="Select BGEX25010011"></td>
+                    <td>
+                        <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                        <span class="tw-ticket-id">BGEX25010011</span>
+                    </td>
+                    <td><div title="Bulk export CSV missing columns">Bulk export CSV missing columns</div></td>
+                    <td>18-04-2025</td>
+                    <td>BGEX</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
+                    <td>
+                        <div class="allottee-cell">
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">K</div>
+                            Kiran Das
+                        </div>
+                    </td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Django: {% endfor %} -->
+            </tbody>
+        </table>
+        </div>
+        </div>
+        <!-- END TAB: RESOLVED -->
+
+
+        <!-- ==================================================
              C3 — TAB CONTENT: CLOSED
              ================================================== -->
         <div class="tab-content" id="tab-closed" data-tab-content="closed" role="tabpanel" aria-label="Closed tickets">
@@ -814,87 +998,6 @@
         </div>
         </div>
         <!-- END TAB: CLOSED -->
-
-
-        <!-- ==================================================
-             C3 — TAB CONTENT: RESOLVED
-             Developer has marked work complete; admin confirms
-             closure. data-ticket-type="existing" → opens
-             ticketDetailsModal with Close Ticket visible.
-             Django: {% for ticket in resolved_tickets %}
-             ================================================== -->
-        <div class="tab-content" id="tab-resolved" data-tab-content="resolved" role="tabpanel" aria-label="Resolved tickets">
-        <div class="table-scroll-wrapper">
-        <table class="tw-table">
-            <thead>
-                <tr>
-                    <th scope="col" class="tw-bulk-col"><input type="checkbox" class="tw-bulk-select-all" data-tab="resolved" aria-label="Select all"></th>
-                    <th scope="col">Ticket ID</th>
-                    <th scope="col">Subject</th>
-                    <th scope="col">Issue Date</th>
-                    <th scope="col">Client</th>
-                    <th scope="col">Priority</th>
-                    <th scope="col">Dev / Tester</th>
-                    <th scope="col"><span class="visually-hidden">Actions</span></th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Django: {% for ticket in resolved_tickets %} -->
-
-                <tr data-ticket-id="GMEC25010010" data-ticket-type="existing" data-subject="Payment gateway timeout on checkout" data-status="resolved" data-client="GMEC">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010010" aria-label="Select GMEC25010010"></td>
-                    <td>
-                        <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                        <span class="tw-ticket-id">GMEC25010010</span>
-                    </td>
-                    <td><div title="Payment gateway timeout on checkout">Payment gateway timeout on checkout</div></td>
-                    <td>14-04-2025</td>
-                    <td>GMEC</td>
-                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
-                    <td>
-                        <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--teal" aria-hidden="true">A</div>
-                            Arjun Mehta / Priya S
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr data-ticket-id="BGEX25010011" data-ticket-type="existing" data-subject="Bulk export CSV missing columns" data-status="resolved" data-client="BGEX">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="BGEX25010011" aria-label="Select BGEX25010011"></td>
-                    <td>
-                        <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                        <span class="tw-ticket-id">BGEX25010011</span>
-                    </td>
-                    <td><div title="Bulk export CSV missing columns">Bulk export CSV missing columns</div></td>
-                    <td>18-04-2025</td>
-                    <td>BGEX</td>
-                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
-                    <td>
-                        <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">K</div>
-                            Kiran Das
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Django: {% endfor %} -->
-            </tbody>
-        </table>
-        </div>
-        </div>
-        <!-- END TAB: RESOLVED -->
 
 
         <!-- ==================================================
@@ -1062,6 +1165,10 @@
                         <i class='bx bx-play-circle' aria-hidden="true"></i>
                         Resume Ticket
                     </button>
+                    <button class="tw-btn tw-btn-outline tw-btn--sm" id="detailsUatRecallBtn" style="display:none" aria-label="Recall ticket to In Progress">
+                        <i class='bx bx-undo' aria-hidden="true"></i>
+                        Recall to In Progress
+                    </button>
                 </div>
 
             </div>
@@ -1077,6 +1184,12 @@
             <div id="modalReadOnlyNotice" style="display:none; background: var(--tw-status-closed-bg); color: var(--tw-status-closed-text); padding: 8px 14px; border-radius: var(--tw-radius-sm); font-size: var(--tw-text-sm); margin-bottom: 12px;">
                 <i class='bx bx-lock-alt' style="margin-right:6px;" aria-hidden="true"></i>
                 This ticket is closed — no further actions are available.
+            </div>
+
+            <!-- Shown by JS only when data-status="uat" -->
+            <div id="modalUatNotice" style="display:none; background: var(--tw-status-uat-bg); color: var(--tw-status-uat-text); padding: 8px 14px; border-radius: var(--tw-radius-sm); font-size: var(--tw-text-sm); margin-bottom: 12px;">
+                <i class='bx bx-user-check' style="margin-right:6px;" aria-hidden="true"></i>
+                This ticket is awaiting client UAT approval. No admin actions are available until the client responds.
             </div>
 
             <div class="tw-info-grid">
@@ -2223,8 +2336,9 @@
         inbox:     { heading: 'Inbox Tickets',        meta: '10 tickets · New and unassigned' },
         progress:  { heading: 'In Progress Tickets',  meta: '28 tickets · Currently being worked on' },
         forwarded: { heading: 'Awaiting Client',       meta: 'Tickets pending client response — TAT paused' },
-        closed:    { heading: 'Closed Tickets',        meta: '243 tickets · Successfully resolved' },
+        uat:       { heading: 'UAT Approval',          meta: 'Awaiting client testing and sign-off' },
         resolved:  { heading: 'Resolved Tickets',      meta: 'Awaiting your confirmation to close' },
+        closed:    { heading: 'Closed Tickets',        meta: '243 tickets · Successfully resolved' },
         rejected:  { heading: 'Rejected Tickets',      meta: 'Tickets declined by admin — client has been notified.' },
     };
 
@@ -2599,18 +2713,22 @@
         var fb  = document.getElementById('detailsForwardBtn');
         var rsb = document.getElementById('detailsResumeBtn');
         var ctb = document.getElementById('closeTicketBtn');
+        var urb = document.getElementById('detailsUatRecallBtn');
 
-        /* Fix 1: hide Forward/Request Info for forwarded (Awaiting Client) and closed */
-        if (fb) fb.style.display = (statusKey === 'closed' || statusKey === 'forwarded') ? 'none' : '';
+        /* Hide Forward/Request Info for forwarded, closed, and UAT */
+        if (fb) fb.style.display = (statusKey === 'closed' || statusKey === 'forwarded' || statusKey === 'uat') ? 'none' : '';
 
-        /* Reassign: hide only for closed */
-        if (rb) rb.style.display = statusKey === 'closed' ? 'none' : '';
+        /* Hide Reassign for closed and UAT (ticket is with client) */
+        if (rb) rb.style.display = (statusKey === 'closed' || statusKey === 'uat') ? 'none' : '';
 
         /* Fix 2: show Resume only for forwarded (Awaiting Client) */
         if (rsb) rsb.style.display = statusKey === 'forwarded' ? '' : 'none';
 
         /* Fix 4: show Close Ticket only for resolved */
         if (ctb) ctb.style.display = statusKey === 'resolved' ? '' : 'none';
+
+        /* Show Recall only for UAT */
+        if (urb) urb.style.display = statusKey === 'uat' ? '' : 'none';
 
         /* Fix 3: update footer badge CSS class to match actual status */
         var footerBadge = document.getElementById('footerStatusBadge');
@@ -2619,6 +2737,7 @@
                 'new':        'tw-status-badge--new',
                 'inprogress': 'tw-status-badge--progress',
                 'forwarded':  'tw-status-badge--forwarded',
+                'uat':        'tw-status-badge--uat',
                 'closed':     'tw-status-badge--closed',
                 'resolved':   'tw-status-badge--resolved'
             };
@@ -2635,6 +2754,10 @@
         var roNotice = document.getElementById('modalReadOnlyNotice');
         if (roNotice) roNotice.style.display = statusKey === 'closed' ? '' : 'none';
 
+        /* Show UAT notice only for UAT tickets */
+        var uatNotice = document.getElementById('modalUatNotice');
+        if (uatNotice) uatNotice.style.display = statusKey === 'uat' ? '' : 'none';
+
         closeDashActionPanel('dashReassignPanel');
         closeDashActionPanel('dashForwardPanel');
     };
@@ -2647,6 +2770,23 @@
             closeTicketDetailsModal();
             resumeTicket(row.querySelector('.tw-action-icon--resume'));
         }
+    });
+
+    /* Wire Recall button — returns UAT ticket to In Progress (backend does the move) */
+    document.getElementById('detailsUatRecallBtn').addEventListener('click', function() {
+        var ticketId = document.getElementById('modalTicketId').textContent;
+        openConfirmModal({
+            type:    'danger',
+            title:   'Recall Ticket',
+            message: 'Recall this ticket? It will return to In Progress at Development stage.',
+            details: '<p><strong>Ticket:</strong> ' + ticketId + '</p>',
+            onConfirm: function() {
+                /* Django: POST /api/tickets/<id>/recall/ */
+                console.log('[Dashboard] UAT recalled:', ticketId);
+                closeTicketDetailsModal();
+                showDashToast('Ticket recalled to In Progress.', 'info');
+            }
+        });
     });
 
 
@@ -3377,6 +3517,7 @@
             case 'inbox':     show = ['bulkAssignBtn', 'bulkRejectBtn'];            break;
             case 'progress':  show = ['bulkReassignBtn', 'bulkRequestInfoBtn'];     break;
             case 'forwarded': show = ['bulkResumeBtn'];                             break;
+            case 'uat':       show = ['bulkExportBtn'];                             break;
             case 'resolved':  show = ['bulkCloseBtn', 'bulkExportBtn'];             break;
             case 'closed':    show = ['bulkExportBtn'];                             break;
             case 'rejected':  show = ['bulkExportBtn'];                             break;
