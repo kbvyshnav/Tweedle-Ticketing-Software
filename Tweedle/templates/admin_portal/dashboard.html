@@ -352,7 +352,6 @@
                     <td>
                         <div class="tw-row-actions">
                             <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
                             <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
                         </div>
                     </td>
@@ -372,7 +371,6 @@
                     <td>
                         <div class="tw-row-actions">
                             <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
                             <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
                         </div>
                     </td>
@@ -838,12 +836,7 @@
                             Duplicate of TKT-00071 — already resolved
                         </div>
                     </td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                        </div>
-                    </td>
+                    <td><div class="tw-row-actions"></div></td>
                 </tr>
 
                 <tr data-ticket-id="TKT-00063" data-ticket-type="rejected" data-subject="Dashboard stats not loading for sub-users" data-status="rejected" data-client="BGEX">
@@ -862,12 +855,7 @@
                             Insufficient information provided — client did not…
                         </div>
                     </td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                        </div>
-                    </td>
+                    <td><div class="tw-row-actions"></div></td>
                 </tr>
 
                 <!-- Django: {% endfor %} -->
@@ -1244,6 +1232,81 @@
     </div>
     </div>
     <!-- END TICKET DETAILS MODAL -->
+
+
+    <!-- ==============================================================
+         REJECTED TICKET MODAL (read-only)
+         Opened by clicking any row in #tab-rejected.
+         No action buttons — terminal state view only.
+         ============================================================== -->
+    <div class="tw-modal-overlay" id="rejectedTicketModal" role="dialog" aria-modal="true" aria-labelledby="rejModalTicketId">
+    <div class="tw-modal-container">
+
+        <div class="tw-modal-header">
+            <div class="tw-modal-header-left">
+
+                <h2 class="tw-modal-title">
+                    <i class="bx bx-receipt" aria-hidden="true"></i>
+                    <span id="rejModalTicketId">TKT-00089</span>
+                </h2>
+
+                <p class="tw-modal-subtitle" id="rejModalSubject">Subject</p>
+
+                <div class="tw-modal-header-meta">
+                    <span class="tw-modal-status-pill" style="background:var(--tw-danger-light,#fdecea);color:var(--tw-danger)">Rejected</span>
+                </div>
+
+            </div>
+
+            <button class="tw-modal-close" onclick="closeRejectedModal()" aria-label="Close rejected ticket details">
+                <i class="bx bx-x" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <div class="tw-modal-body">
+
+            <!-- Read-only banner -->
+            <div style="background:var(--tw-danger-light,#fdecea);color:var(--tw-danger);padding:8px 12px;border-radius:var(--tw-radius-sm);font-size:var(--tw-text-sm);margin-bottom:var(--tw-space-4)">
+                This ticket has been rejected. No further actions are available.
+            </div>
+
+            <div class="tw-info-grid tw-info-grid--3col">
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Client</div>
+                    <div class="tw-info-value" id="rejModalClient">—</div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Priority</div>
+                    <div class="tw-info-value" id="rejModalPriority">—</div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Issue Date</div>
+                    <div class="tw-info-value" id="rejModalIssueDate">—</div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Rejected By</div>
+                    <div class="tw-info-value" id="rejModalRejectedBy">—</div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Rejected On</div>
+                    <div class="tw-info-value" id="rejModalRejectedOn">—</div>
+                </div>
+                <div class="tw-info-item">
+                    <div class="tw-info-label">Category</div>
+                    <div class="tw-info-value" id="rejModalCategory">—</div>
+                </div>
+            </div>
+
+            <div class="tw-modal-section">
+                <h3 class="section-title">Rejection Reason</h3>
+                <div class="tw-description-box" id="rejModalReason"></div>
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+    <!-- END REJECTED TICKET MODAL -->
 
 
     <!-- ==============================================================
@@ -2067,6 +2130,26 @@
 
             if (type === 'new') {
                 openNewTicketModal(ticketId, subject, status || 'New Ticket');
+            } else if (type === 'rejected') {
+                /* Fix 4: read rejected data from table cells */
+                var cells   = this.cells;
+                /* cells[0]=checkbox, [1]=ticketId, [2]=subject, [3]=client,
+                   [4]=priority, [5]=rejectedBy, [6]=rejectedOn, [7]=reason */
+                var reasonDiv = cells[7] ? cells[7].querySelector('div') : null;
+                var fullReason = reasonDiv
+                    ? (reasonDiv.getAttribute('title') || reasonDiv.textContent.trim())
+                    : '—';
+                openRejectedModal(
+                    ticketId,
+                    subject,
+                    cells[3] ? cells[3].textContent.trim() : '—',
+                    cells[4] ? cells[4].textContent.trim() : '—',
+                    '—',       /* issue date not in rejected table */
+                    cells[5] ? cells[5].textContent.trim() : '—',
+                    cells[6] ? cells[6].textContent.trim() : '—',
+                    '—',       /* category not in rejected table */
+                    fullReason
+                );
             } else {
                 openTicketDetailsModal(ticketId, subject, status, allottee, subStatus);
             }
@@ -2623,6 +2706,31 @@
         document.getElementById('chatPanel').classList.add('open');
         const area = document.getElementById('messagesArea');
         if (area) area.scrollTop = area.scrollHeight;
+
+        /* Fix 3: disable send UI for closed tickets */
+        var closedRow = document.querySelector('#tab-closed tbody tr[data-ticket-id="' + ticketId + '"]');
+        var isClosed  = !!closedRow;
+        var textarea  = document.getElementById('chatTextarea');
+        var sendBtn   = document.getElementById('sendBtn');
+        var attachBtn = document.getElementById('attach-btn');
+
+        if (textarea)  textarea.disabled  = isClosed;
+        if (sendBtn)   sendBtn.disabled   = isClosed;
+        if (attachBtn) attachBtn.disabled = isClosed;
+
+        /* Create the read-only notice once; show/hide on every open */
+        var notice = document.getElementById('chatReadOnlyNotice');
+        if (!notice) {
+            notice = document.createElement('div');
+            notice.id = 'chatReadOnlyNotice';
+            notice.textContent = 'This ticket is closed. Chat is read-only.';
+            notice.style.cssText = 'background:var(--tw-status-closed-bg);color:var(--tw-status-closed-text);' +
+                'padding:8px 12px;border-radius:var(--tw-radius-sm);font-size:var(--tw-text-sm);' +
+                'margin-bottom:8px;display:none';
+            var inputRow = document.querySelector('.tw-chat-input-row');
+            if (inputRow) inputRow.parentNode.insertBefore(notice, inputRow);
+        }
+        notice.style.display = isClosed ? 'block' : 'none';
     }
 
     function closeChatPanel() {
@@ -2981,6 +3089,9 @@
         if (document.getElementById('newTicketModal').classList.contains('active')) {
             closeNewTicketModal(); return;
         }
+        if (document.getElementById('rejectedTicketModal').classList.contains('active')) {
+            closeRejectedModal(); return;
+        }
         if (document.getElementById('fullTimelineModal').classList.contains('active')) {
             closeFullTimeline(); return;
         }
@@ -3095,5 +3206,33 @@
         showDashToast('Exporting ' + selectedTicketIds.size + ' ticket(s)…');
         clearBulkSelection();
     }
+
+
+    /* ============================================================
+     * REJECTED TICKET MODAL — Fix 4
+     * ============================================================ */
+    function openRejectedModal(id, subject, client, priority, issueDate,
+                                rejectedBy, rejectedOn, category, reason) {
+        document.getElementById('rejModalTicketId').textContent  = id;
+        document.getElementById('rejModalSubject').textContent   = subject;
+        document.getElementById('rejModalClient').textContent    = client;
+        document.getElementById('rejModalPriority').textContent  = priority;
+        document.getElementById('rejModalIssueDate').textContent = issueDate;
+        document.getElementById('rejModalRejectedBy').textContent = rejectedBy;
+        document.getElementById('rejModalRejectedOn').textContent = rejectedOn;
+        document.getElementById('rejModalCategory').textContent  = category;
+        document.getElementById('rejModalReason').textContent    = reason;
+        document.getElementById('rejectedTicketModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeRejectedModal() {
+        document.getElementById('rejectedTicketModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    document.getElementById('rejectedTicketModal').addEventListener('click', function(e) {
+        if (e.target === this) closeRejectedModal();
+    });
 </script>
 <!-- Django: {% endblock %} -->
