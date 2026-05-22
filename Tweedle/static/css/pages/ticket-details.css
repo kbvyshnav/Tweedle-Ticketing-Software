@@ -1040,7 +1040,7 @@ body {
  * ============================================================ */
 #ticketDetailsModal[data-status="progress"] .tw-modal-container,
 #ticketDetailsModal[data-status="inprogress"] .tw-modal-container,
-#ticketDetailsModal[data-status="inbox"] .tw-modal-container {
+#ticketDetailsModal[data-status="new"] .tw-modal-container {
     border-left: 4px solid var(--tw-status-progress-text);
 }
 

@@ -294,6 +294,11 @@
     color: var(--tw-status-inbox-text);
 }
 
+.tw-status-badge--progress {
+    background: var(--tw-status-progress-bg);
+    color: var(--tw-status-progress-text);
+}
+
 .tw-status-badge--forwarded {
     background: var(--tw-status-forwarded-bg);
     color: var(--tw-status-forwarded-text);

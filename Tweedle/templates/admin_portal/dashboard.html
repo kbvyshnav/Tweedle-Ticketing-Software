@@ -932,7 +932,7 @@
                     <td><div title="Login page broken on Safari">Login page broken on Safari</div></td>
                     <td>GMEC</td>
                     <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
-                    <td>Rajagopal P</td>
+                    <td>Jinoy Jose</td>
                     <td>15-01-2025</td>
                     <td>
                         <div title="Duplicate of TKT-00071 — already resolved">
@@ -951,7 +951,7 @@
                     <td><div title="Dashboard stats not loading for sub-users">Dashboard stats not loading for sub-users</div></td>
                     <td>BGEX</td>
                     <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
-                    <td>Rajagopal P</td>
+                    <td>Jinoy Jose</td>
                     <td>08-01-2025</td>
                     <td>
                         <div title="Insufficient information provided — client did not respond to follow-up within 7 days">
@@ -1907,6 +1907,57 @@
         role:     'Admin'
     };
 
+    /* ============================================================
+     * ACTIVE FILTER STATE + MASTER FILTER FUNCTION
+     * Single source of truth — applyAllFilters() ANDs all three.
+     * ============================================================ */
+    var activeFilters = {
+        company:  'all',
+        priority: 'all',
+        dateFrom:  null,
+        dateTo:    null
+    };
+
+    function applyAllFilters() {
+        document.querySelectorAll('.tab-content tbody tr').forEach(function(row) {
+            var show = true;
+
+            /* Company filter */
+            if (activeFilters.company !== 'all') {
+                var rowCompany = (row.dataset.client || '').toLowerCase();
+                if (rowCompany !== activeFilters.company.toLowerCase()) show = false;
+            }
+
+            /* Priority filter */
+            if (show && activeFilters.priority !== 'all') {
+                var badge = row.querySelector('.tw-priority-badge');
+                if (!badge) {
+                    show = false;
+                } else {
+                    var p = badge.textContent.trim().toLowerCase();
+                    if (p !== activeFilters.priority.toLowerCase()) show = false;
+                }
+            }
+
+            /* Date filter — skips rejected tab; reads date from cells[3] */
+            if (show && (activeFilters.dateFrom || activeFilters.dateTo)) {
+                var tabPanel = row.closest('.tab-content');
+                if (!tabPanel || tabPanel.id !== 'tab-rejected') {
+                    var dateCell = row.cells[3];
+                    var rowDate  = parseTwDate(dateCell ? dateCell.textContent.trim() : '');
+                    if (rowDate) {
+                        if (activeFilters.dateFrom && rowDate < activeFilters.dateFrom) show = false;
+                        if (activeFilters.dateTo   && rowDate > activeFilters.dateTo)   show = false;
+                    }
+                    /* No parseable date → leave row visible */
+                }
+                /* Rejected tab rows always pass the date filter */
+            }
+
+            row.style.display = show ? '' : 'none';
+        });
+    }
+
 
     /* ============================================================
      * STAR TOGGLE
@@ -2057,40 +2108,15 @@
         return isNaN(dt.getTime()) ? null : dt;
     }
 
-    /* Fix 2: date range filter — reads issue date from cells[3] for all non-rejected tabs */
+    /* Date range filter — normalises dates and delegates to applyAllFilters() */
     function applyDateFilter(fromDt, toDt) {
-        if (!fromDt && !toDt) {
-            document.querySelectorAll('.tab-content tbody tr').forEach(function(row) {
-                row.style.removeProperty('display');
-            });
-            return;
-        }
         var from = fromDt ? new Date(fromDt.getTime()) : null;
         var to   = toDt   ? new Date(toDt.getTime())   : null;
         if (from) from.setHours(0, 0, 0, 0);
         if (to)   to.setHours(23, 59, 59, 999);
-
-        document.querySelectorAll('.tab-content tbody tr').forEach(function(row) {
-            /* Rejected tab has no issue date column — always show */
-            var tabPanel = row.closest('.tab-content');
-            if (tabPanel && tabPanel.id === 'tab-rejected') {
-                row.style.removeProperty('display');
-                return;
-            }
-            /* Issue date is in cells[3] for all other tabs */
-            var dateCell = row.cells[3];
-            var rowDate  = parseTwDate(dateCell ? dateCell.textContent.trim() : '');
-            if (!rowDate) {
-                row.style.removeProperty('display');
-                return;
-            }
-            var inRange = (!from || rowDate >= from) && (!to || rowDate <= to);
-            if (inRange) {
-                row.style.removeProperty('display');
-            } else {
-                row.style.display = 'none';
-            }
-        });
+        activeFilters.dateFrom = from;
+        activeFilters.dateTo   = to;
+        applyAllFilters();
     }
 
     document.addEventListener('click', function() {
@@ -2150,41 +2176,14 @@
     });
 
     function applyPriorityFilter(priority) {
-        document.querySelectorAll('.tab-content tbody tr').forEach(function(row) {
-            if (!priority) {
-                row.style.removeProperty('display');
-                return;
-            }
-            /* Find the priority badge in this row, if any */
-            var badge = row.querySelector('.tw-priority-badge');
-            if (!badge) {
-                /* Row has no priority column — do not hide it */
-                row.style.removeProperty('display');
-                return;
-            }
-            var rowPriority = badge.textContent.trim().toLowerCase();
-            if (rowPriority === priority) {
-                row.style.removeProperty('display');
-            } else {
-                row.style.display = 'none';
-            }
-        });
+        activeFilters.priority = priority || 'all';
+        applyAllFilters();
     }
 
     /* Fix 1: company filter — hide rows whose data-client doesn't match */
     function applyCompanyFilter(companyValue) {
-        document.querySelectorAll('.tab-content tbody tr').forEach(function(row) {
-            if (!companyValue || companyValue === 'all') {
-                row.style.removeProperty('display');
-                return;
-            }
-            var rowClient = (row.dataset.client || '').toLowerCase();
-            if (rowClient === companyValue.toLowerCase()) {
-                row.style.removeProperty('display');
-            } else {
-                row.style.display = 'none';
-            }
-        });
+        activeFilters.company = companyValue || 'all';
+        applyAllFilters();
     }
 
 
@@ -2617,11 +2616,11 @@
         var footerBadge = document.getElementById('footerStatusBadge');
         if (footerBadge) {
             var statusClassMap = {
-                inbox:      'tw-status-badge--new',
-                progress:   'tw-status-badge--progress',
-                forwarded:  'tw-status-badge--forwarded',
-                closed:     'tw-status-badge--closed',
-                resolved:   'tw-status-badge--resolved'
+                'new':        'tw-status-badge--new',
+                'inprogress': 'tw-status-badge--progress',
+                'forwarded':  'tw-status-badge--forwarded',
+                'closed':     'tw-status-badge--closed',
+                'resolved':   'tw-status-badge--resolved'
             };
             /* Remove any existing tw-status-badge--* modifier */
             footerBadge.className = footerBadge.className
