@@ -5,6 +5,10 @@ Github commands.txt
 TODO.txt
 *.log
 
+# ── AI and project meta files ───────────────────────────────────
+.claude/
+PROJECT_HANDOFF.md
+
 # ── OS generated files ──────────────────────────────────────────
 .DS_Store
 .DS_Store?
