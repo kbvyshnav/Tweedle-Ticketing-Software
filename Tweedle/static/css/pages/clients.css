@@ -92,6 +92,67 @@ body > main {
 }
 
 
+/* === FIX 1: ⋮ DROPDOWN — OVERFLOW ESCAPE =================
+ * Override the shared overflow-x:auto rules on the card and
+ * scroll wrapper so the absolute dropdown is never clipped.
+ * ============================================================ */
+.tw-table-card {
+    overflow: visible;
+}
+
+.table-scroll-wrapper {
+    overflow: visible;
+}
+
+/* Ensure last td and rows don't re-introduce clipping */
+#clientsTable td:last-child {
+    overflow: visible;
+    position: relative;
+}
+
+#clientsTable tbody tr {
+    overflow: visible;
+}
+
+/* ⋮ dropdown wrapper and menu */
+.client-more-wrap {
+    position: relative;
+}
+
+.client-more-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: 200;
+    background: var(--tw-bg-surface);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-md);
+    box-shadow: var(--tw-shadow-md);
+    min-width: 160px;
+    padding: 4px 0;
+}
+
+.client-more-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-primary);
+    cursor: pointer;
+    white-space: nowrap;
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+}
+
+.client-more-menu-item:hover {
+    background: var(--tw-primary-light);
+    color: var(--tw-primary-text);
+}
+
+
 /* === RESPONSIVE ============================================ */
 
 @media screen and (max-width: 1024px) {

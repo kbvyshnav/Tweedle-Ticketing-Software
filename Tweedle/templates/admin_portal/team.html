@@ -20,6 +20,14 @@
     </div>
 
 
+    <!-- === ROLE FILTER BAR =================================== -->
+    <div class="team-role-filter" style="display:flex;align-items:center;gap:var(--tw-space-2);margin-bottom:var(--tw-space-4)">
+        <button class="tw-btn tw-btn-primary tw-btn--sm" data-role="all" onclick="filterTeamByRole('all', this)">All Members</button>
+        <button class="tw-btn tw-btn-outline tw-btn--sm" data-role="developer" onclick="filterTeamByRole('developer', this)">Developers</button>
+        <button class="tw-btn tw-btn-outline tw-btn--sm" data-role="tester" onclick="filterTeamByRole('tester', this)">Testers</button>
+    </div>
+
+
     <!-- === TEAM TABLE CARD =================================== -->
     <div class="tw-table-card">
 
@@ -66,6 +74,7 @@
                     <th scope="col">Username</th>
                     <th scope="col">Role</th>
                     <th scope="col">Email</th>
+                    <th scope="col">Workload</th>
                     <th scope="col">Status</th>
                     <th scope="col">Actions</th>
                 </tr>
@@ -75,7 +84,7 @@
                 <!-- Django: {% for member in team_members %} -->
 
                 <!-- Row 1: John Smith (Developer, Enabled) -->
-                <tr data-username="john_dev">
+                <tr data-username="john_dev" data-role="developer">
                     <td>
                         <div class="member-name-cell">
                             <div class="tw-avatar tw-avatar--john" aria-hidden="true">J</div>
@@ -91,6 +100,7 @@
                     </td>
                     <!-- Django: {{ member.email }} -->
                     <td>john.smith@tweedle.com</td>
+                    <td><span class="tw-count-badge">5</span></td>
                     <td>
                         <!-- Django: checked="{% if member.is_active %}checked{% endif %}" -->
                         <label class="tw-status-toggle">
@@ -113,7 +123,7 @@
                 </tr>
 
                 <!-- Row 2: Alice Miller (Tester, Disabled) -->
-                <tr data-username="a_miller">
+                <tr data-username="a_miller" data-role="tester">
                     <td>
                         <div class="member-name-cell">
                             <div class="tw-avatar tw-avatar--alice" aria-hidden="true">A</div>
@@ -123,6 +133,7 @@
                     <td>a_miller</td>
                     <td><span class="tw-role-badge tw-role-badge--tester">Tester</span></td>
                     <td>alice.miller@tweedle.com</td>
+                    <td><span class="tw-count-badge">3</span></td>
                     <td>
                         <label class="tw-status-toggle">
                             <input
@@ -142,7 +153,7 @@
                 </tr>
 
                 <!-- Row 3: Vyshnav K B (Developer, Enabled) -->
-                <tr data-username="kb_vyshnav">
+                <tr data-username="kb_vyshnav" data-role="developer">
                     <td>
                         <div class="member-name-cell">
                             <div class="tw-avatar tw-avatar--vyshnav" aria-hidden="true">V</div>
@@ -152,6 +163,7 @@
                     <td>kb_vyshnav</td>
                     <td><span class="tw-role-badge tw-role-badge--developer">Developer</span></td>
                     <td>vyshnav.kb@tweedle.com</td>
+                    <td><span class="tw-count-badge">7</span></td>
                     <td>
                         <label class="tw-status-toggle">
                             <input
@@ -214,6 +226,12 @@
                             <label class="tw-form-label" for="memberJobTitle">Job Title / Specialization</label>
                             <input class="tw-input" id="memberJobTitle" type="text" placeholder="e.g. Backend Developer, QA Lead">
                         </div>
+                    </div>
+
+                    <div class="tw-form-group">
+                        <label class="tw-form-label" for="previewUsername">Username Preview</label>
+                        <input class="tw-input" id="previewUsername" type="text" placeholder="auto-generated from full name" readonly style="background:var(--tw-bg-body);color:var(--tw-text-muted);cursor:default">
+                        <span style="display:block;font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:4px">Auto-generated. Final username assigned on creation.</span>
                     </div>
 
                     <div class="tw-form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--tw-space-4);align-items:start">
@@ -302,7 +320,7 @@
         const rows   = teamTable.querySelectorAll('tbody tr');
 
         rows.forEach(row => {
-            const cells   = row.querySelectorAll('td:nth-child(-n+5)');
+            const cells   = row.querySelectorAll('td:nth-child(-n+6)');
             const rowText = Array.from(cells).map(c => c.textContent).join(' ').toLowerCase();
             row.classList.toggle('row-hidden', filter.length > 0 && !rowText.includes(filter));
         });
@@ -313,17 +331,54 @@
      * STATUS TOGGLE
      * ============================================================ */
     function toggleMemberStatus(checkbox, username) {
-        const label = checkbox.nextElementSibling;
+        var label = checkbox.nextElementSibling;
 
         if (checkbox.checked) {
             label.textContent = 'Enabled';
             label.classList.remove('toggle-label--disabled');
-            console.log(`[Django POST] Enable user: ${username}`);
+            console.log('[Django POST] Enable user: ' + username);
         } else {
+            var row = checkbox.closest('tr');
+            var workloadBadge = row ? row.querySelector('.tw-count-badge') : null;
+            var activeCount = workloadBadge ? parseInt(workloadBadge.textContent, 10) : 0;
+
+            if (activeCount > 0) {
+                var confirmed = confirm(
+                    username + ' has ' + activeCount + ' active ticket' + (activeCount === 1 ? '' : 's') + '. ' +
+                    'Disabling them will not reassign those tickets. Continue?'
+                );
+                if (!confirmed) {
+                    checkbox.checked = true;
+                    return;
+                }
+            }
+
             label.textContent = 'Disabled';
             label.classList.add('toggle-label--disabled');
-            console.log(`[Django POST] Disable user: ${username}`);
+            console.log('[Django POST] Disable user: ' + username);
         }
+    }
+
+
+    /* ============================================================
+     * ROLE FILTER
+     * ============================================================ */
+    function filterTeamByRole(role, btn) {
+        document.querySelectorAll('.team-role-filter .tw-btn').forEach(function(b) {
+            b.classList.remove('tw-btn-primary');
+            b.classList.add('tw-btn-outline');
+        });
+        if (btn) {
+            btn.classList.remove('tw-btn-outline');
+            btn.classList.add('tw-btn-primary');
+        }
+        document.querySelectorAll('#teamTable tbody tr').forEach(function(row) {
+            if (role === 'all') {
+                row.classList.remove('row-hidden');
+            } else {
+                row.classList.toggle('row-hidden', row.dataset.role !== role);
+            }
+        });
     }
 
 
@@ -356,6 +411,17 @@
         if (e.key === 'Escape' && addMemberModal.classList.contains('active')) {
             closeAddMemberModal();
         }
+    });
+
+
+    /* ============================================================
+     * USERNAME PREVIEW
+     * ============================================================ */
+    document.getElementById('memberFullName').addEventListener('input', function() {
+        var words = this.value.replace(/[^a-zA-Z\s]/g, '').trim().split(/\s+/);
+        var preview = words[0] ? words[0].toLowerCase() + (words[1] ? '_' + words[1][0].toLowerCase() : '') : '';
+        var previewEl = document.getElementById('previewUsername');
+        if (previewEl) previewEl.value = preview;
     });
 
 
@@ -460,6 +526,7 @@
 
         var newRow = document.createElement('tr');
         newRow.setAttribute('data-username', username);
+        newRow.setAttribute('data-role', role);
         newRow.innerHTML =
             '<td>' +
                 '<div class="member-name-cell">' +
@@ -473,6 +540,7 @@
             '<td>' + username + '</td>' +
             '<td><span class="tw-role-badge ' + roleClass + '">' + roleLabel + '</span></td>' +
             '<td>' + email + '</td>' +
+            '<td><span class="tw-count-badge">0</span></td>' +
             '<td>' +
                 '<span class="tw-status-badge" style="background:var(--tw-status-progress-bg);color:var(--tw-status-progress-text);display:inline-block;margin-bottom:4px">Pending Invite</span>' +
                 '<label class="tw-status-toggle">' +
@@ -513,6 +581,9 @@
             if (el) { el.value = ''; clearMemberError(el); }
         });
 
+        var previewUsername = document.getElementById('previewUsername');
+        if (previewUsername) previewUsername.value = '';
+
         var maxTickets = document.getElementById('memberMaxTickets');
         if (maxTickets) maxTickets.value = '5';
 
@@ -537,10 +608,10 @@
      * ============================================================ */
     function showTeamToast(message, type) {
         type = type || 'success';
+        var iconMap = { success: 'bx-check-circle', error: 'bx-error-circle', info: 'bx-info-circle' };
         var toast = document.createElement('div');
         toast.className = 'tw-toast tw-toast--' + type;
-        toast.innerHTML = '<i class=\'bx ' +
-            (type === 'success' ? 'bx-check-circle' : 'bx-error-circle') +
+        toast.innerHTML = '<i class=\'bx ' + (iconMap[type] || 'bx-info-circle') +
             '\'></i><span>' + message + '</span>';
         document.body.appendChild(toast);
         setTimeout(function() { toast.classList.add('show'); }, 10);
@@ -556,7 +627,7 @@
      * Django: replace with {% url 'admin_team_member_detail' %} redirect
      * ============================================================ */
     function viewDetails(username) {
-        console.log('[Phase 7] View Details for:', username);
+        showTeamToast('Member details view — coming in the next update', 'info');
     }
 </script>
 <!-- Django: {% endblock %} -->
