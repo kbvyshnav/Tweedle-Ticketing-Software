@@ -271,12 +271,19 @@
                     </div>
                 </div>
 
-                <!-- Priority filter (stub) -->
+                <!-- Priority filter -->
+                <!-- Django: ?priority=high/medium/low query param filters queryset -->
                 <div class="filter-btn-wrap">
-                    <button class="tw-toolbar-btn" id="priorityBtn">
-                        <i class="bx bx-flag"></i> Priority
+                    <button class="tw-toolbar-btn" id="priorityBtn" onclick="togglePriorityDropdown(event)">
+                        <i class="bx bx-flag"></i><span id="priorityBtnText"> Priority</span>
                         <span class="tw-dropdown-arrow" aria-hidden="true"></span>
                     </button>
+                    <div id="priorityDropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--tw-bg-surface);border:1px solid var(--tw-border);border-radius:var(--tw-radius-md);box-shadow:var(--tw-shadow-md);min-width:180px;z-index:100;padding:var(--tw-space-2) 0;">
+                        <div class="tw-priority-option" data-value="" style="padding:var(--tw-space-2) var(--tw-space-4);cursor:pointer;font-size:var(--tw-text-base);color:var(--tw-text-primary);display:flex;align-items:center;transition:background 0.1s">All Priorities</div>
+                        <div class="tw-priority-option" data-value="high" style="padding:var(--tw-space-2) var(--tw-space-4);cursor:pointer;font-size:var(--tw-text-base);color:var(--tw-text-primary);display:flex;align-items:center;transition:background 0.1s"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--tw-priority-high-text);margin-right:6px;flex-shrink:0"></span>High</div>
+                        <div class="tw-priority-option" data-value="medium" style="padding:var(--tw-space-2) var(--tw-space-4);cursor:pointer;font-size:var(--tw-text-base);color:var(--tw-text-primary);display:flex;align-items:center;transition:background 0.1s"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--tw-priority-medium-text);margin-right:6px;flex-shrink:0"></span>Medium</div>
+                        <div class="tw-priority-option" data-value="low" style="padding:var(--tw-space-2) var(--tw-space-4);cursor:pointer;font-size:var(--tw-text-base);color:var(--tw-text-primary);display:flex;align-items:center;transition:background 0.1s"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--tw-priority-low-text);margin-right:6px;flex-shrink:0"></span>Low</div>
+                    </div>
                 </div>
 
             </div>
@@ -1701,6 +1708,9 @@
     var toDate       = document.getElementById('toDate');
     var quickFilters = document.querySelectorAll('.tw-quick-filter');
 
+    var priorityBtn          = document.getElementById('priorityBtn');
+    var activePriorityFilter = '';
+
     dateBtn.addEventListener('click', function(e) {
         e.stopPropagation();
         const isOpen = dateDropdown.classList.toggle('active');
@@ -1762,10 +1772,84 @@
         dateDropdown.classList.remove('active');
         companyBtn.setAttribute('aria-expanded', 'false');
         dateBtn.setAttribute('aria-expanded', 'false');
+        var pd = document.getElementById('priorityDropdown');
+        if (pd) pd.style.display = 'none';
     });
 
     companyDropdown.addEventListener('click', function(e) { e.stopPropagation(); });
     dateDropdown.addEventListener('click', function(e) { e.stopPropagation(); });
+
+    /* Stop priority dropdown clicks from reaching the document close-all handler */
+    var priorityDropdownEl = document.getElementById('priorityDropdown');
+    if (priorityDropdownEl) {
+        priorityDropdownEl.addEventListener('click', function(e) { e.stopPropagation(); });
+    }
+
+
+    /* ============================================================
+     * PRIORITY FILTER DROPDOWN
+     * Django: ?priority=high|medium|low added to DashboardView queryset
+     * ============================================================ */
+    function togglePriorityDropdown(e) {
+        if (e) e.stopPropagation();
+        var dropdown = document.getElementById('priorityDropdown');
+        var isOpen   = dropdown.style.display === 'block';
+        /* Close other open dropdowns first */
+        companyDropdown.classList.remove('active');
+        dateDropdown.classList.remove('active');
+        companyBtn.setAttribute('aria-expanded', 'false');
+        dateBtn.setAttribute('aria-expanded', 'false');
+        dropdown.style.display = isOpen ? 'none' : 'block';
+    }
+
+    document.querySelectorAll('.tw-priority-option').forEach(function(opt) {
+        opt.addEventListener('mouseover', function() {
+            this.style.background = 'var(--tw-primary-light)';
+        });
+        opt.addEventListener('mouseout', function() {
+            this.style.background = 'transparent';
+        });
+        opt.addEventListener('click', function() {
+            var value = this.dataset.value;
+            activePriorityFilter = value;
+
+            /* Update button label and active color */
+            var btnText = document.getElementById('priorityBtnText');
+            if (value) {
+                var label = value.charAt(0).toUpperCase() + value.slice(1);
+                if (btnText)     btnText.textContent = ' Priority: ' + label;
+                if (priorityBtn) priorityBtn.style.color = 'var(--tw-primary)';
+            } else {
+                if (btnText)     btnText.textContent = ' Priority';
+                if (priorityBtn) priorityBtn.style.color = '';
+            }
+
+            document.getElementById('priorityDropdown').style.display = 'none';
+            applyPriorityFilter(value);
+        });
+    });
+
+    function applyPriorityFilter(priority) {
+        document.querySelectorAll('.tab-content tbody tr').forEach(function(row) {
+            if (!priority) {
+                row.style.removeProperty('display');
+                return;
+            }
+            /* Find the priority badge in this row, if any */
+            var badge = row.querySelector('.tw-priority-badge');
+            if (!badge) {
+                /* Row has no priority column — do not hide it */
+                row.style.removeProperty('display');
+                return;
+            }
+            var rowPriority = badge.textContent.trim().toLowerCase();
+            if (rowPriority === priority) {
+                row.style.removeProperty('display');
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
 
 
     /* ============================================================
@@ -2734,6 +2818,11 @@
     document.addEventListener('keydown', function(e) {
         if (e.key !== 'Escape') return;
 
+        var pd = document.getElementById('priorityDropdown');
+        if (pd && pd.style.display === 'block') {
+            pd.style.display = 'none';
+            return;
+        }
         const overlay = document.getElementById('globalSearchOverlay');
         if (overlay && overlay.style.display === 'block') {
             overlay.style.display = 'none';
