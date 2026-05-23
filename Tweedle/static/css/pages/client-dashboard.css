@@ -1,0 +1,1240 @@
+/*
+ * ============================================================
+ * FILE:        client-dashboard.css
+ * PURPOSE:     Client portal page styles — My Tickets (dashboard),
+ *              Submit Ticket, and Ticket Detail views.
+ *              All three client portal pages share this file.
+ * ROLE:        User / Client (role-user, orange theme)
+ * LOAD ORDER:  5 of 5 — after tweedle-components.css
+ * DJANGO PATH: <!-- Django: {% static 'css/pages/client-dashboard.css' %} -->
+ * DEPENDS ON:  tweedle-tokens.css, theme-user.css, tweedle-base.css,
+ *              tweedle-components.css (all must load first)
+ * ============================================================
+ */
+
+
+/* === MAIN CONTENT PADDING =================================== */
+body > main {
+    padding: var(--tw-content-padding);
+}
+
+
+/* ============================================================
+ * SECTION 1: PAGE HEADER (shared pattern — all client pages)
+ * ============================================================ */
+
+.tw-client-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: var(--tw-space-5);
+    gap: var(--tw-space-4);
+    flex-wrap: wrap;
+}
+
+.tw-client-header-left h1 {
+    font-size: var(--tw-text-3xl);
+    font-weight: var(--tw-weight-bold);
+    color: var(--tw-text-primary);
+    margin: 0;
+}
+
+.tw-client-header-subtitle {
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-muted);
+    margin-top: 4px;
+}
+
+/* Back link in submit + detail pages */
+.tw-client-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tw-space-1);
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-muted);
+    margin-bottom: var(--tw-space-2);
+    cursor: pointer;
+    transition: color var(--tw-transition-fast);
+    text-decoration: none;
+}
+
+.tw-client-back-link:hover {
+    color: var(--tw-primary);
+}
+
+
+/* ============================================================
+ * SECTION 2: STAT STRIP — 4 cards (My Tickets page)
+ * Reuses .tw-stat-card base from dashboard.css.
+ * Adds 4 client-specific icon + border variants.
+ * ============================================================ */
+
+.tw-client-stat-strip {
+    display: flex;
+    gap: var(--tw-space-4);
+    margin-bottom: var(--tw-space-5);
+}
+
+/* Border accents */
+.tw-stat-card--client-open     { border-left-color: var(--tw-status-inbox-text); }
+.tw-stat-card--client-progress { border-left-color: var(--tw-status-progress-text); }
+.tw-stat-card--client-awaiting { border-left-color: var(--tw-primary); }
+.tw-stat-card--client-closed   { border-left-color: var(--tw-status-closed-text); }
+
+/* Icon backgrounds */
+.tw-stat-card--client-open     .tw-stat-card__icon { background: var(--tw-status-inbox-bg);     color: var(--tw-status-inbox-text); }
+.tw-stat-card--client-progress .tw-stat-card__icon { background: var(--tw-status-progress-bg);  color: var(--tw-status-progress-text); }
+.tw-stat-card--client-awaiting .tw-stat-card__icon { background: var(--tw-primary-light);        color: var(--tw-primary-text); }
+.tw-stat-card--client-closed   .tw-stat-card__icon { background: var(--tw-status-closed-bg);    color: var(--tw-status-closed-text); }
+
+/* Active (clicked) states */
+.tw-stat-card--client-open.active     { background: var(--tw-status-inbox-bg);     border-color: var(--tw-status-inbox-text);     border-left-color: var(--tw-status-inbox-text); }
+.tw-stat-card--client-progress.active { background: var(--tw-status-progress-bg);  border-color: var(--tw-status-progress-text);  border-left-color: var(--tw-status-progress-text); }
+.tw-stat-card--client-awaiting.active { background: var(--tw-primary-light);        border-color: var(--tw-primary);               border-left-color: var(--tw-primary); }
+.tw-stat-card--client-closed.active   { background: var(--tw-status-closed-bg);    border-color: var(--tw-status-closed-text);    border-left-color: var(--tw-status-closed-text); }
+
+
+/* ============================================================
+ * SECTION 3: FILTER BAR — status pills + search input
+ * ============================================================ */
+
+.tw-client-filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--tw-space-3);
+    margin-bottom: var(--tw-space-4);
+    flex-wrap: wrap;
+}
+
+.tw-client-filter-btns {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    flex-wrap: wrap;
+}
+
+.tw-client-filter-btn {
+    height: 34px;
+    padding: 0 var(--tw-space-4);
+    font-size: var(--tw-text-sm);
+    font-family: var(--tw-font-primary);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-secondary);
+    background: var(--tw-bg-surface);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-pill);
+    cursor: pointer;
+    transition: all var(--tw-transition-fast);
+    white-space: nowrap;
+}
+
+.tw-client-filter-btn:hover {
+    border-color: var(--tw-primary);
+    color: var(--tw-primary);
+}
+
+.tw-client-filter-btn.active {
+    background: var(--tw-primary);
+    color: #ffffff;
+    border-color: var(--tw-primary);
+}
+
+/* Search input in filter bar */
+.tw-client-search {
+    position: relative;
+    width: 220px;
+    flex-shrink: 0;
+}
+
+.tw-client-search input {
+    width: 100%;
+    height: 34px;
+    padding: 0 var(--tw-space-3) 0 32px;
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    font-size: var(--tw-text-sm);
+    font-family: var(--tw-font-primary);
+    background: var(--tw-bg-surface);
+    color: var(--tw-text-primary);
+    outline: none;
+    transition: border-color var(--tw-transition-fast);
+}
+
+.tw-client-search input:focus {
+    border-color: var(--tw-primary);
+    box-shadow: 0 0 0 3px rgba(253, 114, 56, 0.10);
+}
+
+.tw-client-search input::placeholder {
+    color: var(--tw-text-muted);
+    font-size: var(--tw-text-xs);
+}
+
+.tw-client-search .tw-search-icon {
+    position: absolute;
+    left: var(--tw-space-2);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--tw-text-muted);
+    font-size: 16px;
+    pointer-events: none;
+}
+
+
+/* ============================================================
+ * SECTION 4: ACTION REQUIRED INDICATORS
+ * Pulsing dot that draws attention to tickets needing client
+ * action (Awaiting Response, UAT Approval).
+ * ============================================================ */
+
+.tw-action-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--tw-primary);
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 6px;
+    vertical-align: middle;
+    flex-shrink: 0;
+    animation: tw-pulse 1.5s infinite;
+}
+
+@keyframes tw-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(1.3); }
+}
+
+/* "Action Required" text badge */
+.tw-action-required-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--tw-text-xs);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-primary-text);
+    background: var(--tw-primary-light);
+    padding: 2px 7px;
+    border-radius: var(--tw-radius-pill);
+    white-space: nowrap;
+    margin-left: var(--tw-space-2);
+}
+
+/* Status badge for Rejected (not in tweedle-components.css) */
+.tw-status-badge--rejected {
+    background: var(--tw-priority-high-bg);
+    color: var(--tw-priority-high-text);
+}
+
+
+/* ============================================================
+ * SECTION 5: TICKET DETAIL — 2-COLUMN LAYOUT
+ * 65/35 split: left = content, right = meta + timeline
+ * ============================================================ */
+
+.tw-detail-layout {
+    display: grid;
+    grid-template-columns: 65fr 35fr;
+    gap: var(--tw-space-5);
+    align-items: start;
+}
+
+.tw-detail-left { min-width: 0; }
+.tw-detail-right { min-width: 0; }
+
+
+/* ============================================================
+ * SECTION 6: TICKET HEADER CARD (detail page top card)
+ * ============================================================ */
+
+.tw-ticket-header-card {
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-lg);
+    padding: var(--tw-space-5) var(--tw-space-6);
+    margin-bottom: var(--tw-space-5);
+    border: 1px solid var(--tw-border);
+    box-shadow: var(--tw-shadow-sm);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--tw-space-4);
+}
+
+.tw-ticket-header-card__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--tw-space-2);
+    margin-top: var(--tw-space-3);
+}
+
+.tw-ticket-header-id {
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-secondary);
+    background: var(--tw-bg-body);
+    padding: 3px 10px;
+    border-radius: var(--tw-radius-pill);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.tw-ticket-header-dates {
+    display: flex;
+    gap: var(--tw-space-6);
+    flex-shrink: 0;
+    align-items: flex-start;
+}
+
+.tw-ticket-header-date-item { text-align: right; }
+
+.tw-ticket-header-date-label {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.tw-ticket-header-date-val {
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-primary);
+}
+
+
+/* ============================================================
+ * SECTION 7: DETAIL CARDS (left column sections)
+ * ============================================================ */
+
+.tw-detail-card {
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-lg);
+    border: 1px solid var(--tw-border);
+    box-shadow: var(--tw-shadow-sm);
+    margin-bottom: var(--tw-space-4);
+    overflow: hidden;
+}
+
+.tw-detail-card__header {
+    padding: var(--tw-space-4) var(--tw-space-5);
+    border-bottom: 1px solid var(--tw-border);
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+}
+
+.tw-detail-card__title {
+    font-size: var(--tw-text-md);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin: 0;
+}
+
+.tw-detail-card__header i {
+    font-size: 18px;
+    color: var(--tw-text-muted);
+}
+
+.tw-detail-card__body {
+    padding: var(--tw-space-5);
+}
+
+.tw-description-text {
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-secondary);
+    line-height: 1.7;
+    white-space: pre-line;
+}
+
+
+/* ============================================================
+ * SECTION 8: CHAT THREAD
+ * Admin messages: grey bubble, left-aligned.
+ * Client (sent) messages: var(--tw-primary) bubble, right-aligned.
+ * ============================================================ */
+
+.tw-client-chat-thread {
+    display: flex;
+    flex-direction: column;
+    gap: var(--tw-space-3);
+    max-height: 360px;
+    overflow-y: auto;
+    padding: var(--tw-space-4) var(--tw-space-5);
+    scrollbar-width: thin;
+    scrollbar-color: var(--tw-scrollbar) transparent;
+}
+
+.tw-client-message {
+    display: flex;
+    flex-direction: column;
+    max-width: 76%;
+}
+
+.tw-client-message--admin  { align-self: flex-start; }
+.tw-client-message--client { align-self: flex-end; align-items: flex-end; }
+
+.tw-client-message__sender {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    margin-bottom: 4px;
+    font-weight: var(--tw-weight-medium);
+}
+
+.tw-client-message__bubble {
+    padding: var(--tw-space-3) var(--tw-space-4);
+    border-radius: var(--tw-radius-md);
+    font-size: var(--tw-text-base);
+    line-height: 1.6;
+}
+
+.tw-client-message--admin .tw-client-message__bubble {
+    background: var(--tw-bg-body);
+    color: var(--tw-text-primary);
+    border-bottom-left-radius: 3px;
+}
+
+.tw-client-message--client .tw-client-message__bubble {
+    background: var(--tw-primary);
+    color: #ffffff;
+    border-bottom-right-radius: 3px;
+}
+
+.tw-client-message__time {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    margin-top: 4px;
+}
+
+.tw-client-message--client .tw-client-message__time { text-align: right; }
+
+/* System / status messages */
+.tw-status-msg-client {
+    text-align: center;
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    padding: var(--tw-space-2) 0;
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+}
+
+.tw-status-msg-client::before,
+.tw-status-msg-client::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--tw-border);
+}
+
+/* Chat input area */
+.tw-chat-input-area {
+    border-top: 1px solid var(--tw-border);
+    padding: var(--tw-space-4) var(--tw-space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--tw-space-3);
+}
+
+.tw-chat-input-row-client {
+    display: flex;
+    gap: var(--tw-space-2);
+    align-items: flex-end;
+}
+
+.tw-chat-textarea-client {
+    flex: 1;
+    min-height: 72px;
+    max-height: 160px;
+    resize: vertical;
+    padding: var(--tw-space-3) var(--tw-space-4);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    font-size: var(--tw-text-base);
+    font-family: var(--tw-font-primary);
+    color: var(--tw-text-primary);
+    background: var(--tw-bg-input);
+    outline: none;
+    transition: border-color var(--tw-transition-fast),
+                box-shadow var(--tw-transition-fast);
+}
+
+.tw-chat-textarea-client:focus {
+    border-color: var(--tw-primary);
+    box-shadow: 0 0 0 3px rgba(253, 114, 56, 0.10);
+}
+
+.tw-chat-email-check {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-secondary);
+    cursor: pointer;
+    user-select: none;
+}
+
+.tw-chat-email-check input {
+    accent-color: var(--tw-primary);
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+
+/* ============================================================
+ * SECTION 9: STATUS-SPECIFIC ACTION CARDS
+ * Prominent cards shown only when client action is needed.
+ * ============================================================ */
+
+.tw-action-card {
+    border-radius: var(--tw-radius-lg);
+    border: 1px solid var(--tw-border);
+    box-shadow: var(--tw-shadow-sm);
+    margin-bottom: var(--tw-space-4);
+    overflow: hidden;
+}
+
+/* Left-border accent per status */
+.tw-action-card--awaiting { border-left: 4px solid var(--tw-primary); }
+.tw-action-card--uat      { border-left: 4px solid var(--tw-status-uat-text); }
+.tw-action-card--closed   { border-left: 4px solid var(--tw-status-closed-text); }
+
+.tw-action-card__inner {
+    background: var(--tw-bg-surface);
+    padding: var(--tw-space-5) var(--tw-space-6);
+}
+
+.tw-action-card__header {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    margin-bottom: var(--tw-space-2);
+}
+
+.tw-action-card__icon { font-size: 20px; }
+
+.tw-action-card--awaiting .tw-action-card__icon { color: var(--tw-primary); }
+.tw-action-card--uat      .tw-action-card__icon { color: var(--tw-status-uat-text); }
+.tw-action-card--closed   .tw-action-card__icon { color: var(--tw-status-closed-text); }
+
+.tw-action-card__title {
+    font-size: var(--tw-text-md);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin: 0;
+}
+
+.tw-action-card__message {
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-secondary);
+    line-height: 1.65;
+    margin-bottom: var(--tw-space-4);
+}
+
+.tw-action-card__response {
+    width: 100%;
+    min-height: 88px;
+    resize: vertical;
+    padding: var(--tw-space-3) var(--tw-space-4);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    font-size: var(--tw-text-base);
+    font-family: var(--tw-font-primary);
+    color: var(--tw-text-primary);
+    background: var(--tw-bg-input);
+    outline: none;
+    margin-bottom: var(--tw-space-3);
+    transition: border-color var(--tw-transition-fast),
+                box-shadow var(--tw-transition-fast);
+}
+
+.tw-action-card__response:focus {
+    border-color: var(--tw-primary);
+    box-shadow: 0 0 0 3px rgba(253, 114, 56, 0.10);
+}
+
+.tw-action-card__buttons {
+    display: flex;
+    gap: var(--tw-space-3);
+    flex-wrap: wrap;
+}
+
+/* UAT changes textarea — shown on "Request Changes" click */
+.tw-changes-textarea {
+    width: 100%;
+    min-height: 88px;
+    resize: vertical;
+    padding: var(--tw-space-3) var(--tw-space-4);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    font-size: var(--tw-text-base);
+    font-family: var(--tw-font-primary);
+    color: var(--tw-text-primary);
+    background: var(--tw-bg-input);
+    outline: none;
+    margin-top: var(--tw-space-3);
+    margin-bottom: var(--tw-space-3);
+    display: none;
+    transition: border-color var(--tw-transition-fast);
+}
+
+.tw-changes-textarea.show { display: block; }
+
+.tw-changes-textarea:focus {
+    border-color: var(--tw-danger);
+    box-shadow: 0 0 0 3px rgba(219, 80, 74, 0.10);
+}
+
+.tw-submit-changes-btn { display: none; }
+.tw-submit-changes-btn.show { display: inline-flex; }
+
+
+/* ============================================================
+ * SECTION 10: RIGHT COLUMN — INFO PANEL + TIMELINE PANEL
+ * ============================================================ */
+
+.tw-info-panel {
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-lg);
+    border: 1px solid var(--tw-border);
+    box-shadow: var(--tw-shadow-sm);
+    margin-bottom: var(--tw-space-4);
+    overflow: hidden;
+}
+
+.tw-info-panel__header {
+    padding: var(--tw-space-4) var(--tw-space-5);
+    border-bottom: 1px solid var(--tw-border);
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+}
+
+.tw-info-panel__title {
+    font-size: var(--tw-text-base);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin: 0;
+}
+
+.tw-info-panel__header i {
+    font-size: 17px;
+    color: var(--tw-text-muted);
+}
+
+.tw-info-panel__body { padding: var(--tw-space-4) var(--tw-space-5); }
+
+.tw-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--tw-space-2) 0;
+    border-bottom: 1px solid var(--tw-border-light);
+    gap: var(--tw-space-3);
+}
+
+.tw-info-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+.tw-info-row__label {
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-muted);
+    flex-shrink: 0;
+}
+
+.tw-info-row__value {
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-primary);
+    text-align: right;
+}
+
+
+/* ============================================================
+ * SECTION 11: CONDENSED TIMELINE (right column)
+ * Matches tw-timeline pattern from ticket-timeline.html.
+ * ============================================================ */
+
+.tw-client-timeline {
+    padding: var(--tw-space-4) var(--tw-space-5);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.tw-client-timeline-item {
+    display: flex;
+    gap: var(--tw-space-3);
+    position: relative;
+    padding-bottom: var(--tw-space-4);
+}
+
+.tw-client-timeline-item:last-child { padding-bottom: 0; }
+
+/* Connecting vertical line between events */
+.tw-client-timeline-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    bottom: 0;
+    width: 2px;
+    background: var(--tw-border);
+}
+
+.tw-client-tl-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* Icon color variants — semantic, matches status colors */
+.tw-client-tl-icon--created  { background: var(--tw-status-inbox-bg);       color: var(--tw-status-inbox-text); }
+.tw-client-tl-icon--assigned { background: var(--tw-status-progress-bg);    color: var(--tw-status-progress-text); }
+.tw-client-tl-icon--work     { background: var(--tw-status-development-bg); color: var(--tw-status-development-text); }
+.tw-client-tl-icon--info     { background: var(--tw-status-forwarded-bg);   color: var(--tw-status-forwarded-text); }
+.tw-client-tl-icon--uat      { background: var(--tw-status-uat-bg);         color: var(--tw-status-uat-text); }
+.tw-client-tl-icon--resolved { background: var(--tw-status-closed-bg);      color: var(--tw-status-closed-text); }
+.tw-client-tl-icon--closed   { background: var(--tw-status-closed-bg);      color: var(--tw-status-closed-text); }
+
+.tw-client-tl-content {
+    flex: 1;
+    min-width: 0;
+    padding-top: 5px;
+}
+
+.tw-client-tl-label {
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-primary);
+    margin-bottom: 2px;
+}
+
+.tw-client-tl-date {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+}
+
+
+/* ============================================================
+ * SECTION 12: FILE UPLOAD AREA (Submit Ticket page)
+ * ============================================================ */
+
+.tw-upload-area {
+    border: 2px dashed var(--tw-border);
+    border-radius: var(--tw-radius-md);
+    padding: var(--tw-space-8) var(--tw-space-6);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color var(--tw-transition-fast),
+                background var(--tw-transition-fast);
+    background: var(--tw-bg-body);
+    position: relative;
+}
+
+.tw-upload-area:hover,
+.tw-upload-area.drag-over {
+    border-color: var(--tw-primary);
+    background: var(--tw-primary-light);
+}
+
+.tw-upload-area i {
+    font-size: 38px;
+    color: var(--tw-text-muted);
+    display: block;
+    margin-bottom: var(--tw-space-2);
+    transition: color var(--tw-transition-fast);
+}
+
+.tw-upload-area:hover i,
+.tw-upload-area.drag-over i { color: var(--tw-primary); }
+
+.tw-upload-area p {
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-muted);
+    margin: 0;
+}
+
+.tw-upload-link {
+    color: var(--tw-primary);
+    font-weight: var(--tw-weight-medium);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.tw-upload-meta {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    margin-top: var(--tw-space-2);
+}
+
+/* Selected file chip */
+.tw-file-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    background: var(--tw-bg-surface);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    padding: var(--tw-space-2) var(--tw-space-3);
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-secondary);
+    margin-top: var(--tw-space-3);
+}
+
+.tw-file-chip i { color: var(--tw-primary); font-size: 16px; }
+
+.tw-file-chip__remove {
+    background: none;
+    border: none;
+    color: var(--tw-text-muted);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    transition: color var(--tw-transition-fast);
+    margin-left: 2px;
+}
+
+.tw-file-chip__remove:hover { color: var(--tw-danger); }
+
+
+/* ============================================================
+ * SECTION 13: FORM SECTIONS (Submit Ticket page)
+ * ============================================================ */
+
+.tw-form-section {
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-lg);
+    border: 1px solid var(--tw-border);
+    box-shadow: var(--tw-shadow-sm);
+    margin-bottom: var(--tw-space-4);
+    overflow: hidden;
+}
+
+.tw-form-section__header {
+    padding: var(--tw-space-4) var(--tw-space-5);
+    border-bottom: 1px solid var(--tw-border);
+    background: var(--tw-bg-body);
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+}
+
+.tw-form-section__title {
+    font-size: var(--tw-text-md);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin: 0;
+}
+
+.tw-form-section__header i {
+    font-size: 18px;
+    color: var(--tw-text-muted);
+}
+
+.tw-form-section__body {
+    padding: var(--tw-space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--tw-space-4);
+}
+
+/* 2-column form row for side-by-side fields */
+.tw-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--tw-space-4);
+}
+
+/* Character counter below description */
+.tw-char-count {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    text-align: right;
+    margin-top: 4px;
+    transition: color var(--tw-transition-fast);
+}
+
+.tw-char-count.warn { color: var(--tw-warning); }
+
+/* Field hint (e.g. priority note) */
+.tw-field-hint {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    margin-top: 4px;
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    line-height: 1.5;
+}
+
+.tw-field-hint i { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+
+/* Notification preference checkbox */
+.tw-notif-pref {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-secondary);
+    cursor: pointer;
+    padding: var(--tw-space-1) 0;
+    user-select: none;
+}
+
+.tw-notif-pref input[type="checkbox"] {
+    accent-color: var(--tw-primary);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* Submit form footer */
+.tw-submit-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--tw-space-3);
+    padding-top: var(--tw-space-2);
+}
+
+.tw-submit-btn-full {
+    width: 100%;
+    justify-content: center;
+}
+
+
+/* ============================================================
+ * SECTION 14: CONFIRM MODAL (client portal — UAT + actions)
+ * ============================================================ */
+
+.tw-client-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--tw-overlay);
+    z-index: var(--tw-z-overlay);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--tw-transition-base);
+}
+
+.tw-client-confirm-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.tw-client-confirm-box {
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-xl);
+    padding: var(--tw-space-8);
+    width: 440px;
+    max-width: calc(100vw - 40px);
+    box-shadow: var(--tw-shadow-xl);
+    text-align: center;
+}
+
+.tw-client-confirm-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin: 0 auto var(--tw-space-4);
+}
+
+.tw-client-confirm-icon--success { background: var(--tw-success-light); color: var(--tw-success); }
+.tw-client-confirm-icon--danger  { background: var(--tw-danger-light);  color: var(--tw-danger); }
+.tw-client-confirm-icon--info    { background: var(--tw-primary-light);  color: var(--tw-primary-text); }
+
+.tw-client-confirm-title {
+    font-size: var(--tw-text-xl);
+    font-weight: var(--tw-weight-bold);
+    color: var(--tw-text-primary);
+    margin-bottom: var(--tw-space-2);
+}
+
+.tw-client-confirm-message {
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-secondary);
+    margin-bottom: var(--tw-space-6);
+    line-height: 1.65;
+}
+
+.tw-client-confirm-buttons {
+    display: flex;
+    gap: var(--tw-space-3);
+    justify-content: center;
+}
+
+
+/* ============================================================
+ * SECTION 15: TOAST (client portal)
+ * Same pattern as admin portal showDashToast.
+ * ============================================================ */
+
+.tw-client-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: var(--tw-z-toast);
+    padding: 12px 20px;
+    border-radius: var(--tw-radius-md);
+    font-size: var(--tw-text-base);
+    font-family: var(--tw-font-primary);
+    font-weight: var(--tw-weight-medium);
+    color: #ffffff;
+    box-shadow: var(--tw-shadow-lg);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+    max-width: 340px;
+}
+
+.tw-client-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.tw-client-toast--success { background: var(--tw-success); }
+.tw-client-toast--error   { background: var(--tw-danger); }
+.tw-client-toast--info    { background: var(--tw-primary); }
+
+
+/* ============================================================
+ * SECTION 16: RESPONSIVE
+ * 1024px: stack detail columns
+ * 768px:  mobile nav, 2×2 stat grid
+ * 576px:  single column
+ * ============================================================ */
+
+@media screen and (max-width: 1024px) {
+    .tw-detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .tw-detail-right {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--tw-space-4);
+    }
+
+    .tw-info-panel { margin-bottom: 0; }
+}
+
+@media screen and (max-width: 768px) {
+    body > main {
+        padding: var(--tw-content-padding-mobile);
+    }
+
+    .tw-client-page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .tw-client-stat-strip {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--tw-space-3);
+    }
+
+    .tw-client-filter-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .tw-client-search { width: 100%; }
+
+    .tw-form-row { grid-template-columns: 1fr; }
+
+    .tw-ticket-header-card { flex-direction: column; }
+
+    .tw-ticket-header-dates { justify-content: flex-start; }
+
+    .tw-client-confirm-buttons { flex-direction: column; }
+
+    .tw-detail-right { grid-template-columns: 1fr; }
+}
+
+@media screen and (max-width: 576px) {
+    .tw-client-stat-strip { grid-template-columns: 1fr; }
+
+    .tw-action-card__buttons { flex-direction: column; }
+
+    .tw-client-chat-thread { max-height: 280px; }
+}
+
+
+/* ============================================================
+ * SECTION 17: REJECTED STAT CARD (FIX 4)
+ * Danger-red tint, matches admin's rejected card pattern.
+ * ============================================================ */
+
+.tw-stat-card--client-rejected { border-left-color: var(--tw-danger); }
+
+.tw-stat-card--client-rejected .tw-stat-card__icon {
+    background: rgba(219, 80, 74, 0.10);
+    color: var(--tw-danger);
+}
+
+.tw-stat-card--client-rejected.active {
+    background: rgba(219, 80, 74, 0.08);
+    border-color: var(--tw-danger);
+    border-left-color: var(--tw-danger);
+}
+
+
+/* ============================================================
+ * SECTION 18: FILTER TOOLBAR RIGHT CLUSTER (FIX 3)
+ * Priority dropdown + Date Range dropdown + Sort + Search.
+ * Reuses .tw-toolbar-btn and .tw-toolbar-icon-btn from
+ * dashboard.css which is already loaded in client portal.
+ * ============================================================ */
+
+.tw-client-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+/* Wrapper for absolute-positioned dropdowns */
+.tw-client-dropdown-wrap {
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* === PRIORITY DROPDOWN === */
+.tw-client-priority-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    background: var(--tw-bg-surface);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-md);
+    box-shadow: var(--tw-shadow-md);
+    min-width: 160px;
+    z-index: var(--tw-z-dropdown);
+    padding: 4px 0;
+}
+
+.tw-client-priority-dropdown.open { display: block; }
+
+/* Colored dot in priority option */
+.tw-priority-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+/* Selected option highlight */
+.tw-priority-option.selected {
+    background: var(--tw-primary-light);
+    color: var(--tw-primary-text);
+    font-weight: var(--tw-weight-semibold);
+}
+
+/* === DATE RANGE DROPDOWN === */
+.tw-client-date-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    background: var(--tw-bg-surface);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-md);
+    box-shadow: var(--tw-shadow-md);
+    min-width: 280px;
+    z-index: var(--tw-z-dropdown);
+    padding: var(--tw-space-4);
+}
+
+.tw-client-date-dropdown.open { display: block; }
+
+/* Quick filter chips (Today / This Week / This Month) */
+.tw-client-quick-filters {
+    display: flex;
+    gap: var(--tw-space-2);
+    margin-bottom: var(--tw-space-3);
+}
+
+.tw-client-quick-filter {
+    flex: 1;
+    height: 30px;
+    font-size: var(--tw-text-xs);
+    font-family: var(--tw-font-primary);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-secondary);
+    background: var(--tw-bg-body);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    cursor: pointer;
+    transition: all var(--tw-transition-fast);
+    white-space: nowrap;
+}
+
+.tw-client-quick-filter:hover,
+.tw-client-quick-filter.active {
+    background: var(--tw-primary-light);
+    border-color: var(--tw-primary);
+    color: var(--tw-primary-text);
+}
+
+/* From / To date inputs side by side */
+.tw-client-date-input-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--tw-space-3);
+    margin-bottom: var(--tw-space-2);
+}
+
+.tw-client-date-input-group label {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* Active state indicator on dropdown-trigger buttons */
+.tw-toolbar-btn[aria-expanded="true"] {
+    border-color: var(--tw-primary);
+    color: var(--tw-primary);
+}
+
+
+/* ============================================================
+ * SECTION 19: RESPONSIVE ADDITIONS (FIX 3 / 4)
+ * ============================================================ */
+
+@media screen and (max-width: 768px) {
+    .tw-client-toolbar-right {
+        width: 100%;
+    }
+
+    .tw-client-search {
+        flex: 1;
+    }
+
+    .tw-client-date-dropdown {
+        right: auto;
+        left: 0;
+        min-width: 260px;
+    }
+}
