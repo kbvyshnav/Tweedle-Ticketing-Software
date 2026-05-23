@@ -1238,3 +1238,205 @@ body > main {
         min-width: 260px;
     }
 }
+
+
+/* ============================================================
+ * SECTION 20: STATUS-DRIVEN HEADER CARD BORDER (FIX 3)
+ * data-status set by JS on .tw-ticket-header-card on load.
+ * ============================================================ */
+
+.tw-ticket-header-card[data-status="new"]       { border-left: 4px solid var(--tw-status-inbox-text); }
+.tw-ticket-header-card[data-status="progress"]  { border-left: 4px solid var(--tw-status-progress-text); }
+.tw-ticket-header-card[data-status="forwarded"] { border-left: 4px solid var(--tw-primary); }
+.tw-ticket-header-card[data-status="uat"]       { border-left: 4px solid var(--tw-status-uat-text); }
+.tw-ticket-header-card[data-status="resolved"]  { border-left: 4px solid var(--tw-status-forwarded-text); }
+.tw-ticket-header-card[data-status="closed"]    { border-left: 4px solid var(--tw-status-closed-text); }
+.tw-ticket-header-card[data-status="rejected"]  { border-left: 4px solid var(--tw-danger); }
+
+
+/* ============================================================
+ * SECTION 21: TICKET DETAIL — STATUS-SPECIFIC COMPONENTS
+ * Action cards, banners, timeline states, chat disabled.
+ * ============================================================ */
+
+/* Info-only action card variants (new, progress, resolved) */
+.tw-action-card--info-new      { border-left: 4px solid var(--tw-status-inbox-text); }
+.tw-action-card--info-progress { border-left: 4px solid var(--tw-status-progress-text); }
+.tw-action-card--info-resolved { border-left: 4px solid var(--tw-status-forwarded-text); }
+
+/* Info card background tints */
+.tw-action-card--info-new .tw-action-card__inner {
+    background: var(--tw-status-inbox-bg);
+}
+.tw-action-card--info-progress .tw-action-card__inner {
+    background: var(--tw-status-progress-bg);
+}
+
+/* Icon colors for info cards */
+.tw-action-card--info-new      .tw-action-card__icon { color: var(--tw-status-inbox-text); }
+.tw-action-card--info-progress .tw-action-card__icon { color: var(--tw-status-progress-text); }
+.tw-action-card--info-resolved .tw-action-card__icon { color: var(--tw-status-forwarded-text); }
+
+/* === STATUS BANNERS (closed success, rejected error) === */
+.tw-status-banner {
+    border-radius: var(--tw-radius-md);
+    padding: var(--tw-space-4) var(--tw-space-5);
+    margin-bottom: var(--tw-space-4);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--tw-space-3);
+    font-size: var(--tw-text-base);
+    line-height: 1.65;
+}
+
+.tw-status-banner i {
+    font-size: 22px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.tw-status-banner__text { flex: 1; }
+
+.tw-status-banner__title {
+    font-weight: var(--tw-weight-semibold);
+    margin-bottom: 2px;
+    display: block;
+}
+
+.tw-status-banner--closed {
+    background: var(--tw-status-closed-bg);
+    color: var(--tw-status-closed-text);
+}
+
+.tw-status-banner--rejected {
+    background: var(--tw-priority-high-bg);
+    color: var(--tw-danger);
+}
+
+/* === REJECTION DETAILS CARD === */
+.tw-rejection-details {
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-lg);
+    border: 1px solid var(--tw-border);
+    border-left: 4px solid var(--tw-danger);
+    box-shadow: var(--tw-shadow-sm);
+    margin-bottom: var(--tw-space-4);
+    overflow: hidden;
+}
+
+.tw-rejection-details__header {
+    padding: var(--tw-space-4) var(--tw-space-5);
+    border-bottom: 1px solid var(--tw-border);
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+}
+
+.tw-rejection-details__title {
+    font-size: var(--tw-text-md);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin: 0;
+}
+
+.tw-rejection-details__body {
+    padding: var(--tw-space-4) var(--tw-space-5);
+}
+
+.tw-rejection-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--tw-space-2) 0;
+    border-bottom: 1px solid var(--tw-border-light);
+    font-size: var(--tw-text-sm);
+}
+
+.tw-rejection-meta-row:last-of-type { border-bottom: none; }
+.tw-rejection-meta-row__label { color: var(--tw-text-muted); }
+.tw-rejection-meta-row__value { font-weight: var(--tw-weight-medium); color: var(--tw-text-primary); }
+
+.tw-rejection-reason-label {
+    font-size: var(--tw-text-xs);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-top: var(--tw-space-4);
+    margin-bottom: var(--tw-space-2);
+}
+
+/* === SUGGESTION NOTE (rejected tickets) === */
+.tw-suggestion-note {
+    padding: var(--tw-space-4) var(--tw-space-5);
+    background: var(--tw-bg-body);
+    border-radius: var(--tw-radius-md);
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-muted);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--tw-space-3);
+    line-height: 1.65;
+    margin-bottom: var(--tw-space-4);
+}
+
+.tw-suggestion-note i {
+    font-size: 17px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* === TIMELINE PENDING / REJECTED STATES === */
+/* Pending (future) timeline items — grey and muted */
+.tw-client-tl-icon--pending {
+    background: var(--tw-border);
+    color: var(--tw-text-muted);
+}
+
+.tw-client-tl-label--pending {
+    color: var(--tw-text-muted);
+    font-style: italic;
+}
+
+.tw-client-tl-date--pending {
+    color: var(--tw-text-muted);
+    font-style: italic;
+}
+
+/* Rejected timeline dot — red X */
+.tw-client-tl-icon--rejected {
+    background: var(--tw-priority-high-bg);
+    color: var(--tw-danger);
+}
+
+/* === CHAT DISABLED / READ-ONLY STATES === */
+
+/* Notice shown above chat input for closed tickets */
+.tw-chat-notice {
+    margin: 0 var(--tw-space-5) var(--tw-space-4);
+    padding: var(--tw-space-3) var(--tw-space-4);
+    background: var(--tw-status-closed-bg);
+    color: var(--tw-status-closed-text);
+    border-radius: var(--tw-radius-sm);
+    font-size: var(--tw-text-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+}
+
+.tw-chat-notice i { font-size: 16px; flex-shrink: 0; }
+
+/* Disabled chat textarea and send button */
+.tw-chat-textarea-client:disabled {
+    background: var(--tw-bg-body);
+    color: var(--tw-text-disabled);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* === ATTACHMENT UPLOAD FOOTER IN CARD === */
+.tw-attachment-card-footer {
+    padding: var(--tw-space-3) var(--tw-space-5) var(--tw-space-4);
+    border-top: 1px solid var(--tw-border-light);
+}
