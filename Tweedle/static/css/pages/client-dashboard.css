@@ -1440,3 +1440,461 @@ body > main {
     padding: var(--tw-space-3) var(--tw-space-5) var(--tw-space-4);
     border-top: 1px solid var(--tw-border-light);
 }
+
+
+/* ============================================================
+ * SECTION 22: CLIENT REPORTS — STAT CARD VARIANTS
+ * ============================================================ */
+
+.tw-stat-card--cr-submitted { border-left-color: var(--tw-primary); }
+.tw-stat-card--cr-submitted .tw-stat-card__icon { background: var(--tw-primary-light); color: var(--tw-primary-text); }
+
+.tw-stat-card--cr-resolved { border-left-color: var(--tw-status-closed-text); }
+.tw-stat-card--cr-resolved .tw-stat-card__icon { background: var(--tw-status-closed-bg); color: var(--tw-status-closed-text); }
+
+.tw-stat-card--cr-time { border-left-color: var(--tw-status-progress-text); }
+.tw-stat-card--cr-time .tw-stat-card__icon { background: var(--tw-status-progress-bg); color: var(--tw-status-progress-text); }
+
+.tw-stat-card--cr-sla { border-left-color: var(--tw-status-closed-text); }
+.tw-stat-card--cr-sla .tw-stat-card__icon { background: var(--tw-status-closed-bg); color: var(--tw-status-closed-text); }
+
+
+/* ============================================================
+ * SECTION 23: CLIENT REPORTS — SUMMARY BANNER + TABLE UTILS
+ * ============================================================ */
+
+.tw-client-report-banner {
+    background: var(--tw-primary-light);
+    border-left: 5px solid var(--tw-primary);
+    padding: 10px var(--tw-space-4);
+    border-radius: var(--tw-radius-md);
+    margin-bottom: var(--tw-space-3);
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-primary);
+    font-weight: var(--tw-weight-medium);
+    line-height: 1.4;
+}
+
+.tw-client-report-banner strong {
+    font-size: var(--tw-text-base);
+    font-weight: var(--tw-weight-bold);
+    color: var(--tw-primary-text);
+}
+
+.tw-tat-col-client { text-align: center !important; }
+.tw-tat-empty-client { color: var(--tw-text-muted); }
+
+#clientReportEmptyState { display: none; }
+#clientReportEmptyState td {
+    text-align: center;
+    padding: 40px var(--tw-space-4);
+    color: var(--tw-text-muted);
+    cursor: default;
+}
+#clientReportEmptyState i { font-size: 40px; display: block; margin-bottom: var(--tw-space-2); opacity: 0.4; }
+#clientReportEmptyState p { font-size: var(--tw-text-sm); margin: 0; }
+
+
+/* ============================================================
+ * SECTION 24: CLIENT REPORTS — DOWNLOAD BUTTONS
+ * ============================================================ */
+
+.btn-cr-pdf {
+    border-color: var(--tw-file-pdf-icon);
+    color: var(--tw-file-pdf-icon);
+}
+.btn-cr-pdf:hover { background: var(--tw-file-pdf-bg); border-color: var(--tw-file-pdf-icon); color: var(--tw-file-pdf-icon); }
+
+.btn-cr-excel {
+    border-color: var(--tw-success);
+    color: var(--tw-success);
+}
+.btn-cr-excel:hover { background: var(--tw-success-light); border-color: var(--tw-success); color: var(--tw-success); }
+
+.cr-download-buttons { display: flex; gap: 8px; flex-shrink: 0; }
+
+
+/* ============================================================
+ * SECTION 25: CLIENT REPORTS — CHARTS ROW
+ * ============================================================ */
+
+.tw-client-charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--tw-space-5);
+    margin-bottom: var(--tw-space-5);
+}
+
+.tw-client-chart-card {
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-lg);
+    border: 1px solid var(--tw-border);
+    box-shadow: var(--tw-shadow-sm);
+    overflow: hidden;
+}
+
+.tw-client-chart-card__header {
+    padding: var(--tw-space-4) var(--tw-space-5);
+    border-bottom: 1px solid var(--tw-border);
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+}
+
+.tw-client-chart-card__title {
+    font-size: var(--tw-text-md);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin: 0;
+}
+
+.tw-client-chart-card__header i { font-size: 18px; color: var(--tw-text-muted); }
+
+.tw-client-chart-card__body { padding: var(--tw-space-4) var(--tw-space-5); }
+
+/* Horizontal bar chart */
+.tw-bar-chart { display: flex; flex-direction: column; gap: var(--tw-space-3); padding: var(--tw-space-2) 0; }
+
+.tw-bar-row { display: flex; align-items: center; gap: var(--tw-space-3); }
+
+.tw-bar-label {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-secondary);
+    width: 148px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.tw-bar-track {
+    flex: 1;
+    height: 10px;
+    background: var(--tw-bg-body);
+    border-radius: var(--tw-radius-pill);
+    overflow: hidden;
+}
+
+.tw-bar-fill {
+    height: 100%;
+    border-radius: var(--tw-radius-pill);
+    min-width: 4px;
+}
+
+.tw-bar-count {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    width: 60px;
+    text-align: right;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* Resolution metrics panel */
+.tw-resolution-metrics { display: flex; flex-direction: column; gap: var(--tw-space-3); }
+
+.tw-resolution-metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--tw-space-3) var(--tw-space-4);
+    background: var(--tw-bg-body);
+    border-radius: var(--tw-radius-sm);
+    gap: var(--tw-space-3);
+}
+
+.tw-resolution-metric__label { font-size: var(--tw-text-sm); color: var(--tw-text-secondary); }
+
+.tw-resolution-metric__value {
+    font-size: var(--tw-text-md);
+    font-weight: var(--tw-weight-bold);
+    color: var(--tw-text-primary);
+    white-space: nowrap;
+}
+
+.tw-resolution-note {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    margin-top: var(--tw-space-3);
+    padding: var(--tw-space-3);
+    background: var(--tw-bg-body);
+    border-radius: var(--tw-radius-sm);
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .tw-client-charts-row { grid-template-columns: 1fr; }
+}
+
+
+/* ============================================================
+ * SECTION 26: SUBMIT TICKET — PROGRESS STEPS
+ * ============================================================ */
+
+.tw-progress-steps {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--tw-space-5);
+    max-width: 480px;
+}
+
+.tw-progress-step {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+}
+
+.tw-progress-step__circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-semibold);
+    flex-shrink: 0;
+    border: 2px solid var(--tw-border);
+    color: var(--tw-text-muted);
+    background: var(--tw-bg-surface);
+}
+
+.tw-progress-step--active .tw-progress-step__circle {
+    background: var(--tw-primary);
+    border-color: var(--tw-primary);
+    color: #ffffff;
+}
+
+.tw-progress-step__label {
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-muted);
+    white-space: nowrap;
+}
+
+.tw-progress-step--active .tw-progress-step__label {
+    color: var(--tw-primary);
+    font-weight: var(--tw-weight-semibold);
+}
+
+.tw-progress-connector {
+    flex: 1;
+    height: 2px;
+    background: var(--tw-border);
+    margin: 0 var(--tw-space-3);
+    min-width: 32px;
+}
+
+@media (max-width: 576px) {
+    .tw-progress-step__label { display: none; }
+    .tw-progress-connector { min-width: 16px; margin: 0 var(--tw-space-1); }
+}
+
+
+/* ============================================================
+ * SECTION 27: SUBMIT TICKET — TWO-COLUMN LAYOUT
+ * ============================================================ */
+
+.tw-submit-layout {
+    display: grid;
+    grid-template-columns: 60fr 40fr;
+    gap: var(--tw-space-5);
+    align-items: start;
+    max-width: 1060px;
+}
+
+.tw-submit-left  { min-width: 0; }
+.tw-submit-right { min-width: 0; }
+
+@media (max-width: 768px) {
+    .tw-submit-layout { grid-template-columns: 1fr; }
+}
+
+
+/* ============================================================
+ * SECTION 28: SUBMIT TICKET — PRIORITY SLA HINT
+ * ============================================================ */
+
+.tw-priority-hint {
+    margin-top: var(--tw-space-2);
+    padding: var(--tw-space-2) var(--tw-space-3);
+    border-radius: var(--tw-radius-sm);
+    font-size: var(--tw-text-xs);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--tw-space-2);
+    line-height: 1.5;
+    transition: background var(--tw-transition-fast), color var(--tw-transition-fast);
+}
+
+.tw-priority-hint i { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+.tw-priority-hint--high   { background: var(--tw-priority-high-bg);    color: var(--tw-priority-high-text); }
+.tw-priority-hint--medium { background: var(--tw-status-progress-bg);  color: var(--tw-status-progress-text); }
+.tw-priority-hint--low    { background: var(--tw-status-closed-bg);    color: var(--tw-status-closed-text); }
+
+
+/* ============================================================
+ * SECTION 29: SUBMIT TICKET — TIPS CARD
+ * ============================================================ */
+
+.tw-tips-card {
+    background: var(--tw-primary-light);
+    border-left: 3px solid var(--tw-primary);
+    border-radius: var(--tw-radius-md);
+    padding: var(--tw-space-4);
+    margin-top: var(--tw-space-4);
+}
+
+.tw-tips-card__header {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    margin-bottom: var(--tw-space-3);
+}
+
+.tw-tips-card__title {
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-primary-text);
+    margin: 0;
+}
+
+.tw-tips-card__header i { font-size: 18px; color: var(--tw-primary-text); }
+
+.tw-tips-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--tw-space-2); }
+
+.tw-tips-list li {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-primary-text);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--tw-space-2);
+    line-height: 1.55;
+}
+
+.tw-tips-list li::before {
+    content: '•';
+    color: var(--tw-primary);
+    font-weight: var(--tw-weight-bold);
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+
+/* ============================================================
+ * SECTION 30: SUBMIT TICKET — TICKET PREVIEW PANEL
+ * ============================================================ */
+
+.tw-preview-toggle-wrap { display: flex; justify-content: flex-start; margin-top: var(--tw-space-3); }
+
+.tw-preview-toggle {
+    background: none;
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    padding: 6px var(--tw-space-4);
+    font-size: var(--tw-text-sm);
+    font-family: var(--tw-font-primary);
+    color: var(--tw-text-secondary);
+    cursor: pointer;
+    transition: all var(--tw-transition-fast);
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+}
+
+.tw-preview-toggle:hover { border-color: var(--tw-primary); color: var(--tw-primary); }
+
+.tw-preview-panel {
+    display: none;
+    background: var(--tw-bg-surface);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-lg);
+    padding: var(--tw-space-5);
+    margin-top: var(--tw-space-3);
+}
+
+.tw-preview-panel.open { display: block; }
+
+.tw-preview-panel__title {
+    font-size: var(--tw-text-md);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin: 0 0 var(--tw-space-4);
+}
+
+.tw-preview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--tw-space-3) var(--tw-space-6);
+}
+
+.tw-preview-label {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+}
+
+.tw-preview-value {
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-primary);
+    font-weight: var(--tw-weight-medium);
+    min-height: 20px;
+}
+
+.tw-preview-value--empty { color: var(--tw-text-muted); font-weight: 400; }
+
+.tw-preview-desc-item { grid-column: 1 / -1; }
+
+@media (max-width: 576px) {
+    .tw-preview-grid { grid-template-columns: 1fr; }
+    .tw-preview-desc-item { grid-column: 1; }
+}
+
+
+/* ============================================================
+ * SECTION 31: SUBMIT TICKET — MULTI-FILE CHIPS
+ * ============================================================ */
+
+.tw-file-chips-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--tw-space-2);
+    margin-top: var(--tw-space-3);
+}
+
+.tw-file-chip-multi {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    background: var(--tw-bg-surface);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    padding: var(--tw-space-2) var(--tw-space-3);
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-secondary);
+    width: 100%;
+}
+
+.tw-file-chip-multi i { color: var(--tw-primary); font-size: 16px; flex-shrink: 0; }
+.tw-file-chip-multi-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.tw-file-chip-multi__remove {
+    background: none;
+    border: none;
+    color: var(--tw-text-muted);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    transition: color var(--tw-transition-fast);
+    flex-shrink: 0;
+}
+
+.tw-file-chip-multi__remove:hover { color: var(--tw-danger); }
+
+.tw-upload-hint {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    margin-top: var(--tw-space-2);
+}

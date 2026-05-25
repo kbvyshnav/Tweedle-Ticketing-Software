@@ -68,6 +68,15 @@
             </a>
         </li>
 
+        <!-- Reports -->
+        <!-- Django: href="{% url 'client_reports' %}" -->
+        <li class="nav-item">
+            <a href="reports.html" class="nav-link" title="Reports">
+                <i class='bx bx-bar-chart-alt-2'></i>
+                <span class="nav-label">Reports</span>
+            </a>
+        </li>
+
     </ul>
 
 </nav>
@@ -169,9 +178,7 @@
 
     <main id="main-content">
 
-        <!-- =========================================================
-             PAGE HEADER
-             ========================================================= -->
+        <!-- PAGE HEADER -->
         <!-- Django: href="{% url 'client_dashboard' %}" -->
         <a href="dashboard.html" class="tw-client-back-link">
             <i class="bx bx-arrow-back" aria-hidden="true"></i>
@@ -185,42 +192,142 @@
             </div>
         </div>
 
+        <!-- Enhancement C — 3-step progress indicator (visual only) -->
+        <div class="tw-progress-steps" aria-label="Submission progress">
+            <div class="tw-progress-step tw-progress-step--active">
+                <div class="tw-progress-step__circle" aria-current="step">1</div>
+                <span class="tw-progress-step__label">Ticket Details</span>
+            </div>
+            <div class="tw-progress-connector" aria-hidden="true"></div>
+            <div class="tw-progress-step">
+                <div class="tw-progress-step__circle">2</div>
+                <span class="tw-progress-step__label">Review</span>
+            </div>
+            <div class="tw-progress-connector" aria-hidden="true"></div>
+            <div class="tw-progress-step">
+                <div class="tw-progress-step__circle">3</div>
+                <span class="tw-progress-step__label">Submitted</span>
+            </div>
+        </div>
 
-        <!-- =========================================================
-             FORM — max width for readability
-             Django: action="{% url 'client_submit_ticket' %}" method="POST"
-             Django: {% csrf_token %}
-             ========================================================= -->
-        <div style="max-width: 760px;">
+        <!-- Enhancement A — two-column layout (60/40) on desktop -->
+        <!-- Django: action="{% url 'client_submit_ticket' %}" method="POST" -->
+        <!-- Django: {% csrf_token %} -->
+        <div class="tw-submit-layout">
 
-            <!-- ---- Section 1: Ticket Details ---- -->
-            <div class="tw-form-section">
-                <div class="tw-form-section__header">
-                    <i class="bx bx-detail" aria-hidden="true"></i>
-                    <h2 class="tw-form-section__title">Ticket Details</h2>
-                </div>
-                <div class="tw-form-section__body">
+            <!-- ====================================================
+                 LEFT COLUMN (60%) — Subject, Description, Attachments
+                 ==================================================== -->
+            <div class="tw-submit-left">
 
-                    <!-- Subject -->
-                    <div class="tw-form-group" id="subjectGroup">
-                        <label class="tw-form-label" for="subjectInput">
-                            Subject <span aria-hidden="true" style="color:var(--tw-danger)">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            id="subjectInput"
-                            class="tw-input"
-                            placeholder="Brief summary of your issue"
-                            required
-                            maxlength="160"
-                            oninput="validateForm(); clearFieldError(this, document.getElementById('subjectError'))"
-                            aria-describedby="subjectError">
-                        <span id="subjectError" class="tw-error-text" aria-live="polite" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
+                <!-- Ticket Details section -->
+                <div class="tw-form-section">
+                    <div class="tw-form-section__header">
+                        <i class="bx bx-detail" aria-hidden="true"></i>
+                        <h2 class="tw-form-section__title">Ticket Details</h2>
                     </div>
+                    <div class="tw-form-section__body">
 
-                    <!-- Category + Priority row -->
-                    <div class="tw-form-row">
+                        <!-- Subject -->
+                        <div class="tw-form-group" id="subjectGroup">
+                            <label class="tw-form-label" for="subjectInput">
+                                Subject <span aria-hidden="true" style="color:var(--tw-danger)">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="subjectInput"
+                                class="tw-input"
+                                placeholder="Brief summary of your issue"
+                                required
+                                maxlength="160"
+                                oninput="validateForm(); clearFieldError(this, document.getElementById('subjectError')); updatePreview()"
+                                aria-describedby="subjectError">
+                            <span id="subjectError" class="tw-error-text" aria-live="polite" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
+                        </div>
 
+                        <!-- Description (min-height 160px) -->
+                        <div class="tw-form-group" id="descGroup">
+                            <label class="tw-form-label" for="descTextarea">
+                                Description <span aria-hidden="true" style="color:var(--tw-danger)">*</span>
+                            </label>
+                            <textarea
+                                id="descTextarea"
+                                class="tw-textarea"
+                                rows="7"
+                                required
+                                minlength="20"
+                                placeholder="Describe the issue in detail. Include steps to reproduce, expected vs actual behaviour."
+                                oninput="updateCharCount(); validateForm(); clearFieldError(this, document.getElementById('descError')); updatePreview()"
+                                aria-describedby="descError descCharCount"
+                                style="resize:vertical;min-height:160px;"></textarea>
+                            <span id="descError" class="tw-error-text" aria-live="polite" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
+                            <div class="tw-char-count" id="descCharCount" aria-live="polite">0 characters (minimum 20)</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Enhancement B — styled drag-and-drop with multi-file (up to 3) -->
+                <div class="tw-form-section">
+                    <div class="tw-form-section__header">
+                        <i class="bx bx-paperclip" aria-hidden="true"></i>
+                        <h2 class="tw-form-section__title">Attachments <span style="font-weight:400;color:var(--tw-text-muted);font-size:var(--tw-text-sm)">(optional)</span></h2>
+                    </div>
+                    <div class="tw-form-section__body">
+
+                        <!-- Hidden multi-file input -->
+                        <input
+                            type="file"
+                            id="fileInput"
+                            style="display:none"
+                            multiple
+                            accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                            onchange="addSelectedFiles(this)">
+
+                        <!-- Drag & drop zone -->
+                        <div class="tw-upload-area"
+                             id="uploadArea"
+                             onclick="document.getElementById('fileInput').click()"
+                             ondragover="handleDragOver(event)"
+                             ondragleave="handleDragLeave(event)"
+                             ondrop="handleDrop(event)"
+                             role="button"
+                             tabindex="0"
+                             aria-label="Upload files — click or drag to upload"
+                             onkeydown="if(event.key==='Enter'||event.key===' '){document.getElementById('fileInput').click();}">
+                            <i class="bx bx-cloud-upload" aria-hidden="true"></i>
+                            <p>
+                                Drag &amp; drop files here or
+                                <span class="tw-upload-link">Browse Files</span>
+                            </p>
+                            <p class="tw-upload-meta">Supports PDF, DOC, DOCX, PNG, JPG — Max 10MB</p>
+                        </div>
+                        <div class="tw-upload-hint" id="uploadHint">Up to 3 files allowed</div>
+
+                        <!-- File chips (rendered by renderFileChips()) -->
+                        <div id="fileChipsList" class="tw-file-chips-list"></div>
+
+                    </div>
+                </div>
+
+            </div>
+            <!-- END LEFT COLUMN -->
+
+
+            <!-- ====================================================
+                 RIGHT COLUMN (40%) — Category, Priority, Contact, Tips
+                 ==================================================== -->
+            <div class="tw-submit-right">
+
+                <!-- Classification section (Category + Priority) -->
+                <div class="tw-form-section">
+                    <div class="tw-form-section__header">
+                        <i class="bx bx-category" aria-hidden="true"></i>
+                        <h2 class="tw-form-section__title">Classification</h2>
+                    </div>
+                    <div class="tw-form-section__body">
+
+                        <!-- Category -->
                         <div class="tw-form-group" id="categoryGroup">
                             <label class="tw-form-label" for="categorySelect">
                                 Category <span aria-hidden="true" style="color:var(--tw-danger)">*</span>
@@ -229,7 +336,7 @@
                                 id="categorySelect"
                                 class="tw-select"
                                 required
-                                onchange="validateForm(); clearFieldError(this, document.getElementById('categoryError'))"
+                                onchange="validateForm(); clearFieldError(this, document.getElementById('categoryError')); updatePreview()"
                                 aria-describedby="categoryError">
                                 <option value="">Select a category</option>
                                 <!-- Django: {% for category in ticket_categories %} -->
@@ -245,15 +352,22 @@
                             <span id="categoryError" class="tw-error-text" aria-live="polite" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
                         </div>
 
+                        <!-- Priority + SLA hint box -->
                         <div class="tw-form-group">
                             <label class="tw-form-label" for="prioritySelect">Priority</label>
-                            <select id="prioritySelect" class="tw-select">
+                            <select id="prioritySelect" class="tw-select"
+                                    onchange="updatePriorityHint(); updatePreview()">
                                 <!-- Django: {% for priority in priority_choices %} -->
                                 <option value="low">Low</option>
                                 <option value="medium" selected>Medium</option>
                                 <option value="high">High</option>
                                 <!-- Django: {% endfor %} -->
                             </select>
+                            <!-- SLA hint — updated by updatePriorityHint() -->
+                            <div id="priorityHint" class="tw-priority-hint tw-priority-hint--medium" aria-live="polite">
+                                <i class="bx bx-info-circle" aria-hidden="true"></i>
+                                <span id="priorityHintText">Medium priority tickets are reviewed within 24 hours.</span>
+                            </div>
                             <p class="tw-field-hint">
                                 <i class="bx bx-info-circle" aria-hidden="true"></i>
                                 Priority is a suggestion — final priority is set by our support team.
@@ -261,131 +375,114 @@
                         </div>
 
                     </div>
+                </div>
 
-                    <!-- Description -->
-                    <div class="tw-form-group" id="descGroup">
-                        <label class="tw-form-label" for="descTextarea">
-                            Description <span aria-hidden="true" style="color:var(--tw-danger)">*</span>
+                <!-- Contact Preference section -->
+                <div class="tw-form-section">
+                    <div class="tw-form-section__header">
+                        <i class="bx bx-bell" aria-hidden="true"></i>
+                        <h2 class="tw-form-section__title">Contact Preference</h2>
+                    </div>
+                    <div class="tw-form-section__body">
+
+                        <label class="tw-notif-pref">
+                            <input type="checkbox" id="notifEmailCheck" checked>
+                            Notify me by email when this ticket's status changes
                         </label>
-                        <textarea
-                            id="descTextarea"
-                            class="tw-textarea"
-                            rows="6"
-                            required
-                            minlength="20"
-                            placeholder="Describe the issue in detail. Include steps to reproduce, expected vs actual behaviour."
-                            oninput="updateCharCount(); validateForm(); clearFieldError(this, document.getElementById('descError'))"
-                            aria-describedby="descError descCharCount"
-                            style="resize:vertical;"></textarea>
-                        <span id="descError" class="tw-error-text" aria-live="polite" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
-                        <div class="tw-char-count" id="descCharCount" aria-live="polite">0 characters (minimum 20)</div>
-                    </div>
 
-                </div>
-            </div>
-            <!-- END Section 1 -->
-
-
-            <!-- ---- Section 2: Attachments (optional) ---- -->
-            <div class="tw-form-section">
-                <div class="tw-form-section__header">
-                    <i class="bx bx-paperclip" aria-hidden="true"></i>
-                    <h2 class="tw-form-section__title">Attachments <span style="font-weight:400;color:var(--tw-text-muted);font-size:var(--tw-text-sm)">(optional)</span></h2>
-                </div>
-                <div class="tw-form-section__body">
-
-                    <!-- Hidden file input -->
-                    <input
-                        type="file"
-                        id="fileInput"
-                        style="display:none"
-                        accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-                        onchange="handleFileSelect(this)">
-
-                    <!-- Drag & drop / click area -->
-                    <div class="tw-upload-area"
-                         id="uploadArea"
-                         onclick="document.getElementById('fileInput').click()"
-                         ondragover="handleDragOver(event)"
-                         ondragleave="handleDragLeave(event)"
-                         ondrop="handleDrop(event)"
-                         role="button"
-                         tabindex="0"
-                         aria-label="Upload file area — click or drag to upload"
-                         onkeydown="if(event.key==='Enter'||event.key===' '){document.getElementById('fileInput').click();}">
-                        <i class="bx bx-cloud-upload" aria-hidden="true"></i>
-                        <p>
-                            Drag &amp; drop a file here, or
-                            <span class="tw-upload-link">browse to upload</span>
-                        </p>
-                        <p class="tw-upload-meta">PDF, DOC, DOCX, PNG, JPG — max 10 MB</p>
-                    </div>
-
-                    <!-- Selected file chip (shown after selection) -->
-                    <div id="fileChipWrap" style="display:none">
-                        <div class="tw-file-chip">
-                            <i class="bx bx-file" aria-hidden="true"></i>
-                            <span id="fileChipName"></span>
-                            <button class="tw-file-chip__remove" onclick="removeFile()" aria-label="Remove file" type="button">
-                                <i class="bx bx-x" aria-hidden="true"></i>
-                            </button>
+                        <div class="tw-form-group">
+                            <label class="tw-form-label" for="contactSelect">Point of Contact</label>
+                            <select id="contactSelect" class="tw-select" onchange="updatePreview()">
+                                <!-- Django: {% for contact in client_contacts %} -->
+                                <option value="primary">Primary Contact</option>
+                                <option value="account-manager">Account Manager</option>
+                                <option value="technical-lead">Technical Lead</option>
+                                <!-- Django: {% endfor %} -->
+                            </select>
                         </div>
+
                     </div>
-
                 </div>
-            </div>
-            <!-- END Section 2 -->
 
-
-            <!-- ---- Section 3: Contact Preference ---- -->
-            <div class="tw-form-section">
-                <div class="tw-form-section__header">
-                    <i class="bx bx-bell" aria-hidden="true"></i>
-                    <h2 class="tw-form-section__title">Contact Preference</h2>
-                </div>
-                <div class="tw-form-section__body">
-
-                    <!-- Email notification toggle -->
-                    <label class="tw-notif-pref">
-                        <input type="checkbox" id="notifEmailCheck" checked>
-                        Notify me by email when this ticket's status changes
-                    </label>
-
-                    <!-- Contact person -->
-                    <div class="tw-form-group">
-                        <label class="tw-form-label" for="contactSelect">Point of Contact</label>
-                        <select id="contactSelect" class="tw-select">
-                            <!-- Django: {% for contact in client_contacts %} -->
-                            <option value="primary">Primary Contact</option>
-                            <option value="account-manager">Account Manager</option>
-                            <option value="technical-lead">Technical Lead</option>
-                            <!-- Django: {% endfor %} -->
-                        </select>
+                <!-- Enhancement A — Tips for a great ticket card -->
+                <div class="tw-tips-card" role="note" aria-label="Tips for submitting a great ticket">
+                    <div class="tw-tips-card__header">
+                        <i class="bx bx-bulb" aria-hidden="true"></i>
+                        <h3 class="tw-tips-card__title">Tips for a great ticket</h3>
                     </div>
-
+                    <ul class="tw-tips-list">
+                        <li>Be specific about the issue and when it started</li>
+                        <li>Include steps to reproduce the problem</li>
+                        <li>Attach screenshots or error logs if available</li>
+                        <li>Mention which users or accounts are affected</li>
+                    </ul>
                 </div>
+
             </div>
-            <!-- END Section 3 -->
+            <!-- END RIGHT COLUMN -->
+
+        </div>
+        <!-- END TWO-COLUMN LAYOUT -->
 
 
-            <!-- ---- Submit button ---- -->
-            <!-- Django: CSRF token + form POST -->
-            <div class="tw-submit-footer">
-                <a href="dashboard.html" class="tw-btn tw-btn-outline">Cancel</a>
-                <button
-                    type="button"
-                    id="submitBtn"
-                    class="tw-btn tw-btn-primary"
-                    disabled
-                    onclick="submitTicket()"
-                    style="min-width: 160px;">
-                    <i class="bx bx-send" aria-hidden="true"></i>
-                    Submit Ticket
+        <!-- Submit footer — Django: CSRF token + form POST -->
+        <div class="tw-submit-footer" style="max-width:1060px">
+            <a href="dashboard.html" class="tw-btn tw-btn-outline">Cancel</a>
+            <button
+                type="button"
+                id="submitBtn"
+                class="tw-btn tw-btn-primary"
+                disabled
+                onclick="submitTicket()"
+                style="min-width:160px;">
+                <i class="bx bx-send" aria-hidden="true"></i>
+                Submit Ticket
+            </button>
+        </div>
+
+        <!-- Enhancement D — collapsible ticket preview panel -->
+        <div style="max-width:1060px">
+            <div class="tw-preview-toggle-wrap">
+                <button class="tw-preview-toggle" type="button"
+                        onclick="togglePreview()"
+                        id="previewToggleBtn"
+                        aria-expanded="false"
+                        aria-controls="previewPanel">
+                    <i class="bx bx-show" aria-hidden="true"></i>
+                    Preview ticket before submitting
+                    <i class="bx bx-chevron-down" id="previewChevron" aria-hidden="true"></i>
                 </button>
             </div>
 
+            <div class="tw-preview-panel" id="previewPanel" role="region" aria-label="Ticket preview" aria-hidden="true">
+                <p class="tw-preview-panel__title">
+                    <i class="bx bx-file-blank" aria-hidden="true" style="color:var(--tw-primary);margin-right:6px;vertical-align:middle"></i>
+                    Ticket Preview
+                </p>
+                <div class="tw-preview-grid">
+                    <div>
+                        <div class="tw-preview-label">Subject</div>
+                        <div class="tw-preview-value tw-preview-value--empty" id="previewSubject">—</div>
+                    </div>
+                    <div>
+                        <div class="tw-preview-label">Category</div>
+                        <div class="tw-preview-value tw-preview-value--empty" id="previewCategory">—</div>
+                    </div>
+                    <div>
+                        <div class="tw-preview-label">Priority</div>
+                        <div class="tw-preview-value" id="previewPriority">Medium</div>
+                    </div>
+                    <div>
+                        <div class="tw-preview-label">Contact</div>
+                        <div class="tw-preview-value" id="previewContact">Primary Contact</div>
+                    </div>
+                    <div class="tw-preview-desc-item">
+                        <div class="tw-preview-label">Description</div>
+                        <div class="tw-preview-value tw-preview-value--empty" id="previewDesc" style="white-space:pre-line;font-weight:400">—</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <!-- END FORM MAX-WIDTH WRAPPER -->
 
     </main>
 
@@ -486,34 +583,34 @@
 
 
     /* ============================================================
-     * PAGE JS — submit ticket form
+     * PAGE JS — Submit Ticket form
      * ============================================================ */
+
+    /* Multi-file store — up to 3 files */
+    var selectedFiles = [];
+    var MAX_FILES = 3;
+    var MAX_BYTES = 10 * 1024 * 1024;
 
     /*
      * validateForm()
-     * Enables/disables the submit button based on required fields.
-     * Subject + Category + Description (min 20 chars) must be filled.
+     * Enables/disables submit button: Subject + Category + Description (≥20).
      */
     function validateForm() {
         var subject  = (document.getElementById('subjectInput').value || '').trim();
         var category = document.getElementById('categorySelect').value;
         var desc     = (document.getElementById('descTextarea').value || '').trim();
         var btn      = document.getElementById('submitBtn');
-
-        var valid = subject.length > 0 && category !== '' && desc.length >= 20;
-        btn.disabled = !valid;
+        btn.disabled = !(subject.length > 0 && category !== '' && desc.length >= 20);
     }
 
     /*
      * updateCharCount()
-     * Updates the char count label under the description textarea.
-     * Turns orange (warn class) when below the 20-char minimum.
+     * Updates char count label. Warn class when below 20.
      */
     function updateCharCount() {
         var desc  = document.getElementById('descTextarea').value || '';
         var count = desc.length;
         var el    = document.getElementById('descCharCount');
-
         if (count < 20) {
             el.textContent = count + ' characters (minimum 20)';
             el.classList.add('warn');
@@ -523,62 +620,112 @@
         }
     }
 
-    /*
-     * showFieldError(inputEl, errorEl, message)
-     * Adds error state to a field and shows the error message.
-     */
     function showFieldError(inputEl, errorEl, message) {
         inputEl.classList.add('tw-input--error');
-        if (errorEl) {
-            errorEl.textContent = message;
-            errorEl.style.display = 'block';
-        }
+        if (errorEl) { errorEl.textContent = message; errorEl.style.display = 'block'; }
     }
 
-    /*
-     * clearFieldError(inputEl, errorEl)
-     * Removes error state from a field.
-     */
     function clearFieldError(inputEl, errorEl) {
         inputEl.classList.remove('tw-input--error');
-        if (errorEl) {
-            errorEl.textContent = '';
-            errorEl.style.display = 'none';
+        if (errorEl) { errorEl.textContent = ''; errorEl.style.display = 'none'; }
+    }
+
+
+    /* === FILE UPLOAD (Enhancement B — multi-file, up to 3) === */
+
+    /*
+     * addSelectedFiles(input)
+     * Merges newly selected files into selectedFiles[], up to MAX_FILES.
+     * Replaces the old single-file handleFileSelect().
+     */
+    function addSelectedFiles(input) {
+        var newFiles = input.files ? Array.prototype.slice.call(input.files) : [];
+        var added = 0;
+
+        newFiles.forEach(function (file) {
+            if (selectedFiles.length >= MAX_FILES) {
+                showClientToast('Maximum ' + MAX_FILES + ' files allowed.', 'error');
+                return;
+            }
+            if (file.size > MAX_BYTES) {
+                showClientToast('"' + file.name + '" exceeds 10 MB limit.', 'error');
+                return;
+            }
+            selectedFiles.push(file);
+            added++;
+        });
+
+        /* Reset input so same file can be re-added if removed */
+        input.value = '';
+        renderFileChips();
+        updateUploadAreaState();
+    }
+
+    /*
+     * renderFileChips()
+     * Re-renders the file chips list from selectedFiles[].
+     */
+    function renderFileChips() {
+        var list = document.getElementById('fileChipsList');
+        list.innerHTML = '';
+
+        selectedFiles.forEach(function (file, i) {
+            var chip = document.createElement('div');
+            chip.className = 'tw-file-chip-multi';
+
+            /* Choose icon by extension */
+            var ext = (file.name.split('.').pop() || '').toLowerCase();
+            var iconClass = 'bx-file';
+            if (ext === 'pdf') iconClass = 'bxs-file-pdf';
+            else if (ext === 'png' || ext === 'jpg' || ext === 'jpeg') iconClass = 'bxs-image';
+            else if (ext === 'doc' || ext === 'docx') iconClass = 'bxs-file-doc';
+
+            chip.innerHTML =
+                '<i class="bx ' + iconClass + '" aria-hidden="true"></i>' +
+                '<span class="tw-file-chip-multi-name">' + escapeHtml(file.name) + '</span>' +
+                '<button class="tw-file-chip-multi__remove" type="button" ' +
+                    'aria-label="Remove ' + escapeHtml(file.name) + '" ' +
+                    'onclick="removeFileAt(' + i + ')">' +
+                    '<i class="bx bx-x" aria-hidden="true"></i>' +
+                '</button>';
+
+            list.appendChild(chip);
+        });
+    }
+
+    /*
+     * removeFileAt(index)
+     * Removes the file at the given index from selectedFiles[].
+     */
+    function removeFileAt(index) {
+        selectedFiles.splice(index, 1);
+        renderFileChips();
+        updateUploadAreaState();
+    }
+
+    /*
+     * updateUploadAreaState()
+     * Shows/hides upload area and hint based on file count.
+     */
+    function updateUploadAreaState() {
+        var hint = document.getElementById('uploadHint');
+        var area = document.getElementById('uploadArea');
+        var remaining = MAX_FILES - selectedFiles.length;
+
+        if (remaining <= 0) {
+            area.style.opacity = '0.5';
+            area.style.pointerEvents = 'none';
+            hint.textContent = 'Maximum files reached (3/3)';
+        } else {
+            area.style.opacity = '';
+            area.style.pointerEvents = '';
+            hint.textContent = remaining + ' of ' + MAX_FILES + ' files remaining';
         }
     }
 
-
-    /* === FILE UPLOAD === */
-
-    /*
-     * handleFileSelect(input)
-     * Shows the file chip with the selected file's name.
-     * Hides the upload area placeholder text.
-     */
-    function handleFileSelect(input) {
-        if (!input.files || !input.files[0]) return;
-        var file     = input.files[0];
-        var maxBytes = 10 * 1024 * 1024;
-
-        if (file.size > maxBytes) {
-            showClientToast('File too large. Maximum size is 10 MB.', 'error');
-            input.value = '';
-            return;
-        }
-
-        document.getElementById('fileChipName').textContent = file.name;
-        document.getElementById('fileChipWrap').style.display = '';
-    }
-
-    /*
-     * removeFile()
-     * Clears the file input and hides the file chip.
-     */
-    function removeFile() {
-        document.getElementById('fileInput').value = '';
-        document.getElementById('fileChipWrap').style.display = 'none';
-        document.getElementById('fileChipName').textContent = '';
-    }
+    /* Legacy alias — kept so any remaining references don't break */
+    function handleFileSelect(input) { addSelectedFiles(input); }
+    function removeFile() { removeFileAt(0); }
 
     function handleDragOver(e) {
         e.preventDefault();
@@ -592,22 +739,102 @@
     function handleDrop(e) {
         e.preventDefault();
         document.getElementById('uploadArea').classList.remove('drag-over');
-        var files = e.dataTransfer && e.dataTransfer.files;
-        if (files && files[0]) {
-            var dt  = new DataTransfer();
-            dt.items.add(files[0]);
-            var inp = document.getElementById('fileInput');
-            inp.files = dt.files;
-            handleFileSelect(inp);
-        }
+        var droppedFiles = e.dataTransfer && e.dataTransfer.files;
+        if (!droppedFiles || droppedFiles.length === 0) return;
+
+        var fakeInput = { files: droppedFiles, value: '' };
+        addSelectedFiles(fakeInput);
     }
 
 
+    /* === PRIORITY SLA HINT (Enhancement A) === */
+
+    var priorityHints = {
+        high:   { cls: 'tw-priority-hint--high',   text: 'High priority tickets are reviewed within 4 hours.' },
+        medium: { cls: 'tw-priority-hint--medium', text: 'Medium priority tickets are reviewed within 24 hours.' },
+        low:    { cls: 'tw-priority-hint--low',    text: 'Low priority tickets are reviewed within 72 hours.' }
+    };
+
+    /*
+     * updatePriorityHint()
+     * Swaps hint box color class and text based on selected priority.
+     */
+    function updatePriorityHint() {
+        var val   = document.getElementById('prioritySelect').value;
+        var hint  = document.getElementById('priorityHint');
+        var text  = document.getElementById('priorityHintText');
+        var info  = priorityHints[val] || priorityHints['medium'];
+
+        hint.className = 'tw-priority-hint ' + info.cls;
+        text.textContent = info.text;
+    }
+
+    /* Run on load to match default "medium" selection */
+    updatePriorityHint();
+
+
+    /* === LIVE PREVIEW (Enhancement D) === */
+
+    /*
+     * updatePreview()
+     * Reads all form fields and updates the preview card values.
+     * Called on input/change events on every field.
+     */
+    function updatePreview() {
+        var subject   = (document.getElementById('subjectInput').value || '').trim();
+        var catSel    = document.getElementById('categorySelect');
+        var priSel    = document.getElementById('prioritySelect');
+        var desc      = (document.getElementById('descTextarea').value || '').trim();
+        var contactSel = document.getElementById('contactSelect');
+
+        var catText  = catSel.value   ? catSel.options[catSel.selectedIndex].text   : '';
+        var priText  = priSel.value   ? priSel.options[priSel.selectedIndex].text   : '';
+        var conText  = contactSel.options[contactSel.selectedIndex].text || '';
+
+        setPreviewField('previewSubject',  subject,  !subject);
+        setPreviewField('previewCategory', catText,  !catText);
+        setPreviewField('previewPriority', priText,  false);
+        setPreviewField('previewContact',  conText,  false);
+
+        var descPreview = desc ? (desc.length > 100 ? desc.slice(0, 100) + '…' : desc) : '';
+        setPreviewField('previewDesc', descPreview, !desc);
+    }
+
+    function setPreviewField(id, value, isEmpty) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = isEmpty ? '—' : value;
+        if (isEmpty) {
+            el.classList.add('tw-preview-value--empty');
+        } else {
+            el.classList.remove('tw-preview-value--empty');
+        }
+    }
+
+    /*
+     * togglePreview()
+     * Shows/hides the preview panel and rotates the chevron.
+     */
+    function togglePreview() {
+        var panel   = document.getElementById('previewPanel');
+        var chevron = document.getElementById('previewChevron');
+        var btn     = document.getElementById('previewToggleBtn');
+        var isOpen  = panel.classList.toggle('open');
+
+        panel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+        btn.setAttribute('aria-expanded', isOpen);
+        chevron.style.transform = isOpen ? 'rotate(180deg)' : '';
+
+        if (isOpen) updatePreview();
+    }
+
+
+    /* === SUBMIT === */
+
     /*
      * submitTicket()
-     * Validates form, shows loading state on button, fires stub,
-     * then shows success toast and redirects to dashboard after 1.5s.
-     * Django: replace console.log with fetch('{% url "client_submit_ticket" %}', {...})
+     * Validates form, shows loading, fires stub, redirects.
+     * Django: replace console.log with fetch({% url "client_submit_ticket" %}, POST)
      */
     function submitTicket() {
         var subject  = (document.getElementById('subjectInput').value || '').trim();
@@ -616,50 +843,27 @@
         var desc     = (document.getElementById('descTextarea').value || '').trim();
         var notif    = document.getElementById('notifEmailCheck').checked;
         var contact  = document.getElementById('contactSelect').value;
-        var hasFile  = !!document.getElementById('fileInput').files[0];
         var valid    = true;
 
-        /* Inline validation */
         if (!subject) {
-            showFieldError(
-                document.getElementById('subjectInput'),
-                document.getElementById('subjectError'),
-                'Subject is required.'
-            );
+            showFieldError(document.getElementById('subjectInput'), document.getElementById('subjectError'), 'Subject is required.');
             valid = false;
         }
-
         if (!category) {
-            showFieldError(
-                document.getElementById('categorySelect'),
-                document.getElementById('categoryError'),
-                'Please select a category.'
-            );
+            showFieldError(document.getElementById('categorySelect'), document.getElementById('categoryError'), 'Please select a category.');
             valid = false;
         }
-
         if (desc.length < 20) {
-            showFieldError(
-                document.getElementById('descTextarea'),
-                document.getElementById('descError'),
-                'Description must be at least 20 characters.'
-            );
+            showFieldError(document.getElementById('descTextarea'), document.getElementById('descError'), 'Description must be at least 20 characters.');
             valid = false;
         }
-
         if (!valid) return;
 
-        /* Loading state */
         var btn = document.getElementById('submitBtn');
         btn.disabled = true;
         btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Submitting…';
 
-        /* Django: fetch('{% url "client_submit_ticket" %}', {
-             method: 'POST',
-             headers: {'X-CSRFToken': getCsrfToken()},
-             body: JSON.stringify({ subject, category, priority, description: desc,
-                                    notify_email: notif, contact_person: contact })
-           }).then(r => r.json()).then(data => { redirectToDashboard(data.ticket_id); }) */
+        /* Django: replace with fetch POST */
         console.log('[Client Portal] Submit ticket stub:', {
             subject: subject,
             category: category,
@@ -667,22 +871,26 @@
             description: desc,
             notify_email: notif,
             contact_person: contact,
-            has_attachment: hasFile
+            attachment_count: selectedFiles.length
         });
 
         setTimeout(function () {
             showClientToast('Ticket submitted successfully! You will receive a confirmation by email.', 'success');
-            setTimeout(function () {
-                window.location.href = 'dashboard.html';
-            }, 1500);
+            setTimeout(function () { window.location.href = 'dashboard.html'; }, 1500);
         }, 800);
     }
 
 
-    /*
-     * showClientToast(message, type)
-     * Bottom-right transient notification.
-     */
+    /* === UTILITIES === */
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
     function showClientToast(message, type) {
         var t = document.createElement('div');
         t.className = 'tw-client-toast tw-client-toast--' + (type || 'info');
