@@ -20,19 +20,27 @@
     <!-- Django: {% block title %}My Reports — Tweedle{% endblock %} -->
     <title>My Reports — Tweedle</title>
 
+    <!-- Django: {% load static %} -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
-    <!-- Django: {% static 'images/favicon.svg' %} -->
+    <!-- Django: href="{% static 'images/favicon.svg' %}" -->
     <link rel="icon" type="image/svg+xml" href="../../static/images/favicon.svg">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 
     <!-- CSS load order: 1 tokens → 2 theme-user → 3 base → 4 components → 5 notification → 6 page -->
+    <!-- Django: href="{% static 'css/tweedle-tokens.css' %}" -->
     <link rel="stylesheet" href="../../static/css/tweedle-tokens.css">
+    <!-- Django: href="{% static 'css/themes/theme-user.css' %}" -->
     <link rel="stylesheet" href="../../static/css/themes/theme-user.css">
+    <!-- Django: href="{% static 'css/tweedle-base.css' %}" -->
     <link rel="stylesheet" href="../../static/css/tweedle-base.css">
+    <!-- Django: href="{% static 'css/tweedle-components.css' %}" -->
     <link rel="stylesheet" href="../../static/css/tweedle-components.css">
+    <!-- Django: href="{% static 'css/pages/notification.css' %}" -->
     <link rel="stylesheet" href="../../static/css/pages/notification.css">
+    <!-- Django: href="{% static 'css/pages/client-dashboard.css' %}" -->
     <link rel="stylesheet" href="../../static/css/pages/client-dashboard.css">
+    <!-- Django: href="{% static 'css/pages/dashboard.css' %}" -->
     <link rel="stylesheet" href="../../static/css/pages/dashboard.css">
 </head>
 
@@ -45,6 +53,7 @@
 <nav class="sidebar" id="sidebar">
 
     <div class="sidebar-brand">
+        <!-- Django: src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" -->
         <img src="../../static/images/tweedle-logo/tweedle-mark-blue.svg"
              alt="Tweedle"
              class="sidebar-logo-img">
@@ -161,15 +170,15 @@
                  role="button"
                  aria-label="Profile"
                  style="width:36px;height:36px;font-size:14px;cursor:pointer"
-                 onclick="toggleProfileDropdown(event)">AJ</div>
+                 onclick="toggleProfileDropdown(event)" id="clientUserInitials">SJ</div>
 
             <div class="tw-profile-panel" id="profilePanel" role="menu" aria-hidden="true">
                 <div class="tw-profile-header">
-                    <div class="tw-avatar tw-avatar--user" style="width:40px;height:40px;font-size:15px;flex-shrink:0">AJ</div>
+                    <div class="tw-avatar tw-avatar--user" style="width:40px;height:40px;font-size:15px;flex-shrink:0" id="clientUserInitials2">SJ</div>
                     <div>
                         <!-- Django: {{ request.user.get_full_name }} -->
-                        <div style="font-size:var(--tw-text-base);font-weight:600;color:var(--tw-text-primary);line-height:1.3">Alex Jordan</div>
-                        <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px">alex@gmec.com</div>
+                        <div style="font-size:var(--tw-text-base);font-weight:600;color:var(--tw-text-primary);line-height:1.3" id="clientUserName">Sarah Johnson</div>
+                        <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px" id="clientUserEmail">sarah.johnson@globaltech.com</div>
                         <span class="tw-role-pill tw-role-pill--user" style="margin-top:4px;display:inline-block">Client</span>
                     </div>
                 </div>
@@ -350,6 +359,7 @@
         </div>
         <!-- END FILTER CARD -->
 
+        <p class="tw-reports-hint">Select a date range and/or filters, then click <strong>Show Report</strong> to view results.</p>
 
         <!-- Report summary banner — populated by generateClientReport() -->
         <div class="tw-client-report-banner" id="clientReportSummary" aria-live="polite" style="display:none"></div>
@@ -479,11 +489,13 @@
                             <td class="tw-tat-col-client"><span class="tw-tat-badge tw-tat-badge--pending">Pending</span></td>
                         </tr>
 
-                        <!-- Empty state row -->
+                        <!-- Empty state row — visible by default until user clicks Show Report -->
                         <tr id="clientReportEmptyState">
                             <td colspan="9">
-                                <i class="bx bx-file" aria-hidden="true"></i>
-                                <p>No tickets match your filters. Try adjusting your date range or status.</p>
+                                <div class="tw-client-empty-state">
+                                    <i class="bx bx-bar-chart-alt-2" aria-hidden="true"></i>
+                                    <p>Apply filters and click <strong>Show Report</strong> to view your ticket activity.</p>
+                                </div>
                             </td>
                         </tr>
 
@@ -624,6 +636,29 @@
      Django: {% block page_js %}
      ============================================================== -->
 <script>
+    /* Django: CLIENT_USER populated from {{ request.user }} context at deploy time */
+    var CLIENT_USER = {
+        name:     'Sarah Johnson',
+        initials: 'SJ',
+        email:    'sarah.johnson@globaltech.com',
+        company:  'GlobalTech Solutions',
+        role:     'Primary Contact'
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var els = {
+            clientUserInitials:  CLIENT_USER.initials,
+            clientUserInitials2: CLIENT_USER.initials,
+            clientUserName:      CLIENT_USER.name,
+            clientUserEmail:     CLIENT_USER.email,
+            clientUserCompany:   CLIENT_USER.company
+        };
+        Object.keys(els).forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = els[id];
+        });
+    });
+
     /* === SIDEBAR TOGGLE === */
     var sidebar   = document.getElementById('sidebar');
     var hamburger = document.getElementById('hamburger-btn');
@@ -708,6 +743,7 @@
         closeProfileDropdown();
         notifPanel.classList.remove('open');
         notifBellBtn.setAttribute('aria-expanded', 'false');
+        closeClientDownloadModal();
     });
 
 
@@ -778,8 +814,11 @@
         }
     }
 
-    /* Run on page load */
-    generateClientReport();
+    /* Hide all data rows on page load — user must click Show Report */
+    (function () {
+        var initRows = document.querySelectorAll('#clientReportTable tbody tr:not(#clientReportEmptyState)');
+        initRows.forEach(function (row) { row.classList.add('row-hidden'); });
+    })();
 
 
     /*
@@ -797,10 +836,31 @@
 
     /*
      * downloadClientReport(format)
-     * Shows a toast — export available once backend is connected.
-     * Django: replace with window.location.href to export endpoint.
+     * Opens the download confirmation modal.
+     * Django: replace openClientDownloadModal() with a direct export fetch.
      */
     function downloadClientReport(format) {
+        openClientDownloadModal(format);
+    }
+
+    var clientDownloadFormat = '';
+
+    function openClientDownloadModal(format) {
+        clientDownloadFormat = format || '';
+        var modal = document.getElementById('clientDownloadModal');
+        var label = document.getElementById('clientDownloadFormatLabel');
+        if (label) label.textContent = (format || '').toUpperCase();
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closeClientDownloadModal() {
+        var modal = document.getElementById('clientDownloadModal');
+        if (modal) modal.style.display = 'none';
+        clientDownloadFormat = '';
+    }
+
+    function confirmClientDownload() {
+        closeClientDownloadModal();
         showClientToast('Export coming soon — available once backend is connected.', 'info');
     }
 
@@ -822,6 +882,28 @@
         }, 3500);
     }
 </script>
+
+<!-- ============================================================
+     DOWNLOAD CONFIRMATION MODAL
+     ============================================================ -->
+<div id="clientDownloadModal" class="tw-confirm-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="clientDownloadModalTitle">
+    <div class="tw-confirm-box">
+        <div class="tw-confirm-header">
+            <i class="bx bx-download" aria-hidden="true"></i>
+            <h3 class="tw-confirm-title" id="clientDownloadModalTitle">Download Report</h3>
+        </div>
+        <p class="tw-confirm-message">
+            Download your ticket activity report as <strong id="clientDownloadFormatLabel"></strong>?
+        </p>
+        <div class="tw-confirm-actions">
+            <button type="button" class="tw-btn tw-btn-outline" onclick="closeClientDownloadModal()">Cancel</button>
+            <button type="button" class="tw-btn tw-btn-primary" onclick="confirmClientDownload()">
+                <i class="bx bx-download" aria-hidden="true"></i>
+                Download
+            </button>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

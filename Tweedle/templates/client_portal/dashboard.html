@@ -20,23 +20,33 @@
     <!-- Django: {% block title %}My Tickets — Tweedle{% endblock %} -->
     <title>My Tickets — Tweedle</title>
 
+    <!-- Django: {% load static %} -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
-    <!-- Django: {% static 'images/favicon.svg' %} -->
+    <!-- Django: href="{% static 'images/favicon.svg' %}" -->
     <link rel="icon" type="image/svg+xml" href="../../static/images/favicon.svg">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 
     <!-- CSS load order: 1 tokens → 2 theme-user → 3 base → 4 components → 5 notification → 6 page -->
+    <!-- Django: href="{% static 'css/tweedle-tokens.css' %}" -->
     <link rel="stylesheet" href="../../static/css/tweedle-tokens.css">
+    <!-- Django: href="{% static 'css/themes/theme-user.css' %}" -->
     <link rel="stylesheet" href="../../static/css/themes/theme-user.css">
+    <!-- Django: href="{% static 'css/tweedle-base.css' %}" -->
     <link rel="stylesheet" href="../../static/css/tweedle-base.css">
+    <!-- Django: href="{% static 'css/tweedle-components.css' %}" -->
     <link rel="stylesheet" href="../../static/css/tweedle-components.css">
+    <!-- Django: href="{% static 'css/pages/notification.css' %}" -->
     <link rel="stylesheet" href="../../static/css/pages/notification.css">
+    <!-- Django: href="{% static 'css/pages/client-dashboard.css' %}" -->
     <link rel="stylesheet" href="../../static/css/pages/client-dashboard.css">
     <!-- dashboard.css: .tw-stat-card, .tw-toolbar-btn, .tw-toolbar-icon-btn, .tw-priority-option -->
+    <!-- Django: href="{% static 'css/pages/dashboard.css' %}" -->
     <link rel="stylesheet" href="../../static/css/pages/dashboard.css">
     <!-- chat.css + ticket-timeline.css: panel markup classes for slide-in panels (FIX 2) -->
+    <!-- Django: href="{% static 'css/pages/chat.css' %}" -->
     <link rel="stylesheet" href="../../static/css/pages/chat.css">
+    <!-- Django: href="{% static 'css/pages/ticket-timeline.css' %}" -->
     <link rel="stylesheet" href="../../static/css/pages/ticket-timeline.css">
 </head>
 
@@ -55,6 +65,7 @@
     <!-- Brand -->
     <!-- Django: href="{% url 'client_dashboard' %}" -->
     <div class="sidebar-brand">
+        <!-- Django: src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" -->
         <img src="../../static/images/tweedle-logo/tweedle-mark-blue.svg"
              alt="Tweedle"
              class="sidebar-logo-img">
@@ -182,15 +193,15 @@
                  role="button"
                  aria-label="Profile"
                  style="width:36px;height:36px;font-size:14px;cursor:pointer"
-                 onclick="toggleProfileDropdown(event)">AJ</div>
+                 onclick="toggleProfileDropdown(event)" id="clientUserInitials">SJ</div>
 
             <div class="tw-profile-panel" id="profilePanel" role="menu" aria-hidden="true">
                 <div class="tw-profile-header">
                     <!-- Django: {{ request.user.get_full_name }}, {{ request.user.email }} -->
-                    <div class="tw-avatar tw-avatar--user" style="width:40px;height:40px;font-size:15px;flex-shrink:0">AJ</div>
+                    <div class="tw-avatar tw-avatar--user" style="width:40px;height:40px;font-size:15px;flex-shrink:0" id="clientUserInitials2">SJ</div>
                     <div>
-                        <div style="font-size:var(--tw-text-base);font-weight:600;color:var(--tw-text-primary);line-height:1.3">Alex Jordan</div>
-                        <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px">alex@gmec.com</div>
+                        <div style="font-size:var(--tw-text-base);font-weight:600;color:var(--tw-text-primary);line-height:1.3" id="clientUserName">Sarah Johnson</div>
+                        <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px" id="clientUserEmail">sarah.johnson@globaltech.com</div>
                         <span class="tw-role-pill tw-role-pill--user" style="margin-top:4px;display:inline-block">Client</span>
                     </div>
                 </div>
@@ -477,6 +488,7 @@
                         <!-- Django: {% for ticket in tickets %} -->
 
                         <!-- Row 1: In Progress | Medium | 10 Apr 2025 -->
+                        <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
                         <tr data-ticket-status="progress"
                             data-ticket-id="TKT-GMEC-001"
                             data-subject="Payment gateway timeout"
@@ -529,6 +541,7 @@
                         </tr>
 
                         <!-- Row 2: UAT Approval | Medium | 15 Apr 2025 — "Your Review Needed" -->
+                        <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
                         <tr data-ticket-status="uat"
                             data-ticket-id="TKT-GMEC-002"
                             data-subject="Bulk export CSV missing columns"
@@ -576,6 +589,7 @@
                         </tr>
 
                         <!-- Row 3: Forwarded / Awaiting Response | High | 18 Apr 2025 — "Action Required" -->
+                        <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
                         <tr data-ticket-status="forwarded"
                             data-ticket-id="TKT-GMEC-003"
                             data-subject="User role permissions not saving"
@@ -623,6 +637,7 @@
                         </tr>
 
                         <!-- Row 4: New | Low | 02 May 2025 — no attachment -->
+                        <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
                         <tr data-ticket-status="new"
                             data-ticket-id="TKT-GMEC-004"
                             data-subject="Invoice generation wrong totals"
@@ -662,6 +677,7 @@
                         </tr>
 
                         <!-- Row 5: Closed | Low | 28 Mar 2025 — no attachment -->
+                        <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
                         <tr data-ticket-status="closed"
                             data-ticket-id="TKT-GMEC-005"
                             data-subject="Dashboard not loading on mobile"
@@ -701,6 +717,7 @@
                         </tr>
 
                         <!-- Row 6: Rejected | High | 20 Mar 2025 — no attachment -->
+                        <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
                         <tr data-ticket-status="rejected"
                             data-ticket-id="TKT-GMEC-006"
                             data-subject="API rate limit errors on sync"
@@ -939,6 +956,29 @@
      Django: {% block page_js %} — only page-specific code here.
      ============================================================== -->
 <script>
+    /* Django: CLIENT_USER populated from {{ request.user }} context at deploy time */
+    var CLIENT_USER = {
+        name:     'Sarah Johnson',
+        initials: 'SJ',
+        email:    'sarah.johnson@globaltech.com',
+        company:  'GlobalTech Solutions',
+        role:     'Primary Contact'
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var els = {
+            clientUserInitials:  CLIENT_USER.initials,
+            clientUserInitials2: CLIENT_USER.initials,
+            clientUserName:      CLIENT_USER.name,
+            clientUserEmail:     CLIENT_USER.email,
+            clientUserCompany:   CLIENT_USER.company
+        };
+        Object.keys(els).forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = els[id];
+        });
+    });
+
     /* === SIDEBAR TOGGLE === */
     var sidebar   = document.getElementById('sidebar');
     var hamburger = document.getElementById('hamburger-btn');
