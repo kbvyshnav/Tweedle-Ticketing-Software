@@ -898,12 +898,13 @@ body > main {
     cursor: pointer;
 }
 
-/* Submit form footer */
+/* Submit form footer — below the card, centered */
 .tw-submit-footer {
+    max-width: 960px;
+    margin: 20px auto 0;
     display: flex;
-    justify-content: flex-end;
-    gap: var(--tw-space-3);
-    padding-top: var(--tw-space-2);
+    justify-content: space-between;
+    align-items: center;
 }
 
 .tw-submit-btn-full {
@@ -1923,4 +1924,151 @@ body > main {
     font-size: var(--tw-text-xs);
     color: var(--tw-text-muted);
     margin-top: var(--tw-space-2);
+}
+
+
+/* ============================================================
+ * SECTION 32: SUBMIT TICKET — REDESIGNED SINGLE-CARD LAYOUT
+ * Centered form card with clean top-to-bottom field flow.
+ * ============================================================ */
+
+/* Progress steps wrapper — centered at 960px */
+.tw-progress-wrap {
+    max-width: 960px;
+    margin: 0 auto 24px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Tips bar — horizontal pill row above the form card */
+.tw-tips-bar {
+    max-width: 960px;
+    margin: 0 auto 20px;
+    background: var(--tw-primary-light);
+    border-left: 3px solid var(--tw-primary);
+    border-radius: var(--tw-radius-md);
+    padding: 10px 16px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.tw-tips-bar-label {
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-primary-text);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tw-tip-pill {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--tw-text-sm);
+    color: var(--tw-primary-text);
+}
+
+.tw-tip-pill i { font-size: 14px; }
+
+/* Single centered form card */
+.tw-submit-card {
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-xl);
+    border: 1px solid var(--tw-border);
+    box-shadow: var(--tw-shadow-md);
+    padding: 40px 56px;
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+/* Form sections inside the card */
+.tw-submit-section {
+    margin-bottom: 28px;
+}
+
+.tw-submit-section:last-child {
+    margin-bottom: 0;
+}
+
+/* Section labels */
+.tw-submit-label {
+    font-size: var(--tw-text-base);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin-bottom: 6px;
+    display: block;
+}
+
+.tw-submit-sublabel {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    margin-bottom: 10px;
+    display: block;
+    line-height: 1.5;
+}
+
+/* Two-column field row (50/50) */
+.tw-submit-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* Slim section divider */
+.tw-submit-divider {
+    border: none;
+    border-top: 1px solid var(--tw-border);
+    margin: 4px 0 28px;
+}
+
+/* Cancel link in footer */
+.tw-submit-cancel {
+    color: var(--tw-text-secondary);
+    font-size: var(--tw-text-base);
+    text-decoration: none;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: var(--tw-font-primary);
+}
+
+.tw-submit-cancel:hover {
+    color: var(--tw-text-primary);
+}
+
+/* Char counter below description */
+.tw-char-counter {
+    text-align: right;
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    margin-top: 4px;
+}
+
+/* warn class added by JS updateCharCount() */
+.tw-char-counter.warn {
+    color: var(--tw-danger);
+}
+
+/* Submit page h1 — scoped to stay consistent with other portal pages */
+.tw-submit-page-title {
+    font-size: var(--tw-text-2xl);
+}
+
+@media (max-width: 600px) {
+    .tw-submit-card {
+        padding: 24px 20px;
+    }
+
+    .tw-submit-two-col {
+        grid-template-columns: 1fr;
+    }
+
+    .tw-tips-bar {
+        gap: 10px;
+    }
 }

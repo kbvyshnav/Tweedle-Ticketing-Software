@@ -177,6 +177,7 @@
 
 
     <main id="main-content">
+    <div style="max-width:1100px;margin:0 auto;padding:32px 32px 40px;">
 
         <!-- PAGE HEADER -->
         <!-- Django: href="{% url 'client_dashboard' %}" -->
@@ -187,261 +188,244 @@
 
         <div class="tw-client-page-header">
             <div class="tw-client-header-left">
-                <h1>Submit a Ticket</h1>
+                <h1 class="tw-submit-page-title">Submit a Ticket</h1>
                 <p class="tw-client-header-subtitle">Describe your issue and our support team will get back to you shortly.</p>
             </div>
         </div>
 
-        <!-- Enhancement C — 3-step progress indicator (visual only) -->
-        <div class="tw-progress-steps" aria-label="Submission progress">
-            <div class="tw-progress-step tw-progress-step--active">
-                <div class="tw-progress-step__circle" aria-current="step">1</div>
-                <span class="tw-progress-step__label">Ticket Details</span>
-            </div>
-            <div class="tw-progress-connector" aria-hidden="true"></div>
-            <div class="tw-progress-step">
-                <div class="tw-progress-step__circle">2</div>
-                <span class="tw-progress-step__label">Review</span>
-            </div>
-            <div class="tw-progress-connector" aria-hidden="true"></div>
-            <div class="tw-progress-step">
-                <div class="tw-progress-step__circle">3</div>
-                <span class="tw-progress-step__label">Submitted</span>
+        <!-- Progress steps (centered, 760px) -->
+        <div class="tw-progress-wrap">
+            <div class="tw-progress-steps" aria-label="Submission progress">
+                <div class="tw-progress-step tw-progress-step--active">
+                    <div class="tw-progress-step__circle" aria-current="step">1</div>
+                    <span class="tw-progress-step__label">Ticket Details</span>
+                </div>
+                <div class="tw-progress-connector" aria-hidden="true"></div>
+                <div class="tw-progress-step">
+                    <div class="tw-progress-step__circle">2</div>
+                    <span class="tw-progress-step__label">Review</span>
+                </div>
+                <div class="tw-progress-connector" aria-hidden="true"></div>
+                <div class="tw-progress-step">
+                    <div class="tw-progress-step__circle">3</div>
+                    <span class="tw-progress-step__label">Submitted</span>
+                </div>
             </div>
         </div>
 
-        <!-- Enhancement A — two-column layout (60/40) on desktop -->
+        <!-- Tips bar -->
+        <div class="tw-tips-bar" role="note" aria-label="Tips for a great ticket">
+            <span class="tw-tips-bar-label">
+                <i class="bx bx-bulb" aria-hidden="true"></i>
+                Tips:
+            </span>
+            <span class="tw-tip-pill">
+                <i class="bx bx-edit-alt" aria-hidden="true"></i>
+                Be specific
+            </span>
+            <span class="tw-tip-pill">
+                <i class="bx bx-list-ol" aria-hidden="true"></i>
+                Add steps
+            </span>
+            <span class="tw-tip-pill">
+                <i class="bx bx-paperclip" aria-hidden="true"></i>
+                Attach files
+            </span>
+            <span class="tw-tip-pill">
+                <i class="bx bx-group" aria-hidden="true"></i>
+                Name affected users
+            </span>
+        </div>
+
+        <!-- Single submit card -->
         <!-- Django: action="{% url 'client_submit_ticket' %}" method="POST" -->
         <!-- Django: {% csrf_token %} -->
-        <div class="tw-submit-layout">
+        <div class="tw-submit-card">
 
-            <!-- ====================================================
-                 LEFT COLUMN (60%) — Subject, Description, Attachments
-                 ==================================================== -->
-            <div class="tw-submit-left">
-
-                <!-- Ticket Details section -->
-                <div class="tw-form-section">
-                    <div class="tw-form-section__header">
-                        <i class="bx bx-detail" aria-hidden="true"></i>
-                        <h2 class="tw-form-section__title">Ticket Details</h2>
-                    </div>
-                    <div class="tw-form-section__body">
-
-                        <!-- Subject -->
-                        <div class="tw-form-group" id="subjectGroup">
-                            <label class="tw-form-label" for="subjectInput">
-                                Subject <span aria-hidden="true" style="color:var(--tw-danger)">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                id="subjectInput"
-                                class="tw-input"
-                                placeholder="Brief summary of your issue"
-                                required
-                                maxlength="160"
-                                oninput="validateForm(); clearFieldError(this, document.getElementById('subjectError')); updatePreview()"
-                                aria-describedby="subjectError">
-                            <span id="subjectError" class="tw-error-text" aria-live="polite" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
-                        </div>
-
-                        <!-- Description (min-height 160px) -->
-                        <div class="tw-form-group" id="descGroup">
-                            <label class="tw-form-label" for="descTextarea">
-                                Description <span aria-hidden="true" style="color:var(--tw-danger)">*</span>
-                            </label>
-                            <textarea
-                                id="descTextarea"
-                                class="tw-textarea"
-                                rows="7"
-                                required
-                                minlength="20"
-                                placeholder="Describe the issue in detail. Include steps to reproduce, expected vs actual behaviour."
-                                oninput="updateCharCount(); validateForm(); clearFieldError(this, document.getElementById('descError')); updatePreview()"
-                                aria-describedby="descError descCharCount"
-                                style="resize:vertical;min-height:160px;"></textarea>
-                            <span id="descError" class="tw-error-text" aria-live="polite" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
-                            <div class="tw-char-count" id="descCharCount" aria-live="polite">0 characters (minimum 20)</div>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- Enhancement B — styled drag-and-drop with multi-file (up to 3) -->
-                <div class="tw-form-section">
-                    <div class="tw-form-section__header">
-                        <i class="bx bx-paperclip" aria-hidden="true"></i>
-                        <h2 class="tw-form-section__title">Attachments <span style="font-weight:400;color:var(--tw-text-muted);font-size:var(--tw-text-sm)">(optional)</span></h2>
-                    </div>
-                    <div class="tw-form-section__body">
-
-                        <!-- Hidden multi-file input -->
-                        <input
-                            type="file"
-                            id="fileInput"
-                            style="display:none"
-                            multiple
-                            accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-                            onchange="addSelectedFiles(this)">
-
-                        <!-- Drag & drop zone -->
-                        <div class="tw-upload-area"
-                             id="uploadArea"
-                             onclick="document.getElementById('fileInput').click()"
-                             ondragover="handleDragOver(event)"
-                             ondragleave="handleDragLeave(event)"
-                             ondrop="handleDrop(event)"
-                             role="button"
-                             tabindex="0"
-                             aria-label="Upload files — click or drag to upload"
-                             onkeydown="if(event.key==='Enter'||event.key===' '){document.getElementById('fileInput').click();}">
-                            <i class="bx bx-cloud-upload" aria-hidden="true"></i>
-                            <p>
-                                Drag &amp; drop files here or
-                                <span class="tw-upload-link">Browse Files</span>
-                            </p>
-                            <p class="tw-upload-meta">Supports PDF, DOC, DOCX, PNG, JPG — Max 10MB</p>
-                        </div>
-                        <div class="tw-upload-hint" id="uploadHint">Up to 3 files allowed</div>
-
-                        <!-- File chips (rendered by renderFileChips()) -->
-                        <div id="fileChipsList" class="tw-file-chips-list"></div>
-
-                    </div>
-                </div>
-
+            <!-- Section 1: Subject -->
+            <div class="tw-submit-section">
+                <label class="tw-submit-label" for="subjectInput">
+                    What's the issue? <span aria-hidden="true" style="color:var(--tw-danger)">&#9679;</span>
+                </label>
+                <input
+                    type="text"
+                    id="subjectInput"
+                    class="tw-input"
+                    placeholder="Brief summary of your issue"
+                    required
+                    maxlength="160"
+                    oninput="validateForm(); clearFieldError(this, document.getElementById('subjectError')); updatePreview()"
+                    aria-describedby="subjectError">
+                <span id="subjectError" class="tw-error-text" aria-live="polite" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
             </div>
-            <!-- END LEFT COLUMN -->
 
+            <!-- Section 2: Category + Priority (two-col) -->
+            <div class="tw-submit-section">
+                <div class="tw-submit-two-col">
 
-            <!-- ====================================================
-                 RIGHT COLUMN (40%) — Category, Priority, Contact, Tips
-                 ==================================================== -->
-            <div class="tw-submit-right">
-
-                <!-- Classification section (Category + Priority) -->
-                <div class="tw-form-section">
-                    <div class="tw-form-section__header">
-                        <i class="bx bx-category" aria-hidden="true"></i>
-                        <h2 class="tw-form-section__title">Classification</h2>
+                    <!-- Category -->
+                    <div>
+                        <label class="tw-submit-label" for="categorySelect">
+                            Category <span aria-hidden="true" style="color:var(--tw-danger)">&#9679;</span>
+                        </label>
+                        <select
+                            id="categorySelect"
+                            class="tw-select"
+                            required
+                            onchange="validateForm(); clearFieldError(this, document.getElementById('categoryError')); updatePreview()"
+                            aria-describedby="categoryError">
+                            <option value="">Select a category</option>
+                            <!-- Django: {% for category in ticket_categories %} -->
+                            <option value="billing">Billing</option>
+                            <option value="access-control">Access Control</option>
+                            <option value="reports">Reports</option>
+                            <option value="integration">Integration</option>
+                            <option value="ui-ux">UI/UX</option>
+                            <option value="performance">Performance</option>
+                            <option value="other">Other</option>
+                            <!-- Django: {% endfor %} -->
+                        </select>
+                        <span id="categoryError" class="tw-error-text" aria-live="polite" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
                     </div>
-                    <div class="tw-form-section__body">
 
-                        <!-- Category -->
-                        <div class="tw-form-group" id="categoryGroup">
-                            <label class="tw-form-label" for="categorySelect">
-                                Category <span aria-hidden="true" style="color:var(--tw-danger)">*</span>
-                            </label>
-                            <select
-                                id="categorySelect"
-                                class="tw-select"
-                                required
-                                onchange="validateForm(); clearFieldError(this, document.getElementById('categoryError')); updatePreview()"
-                                aria-describedby="categoryError">
-                                <option value="">Select a category</option>
-                                <!-- Django: {% for category in ticket_categories %} -->
-                                <option value="billing">Billing</option>
-                                <option value="access-control">Access Control</option>
-                                <option value="reports">Reports</option>
-                                <option value="integration">Integration</option>
-                                <option value="ui-ux">UI/UX</option>
-                                <option value="performance">Performance</option>
-                                <option value="other">Other</option>
-                                <!-- Django: {% endfor %} -->
-                            </select>
-                            <span id="categoryError" class="tw-error-text" aria-live="polite" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
+                    <!-- Priority -->
+                    <div>
+                        <label class="tw-submit-label" for="prioritySelect">Priority</label>
+                        <select id="prioritySelect" class="tw-select"
+                                onchange="updatePriorityHint(); updatePreview()">
+                            <!-- Django: {% for priority in priority_choices %} -->
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                            <!-- Django: {% endfor %} -->
+                        </select>
+                        <!-- SLA hint — updated by updatePriorityHint() -->
+                        <div id="priorityHint" class="tw-priority-hint tw-priority-hint--medium" aria-live="polite">
+                            <i class="bx bx-info-circle" aria-hidden="true"></i>
+                            <span id="priorityHintText">Medium priority tickets are reviewed within 24 hours.</span>
                         </div>
-
-                        <!-- Priority + SLA hint box -->
-                        <div class="tw-form-group">
-                            <label class="tw-form-label" for="prioritySelect">Priority</label>
-                            <select id="prioritySelect" class="tw-select"
-                                    onchange="updatePriorityHint(); updatePreview()">
-                                <!-- Django: {% for priority in priority_choices %} -->
-                                <option value="low">Low</option>
-                                <option value="medium" selected>Medium</option>
-                                <option value="high">High</option>
-                                <!-- Django: {% endfor %} -->
-                            </select>
-                            <!-- SLA hint — updated by updatePriorityHint() -->
-                            <div id="priorityHint" class="tw-priority-hint tw-priority-hint--medium" aria-live="polite">
-                                <i class="bx bx-info-circle" aria-hidden="true"></i>
-                                <span id="priorityHintText">Medium priority tickets are reviewed within 24 hours.</span>
-                            </div>
-                            <p class="tw-field-hint">
-                                <i class="bx bx-info-circle" aria-hidden="true"></i>
-                                Priority is a suggestion — final priority is set by our support team.
-                            </p>
-                        </div>
-
+                        <p class="tw-field-hint">
+                            <i class="bx bx-info-circle" aria-hidden="true"></i>
+                            Priority is a suggestion — final priority is set by our support team.
+                        </p>
                     </div>
+
                 </div>
+            </div>
 
-                <!-- Contact Preference section -->
-                <div class="tw-form-section">
-                    <div class="tw-form-section__header">
-                        <i class="bx bx-bell" aria-hidden="true"></i>
-                        <h2 class="tw-form-section__title">Contact Preference</h2>
-                    </div>
-                    <div class="tw-form-section__body">
+            <!-- Section 3: Description -->
+            <div class="tw-submit-section">
+                <label class="tw-submit-label" for="descTextarea">
+                    Description <span aria-hidden="true" style="color:var(--tw-danger)">&#9679;</span>
+                </label>
+                <span class="tw-submit-sublabel">Describe the issue in detail. Include steps to reproduce, expected vs actual behaviour.</span>
+                <textarea
+                    id="descTextarea"
+                    class="tw-textarea"
+                    rows="7"
+                    required
+                    minlength="20"
+                    placeholder="e.g. When I click Export on the Reports page, the download starts but the file is empty…"
+                    oninput="updateCharCount(); validateForm(); clearFieldError(this, document.getElementById('descError')); updatePreview()"
+                    aria-describedby="descError descCharCount"
+                    style="resize:vertical;min-height:160px;"></textarea>
+                <span id="descError" class="tw-error-text" aria-live="polite" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
+                <div class="tw-char-counter" id="descCharCount" aria-live="polite">0 characters (minimum 20)</div>
+            </div>
 
+            <!-- Section 4: Attachments -->
+            <div class="tw-submit-section">
+                <label class="tw-submit-label">
+                    Attachments
+                    <span style="font-weight:400;color:var(--tw-text-muted);font-size:var(--tw-text-sm)">(optional)</span>
+                </label>
+
+                <!-- Hidden multi-file input -->
+                <input
+                    type="file"
+                    id="fileInput"
+                    style="display:none"
+                    multiple
+                    accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                    onchange="addSelectedFiles(this)">
+
+                <!-- Drag & drop zone (compact) -->
+                <div class="tw-upload-area"
+                     id="uploadArea"
+                     onclick="document.getElementById('fileInput').click()"
+                     ondragover="handleDragOver(event)"
+                     ondragleave="handleDragLeave(event)"
+                     ondrop="handleDrop(event)"
+                     role="button"
+                     tabindex="0"
+                     aria-label="Upload files — click or drag to upload"
+                     onkeydown="if(event.key==='Enter'||event.key===' '){document.getElementById('fileInput').click();}"
+                     style="padding:20px;min-height:100px">
+                    <i class="bx bx-cloud-upload" aria-hidden="true"></i>
+                    <p>
+                        Drag &amp; drop files here or
+                        <span class="tw-upload-link">Browse Files</span>
+                    </p>
+                    <p class="tw-upload-meta">Supports PDF, DOC, DOCX, PNG, JPG — Max 10MB</p>
+                </div>
+                <div class="tw-upload-hint" id="uploadHint">Up to 3 files allowed</div>
+
+                <!-- File chips (rendered by renderFileChips()) -->
+                <div id="fileChipsList" class="tw-file-chips-list"></div>
+            </div>
+
+            <!-- Divider -->
+            <hr class="tw-submit-divider">
+
+            <!-- Section 5: Notify + Contact (two-col) -->
+            <div class="tw-submit-section">
+                <div class="tw-submit-two-col">
+
+                    <!-- Notify -->
+                    <div>
+                        <label class="tw-submit-label">Notifications</label>
                         <label class="tw-notif-pref">
                             <input type="checkbox" id="notifEmailCheck" checked>
                             Notify me by email when this ticket's status changes
                         </label>
-
-                        <div class="tw-form-group">
-                            <label class="tw-form-label" for="contactSelect">Point of Contact</label>
-                            <select id="contactSelect" class="tw-select" onchange="updatePreview()">
-                                <!-- Django: {% for contact in client_contacts %} -->
-                                <option value="primary">Primary Contact</option>
-                                <option value="account-manager">Account Manager</option>
-                                <option value="technical-lead">Technical Lead</option>
-                                <!-- Django: {% endfor %} -->
-                            </select>
-                        </div>
-
                     </div>
-                </div>
 
-                <!-- Enhancement A — Tips for a great ticket card -->
-                <div class="tw-tips-card" role="note" aria-label="Tips for submitting a great ticket">
-                    <div class="tw-tips-card__header">
-                        <i class="bx bx-bulb" aria-hidden="true"></i>
-                        <h3 class="tw-tips-card__title">Tips for a great ticket</h3>
+                    <!-- Contact -->
+                    <div>
+                        <label class="tw-submit-label" for="contactSelect">Point of Contact</label>
+                        <select id="contactSelect" class="tw-select" onchange="updatePreview()">
+                            <!-- Django: {% for contact in client_contacts %} -->
+                            <option value="primary">Primary Contact</option>
+                            <option value="account-manager">Account Manager</option>
+                            <option value="technical-lead">Technical Lead</option>
+                            <!-- Django: {% endfor %} -->
+                        </select>
                     </div>
-                    <ul class="tw-tips-list">
-                        <li>Be specific about the issue and when it started</li>
-                        <li>Include steps to reproduce the problem</li>
-                        <li>Attach screenshots or error logs if available</li>
-                        <li>Mention which users or accounts are affected</li>
-                    </ul>
-                </div>
 
+                </div>
             </div>
-            <!-- END RIGHT COLUMN -->
 
         </div>
-        <!-- END TWO-COLUMN LAYOUT -->
+        <!-- END SUBMIT CARD -->
 
 
-        <!-- Submit footer — Django: CSRF token + form POST -->
-        <div class="tw-submit-footer" style="max-width:1060px">
-            <a href="dashboard.html" class="tw-btn tw-btn-outline">Cancel</a>
+        <!-- Submit footer -->
+        <div class="tw-submit-footer">
+            <button type="button" class="tw-submit-cancel" onclick="window.location.href='dashboard.html'">Cancel</button>
             <button
                 type="button"
                 id="submitBtn"
                 class="tw-btn tw-btn-primary"
                 disabled
                 onclick="submitTicket()"
-                style="min-width:160px;">
+                style="min-width:180px;">
                 <i class="bx bx-send" aria-hidden="true"></i>
                 Submit Ticket
             </button>
         </div>
 
-        <!-- Enhancement D — collapsible ticket preview panel -->
-        <div style="max-width:1060px">
+        <!-- Collapsible ticket preview panel -->
+        <div style="max-width:960px;margin:0 auto">
             <div class="tw-preview-toggle-wrap">
                 <button class="tw-preview-toggle" type="button"
                         onclick="togglePreview()"
@@ -484,6 +468,7 @@
             </div>
         </div>
 
+    </div><!-- end page content wrapper -->
     </main>
 
 </section>
@@ -825,7 +810,12 @@
         btn.setAttribute('aria-expanded', isOpen);
         chevron.style.transform = isOpen ? 'rotate(180deg)' : '';
 
-        if (isOpen) updatePreview();
+        if (isOpen) {
+            updatePreview();
+            setTimeout(function () {
+                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 150);
+        }
     }
 
 
