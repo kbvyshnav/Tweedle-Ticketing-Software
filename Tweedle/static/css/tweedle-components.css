@@ -580,7 +580,7 @@
 /* --- Table element ------------------------------------------ */
 .tw-table {
     width: 100%;
-    border-collapse: separate;
+    border-collapse: collapse;
     border-spacing: 0;
 }
 
@@ -608,14 +608,14 @@
 
 .tw-table tbody tr {
     cursor: pointer;
-    border-bottom: 1px solid var(--tw-border);
+    border-bottom: 1px solid #e0e0e0 !important;
     transition: background var(--tw-transition-fast),
                 transform var(--tw-transition-fast),
                 box-shadow var(--tw-transition-fast);
 }
 
 .tw-table tbody tr:last-child {
-    border-bottom: none;
+    border-bottom: none !important;
 }
 
 .tw-table tbody tr:hover {

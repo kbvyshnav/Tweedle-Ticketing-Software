@@ -486,7 +486,7 @@
                             <th>Submitted On</th>
                             <th>Last Updated</th>
                             <th>Status</th>
-                            <th>Actions</th>
+                            <th>Quick Access</th>
                         </tr>
                     </thead>
                     <tbody id="ticketTableBody">
@@ -498,7 +498,10 @@
                             data-ticket-id="TKT-GMEC-001"
                             data-subject="Payment gateway timeout"
                             data-priority="medium"
-                            data-submitted-date="2025-04-10">
+                            data-submitted-date="2025-04-10"
+                            style="cursor:pointer"
+                            onclick="window.location.href='ticket-detail.html'"
+                            aria-label="View ticket TKT-GMEC-001">
                             <td>
                                 <!-- FIX 1: Star icon + ticket ID in flex wrapper -->
                                 <div class="ticket-id-cell">
@@ -529,7 +532,6 @@
                                 <span class="tw-status-badge tw-status-badge--progress">In Progress</span>
                             </td>
                             <td>
-                                <!-- FIX 2: Timeline + Chat icons + View button -->
                                 <div class="tw-row-actions">
                                     <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
                                        onclick="event.stopPropagation(); openClientTimelinePanel('TKT-GMEC-001', 'Payment gateway timeout')"
@@ -539,12 +541,6 @@
                                        onclick="event.stopPropagation(); openClientChatPanel('TKT-GMEC-001', 'Payment gateway timeout')"
                                        role="button" tabindex="0"
                                        aria-label="Open chat"></i>
-                                    <!-- Django: href="{% url 'client_ticket_detail' ticket.id %}" -->
-                                    <a href="ticket-detail.html"
-                                       class="tw-btn tw-btn-outline tw-btn--sm"
-                                       onclick="event.stopPropagation()">
-                                        <i class="bx bx-show" aria-hidden="true"></i> View
-                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -554,7 +550,10 @@
                             data-ticket-id="TKT-GMEC-002"
                             data-subject="Bulk export CSV missing columns"
                             data-priority="medium"
-                            data-submitted-date="2025-04-15">
+                            data-submitted-date="2025-04-15"
+                            style="cursor:pointer"
+                            onclick="window.location.href='ticket-detail.html'"
+                            aria-label="View ticket TKT-GMEC-002">
                             <td>
                                 <div class="ticket-id-cell">
                                     <i class="bx bxs-star tw-star-icon"
@@ -589,11 +588,6 @@
                                        onclick="event.stopPropagation(); openClientChatPanel('TKT-GMEC-002', 'Bulk export CSV missing columns')"
                                        role="button" tabindex="0"
                                        aria-label="Open chat"></i>
-                                    <a href="ticket-detail.html"
-                                       class="tw-btn tw-btn-outline tw-btn--sm"
-                                       onclick="event.stopPropagation()">
-                                        <i class="bx bx-show" aria-hidden="true"></i> View
-                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -603,7 +597,10 @@
                             data-ticket-id="TKT-GMEC-003"
                             data-subject="User role permissions not saving"
                             data-priority="high"
-                            data-submitted-date="2025-04-18">
+                            data-submitted-date="2025-04-18"
+                            style="cursor:pointer"
+                            onclick="window.location.href='ticket-detail.html'"
+                            aria-label="View ticket TKT-GMEC-003">
                             <td>
                                 <div class="ticket-id-cell">
                                     <i class="bx bxs-star tw-star-icon"
@@ -638,11 +635,6 @@
                                        onclick="event.stopPropagation(); openClientChatPanel('TKT-GMEC-003', 'User role permissions not saving')"
                                        role="button" tabindex="0"
                                        aria-label="Open chat"></i>
-                                    <a href="ticket-detail.html"
-                                       class="tw-btn tw-btn-outline tw-btn--sm"
-                                       onclick="event.stopPropagation()">
-                                        <i class="bx bx-show" aria-hidden="true"></i> View
-                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -652,7 +644,10 @@
                             data-ticket-id="TKT-GMEC-004"
                             data-subject="Invoice generation wrong totals"
                             data-priority="low"
-                            data-submitted-date="2025-05-02">
+                            data-submitted-date="2025-05-02"
+                            style="cursor:pointer"
+                            onclick="window.location.href='ticket-detail.html'"
+                            aria-label="View ticket TKT-GMEC-004">
                             <td>
                                 <div class="ticket-id-cell">
                                     <i class="bx bxs-star tw-star-icon"
@@ -679,11 +674,6 @@
                                        onclick="event.stopPropagation(); openClientChatPanel('TKT-GMEC-004', 'Invoice generation wrong totals')"
                                        role="button" tabindex="0"
                                        aria-label="Open chat"></i>
-                                    <a href="ticket-detail.html"
-                                       class="tw-btn tw-btn-outline tw-btn--sm"
-                                       onclick="event.stopPropagation()">
-                                        <i class="bx bx-show" aria-hidden="true"></i> View
-                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -693,7 +683,10 @@
                             data-ticket-id="TKT-GMEC-005"
                             data-subject="Dashboard not loading on mobile"
                             data-priority="low"
-                            data-submitted-date="2025-03-28">
+                            data-submitted-date="2025-03-28"
+                            style="cursor:pointer"
+                            onclick="window.location.href='ticket-detail.html'"
+                            aria-label="View ticket TKT-GMEC-005">
                             <td>
                                 <div class="ticket-id-cell">
                                     <i class="bx bxs-star tw-star-icon"
@@ -720,11 +713,6 @@
                                        onclick="event.stopPropagation(); openClientChatPanel('TKT-GMEC-005', 'Dashboard not loading on mobile')"
                                        role="button" tabindex="0"
                                        aria-label="Open chat"></i>
-                                    <a href="ticket-detail.html"
-                                       class="tw-btn tw-btn-outline tw-btn--sm"
-                                       onclick="event.stopPropagation()">
-                                        <i class="bx bx-show" aria-hidden="true"></i> View
-                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -734,7 +722,10 @@
                             data-ticket-id="TKT-GMEC-006"
                             data-subject="API rate limit errors on sync"
                             data-priority="high"
-                            data-submitted-date="2025-03-20">
+                            data-submitted-date="2025-03-20"
+                            style="cursor:pointer"
+                            onclick="window.location.href='ticket-detail.html'"
+                            aria-label="View ticket TKT-GMEC-006">
                             <td>
                                 <div class="ticket-id-cell">
                                     <i class="bx bxs-star tw-star-icon"
@@ -761,11 +752,6 @@
                                        onclick="event.stopPropagation(); openClientChatPanel('TKT-GMEC-006', 'API rate limit errors on sync')"
                                        role="button" tabindex="0"
                                        aria-label="Open chat"></i>
-                                    <a href="ticket-detail.html"
-                                       class="tw-btn tw-btn-outline tw-btn--sm"
-                                       onclick="event.stopPropagation()">
-                                        <i class="bx bx-show" aria-hidden="true"></i> View
-                                    </a>
                                 </div>
                             </td>
                         </tr>
