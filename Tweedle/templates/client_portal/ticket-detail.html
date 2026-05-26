@@ -628,11 +628,108 @@ Actual: only Ticket ID, Client, Subject, Priority, Status, and Issue Date column
      ============================================================== -->
 <script>
     /* ============================================================
-     * TICKET STATUS — change this value to preview any state:
-     * 'new' | 'progress' | 'forwarded' | 'uat' | 'resolved' | 'closed' | 'rejected'
+     * TICKET STATUS & ID — read from URL query parameters.
      * Django: var TICKET_STATUS = "{{ ticket.status }}";
+     *         var TICKET_ID     = "{{ ticket.ticket_id }}";
      * ============================================================ */
-    var TICKET_STATUS = 'uat';
+    var urlParams     = new URLSearchParams(window.location.search);
+    var TICKET_STATUS = urlParams.get('status') || 'new';
+    var TICKET_ID     = urlParams.get('id')     || 'TKT-GMEC-001';
+    var currentTicket; /* set by initPage; used by confirmApprove */
+
+
+    /* ============================================================
+     * TICKET DATA — maps ticket ID → full ticket content.
+     * Django: replaces this entire object with {{ ticket }} context.
+     * ============================================================ */
+    var TICKET_DATA = {
+        'TKT-GMEC-001': {
+            subject:      'Payment gateway timeout',
+            category:     'Billing',
+            priority:     'HIGH',
+            priorityClass:'tw-priority-badge--high',
+            submitted:    '10 Apr 2025',
+            lastUpdated:  '22 Apr 2025',
+            assignedTo:   'Arjun Mehta',
+            estResolution:'30 May 2025',
+            description:  'The payment gateway is timing out during checkout. Customers are unable to complete purchases. The issue started on 8 Apr 2025 and affects approximately 30% of transactions. Error code: GATEWAY_TIMEOUT_503.',
+            attachments: [
+                { name: 'requirements_v2.pdf', type: 'pdf', size: '180 KB', date: '10 Apr 2025' }
+            ]
+        },
+        'TKT-GMEC-002': {
+            subject:      'Bulk export CSV missing columns',
+            category:     'Reports',
+            priority:     'MEDIUM',
+            priorityClass:'tw-priority-badge--medium',
+            submitted:    '15 Apr 2025',
+            lastUpdated:  '20 Apr 2025',
+            assignedTo:   'Priya Menon',
+            estResolution:'25 Apr 2025',
+            description:  'When exporting reports to CSV, multiple columns are missing from the output. Specifically, the Assigned Date and Resolved Date columns do not appear in the downloaded file even though they are visible in the report table on screen. This affects all report exports generated after 14 Apr 2025.',
+            actionMessage:'Priya Menon has completed work on the CSV export issue. Please test the export functionality and confirm whether the Assigned Date and Resolved Date columns now appear correctly in your downloaded files.',
+            attachments: [
+                { name: 'csv-export-screenshot.png', type: 'img', size: '214 KB', date: '15 Apr 2025' }
+            ]
+        },
+        'TKT-GMEC-003': {
+            subject:      'User role permissions not saving',
+            category:     'Access Control',
+            priority:     'HIGH',
+            priorityClass:'tw-priority-badge--high',
+            submitted:    '18 Apr 2025',
+            lastUpdated:  '21 Apr 2025',
+            assignedTo:   'Kiran Das',
+            estResolution:'28 Apr 2025',
+            description:  'When updating user role permissions in the admin panel, changes are not being saved. The UI shows success but on page refresh, the old permissions are restored. This affects all admin users trying to update team member access levels.',
+            actionMessage:'Kiran Das from our support team has requested additional information about your Access Control issue. Please provide details about which specific roles are affected and when the issue first occurred.',
+            attachments: [
+                { name: 'access_issue_log.pdf', type: 'pdf', size: '92 KB', date: '18 Apr 2025' }
+            ]
+        },
+        'TKT-GMEC-004': {
+            subject:      'Invoice generation wrong totals',
+            category:     'Billing',
+            priority:     'MEDIUM',
+            priorityClass:'tw-priority-badge--medium',
+            submitted:    '02 May 2025',
+            lastUpdated:  '05 May 2025',
+            assignedTo:   'Pending assignment',
+            estResolution:'To be confirmed',
+            description:  'The invoice generation module is calculating incorrect totals when multiple discount codes are applied. The final amount shows a higher value than expected. This affects invoices generated after the latest billing module update on 1 May 2025.',
+            attachments: []
+        },
+        'TKT-GMEC-005': {
+            subject:          'Dashboard not loading on mobile',
+            category:         'UI/UX',
+            priority:         'MEDIUM',
+            priorityClass:    'tw-priority-badge--medium',
+            submitted:        '28 Mar 2025',
+            lastUpdated:      '15 Apr 2025',
+            assignedTo:       'Rithik S',
+            closedOn:         '15 Apr 2025',
+            resolutionTime:   '18 days',
+            tatStatus:        'Met',
+            closedBy:         'Support Admin',
+            resolutionSummary:'Fixed responsive CSS breakpoint issue causing layout collapse on screens below 768px. Deployed hotfix v2.1.4.',
+            description:      'The main dashboard does not load correctly on mobile devices. The layout breaks and key widgets are not visible. Reproducible on iOS Safari and Android Chrome.',
+            attachments: []
+        },
+        'TKT-GMEC-006': {
+            subject:         'API rate limit errors on sync',
+            category:        'Integration',
+            priority:        'HIGH',
+            priorityClass:   'tw-priority-badge--high',
+            submitted:       '20 Mar 2025',
+            lastUpdated:     '25 Mar 2025',
+            assignedTo:      'N/A',
+            rejectedBy:      'Support Admin',
+            rejectedOn:      '25 Mar 2025',
+            rejectionReason: 'This issue is outside the scope of your current support plan. The API rate limiting is a third-party provider limitation. Please contact your account manager to discuss upgrading your plan for dedicated API support.',
+            description:     'We are experiencing frequent API rate limit errors when syncing data with the external payment provider. The sync fails every 2-3 hours requiring manual intervention.',
+            attachments: []
+        }
+    };
 
 
     /* ============================================================
@@ -835,9 +932,7 @@ Actual: only Ticket ID, Client, Subject, Priority, Status, and Issue Date column
      * Shown in both the Attachments section and reflected in chat.
      * Django: pre-populated from ticket.attachments.all context.
      * ============================================================ */
-    var sharedAttachments = [
-        { name: 'csv-export-screenshot.png', type: 'img', size: '214 KB', date: '15 Apr 2025' }
-    ];
+    var sharedAttachments = [];
 
 
     /* ============================================================
@@ -910,13 +1005,13 @@ Actual: only Ticket ID, Client, Subject, Priority, Status, and Issue Date column
      * Updates the status badge cluster in the ticket header card.
      * Also appends the priority and category badges.
      */
-    function renderHeaderMeta(data) {
+    function renderHeaderMeta(data, ticket) {
         var meta = document.getElementById('headerStatusMeta');
         if (!meta) return;
         var html = data.headerBadge;
         if (data.showActionDot) html += ' <span class="tw-action-dot" aria-label="Action needed"></span>';
-        html += ' <span class="tw-priority-badge tw-priority-badge--medium">Medium</span>';
-        html += ' <span class="tw-ticket-label">Reports</span>';
+        html += ' <span class="tw-priority-badge ' + ticket.priorityClass + '">' + escapeHtml(ticket.priority) + '</span>';
+        html += ' <span class="tw-ticket-label">' + escapeHtml(ticket.category) + '</span>';
         meta.innerHTML = html;
     }
 
@@ -964,6 +1059,78 @@ Actual: only Ticket ID, Client, Subject, Priority, Status, and Issue Date column
     }
 
 
+    /*
+     * buildInfoRows(s, ticket)
+     * Returns per-status info panel rows using live ticket data.
+     * Supersedes STATUS_DATA[s].infoRows for initPage() rendering.
+     */
+    function buildInfoRows(s, ticket) {
+        var pri = '<span class="tw-priority-badge ' + ticket.priorityClass + '">' + escapeHtml(ticket.priority) + '</span>';
+        switch (s) {
+            case 'new':
+                return [
+                    { label: 'Status',          value: '<span class="tw-status-badge tw-status-badge--new">New</span>' },
+                    { label: 'Priority',        value: pri },
+                    { label: 'Category',        value: escapeHtml(ticket.category) },
+                    { label: 'Submitted',       value: escapeHtml(ticket.submitted) },
+                    { label: 'Assigned To',     value: '<span style="color:var(--tw-text-muted);font-style:italic">Pending assignment</span>' },
+                    { label: 'Est. Resolution', value: '<span style="color:var(--tw-text-muted)">To be confirmed</span>' }
+                ];
+            case 'progress':
+                return [
+                    { label: 'Status',          value: '<span class="tw-status-badge tw-status-badge--progress">In Progress</span>' },
+                    { label: 'Sub-status',      value: '<span class="tw-status-badge tw-status-badge--development">Development</span>' },
+                    { label: 'Priority',        value: pri },
+                    { label: 'Assigned Dev',    value: escapeHtml(ticket.assignedTo) },
+                    { label: 'Est. Resolution', value: escapeHtml(ticket.estResolution) },
+                    { label: 'TAT Status',      value: '<span class="tw-tat-badge tw-tat-badge--pending">On Track</span>' }
+                ];
+            case 'forwarded':
+                return [
+                    { label: 'Status',         value: '<span class="tw-status-badge tw-status-badge--forwarded">Awaiting Response</span>' },
+                    { label: 'Priority',       value: pri },
+                    { label: 'Category',       value: escapeHtml(ticket.category) },
+                    { label: 'Submitted',      value: escapeHtml(ticket.submitted) },
+                    { label: 'Assigned To',    value: escapeHtml(ticket.assignedTo) },
+                    { label: 'Info Requested', value: escapeHtml(ticket.lastUpdated) }
+                ];
+            case 'uat':
+                return [
+                    { label: 'Status',          value: '<span class="tw-status-badge tw-status-badge--uat">UAT Approval</span>' },
+                    { label: 'Priority',        value: pri },
+                    { label: 'Category',        value: escapeHtml(ticket.category) },
+                    { label: 'Submitted',       value: escapeHtml(ticket.submitted) },
+                    { label: 'Assigned To',     value: escapeHtml(ticket.assignedTo) },
+                    { label: 'Est. Resolution', value: escapeHtml(ticket.estResolution) }
+                ];
+            case 'resolved':
+                return [
+                    { label: 'Status',          value: '<span class="tw-status-badge tw-status-badge--resolved">Resolved</span>' },
+                    { label: 'Developer',       value: escapeHtml(ticket.assignedTo) },
+                    { label: 'Resolved On',     value: escapeHtml(ticket.lastUpdated) },
+                    { label: 'Resolution Time', value: escapeHtml(ticket.resolutionTime || 'N/A') },
+                    { label: 'TAT Status',      value: '<span class="tw-tat-badge tw-tat-badge--met">Met</span>' }
+                ];
+            case 'closed':
+                return [
+                    { label: 'Status',          value: '<span class="tw-status-badge tw-status-badge--closed">Closed</span>' },
+                    { label: 'Closed On',       value: escapeHtml(ticket.closedOn) },
+                    { label: 'Resolution Time', value: escapeHtml(ticket.resolutionTime) },
+                    { label: 'TAT Status',      value: '<span class="tw-tat-badge tw-tat-badge--met">Met</span>' },
+                    { label: 'Closed By',       value: escapeHtml(ticket.closedBy) }
+                ];
+            case 'rejected':
+                return [
+                    { label: 'Status',      value: '<span class="tw-status-badge tw-status-badge--rejected">Rejected</span>' },
+                    { label: 'Rejected On', value: escapeHtml(ticket.rejectedOn) },
+                    { label: 'Rejected By', value: escapeHtml(ticket.rejectedBy) }
+                ];
+            default:
+                return STATUS_DATA['new'].infoRows;
+        }
+    }
+
+
     /* ============================================================
      * INIT PAGE (runs last, after all declarations)
      * Reads TICKET_STATUS and sets up the entire page state.
@@ -971,15 +1138,31 @@ Actual: only Ticket ID, Client, Subject, Priority, Status, and Issue Date column
      * and this IIFE becomes irrelevant (Django renders per-status).
      * ============================================================ */
     (function initPage() {
-        var s    = TICKET_STATUS;
-        var data = STATUS_DATA[s] || STATUS_DATA['new'];
+        var s      = TICKET_STATUS;
+        var data   = STATUS_DATA[s] || STATUS_DATA['new'];
+        var ticket = TICKET_DATA[TICKET_ID] || TICKET_DATA['TKT-GMEC-001'];
+        currentTicket = ticket;
+
+        /* Page title and header text */
+        document.title = ticket.subject + ' — Tweedle';
+        var h1El = document.querySelector('.tw-client-header-left h1');
+        if (h1El) h1El.textContent = ticket.subject;
+        var subtitleEl = document.querySelector('.tw-client-header-subtitle');
+        if (subtitleEl) subtitleEl.textContent = TICKET_ID;
+        var headerIdEl = document.querySelector('.tw-ticket-header-id');
+        if (headerIdEl) headerIdEl.textContent = TICKET_ID;
+
+        /* Dates in header card */
+        var dateVals = document.querySelectorAll('.tw-ticket-header-date-val');
+        if (dateVals[0]) dateVals[0].textContent = ticket.submitted;
+        if (dateVals[1]) dateVals[1].textContent = ticket.lastUpdated;
 
         /* FIX 3: Set data-status on header card for CSS border color */
         var headerCard = document.querySelector('.tw-ticket-header-card');
         if (headerCard) headerCard.dataset.status = s;
 
         /* Render header meta badges */
-        renderHeaderMeta(data);
+        renderHeaderMeta(data, ticket);
 
         /* Show correct action card, hide all others */
         var cardMap = {
@@ -991,14 +1174,59 @@ Actual: only Ticket ID, Client, Subject, Priority, Status, and Issue Date column
             'closed':   'closedBanner',
             'rejected': 'rejectedBanner'
         };
-
         Object.keys(cardMap).forEach(function (status) {
             var el = document.getElementById(cardMap[status]);
             if (el) el.style.display = (s === status) ? '' : 'none';
         });
 
+        /* Status-specific action card message */
+        if ((s === 'forwarded' || s === 'uat') && ticket.actionMessage) {
+            var cardId = s === 'forwarded' ? 'awaitingActionCard' : 'uatActionCard';
+            var msgEl = document.querySelector('#' + cardId + ' .tw-action-card__message');
+            if (msgEl) msgEl.textContent = ticket.actionMessage;
+        }
+
+        /* Description — updated before closed injection to avoid querySelector ambiguity */
+        var descEl = document.querySelector('.tw-description-text');
+        if (descEl) descEl.textContent = ticket.description;
+
+        /* Closed: inject resolution summary card after the status banner */
+        if (s === 'closed' && ticket.resolutionSummary) {
+            var closedEl = document.getElementById('closedBanner');
+            if (closedEl) {
+                closedEl.insertAdjacentHTML('beforeend',
+                    '<div class="tw-detail-card" style="margin-top:var(--tw-space-4)">' +
+                    '<div class="tw-detail-card__header">' +
+                    '<i class="bx bx-check-double" aria-hidden="true"></i>' +
+                    '<h3 class="tw-detail-card__title">Resolution Summary</h3>' +
+                    '</div>' +
+                    '<div class="tw-detail-card__body">' +
+                    '<p style="margin:0;color:var(--tw-text-secondary);font-size:var(--tw-text-sm)">' +
+                    escapeHtml(ticket.resolutionSummary) + '</p>' +
+                    '</div></div>'
+                );
+            }
+        }
+
+        /* Rejected: populate rejection details panel */
+        if (s === 'rejected') {
+            var metaVals = document.querySelectorAll('.tw-rejection-meta-row__value');
+            if (metaVals[0]) metaVals[0].textContent = ticket.rejectedBy;
+            if (metaVals[1]) metaVals[1].textContent = ticket.rejectedOn;
+            var reasonBox = document.querySelector('.tw-rejection-details .tw-description-box');
+            if (reasonBox) reasonBox.textContent = ticket.rejectionReason;
+        }
+
+        /* Attachments — seed array and conditionally hide the card */
+        sharedAttachments = ticket.attachments.slice();
+        var attachListEl = document.getElementById('attachmentList');
+        if (attachListEl) {
+            var attachCard = attachListEl.closest('.tw-detail-card');
+            if (attachCard) attachCard.style.display = ticket.attachments.length === 0 ? 'none' : '';
+        }
+
         /* Render right column */
-        renderInfoPanel(data.infoRows);
+        renderInfoPanel(buildInfoRows(s, ticket));
         renderTimeline(data.timeline);
 
         /* Handle chat state */
@@ -1012,8 +1240,8 @@ Actual: only Ticket ID, Client, Subject, Priority, Status, and Issue Date column
             if (chatInputArea) chatInputArea.style.display = 'none';
         } else if (data.chatDisabled) {
             /* closed: show notice, disable textarea and send button */
-            if (chatNotice) chatNotice.style.display = '';
-            if (chatInput)  { chatInput.disabled = true; chatInput.placeholder = 'Chat is closed.'; }
+            if (chatNotice)  chatNotice.style.display = '';
+            if (chatInput)   { chatInput.disabled = true; chatInput.placeholder = 'Chat is closed.'; }
             if (chatSendBtn) chatSendBtn.disabled = true;
         }
 
@@ -1183,7 +1411,7 @@ Actual: only Ticket ID, Client, Subject, Priority, Status, and Issue Date column
      */
     function confirmApprove() {
         closeApproveConfirm();
-        console.log('[Client Portal] UAT approve stub: TKT-GMEC-002');
+        console.log('[Client Portal] UAT approve stub:', TICKET_ID);
 
         var card = document.getElementById('uatActionCard');
         if (card) card.style.display = 'none';
@@ -1192,8 +1420,8 @@ Actual: only Ticket ID, Client, Subject, Priority, Status, and Issue Date column
         var meta = document.getElementById('headerStatusMeta');
         if (meta) {
             meta.innerHTML = '<span class="tw-status-badge tw-status-badge--resolved">Resolved</span>' +
-                             ' <span class="tw-priority-badge tw-priority-badge--medium">Medium</span>' +
-                             ' <span class="tw-ticket-label">Reports</span>';
+                             ' <span class="tw-priority-badge ' + currentTicket.priorityClass + '">' + escapeHtml(currentTicket.priority) + '</span>' +
+                             ' <span class="tw-ticket-label">' + escapeHtml(currentTicket.category) + '</span>';
         }
         /* Update header card border */
         var headerCard = document.querySelector('.tw-ticket-header-card');

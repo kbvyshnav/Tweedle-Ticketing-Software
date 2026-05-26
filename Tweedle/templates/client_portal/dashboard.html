@@ -248,13 +248,13 @@
 
 
         <!-- =========================================================
-             STAT STRIP — 5 cards (FIX 4: + Rejected)
-             Django: {{ open_count }}, {{ inprogress_count }},
-                     {{ awaiting_count }}, {{ closed_count }},
-                     {{ rejected_count }}
+             STAT STRIP — 4 cards
+             Django: {{ open_count }}, {{ needs_action_count }},
+                     {{ closed_count }}, {{ rejected_count }}
              ========================================================= -->
         <div class="tw-client-stat-strip" aria-label="Ticket status summary">
 
+            <!-- Card 1: Open — blue tint -->
             <div class="tw-stat-card tw-stat-card--client-open"
                  data-filter="open"
                  role="button" tabindex="0"
@@ -268,44 +268,29 @@
                 <div class="tw-stat-card__body">
                     <!-- Django: {{ open_count }} -->
                     <div class="tw-stat-card__count">8</div>
-                    <div class="tw-stat-card__label">Open</div>
+                    <div class="tw-stat-card__label">Active tickets</div>
                 </div>
             </div>
 
-            <div class="tw-stat-card tw-stat-card--client-progress"
-                 data-filter="progress"
+            <!-- Card 2: Needs Action — orange tint, pulsing border when count > 0 -->
+            <div class="tw-stat-card tw-stat-card--client-needs-action has-items"
+                 data-filter="needs-action"
                  role="button" tabindex="0"
-                 aria-label="In Progress: 5"
-                 onclick="filterByStatCard('progress', this)">
+                 aria-label="Needs action: 2"
+                 onclick="filterByStatCard('needs-action', this)">
                 <div class="tw-stat-card__left">
                     <div class="tw-stat-card__icon" aria-hidden="true">
-                        <i class='bx bx-time-five'></i>
+                        <i class='bx bx-bell'></i>
                     </div>
                 </div>
                 <div class="tw-stat-card__body">
-                    <!-- Django: {{ inprogress_count }} -->
-                    <div class="tw-stat-card__count">5</div>
-                    <div class="tw-stat-card__label">In Progress</div>
-                </div>
-            </div>
-
-            <div class="tw-stat-card tw-stat-card--client-awaiting"
-                 data-filter="awaiting"
-                 role="button" tabindex="0"
-                 aria-label="Awaiting your response: 2"
-                 onclick="filterByStatCard('awaiting', this)">
-                <div class="tw-stat-card__left">
-                    <div class="tw-stat-card__icon" aria-hidden="true">
-                        <i class='bx bx-bell-plus'></i>
-                    </div>
-                </div>
-                <div class="tw-stat-card__body">
-                    <!-- Django: {{ awaiting_count }} -->
+                    <!-- Django: {{ needs_action_count }} -->
                     <div class="tw-stat-card__count">2</div>
-                    <div class="tw-stat-card__label">Awaiting Response</div>
+                    <div class="tw-stat-card__label">Require your response</div>
                 </div>
             </div>
 
+            <!-- Card 3: Closed — green tint -->
             <div class="tw-stat-card tw-stat-card--client-closed"
                  data-filter="closed"
                  role="button" tabindex="0"
@@ -313,17 +298,17 @@
                  onclick="filterByStatCard('closed', this)">
                 <div class="tw-stat-card__left">
                     <div class="tw-stat-card__icon" aria-hidden="true">
-                        <i class='bx bx-check-double'></i>
+                        <i class='bx bx-check-circle'></i>
                     </div>
                 </div>
                 <div class="tw-stat-card__body">
                     <!-- Django: {{ closed_count }} -->
                     <div class="tw-stat-card__count">12</div>
-                    <div class="tw-stat-card__label">Closed</div>
+                    <div class="tw-stat-card__label">Successfully resolved</div>
                 </div>
             </div>
 
-            <!-- FIX 4: Rejected stat card — danger red tint -->
+            <!-- Card 4: Rejected — danger red tint -->
             <div class="tw-stat-card tw-stat-card--client-rejected"
                  data-filter="rejected"
                  role="button" tabindex="0"
@@ -337,7 +322,7 @@
                 <div class="tw-stat-card__body">
                     <!-- Django: {{ rejected_count }} -->
                     <div class="tw-stat-card__count">1</div>
-                    <div class="tw-stat-card__label">Rejected</div>
+                    <div class="tw-stat-card__label">Not accepted</div>
                 </div>
             </div>
 
@@ -360,13 +345,11 @@
 
                 <!-- Status filter pills -->
                 <div class="tw-client-filter-btns" role="group" aria-label="Filter by status">
-                    <button class="tw-client-filter-btn active" data-status-filter="all"      onclick="filterTickets('all', this)">All</button>
-                    <button class="tw-client-filter-btn"        data-status-filter="open"     onclick="filterTickets('open', this)">Open</button>
-                    <button class="tw-client-filter-btn"        data-status-filter="progress" onclick="filterTickets('progress', this)">In Progress</button>
-                    <button class="tw-client-filter-btn"        data-status-filter="awaiting" onclick="filterTickets('awaiting', this)">Awaiting Response</button>
-                    <button class="tw-client-filter-btn"        data-status-filter="closed"   onclick="filterTickets('closed', this)">Closed</button>
-                    <!-- FIX 4: Rejected filter pill -->
-                    <button class="tw-client-filter-btn"        data-status-filter="rejected" onclick="filterTickets('rejected', this)">Rejected</button>
+                    <button class="tw-client-filter-btn active" data-status-filter="all"          onclick="filterTickets('all', this)">All</button>
+                    <button class="tw-client-filter-btn"        data-status-filter="open"         onclick="filterTickets('open', this)">Open</button>
+                    <button class="tw-client-filter-btn"        data-status-filter="needs-action" onclick="filterTickets('needs-action', this)">Needs Action</button>
+                    <button class="tw-client-filter-btn"        data-status-filter="closed"       onclick="filterTickets('closed', this)">Closed</button>
+                    <button class="tw-client-filter-btn"        data-status-filter="rejected"     onclick="filterTickets('rejected', this)">Rejected</button>
                 </div>
 
                 <!-- Right cluster: Priority | Date Range | Sort | Search -->
@@ -500,7 +483,7 @@
                             data-priority="medium"
                             data-submitted-date="2025-04-10"
                             style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html'"
+                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-001&amp;status=progress'"
                             aria-label="View ticket TKT-GMEC-001">
                             <td>
                                 <!-- FIX 1: Star icon + ticket ID in flex wrapper -->
@@ -552,7 +535,7 @@
                             data-priority="medium"
                             data-submitted-date="2025-04-15"
                             style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html'"
+                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-002&amp;status=uat'"
                             aria-label="View ticket TKT-GMEC-002">
                             <td>
                                 <div class="ticket-id-cell">
@@ -592,14 +575,14 @@
                             </td>
                         </tr>
 
-                        <!-- Row 3: Awaiting Response | High | 18 Apr 2025 — "Action Required" -->
-                        <tr data-ticket-status="awaiting"
+                        <!-- Row 3: Forwarded / Awaiting Response | High | 18 Apr 2025 — "Action Required" -->
+                        <tr data-ticket-status="forwarded"
                             data-ticket-id="TKT-GMEC-003"
                             data-subject="User role permissions not saving"
                             data-priority="high"
                             data-submitted-date="2025-04-18"
                             style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html'"
+                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-003&amp;status=forwarded'"
                             aria-label="View ticket TKT-GMEC-003">
                             <td>
                                 <div class="ticket-id-cell">
@@ -646,7 +629,7 @@
                             data-priority="low"
                             data-submitted-date="2025-05-02"
                             style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html'"
+                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-004&amp;status=new'"
                             aria-label="View ticket TKT-GMEC-004">
                             <td>
                                 <div class="ticket-id-cell">
@@ -685,7 +668,7 @@
                             data-priority="low"
                             data-submitted-date="2025-03-28"
                             style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html'"
+                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-005&amp;status=closed'"
                             aria-label="View ticket TKT-GMEC-005">
                             <td>
                                 <div class="ticket-id-cell">
@@ -724,7 +707,7 @@
                             data-priority="high"
                             data-submitted-date="2025-03-20"
                             style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html'"
+                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-006&amp;status=rejected'"
                             aria-label="View ticket TKT-GMEC-006">
                             <td>
                                 <div class="ticket-id-cell">
@@ -756,10 +739,16 @@
                             </td>
                         </tr>
 
+                        <!-- Empty state — shown by JS when no rows match the active filter -->
                         <!-- Django: {% empty %} -->
-                        <!-- Django: <tr id="emptyStatePlaceholder"> -->
-                        <!-- Django: <td colspan="7" style="text-align:center;padding:40px;color:var(--tw-text-muted)">No tickets found.</td> -->
-                        <!-- Django: </tr> -->
+                        <tr id="emptyStatePlaceholder" style="display:none">
+                            <td colspan="7">
+                                <div style="text-align:center;padding:40px 20px;color:var(--tw-text-muted)">
+                                    <i class="bx bx-folder-open" style="font-size:40px;display:block;margin-bottom:8px;opacity:0.4" aria-hidden="true"></i>
+                                    <p id="emptyStateMsg" style="margin:0;font-size:var(--tw-text-sm)">You haven't submitted any tickets yet.</p>
+                                </div>
+                            </td>
+                        </tr>
                         <!-- Django: {% endfor %} -->
 
                     </tbody>
@@ -1070,7 +1059,7 @@
 
     /* --- Composable filter state --------------------------------- */
     var clientFilters = {
-        status:   'all',   /* 'all'|'open'|'progress'|'awaiting'|'closed'|'rejected' */
+        status:   'all',   /* 'all'|'open'|'needs-action'|'closed'|'rejected' */
         priority: 'all',   /* 'all'|'high'|'medium'|'low' */
         dateFrom: null,    /* Date object | null */
         dateTo:   null,    /* Date object | null */
@@ -1109,9 +1098,24 @@
         /* Re-sort after filtering */
         applySortOrder();
 
-        /* Empty state placeholder */
+        /* Empty state placeholder — contextual message per active filter */
         var empty = document.getElementById('emptyStatePlaceholder');
-        if (empty) empty.style.display = visibleCount === 0 ? '' : 'none';
+        if (empty) {
+            if (visibleCount === 0) {
+                var emptyMsgs = {
+                    'open':         'No active tickets. Submit a new ticket if you need support.',
+                    'needs-action': 'No tickets require your attention right now.',
+                    'closed':       'No closed tickets yet.',
+                    'rejected':     'No rejected tickets.',
+                    'all':          "You haven't submitted any tickets yet."
+                };
+                var msgEl = document.getElementById('emptyStateMsg');
+                if (msgEl) msgEl.textContent = emptyMsgs[clientFilters.status] || emptyMsgs['all'];
+                empty.style.display = '';
+            } else {
+                empty.style.display = 'none';
+            }
+        }
     }
 
     /*
@@ -1131,18 +1135,14 @@
         if (s === 'all') {
             statusMatch = true;
         } else if (s === 'open') {
-            /* Open = any active ticket — excludes closed and rejected */
-            statusMatch = ['new', 'progress', 'awaiting', 'uat'].indexOf(rowStatus) !== -1;
-        } else if (s === 'progress') {
-            statusMatch = rowStatus === 'progress';
-        } else if (s === 'awaiting') {
-            /* Awaiting Response = tickets needing client action */
-            statusMatch = rowStatus === 'awaiting' || rowStatus === 'uat';
+            /* Open = any active ticket: new, in progress, forwarded, or awaiting UAT */
+            statusMatch = ['new', 'progress', 'forwarded', 'uat'].indexOf(rowStatus) !== -1;
+        } else if (s === 'needs-action') {
+            /* Needs Action = tickets requiring client response or approval */
+            statusMatch = rowStatus === 'forwarded' || rowStatus === 'uat';
         } else if (s === 'closed') {
-            /* Closed filter: only truly closed — NOT rejected (FIX 4) */
             statusMatch = rowStatus === 'closed';
         } else if (s === 'rejected') {
-            /* FIX 4: Dedicated rejected filter */
             statusMatch = rowStatus === 'rejected';
         } else {
             statusMatch = false;

@@ -1079,10 +1079,36 @@ body > main {
 
 
 /* ============================================================
- * SECTION 17: REJECTED STAT CARD (FIX 4)
- * Danger-red tint, matches admin's rejected card pattern.
+ * SECTION 17: ADDITIONAL STAT CARD VARIANTS
+ * needs-action (orange/primary) + rejected (danger red).
  * ============================================================ */
 
+/* --- Needs Action card --- */
+.tw-stat-card--client-needs-action { border-left-color: var(--tw-primary); }
+
+.tw-stat-card--client-needs-action .tw-stat-card__icon {
+    background: var(--tw-primary-light);
+    color: var(--tw-primary);
+}
+
+.tw-stat-card--client-needs-action.active {
+    background: var(--tw-primary-light);
+    border-color: var(--tw-primary);
+    border-left-color: var(--tw-primary);
+}
+
+/* Pulsing border ring when count > 0 */
+.tw-stat-card--client-needs-action.has-items {
+    box-shadow: 0 0 0 2px var(--tw-primary);
+    animation: tw-card-pulse 2s infinite;
+}
+
+@keyframes tw-card-pulse {
+    0%, 100% { box-shadow: 0 0 0 2px var(--tw-primary); }
+    50%       { box-shadow: 0 0 0 4px var(--tw-primary-light); }
+}
+
+/* --- Rejected card --- */
 .tw-stat-card--client-rejected { border-left-color: var(--tw-danger); }
 
 .tw-stat-card--client-rejected .tw-stat-card__icon {
