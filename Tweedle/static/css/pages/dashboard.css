@@ -231,7 +231,7 @@ body > main {
 .tw-stat-card--forwarded { border-left-color: var(--tw-status-forwarded-text); }
 .tw-stat-card--uat       { border-left-color: var(--tw-status-uat-text); }
 .tw-stat-card--closed    { border-left-color: var(--tw-status-closed-text); }
-.tw-stat-card--resolved  { border-left-color: var(--tw-status-forwarded-text); }
+.tw-stat-card--resolved  { border-left-color: var(--tw-status-closed-text); }
 .tw-stat-card--rejected  { border-left-color: var(--tw-danger); }
 
 /* Active state — tinted background */
@@ -240,7 +240,7 @@ body > main {
 .tw-stat-card--forwarded.active { background: var(--tw-status-forwarded-bg); border-color: var(--tw-status-forwarded-text); border-left-color: var(--tw-status-forwarded-text); }
 .tw-stat-card--uat.active       { background: var(--tw-status-uat-bg);       border-color: var(--tw-status-uat-text);       border-left-color: var(--tw-status-uat-text); }
 .tw-stat-card--closed.active    { background: var(--tw-status-closed-bg);    border-color: var(--tw-status-closed-text);    border-left-color: var(--tw-status-closed-text); }
-.tw-stat-card--resolved.active  { background: var(--tw-status-forwarded-bg); border-color: var(--tw-status-forwarded-text); border-left-color: var(--tw-status-forwarded-text); }
+.tw-stat-card--resolved.active  { background: var(--tw-status-closed-bg);    border-color: var(--tw-status-closed-text);    border-left-color: var(--tw-status-closed-text); }
 .tw-stat-card--rejected.active  { background: rgba(219, 80, 74, 0.08);       border-color: var(--tw-danger);               border-left-color: var(--tw-danger); }
 
 /* Left slot (icon) */
@@ -262,7 +262,7 @@ body > main {
 .tw-stat-card--forwarded .tw-stat-card__icon { background: var(--tw-status-forwarded-bg); color: var(--tw-status-forwarded-text); }
 .tw-stat-card--uat       .tw-stat-card__icon { background: var(--tw-status-uat-bg);       color: var(--tw-status-uat-text); }
 .tw-stat-card--closed    .tw-stat-card__icon { background: var(--tw-status-closed-bg);    color: var(--tw-status-closed-text); }
-.tw-stat-card--resolved  .tw-stat-card__icon { background: var(--tw-status-forwarded-bg); color: var(--tw-status-forwarded-text); }
+.tw-stat-card--resolved  .tw-stat-card__icon { background: var(--tw-status-closed-bg);    color: var(--tw-status-closed-text); }
 .tw-stat-card--rejected  .tw-stat-card__icon { background: rgba(219, 80, 74, 0.10);       color: var(--tw-danger); }
 
 /* Body (count + label) */

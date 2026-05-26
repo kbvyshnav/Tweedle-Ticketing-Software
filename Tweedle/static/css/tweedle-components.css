@@ -310,8 +310,8 @@
 }
 
 .tw-status-badge--resolved {
-    background: var(--tw-status-forwarded-bg);
-    color: var(--tw-status-forwarded-text);
+    background: var(--tw-status-closed-bg);
+    color: var(--tw-status-closed-text);
 }
 
 .tw-status-badge--active {
@@ -1212,7 +1212,7 @@
 }
 
 .tw-message.sent .tw-message-content {
-    background: #6b89a7;
+    background: var(--tw-primary);
     color: #ffffff;
 }
 
@@ -1338,7 +1338,7 @@
 
 .tw-chat-input:focus {
     border-color: var(--tw-primary);
-    box-shadow: 0 0 0 2px rgba(60, 145, 230, 0.10);
+    box-shadow: var(--tw-shadow-primary);
 }
 
 .tw-attach-btn {
@@ -1891,7 +1891,7 @@
 
 .tw-input:focus {
     border-color: var(--tw-primary);
-    box-shadow: 0 0 0 3px rgba(60, 145, 230, 0.10);
+    box-shadow: var(--tw-shadow-primary);
 }
 
 .tw-input--error {
@@ -1925,7 +1925,7 @@
 .tw-select:focus {
     outline: none;
     border-color: var(--tw-primary);
-    box-shadow: 0 0 0 3px rgba(60, 145, 230, 0.10);
+    box-shadow: var(--tw-shadow-primary);
 }
 
 /* Developer stats mini-grid (inside assignment section) */
@@ -1991,7 +1991,7 @@
 .tw-textarea:focus {
     outline: none;
     border-color: var(--tw-primary);
-    box-shadow: 0 0 0 3px rgba(60, 145, 230, 0.10);
+    box-shadow: var(--tw-shadow-primary);
 }
 
 /* Checkbox group row */

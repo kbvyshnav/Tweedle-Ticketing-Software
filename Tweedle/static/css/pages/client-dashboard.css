@@ -2072,3 +2072,25 @@ body > main {
         gap: 10px;
     }
 }
+
+/* Empty state — shown when no ticket rows match active filters */
+.tw-client-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    color: var(--tw-text-muted);
+    gap: 12px;
+}
+
+.tw-client-empty-state i {
+    font-size: 40px;
+    color: var(--tw-border);
+}
+
+.tw-client-empty-state p {
+    font-size: var(--tw-text-md);
+    color: var(--tw-text-secondary);
+    margin: 0;
+}

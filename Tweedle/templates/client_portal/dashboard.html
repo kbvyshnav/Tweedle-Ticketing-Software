@@ -741,11 +741,15 @@
 
                         <!-- Empty state — shown by JS when no rows match the active filter -->
                         <!-- Django: {% empty %} -->
-                        <tr id="emptyStatePlaceholder" style="display:none">
+                        <tr id="clientEmptyState" style="display:none;">
                             <td colspan="7">
-                                <div style="text-align:center;padding:40px 20px;color:var(--tw-text-muted)">
-                                    <i class="bx bx-folder-open" style="font-size:40px;display:block;margin-bottom:8px;opacity:0.4" aria-hidden="true"></i>
-                                    <p id="emptyStateMsg" style="margin:0;font-size:var(--tw-text-sm)">You haven't submitted any tickets yet.</p>
+                                <div class="tw-client-empty-state">
+                                    <i class='bx bx-folder-open' aria-hidden="true"></i>
+                                    <p id="clientEmptyMsg">No tickets found.</p>
+                                    <button class="tw-btn tw-btn-outline tw-btn--sm"
+                                            onclick="resetClientFilters()">
+                                        Clear Filters
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -1082,14 +1086,11 @@
      * Runs after every state change, then applies sort.
      * ============================================================ */
     function applyClientFilters() {
-        var rows        = document.querySelectorAll('#ticketTableBody tr[data-ticket-status]');
-        var visibleCount = 0;
+        var rows = document.querySelectorAll('#ticketTableBody tr[data-ticket-status]');
 
         rows.forEach(function (row) {
-            var match = checkRowMatch(row);
-            if (match) {
+            if (checkRowMatch(row)) {
                 row.classList.remove('row-hidden');
-                visibleCount++;
             } else {
                 row.classList.add('row-hidden');
             }
@@ -1098,24 +1099,7 @@
         /* Re-sort after filtering */
         applySortOrder();
 
-        /* Empty state placeholder — contextual message per active filter */
-        var empty = document.getElementById('emptyStatePlaceholder');
-        if (empty) {
-            if (visibleCount === 0) {
-                var emptyMsgs = {
-                    'open':         'No active tickets. Submit a new ticket if you need support.',
-                    'needs-action': 'No tickets require your attention right now.',
-                    'closed':       'No closed tickets yet.',
-                    'rejected':     'No rejected tickets.',
-                    'all':          "You haven't submitted any tickets yet."
-                };
-                var msgEl = document.getElementById('emptyStateMsg');
-                if (msgEl) msgEl.textContent = emptyMsgs[clientFilters.status] || emptyMsgs['all'];
-                empty.style.display = '';
-            } else {
-                empty.style.display = 'none';
-            }
-        }
+        updateClientEmptyState();
     }
 
     /*
@@ -1556,6 +1540,65 @@
         var d = new Date();
         return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) +
                ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function updateClientEmptyState() {
+        var visibleRows = document.querySelectorAll(
+            '#ticketTableBody tr[data-ticket-status]:not(.row-hidden)'
+        ).length;
+        var emptyState = document.getElementById('clientEmptyState');
+        var emptyMsg   = document.getElementById('clientEmptyMsg');
+        if (!emptyState) return;
+        if (visibleRows === 0) {
+            emptyState.style.display = '';
+            var msgs = {
+                'all':          "You haven't submitted any tickets yet.",
+                'open':         'No active tickets. Submit a new ticket if you need support.',
+                'needs-action': 'No tickets require your attention right now. Great job!',
+                'closed':       'No closed tickets yet.',
+                'rejected':     'No rejected tickets.'
+            };
+            if (emptyMsg) emptyMsg.textContent = msgs[clientFilters.status] || 'No tickets match your filters.';
+        } else {
+            emptyState.style.display = 'none';
+        }
+    }
+
+    function resetClientFilters() {
+        clientFilters.status   = 'all';
+        clientFilters.priority = 'all';
+        clientFilters.dateFrom = null;
+        clientFilters.dateTo   = null;
+        clientFilters.search   = '';
+        document.querySelectorAll('.tw-client-filter-btn').forEach(function (b) {
+            b.classList.remove('active');
+            if (b.dataset.statusFilter === 'all') b.classList.add('active');
+        });
+        document.querySelectorAll('.tw-stat-card').forEach(function (c) {
+            c.classList.remove('active');
+        });
+        var priorityLabel = document.getElementById('priorityBtnLabel');
+        if (priorityLabel) priorityLabel.textContent = 'Priority';
+        document.querySelectorAll('#clientPriorityDropdown .tw-priority-option').forEach(function (o) {
+            o.classList.remove('selected');
+        });
+        var fromIn = document.getElementById('clientDateFrom');
+        var toIn   = document.getElementById('clientDateTo');
+        if (fromIn) fromIn.value = '';
+        if (toIn)   toIn.value   = '';
+        var dateLabel = document.getElementById('dateBtnLabel');
+        if (dateLabel) dateLabel.textContent = 'Date Range';
+        document.querySelectorAll('.tw-client-quick-filter').forEach(function (b) {
+            b.classList.remove('active');
+        });
+        var searchInput = document.getElementById('ticketSearchInput');
+        if (searchInput) searchInput.value = '';
+        clientSortOrder = 'default';
+        var sortIcon = document.getElementById('sortIcon');
+        if (sortIcon) sortIcon.className = 'bx bx-sort-alt-2';
+        var sortBtn = document.getElementById('sortBtn');
+        if (sortBtn) sortBtn.title = 'Sort by submitted date';
+        applyClientFilters();
     }
 
     /*
