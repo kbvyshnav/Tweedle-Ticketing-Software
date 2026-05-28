@@ -787,7 +787,7 @@
 
 /* Chat-specific avatar colors by role */
 .tw-avatar--admin     { background: var(--tw-danger); }
-.tw-avatar--developer { background: var(--tw-info); }
+.tw-avatar--developer { background: var(--tw-primary); }
 .tw-avatar--tester    { background: var(--tw-success); }
 .tw-avatar--user      { background: #6c757d; }
 

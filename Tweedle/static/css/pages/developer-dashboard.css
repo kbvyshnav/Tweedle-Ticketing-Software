@@ -1,0 +1,1697 @@
+/*
+ * ============================================================
+ * FILE:        developer-dashboard.css
+ * PURPOSE:     Developer portal page styles — dashboard and
+ *              ticket-detail pages. All developer-specific
+ *              classes. Shared component classes live in
+ *              tweedle-components.css.
+ * LOAD ORDER:  5 of 5 — after tweedle-components.css
+ *              (also loads after notification.css, chat.css,
+ *               ticket-timeline.css in the full page stack)
+ * DJANGO PATH: <!-- Django: {% static 'css/pages/developer-dashboard.css' %} -->
+ * ROLE:        Developer — purple theme via theme-developer.css
+ * ============================================================
+ */
+
+
+/* ============================================================
+ * SECTION 1: PAGE HEADER
+ * ============================================================ */
+
+.dev-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: var(--tw-space-6);
+    gap: var(--tw-space-4);
+}
+
+.dev-page-header h1 {
+    font-size: var(--tw-text-3xl);
+    font-weight: var(--tw-weight-bold);
+    color: var(--tw-text-primary);
+    margin: 0 0 var(--tw-space-1) 0;
+    line-height: 1.2;
+}
+
+.dev-page-subtitle {
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-secondary);
+    margin: 0;
+}
+
+
+/* ============================================================
+ * SECTION 2: STAT STRIP — 3 cards
+ * ============================================================ */
+
+.dev-stat-strip {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--tw-space-4);
+    margin-bottom: var(--tw-space-6);
+}
+
+.dev-stat-card {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-4);
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-xl);
+    padding: var(--tw-space-5);
+    box-shadow: var(--tw-shadow-sm);
+    cursor: pointer;
+    border-left: 4px solid transparent;
+    transition: box-shadow var(--tw-transition-base),
+                transform var(--tw-transition-fast),
+                background var(--tw-transition-base);
+    outline: none;
+}
+
+.dev-stat-card:hover,
+.dev-stat-card.active {
+    box-shadow: var(--tw-shadow-md);
+    transform: translateY(-2px);
+}
+
+.dev-stat-card:focus-visible {
+    outline: 2px solid var(--tw-primary);
+    outline-offset: 2px;
+}
+
+.dev-stat-card__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--tw-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+    transition: background var(--tw-transition-base);
+}
+
+.dev-stat-card__count {
+    font-size: var(--tw-text-2xl);
+    font-weight: var(--tw-weight-bold);
+    color: var(--tw-text-primary);
+    line-height: 1.2;
+}
+
+.dev-stat-card__label {
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-secondary);
+    margin-top: 2px;
+}
+
+/* Card 1 — Active (purple tint) */
+.dev-stat-card--active {
+    border-left-color: var(--tw-primary);
+}
+
+.dev-stat-card--active .dev-stat-card__icon {
+    background: var(--tw-primary-light);
+    color: var(--tw-primary);
+}
+
+.dev-stat-card--active.active {
+    background: var(--tw-primary-light);
+}
+
+/* Card 2 — Overdue (danger red) */
+.dev-stat-card--overdue {
+    border-left-color: var(--tw-priority-high-text);
+}
+
+.dev-stat-card--overdue .dev-stat-card__icon {
+    background: var(--tw-priority-high-bg);
+    color: var(--tw-priority-high-text);
+}
+
+.dev-stat-card--overdue .dev-stat-card__count {
+    color: var(--tw-priority-high-text);
+}
+
+.dev-stat-card--overdue.active {
+    background: var(--tw-priority-high-bg);
+}
+
+/* Pulsing border animation for overdue card (mirrors client portal "Needs Action" pattern) */
+@keyframes dev-pulse-border {
+    0%   { box-shadow: 0 0 0 0   rgba(192, 57, 43, 0.45), var(--tw-shadow-sm); }
+    70%  { box-shadow: 0 0 0 8px rgba(192, 57, 43, 0),    var(--tw-shadow-sm); }
+    100% { box-shadow: 0 0 0 0   rgba(192, 57, 43, 0),    var(--tw-shadow-sm); }
+}
+
+.dev-stat-card--overdue.has-items {
+    animation: dev-pulse-border 2s ease-in-out infinite;
+}
+
+/* Card 3 — Resolved This Month (green) */
+.dev-stat-card--resolved-month {
+    border-left-color: var(--tw-status-closed-text);
+}
+
+.dev-stat-card--resolved-month .dev-stat-card__icon {
+    background: var(--tw-status-closed-bg);
+    color: var(--tw-status-closed-text);
+}
+
+.dev-stat-card--resolved-month .dev-stat-card__count {
+    color: var(--tw-status-closed-text);
+}
+
+.dev-stat-card--resolved-month.active {
+    background: var(--tw-status-closed-bg);
+}
+
+
+/* ============================================================
+ * SECTION 3: TABLE CARD WRAPPER
+ * ============================================================ */
+
+.dev-table-card {
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-lg);
+    box-shadow: var(--tw-shadow-sm);
+    overflow: hidden;
+}
+
+
+/* ============================================================
+ * SECTION 4: FILTER BAR
+ * ============================================================ */
+
+.dev-filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--tw-space-4);
+    padding: var(--tw-space-4) var(--tw-space-5);
+    border-bottom: 1px solid var(--tw-border);
+    flex-wrap: wrap;
+}
+
+/* --- Sub-status pills ---------------------------------------- */
+.dev-filter-pills {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-1);
+    flex-wrap: wrap;
+}
+
+.dev-filter-pill {
+    position: relative;
+    padding: var(--tw-space-2) var(--tw-space-4);
+    border-radius: var(--tw-radius-pill);
+    font-size: var(--tw-text-base);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-secondary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color var(--tw-transition-fast);
+    white-space: nowrap;
+    font-family: var(--tw-font-primary);
+}
+
+.dev-filter-pill::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: var(--tw-primary);
+    border-radius: 2px;
+    transition: width var(--tw-transition-base);
+}
+
+.dev-filter-pill:hover:not(.active) {
+    color: var(--tw-text-primary);
+}
+
+.dev-filter-pill.active {
+    color: var(--tw-primary);
+    font-weight: var(--tw-weight-semibold);
+}
+
+.dev-filter-pill.active::after {
+    width: 60%;
+}
+
+/* --- Toolbar right cluster ----------------------------------- */
+.dev-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+    flex-wrap: wrap;
+}
+
+/* --- Priority dropdown button -------------------------------- */
+.dev-dropdown-wrap {
+    position: relative;
+}
+
+.dev-toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    padding: var(--tw-space-2) var(--tw-space-3);
+    height: 36px;
+    background: var(--tw-bg-surface);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    font-size: var(--tw-text-base);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-secondary);
+    cursor: pointer;
+    font-family: var(--tw-font-primary);
+    transition: border-color var(--tw-transition-fast),
+                color var(--tw-transition-fast),
+                background var(--tw-transition-fast);
+    white-space: nowrap;
+}
+
+.dev-toolbar-btn:hover,
+.dev-toolbar-btn[aria-expanded="true"] {
+    border-color: var(--tw-primary);
+    color: var(--tw-primary);
+    background: var(--tw-primary-light);
+}
+
+.dev-toolbar-icon-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: var(--tw-radius-sm);
+    border: 1px solid var(--tw-border);
+    background: var(--tw-bg-surface);
+    color: var(--tw-text-secondary);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color var(--tw-transition-fast),
+                color var(--tw-transition-fast),
+                background var(--tw-transition-fast);
+}
+
+.dev-toolbar-icon-btn:hover {
+    border-color: var(--tw-primary);
+    color: var(--tw-primary);
+    background: var(--tw-primary-light);
+}
+
+.dev-dropdown-arrow {
+    font-size: 16px;
+    transition: transform var(--tw-transition-fast);
+}
+
+.dev-toolbar-btn[aria-expanded="true"] .dev-dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* --- Priority dropdown panel --------------------------------- */
+.dev-priority-dropdown {
+    position: absolute;
+    top: calc(100% + var(--tw-space-2));
+    right: 0;
+    background: var(--tw-bg-surface);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-md);
+    box-shadow: var(--tw-shadow-md);
+    min-width: 160px;
+    z-index: var(--tw-z-dropdown);
+    display: none;
+    overflow: hidden;
+}
+
+.dev-priority-dropdown.open {
+    display: block;
+}
+
+.dev-priority-option {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    padding: var(--tw-space-2) var(--tw-space-4);
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-secondary);
+    cursor: pointer;
+    font-family: var(--tw-font-primary);
+    transition: background var(--tw-transition-fast);
+}
+
+.dev-priority-option:hover {
+    background: var(--tw-bg-body);
+    color: var(--tw-text-primary);
+}
+
+.dev-priority-option.selected {
+    background: var(--tw-primary-light);
+    color: var(--tw-primary-text);
+    font-weight: var(--tw-weight-medium);
+}
+
+.dev-priority-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: inline-block;
+}
+
+/* --- Search input -------------------------------------------- */
+.dev-search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.dev-search-icon {
+    position: absolute;
+    left: var(--tw-space-3);
+    color: var(--tw-text-muted);
+    font-size: 16px;
+    pointer-events: none;
+}
+
+.dev-search-input {
+    padding: var(--tw-space-2) var(--tw-space-3) var(--tw-space-2) calc(var(--tw-space-6) + 4px);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    background: var(--tw-bg-input);
+    font-size: var(--tw-text-base);
+    font-family: var(--tw-font-primary);
+    color: var(--tw-text-primary);
+    width: 230px;
+    height: 36px;
+    outline: none;
+    transition: border-color var(--tw-transition-fast),
+                box-shadow var(--tw-transition-fast),
+                background var(--tw-transition-fast);
+}
+
+.dev-search-input:focus {
+    border-color: var(--tw-primary);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+    background: var(--tw-bg-surface);
+}
+
+.dev-search-input::placeholder {
+    color: var(--tw-text-muted);
+}
+
+
+/* ============================================================
+ * SECTION 5: TABLE OVERRIDES
+ * Uses existing .tw-table from tweedle-components.css.
+ * Developer-specific additions only.
+ * ============================================================ */
+
+.ticket-id-cell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.tw-ticket-id {
+    font-weight: 600;
+    color: var(--tw-text-primary);
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+}
+
+/* Overdue badge inside ticket-id-cell */
+.tw-overdue-badge {
+    display: inline-flex;
+    align-items: center;
+    background: var(--tw-danger);
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: var(--tw-weight-bold);
+    padding: 2px var(--tw-space-2);
+    border-radius: var(--tw-radius-pill);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+/* Row overdue left border accent */
+.dev-row-overdue {
+    border-left: 3px solid var(--tw-danger) !important;
+}
+
+/* Attachment chip inside Subject cell */
+.dev-row-attachment {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 3px;
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    background: var(--tw-bg-body);
+    padding: 2px 6px;
+    border-radius: var(--tw-radius-pill);
+}
+
+.dev-row-attachment .attach-icon {
+    font-size: 12px;
+}
+
+.dev-row-attachment .attach-icon.pdf { color: var(--tw-file-pdf-icon); }
+.dev-row-attachment .attach-icon.doc { color: var(--tw-file-doc-icon); }
+.dev-row-attachment .attach-icon.img { color: var(--tw-file-img-icon); }
+
+/* Empty state */
+.dev-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--tw-space-12) var(--tw-space-6);
+    gap: var(--tw-space-3);
+}
+
+.dev-empty-state i {
+    font-size: 40px;
+    color: var(--tw-text-muted);
+}
+
+.dev-empty-state p {
+    font-size: var(--tw-text-md);
+    color: var(--tw-text-secondary);
+    margin: 0;
+    text-align: center;
+}
+
+
+/* ============================================================
+ * SECTION 6: SIDEBAR USER SECTION (bottom of sidebar)
+ * ============================================================ */
+
+.sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+    padding: var(--tw-space-3) var(--tw-space-4);
+    border-top: 1px solid var(--tw-border-light);
+    margin-top: auto;
+    overflow: hidden;
+}
+
+.sidebar-user-info {
+    overflow: hidden;
+}
+
+.sidebar-user-name {
+    font-size: var(--tw-text-base);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: var(--tw-font-secondary);
+    line-height: 1.3;
+}
+
+.sidebar-user-role {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    font-family: var(--tw-font-secondary);
+}
+
+/* Hide text labels when sidebar is collapsed */
+.sidebar.hide .sidebar-user-info {
+    display: none;
+}
+
+
+/* ============================================================
+ * SECTION 7: TOAST NOTIFICATIONS
+ * ============================================================ */
+
+.dev-toast {
+    position: fixed;
+    bottom: var(--tw-space-6);
+    right: var(--tw-space-6);
+    background: var(--tw-bg-surface);
+    border-left: 4px solid var(--tw-primary);
+    border-radius: var(--tw-radius-md);
+    padding: var(--tw-space-3) var(--tw-space-5);
+    box-shadow: var(--tw-shadow-lg);
+    font-size: var(--tw-text-base);
+    font-family: var(--tw-font-primary);
+    color: var(--tw-text-primary);
+    z-index: var(--tw-z-toast);
+    opacity: 0;
+    transform: translateY(var(--tw-space-4));
+    transition: opacity var(--tw-transition-base), transform var(--tw-transition-base);
+    min-width: 240px;
+    max-width: 380px;
+    pointer-events: none;
+}
+
+.dev-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+}
+
+.dev-toast--success { border-left-color: var(--tw-success); }
+.dev-toast--error   { border-left-color: var(--tw-danger); }
+.dev-toast--info    { border-left-color: var(--tw-info); }
+.dev-toast--warning { border-left-color: var(--tw-warning); } /* Added in visual consistency pass */
+
+
+/* ============================================================
+ * SECTION 8: TICKET DETAIL — PAGE HEADER
+ * ============================================================ */
+
+.dev-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    color: var(--tw-primary);
+    font-size: var(--tw-text-base);
+    font-weight: var(--tw-weight-medium);
+    text-decoration: none;
+    margin-bottom: var(--tw-space-4);
+    transition: color var(--tw-transition-fast),
+                text-decoration-color var(--tw-transition-fast);
+}
+
+.dev-back-link:hover {
+    color: var(--tw-primary-dark);
+    text-decoration: underline;
+}
+
+.dev-page-title-area {
+    margin-bottom: var(--tw-space-5);
+}
+
+.dev-page-title-area h1 {
+    font-size: var(--tw-text-2xl);
+    font-weight: var(--tw-weight-bold);
+    color: var(--tw-text-primary);
+    margin: 0 0 var(--tw-space-1) 0;
+    line-height: 1.3;
+}
+
+.dev-ticket-id-sub {
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-muted);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.5px;
+}
+
+
+/* ============================================================
+ * SECTION 9: TICKET HEADER CARD (ticket-detail)
+ * ============================================================ */
+
+.dev-ticket-header-card {
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-lg);
+    box-shadow: var(--tw-shadow-sm);
+    padding: var(--tw-space-5) var(--tw-space-6);
+    margin-bottom: var(--tw-space-5);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-left: 4px solid var(--tw-border);
+    transition: border-left-color var(--tw-transition-base);
+    gap: var(--tw-space-4);
+}
+
+/* Border color by sub-status */
+.dev-ticket-header-card[data-substatus="development"] { border-left-color: var(--tw-status-development-text); }
+.dev-ticket-header-card[data-substatus="testing"]     { border-left-color: var(--tw-status-testing-text); }
+.dev-ticket-header-card[data-substatus="uat"]         { border-left-color: var(--tw-status-uat-text); }
+
+.dev-ticket-header-id {
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-muted);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--tw-space-2);
+}
+
+.dev-ticket-header-badges {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    flex-wrap: wrap;
+}
+
+.dev-ticket-client-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--tw-bg-body);
+    color: var(--tw-text-secondary);
+    font-size: var(--tw-text-xs);
+    font-weight: var(--tw-weight-medium);
+    padding: 4px 10px;
+    border-radius: var(--tw-radius-pill);
+    border: 1px solid var(--tw-border);
+}
+
+.dev-ticket-header-dates {
+    display: flex;
+    gap: var(--tw-space-6);
+    flex-shrink: 0;
+    align-self: center;
+}
+
+.dev-ticket-header-date-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.dev-ticket-header-date-label {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+}
+
+.dev-ticket-header-date-val {
+    font-size: var(--tw-text-base);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-primary);
+}
+
+
+/* ============================================================
+ * SECTION 10: TWO-COLUMN DETAIL LAYOUT
+ * ============================================================ */
+
+.dev-detail-layout {
+    display: grid;
+    grid-template-columns: 65% 1fr;
+    gap: var(--tw-space-5);
+    align-items: start;
+}
+
+.dev-detail-left,
+.dev-detail-right {
+    display: flex;
+    flex-direction: column;
+    gap: var(--tw-space-4);
+}
+
+
+/* ============================================================
+ * SECTION 11: DETAIL CARDS
+ * ============================================================ */
+
+.dev-detail-card {
+    background: var(--tw-bg-surface);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-lg);
+    box-shadow: var(--tw-shadow-sm);
+    overflow: hidden;
+}
+
+.dev-detail-card__header {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    padding: var(--tw-space-4) var(--tw-space-5);
+    border-bottom: 1px solid var(--tw-border-light);
+}
+
+.dev-detail-card__header > i {
+    font-size: 18px;
+    color: var(--tw-primary);
+}
+
+.dev-detail-card__title {
+    font-size: var(--tw-text-base);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin: 0;
+}
+
+.dev-detail-card__body {
+    padding: var(--tw-space-5);
+}
+
+.dev-description-text {
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-secondary);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    margin: 0;
+}
+
+.dev-attachment-card-footer {
+    padding: var(--tw-space-3) var(--tw-space-5) var(--tw-space-4);
+    border-top: 1px solid var(--tw-border-light);
+}
+
+
+/* ============================================================
+ * SECTION 12: ADMIN NOTE
+ * ============================================================ */
+
+.dev-admin-note {
+    background: var(--tw-primary-light);
+    border-left: 3px solid var(--tw-primary);
+    border-radius: var(--tw-radius-md);
+    padding: var(--tw-space-4) var(--tw-space-5);
+    display: flex;
+    gap: var(--tw-space-3);
+    align-items: flex-start;
+}
+
+.dev-admin-note-icon {
+    color: var(--tw-primary);
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.dev-admin-note-title {
+    font-size: var(--tw-text-base);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-primary-text);
+    margin-bottom: var(--tw-space-1);
+}
+
+.dev-admin-note-body {
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+
+/* ============================================================
+ * SECTION 13: OVERDUE BANNER (ticket-detail)
+ * ============================================================ */
+
+.dev-overdue-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+    background: var(--tw-priority-high-bg);
+    border: 1px solid rgba(192, 57, 43, 0.35);
+    border-radius: var(--tw-radius-md);
+    padding: var(--tw-space-3) var(--tw-space-5);
+    font-size: var(--tw-text-base);
+    color: var(--tw-priority-high-text);
+    font-weight: var(--tw-weight-medium);
+}
+
+.dev-overdue-banner i {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+
+/* ============================================================
+ * SECTION 14: SUB-STATUS UPDATE PANEL (ticket-detail)
+ * ============================================================ */
+
+.dev-substatus-panel-body {
+    padding: var(--tw-space-5);
+}
+
+.dev-substatus-action-note {
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-muted);
+    margin-top: var(--tw-space-3);
+    margin-bottom: 0;
+    line-height: 1.5;
+}
+
+
+/* ============================================================
+ * SECTION 15: SUB-STATUS STEPPER
+ * ============================================================ */
+
+.dev-substatus-stepper {
+    display: flex;
+    align-items: center;
+    padding: var(--tw-space-4) 0 var(--tw-space-5);
+}
+
+.dev-substatus-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.dev-substatus-step-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--tw-bg-body);
+    border: 2px solid var(--tw-border);
+    color: var(--tw-text-muted);
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-semibold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--tw-transition-base),
+                border-color var(--tw-transition-base),
+                color var(--tw-transition-base),
+                box-shadow var(--tw-transition-base);
+    position: relative;
+    z-index: 2;
+}
+
+.dev-substatus-step.done .dev-substatus-step-circle {
+    background: var(--tw-success);
+    border-color: var(--tw-success);
+    color: #ffffff;
+}
+
+.dev-substatus-step.active .dev-substatus-step-circle {
+    background: var(--tw-primary);
+    border-color: var(--tw-primary);
+    color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.20);
+}
+
+.dev-substatus-step-label {
+    margin-top: var(--tw-space-2);
+    font-size: var(--tw-text-xs);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-muted);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.dev-substatus-step.done .dev-substatus-step-label {
+    color: var(--tw-success);
+}
+
+.dev-substatus-step.active .dev-substatus-step-label {
+    color: var(--tw-primary);
+    font-weight: var(--tw-weight-semibold);
+}
+
+/* Connector lines between steps */
+.dev-substatus-connector {
+    flex: 1;
+    height: 2px;
+    background: var(--tw-border);
+    /* Offset down to align with step circles (circle 36px, label below) */
+    margin-bottom: calc(var(--tw-space-2) + var(--tw-text-xs) + var(--tw-space-5));
+    position: relative;
+    z-index: 0;
+    transition: background var(--tw-transition-base);
+}
+
+.dev-substatus-connector.done {
+    background: var(--tw-success);
+}
+
+
+/* ============================================================
+ * SECTION 16: RESOLVED BANNER (ticket-detail)
+ * ============================================================ */
+
+.dev-resolved-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+    background: var(--tw-status-closed-bg);
+    border: 1px solid rgba(26, 122, 50, 0.30);
+    border-radius: var(--tw-radius-md);
+    padding: var(--tw-space-4) var(--tw-space-5);
+    font-size: var(--tw-text-base);
+    color: var(--tw-status-closed-text);
+    font-weight: var(--tw-weight-medium);
+}
+
+.dev-resolved-banner i {
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+
+/* ============================================================
+ * SECTION 17: WARNING BOX (orange — UAT note)
+ * ============================================================ */
+
+.dev-warning-box {
+    display: flex;
+    gap: var(--tw-space-3);
+    align-items: flex-start;
+    background: #fff8e1;
+    border: 1px solid #f59e0b;
+    border-radius: var(--tw-radius-md);
+    padding: var(--tw-space-3) var(--tw-space-4);
+    font-size: var(--tw-text-sm);
+    color: #78350f;
+    line-height: 1.5;
+    margin-top: var(--tw-space-4);
+}
+
+.dev-warning-box i {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: #d97706;
+}
+
+
+/* ============================================================
+ * SECTION 18: INFO PANEL (right column — ticket-detail)
+ * ============================================================ */
+
+.dev-info-panel {
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-lg);
+    box-shadow: var(--tw-shadow-sm);
+    overflow: hidden;
+}
+
+.dev-info-panel__header {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    padding: var(--tw-space-4) var(--tw-space-5);
+    border-bottom: 1px solid var(--tw-border-light);
+}
+
+.dev-info-panel__header > i {
+    font-size: 18px;
+    color: var(--tw-primary);
+}
+
+.dev-info-panel__title {
+    font-size: var(--tw-text-base);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin: 0;
+}
+
+.dev-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--tw-space-3) var(--tw-space-5);
+    border-bottom: 1px solid var(--tw-border-light);
+    gap: var(--tw-space-3);
+}
+
+.dev-info-row:last-child {
+    border-bottom: none;
+}
+
+.dev-info-row__label {
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-muted);
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.dev-info-row__value {
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-primary);
+    text-align: right;
+}
+
+
+/* ============================================================
+ * SECTION 19: PROGRESS TIMELINE (right column — ticket-detail)
+ * ============================================================ */
+
+.dev-progress-timeline {
+    padding: var(--tw-space-4) var(--tw-space-5) var(--tw-space-5);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.dev-progress-tl-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--tw-space-3);
+    position: relative;
+    padding-bottom: var(--tw-space-4);
+}
+
+.dev-progress-tl-item:last-child {
+    padding-bottom: 0;
+}
+
+/* Vertical connector line between items */
+.dev-progress-tl-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 24px;
+    bottom: 0;
+    width: 2px;
+    background: var(--tw-border);
+}
+
+.dev-progress-tl-item.done:not(:last-child)::after {
+    background: var(--tw-success);
+}
+
+.dev-progress-tl-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--tw-border);
+    background: var(--tw-bg-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    font-size: 12px;
+    color: var(--tw-text-muted);
+    transition: background var(--tw-transition-base),
+                border-color var(--tw-transition-base),
+                color var(--tw-transition-base);
+}
+
+.dev-progress-tl-item.done .dev-progress-tl-dot {
+    background: var(--tw-success);
+    border-color: var(--tw-success);
+    color: #ffffff;
+}
+
+/* Pulsing purple dot for the current active step */
+@keyframes dev-pulse-dot {
+    0%   { box-shadow: 0 0 0 0   rgba(139, 92, 246, 0.45); }
+    70%  { box-shadow: 0 0 0 7px rgba(139, 92, 246, 0); }
+    100% { box-shadow: 0 0 0 0   rgba(139, 92, 246, 0); }
+}
+
+.dev-progress-tl-item.current .dev-progress-tl-dot {
+    background: var(--tw-primary);
+    border-color: var(--tw-primary);
+    color: #ffffff;
+    animation: dev-pulse-dot 2s ease-in-out infinite;
+}
+
+.dev-progress-tl-content {
+    padding-top: 2px;
+}
+
+.dev-progress-tl-label {
+    font-size: var(--tw-text-base);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-primary);
+    line-height: 1.3;
+}
+
+.dev-progress-tl-item.pending .dev-progress-tl-label {
+    color: var(--tw-text-muted);
+    font-style: italic;
+    font-weight: var(--tw-weight-normal);
+}
+
+.dev-progress-tl-date {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    margin-top: 2px;
+}
+
+
+/* ============================================================
+ * SECTION 20: CHAT SECTION (inline in ticket-detail left col)
+ * ============================================================ */
+
+.dev-chat-muted-note {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    font-style: italic;
+    padding: var(--tw-space-3) var(--tw-space-5) 0;
+}
+
+.dev-chat-thread {
+    max-height: 360px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--tw-space-3);
+    padding: var(--tw-space-4) var(--tw-space-5);
+    scroll-behavior: smooth;
+}
+
+.dev-chat-status-msg {
+    text-align: center;
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    padding: var(--tw-space-1) var(--tw-space-4);
+    background: var(--tw-bg-body);
+    border-radius: var(--tw-radius-pill);
+    align-self: center;
+    flex-shrink: 0;
+}
+
+.dev-msg {
+    display: flex;
+    gap: var(--tw-space-2);
+    align-items: flex-end;
+}
+
+.dev-msg--admin {
+    flex-direction: row;
+}
+
+.dev-msg--dev {
+    flex-direction: row-reverse;
+}
+
+.dev-msg-body {
+    display: flex;
+    flex-direction: column;
+    max-width: 75%;
+}
+
+.dev-msg--dev .dev-msg-body {
+    align-items: flex-end;
+}
+
+.dev-msg-sender {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    margin-bottom: 3px;
+}
+
+.dev-msg-bubble {
+    padding: var(--tw-space-2) var(--tw-space-4);
+    border-radius: var(--tw-radius-md);
+    font-size: var(--tw-text-base);
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.dev-msg--admin .dev-msg-bubble {
+    background: var(--tw-bg-body);
+    color: var(--tw-text-primary);
+    border-radius: 4px var(--tw-radius-md) var(--tw-radius-md) var(--tw-radius-md);
+}
+
+.dev-msg--dev .dev-msg-bubble {
+    background: var(--tw-primary);
+    color: #ffffff;
+    border-radius: var(--tw-radius-md) 4px var(--tw-radius-md) var(--tw-radius-md);
+}
+
+.dev-msg-time {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    margin-top: 3px;
+}
+
+/* Chat input area */
+.dev-chat-footer {
+    padding: var(--tw-space-3) var(--tw-space-5) var(--tw-space-4);
+    border-top: 1px solid var(--tw-border-light);
+}
+
+.dev-chat-input-row {
+    display: flex;
+    gap: var(--tw-space-2);
+    align-items: flex-end;
+}
+
+.dev-chat-textarea {
+    flex: 1;
+    padding: var(--tw-space-2) var(--tw-space-3);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    background: var(--tw-bg-input);
+    font-family: var(--tw-font-primary);
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-primary);
+    resize: none;
+    outline: none;
+    min-height: 40px;
+    max-height: 120px;
+    transition: border-color var(--tw-transition-fast),
+                box-shadow var(--tw-transition-fast);
+}
+
+.dev-chat-textarea:focus {
+    border-color: var(--tw-primary);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+    background: var(--tw-bg-surface);
+}
+
+/* Conversation list item (chat.html sidebar list) — Added in visual consistency pass */
+.dev-conv-item {
+    padding: var(--tw-space-4);
+    border-bottom: 1px solid var(--tw-border-light);
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    transition: background var(--tw-transition-fast), border-left-color var(--tw-transition-fast);
+}
+
+.dev-conv-item:hover {
+    background: var(--tw-bg-body);
+}
+
+.dev-conv-item.active {
+    border-left-color: var(--tw-primary);
+    background: var(--tw-primary-light);
+}
+
+
+/* ============================================================
+ * SECTION 21: CONFIRM MODAL (substatus change + mark resolved)
+ * ============================================================ */
+
+.dev-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--tw-overlay);
+    z-index: var(--tw-z-overlay);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--tw-space-4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--tw-transition-base);
+}
+
+.dev-confirm-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.dev-confirm-box {
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-xl);
+    padding: var(--tw-space-8);
+    max-width: 440px;
+    width: 100%;
+    box-shadow: var(--tw-shadow-xl);
+    text-align: center;
+    transform: scale(0.95);
+    transition: transform var(--tw-transition-base);
+}
+
+.dev-confirm-overlay.active .dev-confirm-box {
+    transform: scale(1);
+}
+
+.dev-confirm-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin: 0 auto var(--tw-space-4);
+    flex-shrink: 0;
+}
+
+.dev-confirm-icon--primary {
+    background: var(--tw-primary-light);
+    color: var(--tw-primary);
+}
+
+.dev-confirm-icon--danger {
+    background: var(--tw-danger-light);
+    color: var(--tw-danger);
+}
+
+.dev-confirm-icon--success {
+    background: var(--tw-success-light);
+    color: var(--tw-success);
+}
+
+.dev-confirm-title {
+    font-size: var(--tw-text-xl);
+    font-weight: var(--tw-weight-bold);
+    color: var(--tw-text-primary);
+    margin-bottom: var(--tw-space-2);
+}
+
+.dev-confirm-message {
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--tw-space-6);
+}
+
+.dev-confirm-buttons {
+    display: flex;
+    gap: var(--tw-space-3);
+    justify-content: center;
+}
+
+
+/* ============================================================
+ * SECTION 22: RESPONSIVE
+ * ============================================================ */
+
+@media (max-width: 1024px) {
+    .dev-stat-strip {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+
+    .dev-detail-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    /* E4: show Tweedle mark in topbar when sidebar hidden on mobile — Added in visual consistency pass */
+    .topbar-brand-mobile {
+        display: flex !important;
+        align-items: center;
+    }
+
+    .dev-stat-strip {
+        grid-template-columns: 1fr;
+    }
+
+    .dev-filter-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .dev-toolbar-right {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .dev-search-input {
+        width: 100%;
+    }
+
+    .dev-ticket-header-card {
+        flex-direction: column;
+    }
+
+    .dev-ticket-header-dates {
+        flex-direction: row;
+        gap: var(--tw-space-4);
+        align-self: flex-start;
+    }
+
+    .dev-ticket-header-date-item {
+        align-items: flex-start;
+    }
+
+    .dev-substatus-stepper {
+        gap: 0;
+    }
+
+    .dev-search-input {
+        width: 100%;
+        min-width: unset;
+    }
+}
+
+@media (max-width: 576px) {
+    .dev-page-header {
+        flex-direction: column;
+    }
+
+    .dev-confirm-box {
+        padding: var(--tw-space-6);
+    }
+}
+
+
+/* ============================================================
+ * SECTION 23: PROFILE PAGE
+ * ============================================================ */
+
+/* Sidebar nav active item — add left accent border (developer portal) */
+.nav-link.active {
+    border-left: 3px solid var(--tw-primary);
+    padding-left: 9px; /* 12px default - 3px border = consistent visual padding */
+    border-radius: 0 var(--tw-radius-sm) var(--tw-radius-sm) 0;
+}
+
+/* Profile form row layout — 2-column responsive grid */
+.dev-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--tw-space-4);
+    margin-bottom: var(--tw-space-4);
+}
+
+.dev-form-row:last-child {
+    margin-bottom: 0;
+}
+
+.dev-form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Activity stat mini-card */
+.dev-activity-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--tw-space-3) var(--tw-space-4);
+    background: var(--tw-bg-body);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-md);
+}
+
+.dev-activity-stat__label {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.dev-activity-stat__count {
+    font-size: var(--tw-text-2xl);
+    font-weight: 700;
+    margin-top: 2px;
+}
+
+.dev-activity-stat__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--tw-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.dev-activity-stat__icon i {
+    font-size: 20px;
+}
+
+/* Large profile avatar with subtle purple ring */
+.dev-profile-avatar-lg {
+    border: 3px solid var(--tw-primary-light);
+    box-shadow: 0 0 0 4px var(--tw-primary-light);
+}
+
+/* Profile page two-column grid — left col flexible, right col fixed 340px */
+.dev-profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 24px;
+    align-items: start;
+}
+
+/* Form group label — small bottom gap so label doesn't sit on the input */
+.dev-form-group label {
+    font-size: var(--tw-text-sm);
+    font-weight: 500;
+    color: var(--tw-text-secondary);
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* Profile form — padding keeps fields away from card edges (FIX 2 scoped here
+   rather than on .dev-detail-card to avoid double-padding right-column cards) */
+.dev-profile-form {
+    padding: 24px;
+}
+
+.dev-profile-form input[type="text"],
+.dev-profile-form input[type="email"],
+.dev-profile-form input[type="tel"],
+.dev-profile-form input[type="password"],
+.dev-profile-form input:not([type]),
+.dev-profile-form select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--tw-border);
+    border-radius: var(--tw-radius-md);
+    background: var(--tw-bg-input);
+    color: var(--tw-text-primary);
+    font-size: var(--tw-text-base);
+    font-family: inherit;
+    transition: border-color 0.2s;
+    outline: none;
+}
+
+.dev-profile-form input:focus,
+.dev-profile-form input[type="password"]:focus {
+    border-color: var(--tw-primary);
+    box-shadow: 0 0 0 3px var(--tw-primary-light);
+}
+
+.dev-profile-form input:disabled,
+.dev-profile-form input[readonly] {
+    background: var(--tw-bg-body);
+    color: var(--tw-text-muted);
+    cursor: not-allowed;
+    border-color: var(--tw-border);
+}
+
+/* Stat card — Awaiting Client (forwarded) — amber tint */
+.dev-stat-card--forwarded {
+    border-left-color: #f59e0b;
+}
+
+.dev-stat-card--forwarded .dev-stat-card__icon {
+    background: #fffbeb;
+    color: #b45309;
+}
+
+.dev-stat-card--forwarded .dev-stat-card__count {
+    color: #b45309;
+}
+
+.dev-stat-card--forwarded.active {
+    background: #fffbeb;
+}
+
+@keyframes dev-pulse-border-amber {
+    0%   { box-shadow: 0 0 0 0   rgba(245, 158, 11, 0.45), var(--tw-shadow-sm); }
+    70%  { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0),    var(--tw-shadow-sm); }
+    100% { box-shadow: 0 0 0 0   rgba(245, 158, 11, 0),    var(--tw-shadow-sm); }
+}
+
+.dev-stat-card--forwarded.has-items {
+    animation: dev-pulse-border-amber 2s ease-in-out infinite;
+}
+
+/* Stat card — In UAT Review (uat_approval) — purple light tint */
+.dev-stat-card--uat-approval {
+    border-left-color: var(--tw-primary);
+}
+
+.dev-stat-card--uat-approval .dev-stat-card__icon {
+    background: var(--tw-primary-light);
+    color: var(--tw-primary);
+}
+
+.dev-stat-card--uat-approval.active {
+    background: var(--tw-primary-light);
+}
+
+/* UAT Approval banner — ticket-detail.html substatus panel */
+.dev-uat-approval-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: var(--tw-primary-light);
+    border-left: 3px solid var(--tw-primary);
+    border-radius: var(--tw-radius-md);
+    padding: 16px 20px;
+}
+
+.dev-uat-approval-banner i {
+    font-size: 24px;
+    color: var(--tw-primary);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.dev-uat-approval-banner__title {
+    font-size: var(--tw-text-base);
+    font-weight: 600;
+    color: var(--tw-primary);
+    margin-bottom: 4px;
+}
+
+.dev-uat-approval-banner__body {
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-secondary);
+    line-height: 1.5;
+}
+
+/* Closed ticket banner — ticket-detail.html substatus panel */
+.dev-closed-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: var(--tw-status-closed-bg);
+    border-left: 3px solid var(--tw-status-closed-text);
+    border-radius: var(--tw-radius-md);
+    padding: 16px 20px;
+}
+
+.dev-closed-banner i {
+    font-size: 24px;
+    color: var(--tw-status-closed-text);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.dev-closed-banner__title {
+    font-size: var(--tw-text-base);
+    font-weight: 600;
+    color: var(--tw-status-closed-text);
+    margin-bottom: 4px;
+}
+
+.dev-closed-banner__body {
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-secondary);
+    line-height: 1.5;
+}
+
+/* Awaiting Client banner — ticket-detail.html substatus panel */
+.dev-awaiting-client-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+    border-radius: var(--tw-radius-md);
+    padding: 16px 20px;
+}
+
+.dev-awaiting-client-banner i {
+    font-size: 24px;
+    color: #f59e0b;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.dev-awaiting-client-banner__title {
+    font-size: var(--tw-text-base);
+    font-weight: 600;
+    color: var(--tw-text-primary);
+    margin-bottom: 4px;
+}
+
+.dev-awaiting-client-banner__body {
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-secondary);
+    line-height: 1.5;
+}

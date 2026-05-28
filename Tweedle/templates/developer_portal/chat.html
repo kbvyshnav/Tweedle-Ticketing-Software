@@ -1,0 +1,716 @@
+<!--
+  File: templates/developer_portal/chat.html
+  Django template: extends 'developer_base.html'
+  Django view:     developer_portal.views.chat
+  Django url:      dev:chat
+  Role:            Developer — body class="role-developer" (purple theme)
+-->
+<!-- Django: {% extends 'developer_base.html' %} -->
+<!-- Django: {% block body_role %}developer{% endblock %} -->
+<!-- Django: {% block page_css %}
+<link rel="stylesheet" href="{% static 'css/pages/developer-dashboard.css' %}">
+{% endblock %} -->
+<!-- Django: {% block content %} -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Django: {% block title %}Chat — Tweedle{% endblock %} -->
+    <title>Chat — Tweedle</title>
+
+    <!-- Django: {% load static %} -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
+    <!-- Django: href="{% static 'images/favicon.svg' %}" -->
+    <link rel="icon" type="image/svg+xml" href="../../static/images/favicon.svg">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+    <!-- CSS load order: 1 tokens → 2 theme-developer → 3 base → 4 components → 5 notification → 6 page -->
+    <!-- Django: href="{% static 'css/tweedle-tokens.css' %}" -->
+    <link rel="stylesheet" href="../../static/css/tweedle-tokens.css">
+    <!-- Django: href="{% static 'css/themes/theme-developer.css' %}" -->
+    <link rel="stylesheet" href="../../static/css/themes/theme-developer.css">
+    <!-- Django: href="{% static 'css/tweedle-base.css' %}" -->
+    <link rel="stylesheet" href="../../static/css/tweedle-base.css">
+    <!-- Django: href="{% static 'css/tweedle-components.css' %}" -->
+    <link rel="stylesheet" href="../../static/css/tweedle-components.css">
+    <!-- Django: href="{% static 'css/pages/notification.css' %}" -->
+    <link rel="stylesheet" href="../../static/css/pages/notification.css">
+    <!-- Django: href="{% static 'css/pages/developer-dashboard.css' %}" -->
+    <link rel="stylesheet" href="../../static/css/pages/developer-dashboard.css">
+</head>
+
+<!--
+    BODY CLASS: role-developer activates purple theme from theme-developer.css.
+    Django: class="role-{% block body_role %}developer{% endblock %}"
+-->
+<body class="role-developer">
+
+
+<!-- ==============================================================
+     SIDEBAR — developer portal: My Tickets + Chat
+     ============================================================== -->
+<nav class="sidebar" id="sidebar">
+
+    <!-- Brand -->
+    <!-- Django: href="{% url 'dev:dashboard' %}" -->
+    <div class="sidebar-brand">
+        <!-- Django: src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" -->
+        <img src="../../static/images/tweedle-logo/tweedle-mark-blue.svg"
+             alt="Tweedle"
+             class="sidebar-logo-img">
+        <span class="brand-text">Tweedle</span>
+    </div>
+
+    <ul class="sidebar-nav">
+
+        <!-- My Tickets -->
+        <!-- Django: href="{% url 'dev:dashboard' %}" -->
+        <li class="nav-item">
+            <a href="dashboard.html" class="nav-link" title="My Tickets">
+                <i class='bx bx-task'></i>
+                <span class="nav-label">My Tickets</span>
+            </a>
+        </li>
+
+        <!-- Chat — active on this page -->
+        <!-- Django: href="{% url 'dev:chat' %}" -->
+        <li class="nav-item active-item">
+            <a href="chat.html" class="nav-link active" title="Chat">
+                <i class='bx bx-chat'></i>
+                <span class="nav-label">Chat</span>
+            </a>
+        </li>
+
+    </ul>
+
+    <!-- Sidebar bottom user section -->
+    <div class="sidebar-user">
+        <!-- Django: {{ dev_user.initials }} -->
+        <div class="tw-avatar tw-avatar--developer" id="devAvatarSidebar"
+             style="width:36px;height:36px;font-size:13px;flex-shrink:0;">AM</div>
+        <div class="sidebar-user-info">
+            <!-- Django: {{ dev_user.name }} -->
+            <div class="sidebar-user-name" id="devNameSidebar">Arjun Mehta</div>
+            <div class="sidebar-user-role">Developer</div>
+        </div>
+    </div>
+
+</nav>
+<!-- END SIDEBAR -->
+
+
+<!-- ==============================================================
+     MAIN CONTENT WRAPPER
+     ============================================================== -->
+<section id="content">
+
+    <!-- ==========================================================
+         TOPBAR
+         ========================================================== -->
+    <nav class="topbar">
+
+        <i class="bx bx-menu" id="hamburger-btn" role="button" aria-label="Toggle sidebar"></i>
+
+        <!-- Tweedle logo — mobile only -->
+        <div class="topbar-brand-mobile" style="display:none">
+            <!-- Django: src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" -->
+            <img src="../../static/images/tweedle-logo/tweedle-mark-blue.svg" alt="Tweedle" style="height:28px;">
+        </div>
+
+        <!-- NOTIFICATION BELL -->
+        <div class="tw-notif-bell-wrap" id="notifBellWrap">
+            <button
+                class="tw-notif-bell-btn"
+                id="notifBellBtn"
+                aria-label="Notifications"
+                aria-expanded="false"
+                aria-controls="notifPanel">
+                <i class="bx bxs-bell" aria-hidden="true"></i>
+                <!-- Django: {% if unread_notification_count %} -->
+                <span class="tw-notif-count-badge" id="notifCount">3</span>
+                <!-- Django: {% endif %} -->
+            </button>
+
+            <div class="tw-notif-panel" id="notifPanel" role="dialog" aria-label="Notifications">
+                <div class="tw-notif-panel-header">
+                    <span class="tw-notif-panel-title">Notifications</span>
+                    <button class="tw-btn tw-btn-outline tw-btn--sm" id="markAllReadBtn" aria-label="Mark all as read">
+                        Mark all read
+                    </button>
+                </div>
+                <div class="tw-notif-list">
+                    <!-- Django: {% for notification in notifications %} -->
+                    <div class="tw-notif-item unread" role="button" style="cursor:pointer">
+                        <div class="tw-notif-item-body">
+                            <div class="tw-notif-type-icon tw-notif-type-icon--warning">
+                                <i class="bx bx-time-five" aria-hidden="true"></i>
+                            </div>
+                            <div class="tw-notif-item-text">
+                                <div class="tw-notif-item-title">Ticket overdue — GMEC25010001</div>
+                                <div class="tw-notif-item-msg">Payment gateway timeout is past its estimated resolution date.</div>
+                                <div class="tw-notif-item-time">1 day ago</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tw-notif-item unread" role="button" style="cursor:pointer">
+                        <div class="tw-notif-item-body">
+                            <div class="tw-notif-type-icon tw-notif-type-icon--info">
+                                <i class="bx bx-info-circle" aria-hidden="true"></i>
+                            </div>
+                            <div class="tw-notif-item-text">
+                                <div class="tw-notif-item-title">New ticket assigned — BGEX25010013</div>
+                                <div class="tw-notif-item-msg">User role permissions not saving has been assigned to you.</div>
+                                <div class="tw-notif-item-time">2 days ago</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tw-notif-item" role="button" style="cursor:pointer">
+                        <div class="tw-notif-item-body">
+                            <div class="tw-notif-type-icon tw-notif-type-icon--success">
+                                <i class="bx bx-check-circle" aria-hidden="true"></i>
+                            </div>
+                            <div class="tw-notif-item-text">
+                                <div class="tw-notif-item-title">Admin note added — GMEC25010004</div>
+                                <div class="tw-notif-item-msg">Admin left a note on Invoice generation wrong totals.</div>
+                                <div class="tw-notif-item-time">3 days ago</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Django: {% endfor %} -->
+                </div>
+                <div class="tw-notif-panel-footer">
+                    <!-- Django: href="{% url 'dev:notifications' %}" -->
+                    <a href="notifications.html" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
+                </div>
+            </div>
+        </div>
+        <!-- END NOTIFICATION BELL -->
+
+        <!-- PROFILE DROPDOWN -->
+        <div class="tw-profile-wrap" id="profileWrap">
+            <!-- Django: {{ dev_user.initials }} -->
+            <div class="tw-avatar tw-avatar--developer"
+                 id="devAvatarTopbar"
+                 role="button"
+                 aria-label="Profile"
+                 style="width:36px;height:36px;font-size:14px;cursor:pointer"
+                 onclick="toggleProfileDropdown(event)">AM</div>
+
+            <div class="tw-profile-panel" id="profilePanel" role="menu" aria-hidden="true">
+                <div class="tw-profile-header">
+                    <!-- Django: {{ dev_user.initials }}, {{ dev_user.name }}, {{ dev_user.email }} -->
+                    <div class="tw-avatar tw-avatar--developer"
+                         style="width:40px;height:40px;font-size:15px;flex-shrink:0"
+                         id="devAvatarPanel">AM</div>
+                    <div>
+                        <div style="font-size:var(--tw-text-base);font-weight:600;color:var(--tw-text-primary);line-height:1.3"
+                             id="devNamePanel">Arjun Mehta</div>
+                        <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px"
+                             id="devEmailPanel">arjun.mehta@tweedle.io</div>
+                        <span class="tw-role-pill tw-role-pill--developer" style="margin-top:4px;display:inline-block">Developer</span>
+                    </div>
+                </div>
+                <div class="tw-profile-divider"></div>
+                <!-- Django: href="{% url 'dev:profile' %}" -->
+                <div class="tw-profile-menu-item" role="menuitem"
+                     onclick="closeProfileDropdown(); window.location.href='profile.html'">
+                    <i class="bx bx-user" aria-hidden="true"></i>
+                    <span>View Profile</span>
+                </div>
+                <!-- Django: href="{% url 'dev:settings' %}" -->
+                <div class="tw-profile-menu-item" role="menuitem"
+                     onclick="closeProfileDropdown(); showDevToast('Password settings coming soon.', 'info')">
+                    <i class="bx bx-lock-alt" aria-hidden="true"></i>
+                    <span>Change Password</span>
+                </div>
+                <div class="tw-profile-divider"></div>
+                <!-- Django: window.location.href="{% url 'logout' %}" -->
+                <div class="tw-profile-menu-item tw-profile-menu-item--danger" role="menuitem"
+                     onclick="window.location.href = '../login.html'">
+                    <i class="bx bx-log-out" aria-hidden="true"></i>
+                    <span>Sign Out</span>
+                </div>
+            </div>
+        </div>
+        <!-- END PROFILE DROPDOWN -->
+
+    </nav>
+    <!-- END TOPBAR -->
+
+
+    <!-- ==========================================================
+         MAIN PAGE CONTENT
+         ========================================================== -->
+    <main id="main-content">
+
+        <!-- PAGE HEADER -->
+        <div class="dev-page-header">
+            <div>
+                <h1>Chat</h1>
+                <p class="dev-page-subtitle">Messages between you and the support admin</p>
+            </div>
+        </div>
+
+
+        <!-- =====================================================
+             CHAT LAYOUT — 30% conversation list + 70% active chat
+             ===================================================== -->
+        <div style="display:grid;grid-template-columns:280px 1fr;gap:var(--tw-space-4);height:calc(100vh - 230px);min-height:500px;">
+
+            <!-- LEFT: Conversation list -->
+            <div class="dev-detail-card" style="overflow:hidden;display:flex;flex-direction:column;">
+                <div class="dev-detail-card__header" style="flex-shrink:0;">
+                    <i class="bx bx-message-dots" aria-hidden="true"></i>
+                    <h3 class="dev-detail-card__title">Conversations</h3>
+                </div>
+
+                <div style="overflow-y:auto;flex:1;">
+                    <!-- Django: {% for conversation in dev_conversations %} -->
+
+                    <!-- Conv 1: GMEC25010001 — active, 2 unread -->
+                    <div class="dev-conv-item"
+                         data-ticket-id="GMEC25010001"
+                         role="button"
+                         tabindex="0"
+                         onclick="openConversation('GMEC25010001')"
+                         style="padding:var(--tw-space-4);border-bottom:1px solid var(--tw-border-light);cursor:pointer;border-left:3px solid var(--tw-primary);background:var(--tw-primary-light);">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:var(--tw-space-2);">
+                            <div style="flex:1;min-width:0;">
+                                <!-- Django: {{ conversation.ticket_id }} -->
+                                <div style="font-size:var(--tw-text-xs);font-weight:700;color:var(--tw-text-primary);font-family:'Courier New',monospace;margin-bottom:2px;">GMEC25010001</div>
+                                <div style="font-size:var(--tw-text-base);color:var(--tw-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;">Payment gateway timeout on checkout</div>
+                                <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Will push the fix to staging today.</div>
+                            </div>
+                            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
+                                <span style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);">2h ago</span>
+                                <span style="background:var(--tw-primary);color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conv 2: BGEX25010013 — read -->
+                    <div class="dev-conv-item"
+                         data-ticket-id="BGEX25010013"
+                         role="button"
+                         tabindex="0"
+                         onclick="openConversation('BGEX25010013')"
+                         style="padding:var(--tw-space-4);border-bottom:1px solid var(--tw-border-light);cursor:pointer;border-left:3px solid transparent;transition:background var(--tw-transition-fast);"
+                         onmouseenter="this.style.background='var(--tw-bg-body)'"
+                         onmouseleave="this.style.background=(activeConversation==='BGEX25010013'?'var(--tw-primary-light)':'')">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:var(--tw-space-2);">
+                            <div style="flex:1;min-width:0;">
+                                <!-- Django: {{ conversation.ticket_id }} -->
+                                <div style="font-size:var(--tw-text-xs);font-weight:700;color:var(--tw-text-primary);font-family:'Courier New',monospace;margin-bottom:2px;">BGEX25010013</div>
+                                <div style="font-size:var(--tw-text-base);color:var(--tw-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">User role permissions not saving</div>
+                                <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Confirmed — all 3 role types tested.</div>
+                            </div>
+                            <span style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);flex-shrink:0;">Yesterday</span>
+                        </div>
+                    </div>
+
+                    <!-- Conv 3: GMEC25010010 — read -->
+                    <div class="dev-conv-item"
+                         data-ticket-id="GMEC25010010"
+                         role="button"
+                         tabindex="0"
+                         onclick="openConversation('GMEC25010010')"
+                         style="padding:var(--tw-space-4);border-bottom:1px solid var(--tw-border-light);cursor:pointer;border-left:3px solid transparent;transition:background var(--tw-transition-fast);"
+                         onmouseenter="this.style.background='var(--tw-bg-body)'"
+                         onmouseleave="this.style.background=(activeConversation==='GMEC25010010'?'var(--tw-primary-light)':'')">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:var(--tw-space-2);">
+                            <div style="flex:1;min-width:0;">
+                                <!-- Django: {{ conversation.ticket_id }} -->
+                                <div style="font-size:var(--tw-text-xs);font-weight:700;color:var(--tw-text-primary);font-family:'Courier New',monospace;margin-bottom:2px;">GMEC25010010</div>
+                                <div style="font-size:var(--tw-text-base);color:var(--tw-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Bulk export CSV missing columns</div>
+                                <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Starting on this tomorrow.</div>
+                            </div>
+                            <span style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);flex-shrink:0;">3d ago</span>
+                        </div>
+                    </div>
+
+                    <!-- Django: {% endfor %} -->
+                </div>
+            </div>
+            <!-- END LEFT PANEL -->
+
+
+            <!-- RIGHT: Active chat area -->
+            <div class="dev-detail-card" style="overflow:hidden;display:flex;flex-direction:column;">
+
+                <!-- Chat header — purple bar -->
+                <div style="background:var(--tw-primary);padding:var(--tw-space-4) var(--tw-space-5);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+                    <div>
+                        <div style="font-size:var(--tw-text-xs);color:rgba(255,255,255,0.80);margin-bottom:2px;" id="chatHeaderTicketId">
+                            <!-- Django: {{ active_conversation.ticket_id }} -->
+                            Ticket: GMEC25010001
+                        </div>
+                        <div style="font-size:var(--tw-text-base);font-weight:600;color:#ffffff;" id="chatHeaderSubject">
+                            Payment gateway timeout on checkout
+                        </div>
+                    </div>
+                    <!-- Django: href="{% url 'dev:ticket_detail' active_conversation.ticket_id %}" -->
+                    <a href="ticket-detail.html?id=GMEC25010001&amp;substatus=testing"
+                       id="chatViewTicketLink"
+                       style="font-size:var(--tw-text-xs);color:rgba(255,255,255,0.85);text-decoration:none;border:1px solid rgba(255,255,255,0.40);padding:5px 12px;border-radius:var(--tw-radius-sm);white-space:nowrap;transition:background var(--tw-transition-fast);"
+                       onmouseenter="this.style.background='rgba(255,255,255,0.15)'"
+                       onmouseleave="this.style.background=''">
+                        View Ticket →
+                    </a>
+                </div>
+
+                <!-- Muted note -->
+                <div style="padding:var(--tw-space-2) var(--tw-space-5);border-bottom:1px solid var(--tw-border-light);flex-shrink:0;">
+                    <p style="margin:0;font-size:var(--tw-text-xs);color:var(--tw-text-muted);font-style:italic;">
+                        This chat is between you and the support admin. Clients cannot see these messages.
+                    </p>
+                </div>
+
+                <!-- Messages area (scrollable) -->
+                <!-- Django: {% for message in active_conversation.messages.all %} -->
+                <div class="dev-chat-thread" id="devChatThread" style="flex:1;overflow-y:auto;min-height:0;">
+
+                    <div class="dev-msg dev-msg--admin">
+                        <div class="tw-avatar tw-avatar--sm tw-avatar--admin" aria-hidden="true">S</div>
+                        <div class="dev-msg-body">
+                            <div class="dev-msg-sender">Support Admin <span class="tw-role-pill tw-role-pill--admin">Admin</span></div>
+                            <!-- Django: {{ message.content }} -->
+                            <div class="dev-msg-bubble">Hey Arjun, any update on the payment gateway fix?</div>
+                            <div class="dev-msg-time">10:30 AM</div>
+                        </div>
+                    </div>
+
+                    <div class="dev-msg dev-msg--dev">
+                        <div class="tw-avatar tw-avatar--sm tw-avatar--developer" aria-hidden="true" id="chatMsgAvatar">AM</div>
+                        <div class="dev-msg-body">
+                            <div class="dev-msg-sender">You <span class="tw-role-pill tw-role-pill--developer">Developer</span></div>
+                            <!-- Django: {{ message.content }} -->
+                            <div class="dev-msg-bubble">Running tests now — found the root cause.</div>
+                            <div class="dev-msg-time">10:45 AM</div>
+                        </div>
+                    </div>
+
+                    <div class="dev-msg dev-msg--admin">
+                        <div class="tw-avatar tw-avatar--sm tw-avatar--admin" aria-hidden="true">S</div>
+                        <div class="dev-msg-body">
+                            <div class="dev-msg-sender">Support Admin <span class="tw-role-pill tw-role-pill--admin">Admin</span></div>
+                            <div class="dev-msg-bubble">Great, client is waiting. Please prioritise.</div>
+                            <div class="dev-msg-time">11:00 AM</div>
+                        </div>
+                    </div>
+
+                    <div class="dev-msg dev-msg--dev">
+                        <div class="tw-avatar tw-avatar--sm tw-avatar--developer" aria-hidden="true">AM</div>
+                        <div class="dev-msg-body">
+                            <div class="dev-msg-sender">You <span class="tw-role-pill tw-role-pill--developer">Developer</span></div>
+                            <div class="dev-msg-bubble">Will push the fix to staging today.</div>
+                            <div class="dev-msg-time">11:15 AM</div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- Django: {% endfor %} -->
+
+                <!-- Chat footer (input + send) -->
+                <div class="dev-chat-footer" style="flex-shrink:0;">
+                    <div class="dev-chat-input-row">
+                        <textarea
+                            class="dev-chat-textarea"
+                            id="chatInput"
+                            placeholder="Type a message…"
+                            rows="1"
+                            aria-label="Message input"
+                            oninput="this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+                        <button type="button"
+                                class="tw-btn tw-btn-primary tw-btn--sm"
+                                style="flex-shrink:0"
+                                onclick="sendChatMessage()"
+                                aria-label="Send message">
+                            <i class="bx bx-send" aria-hidden="true"></i>
+                            Send
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            <!-- END RIGHT PANEL -->
+
+        </div>
+        <!-- END CHAT LAYOUT -->
+
+    </main>
+    <!-- END MAIN -->
+
+</section>
+<!-- END CONTENT WRAPPER -->
+
+
+<!-- ==============================================================
+     VENDOR SCRIPTS
+     ============================================================== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<!-- ==============================================================
+     PAGE SCRIPT
+     All top-level vars use var (never const/let) to prevent TDZ
+     crashes when the page router re-executes this script.
+     Django: {% block page_js %}
+     ============================================================== -->
+<script>
+
+    /* ============================================================
+     * DEVELOPER IDENTITY
+     * Django: var DEV_USER = {{ dev_user|safe }};
+     * ============================================================ */
+    var DEV_USER = {
+        name:     'Arjun Mehta',
+        initials: 'AM',
+        email:    'arjun.mehta@tweedle.io',
+        role:     'Developer'
+    };
+
+    /* Active conversation ticket ID */
+    var activeConversation = 'GMEC25010001';
+
+    /* Conversation map for header + link updates */
+    /* Django: var CONVERSATIONS = {{ conversations_json|safe }}; */
+    var CONVERSATIONS = {
+        'GMEC25010001': { subject: 'Payment gateway timeout on checkout', substatus: 'testing'     },
+        'BGEX25010013': { subject: 'User role permissions not saving',    substatus: 'uat'         },
+        'GMEC25010010': { subject: 'Bulk export CSV missing columns',     substatus: 'development' }
+    };
+
+
+    /* ============================================================
+     * DOMContentLoaded — hydrate user identity + scroll chat
+     * ============================================================ */
+    document.addEventListener('DOMContentLoaded', function () {
+        var idMap = {
+            devAvatarTopbar:  DEV_USER.initials,
+            devAvatarSidebar: DEV_USER.initials,
+            devAvatarPanel:   DEV_USER.initials,
+            chatMsgAvatar:    DEV_USER.initials,
+            devNameSidebar:   DEV_USER.name,
+            devNamePanel:     DEV_USER.name,
+            devEmailPanel:    DEV_USER.email
+        };
+        Object.keys(idMap).forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = idMap[id];
+        });
+
+        var thread = document.getElementById('devChatThread');
+        if (thread) thread.scrollTop = thread.scrollHeight;
+    });
+
+
+    /* ============================================================
+     * openConversation(ticketId)
+     * Switches active conversation, updates header, re-highlights list item.
+     * ============================================================ */
+    function openConversation(ticketId) {
+        activeConversation = ticketId;
+        var conv = CONVERSATIONS[ticketId];
+        if (!conv) return;
+
+        /* Update right panel header */
+        var idEl   = document.getElementById('chatHeaderTicketId');
+        var subEl  = document.getElementById('chatHeaderSubject');
+        var linkEl = document.getElementById('chatViewTicketLink');
+        if (idEl)   idEl.textContent  = 'Ticket: ' + ticketId;
+        if (subEl)  subEl.textContent = conv.subject;
+        if (linkEl) linkEl.href = 'ticket-detail.html?id=' + ticketId + '&substatus=' + conv.substatus;
+
+        /* Highlight active item in conversation list */
+        document.querySelectorAll('.dev-conv-item').forEach(function (item) {
+            var isActive = item.dataset.ticketId === ticketId;
+            item.style.borderLeft  = isActive ? '3px solid var(--tw-primary)' : '3px solid transparent';
+            item.style.background  = isActive ? 'var(--tw-primary-light)' : '';
+        });
+    }
+
+
+    /* ============================================================
+     * sendChatMessage()
+     * Appends purple developer bubble to thread. Console.log stub.
+     * ============================================================ */
+    function sendChatMessage() {
+        var textarea = document.getElementById('chatInput');
+        var text     = (textarea ? textarea.value : '').trim();
+        if (!text) { if (textarea) textarea.focus(); return; }
+
+        var thread = document.getElementById('devChatThread');
+        var el     = document.createElement('div');
+        el.className = 'dev-msg dev-msg--dev';
+        el.innerHTML =
+            '<div class="tw-avatar tw-avatar--sm tw-avatar--developer" aria-hidden="true">' +
+            escapeHtml(DEV_USER.initials) + '</div>' +
+            '<div class="dev-msg-body">' +
+            '<div class="dev-msg-sender">You <span class="tw-role-pill tw-role-pill--developer">Developer</span></div>' +
+            '<div class="dev-msg-bubble">' + escapeHtml(text) + '</div>' +
+            '<div class="dev-msg-time">' + formatNow() + '</div>' +
+            '</div>';
+
+        if (thread) {
+            thread.appendChild(el);
+            thread.scrollTop = thread.scrollHeight;
+        }
+
+        textarea.value = '';
+        textarea.style.height = 'auto';
+
+        /* Django: fetch('{% url "dev:send_message" ticket_id %}', {
+           method: 'POST',
+           headers: { 'X-CSRFToken': getCookie('csrftoken') },
+           body: JSON.stringify({ message: text })
+        }) */
+        console.log('[Dev Portal] sendChatMessage stub:', { ticket: activeConversation, message: text });
+        showDevToast('Message sent.', 'success');
+    }
+
+
+    /* ============================================================
+     * SIDEBAR TOGGLE
+     * ============================================================ */
+
+    var sidebar   = document.getElementById('sidebar');
+    var hamburger = document.getElementById('hamburger-btn');
+
+    function isMobile() { return window.innerWidth <= 768; }
+
+    hamburger.addEventListener('click', function () {
+        if (isMobile()) {
+            sidebar.classList.toggle('mobile-open');
+        } else {
+            sidebar.classList.toggle('hide');
+            document.body.classList.toggle('sidebar-hidden');
+        }
+    });
+
+    window.addEventListener('resize', function () {
+        if (isMobile()) {
+            sidebar.classList.remove('hide');
+            document.body.classList.remove('sidebar-hidden');
+        }
+    });
+
+
+    /* ============================================================
+     * NOTIFICATION BELL
+     * ============================================================ */
+
+    var notifBellBtn = document.getElementById('notifBellBtn');
+    var notifPanel   = document.getElementById('notifPanel');
+
+    notifBellBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var isOpen = notifPanel.classList.toggle('open');
+        notifBellBtn.setAttribute('aria-expanded', isOpen);
+    });
+
+    document.getElementById('markAllReadBtn').addEventListener('click', function () {
+        document.querySelectorAll('.tw-notif-item.unread').forEach(function (item) {
+            item.classList.remove('unread');
+        });
+        var badge = document.getElementById('notifCount');
+        if (badge) badge.remove();
+    });
+
+
+    /* ============================================================
+     * PROFILE DROPDOWN
+     * ============================================================ */
+
+    var profilePanelOpen = false;
+
+    function toggleProfileDropdown(e) {
+        e.stopPropagation();
+        var panel = document.getElementById('profilePanel');
+        if (notifPanel.classList.contains('open')) {
+            notifPanel.classList.remove('open');
+            notifBellBtn.setAttribute('aria-expanded', 'false');
+        }
+        profilePanelOpen = !profilePanelOpen;
+        panel.classList.toggle('open', profilePanelOpen);
+        panel.setAttribute('aria-hidden', profilePanelOpen ? 'false' : 'true');
+    }
+
+    function closeProfileDropdown() {
+        var panel = document.getElementById('profilePanel');
+        if (panel) {
+            panel.classList.remove('open');
+            profilePanelOpen = false;
+            panel.setAttribute('aria-hidden', 'true');
+        }
+    }
+
+
+    /* ============================================================
+     * CLICK-OUTSIDE
+     * ============================================================ */
+
+    document.addEventListener('click', function (e) {
+        if (!notifBellBtn.contains(e.target) && !notifPanel.contains(e.target)) {
+            notifPanel.classList.remove('open');
+            notifBellBtn.setAttribute('aria-expanded', 'false');
+        }
+        var pp = document.getElementById('profilePanel');
+        if (pp && pp.classList.contains('open')) {
+            if (!document.getElementById('profileWrap').contains(e.target)) {
+                closeProfileDropdown();
+            }
+        }
+    });
+
+
+    /* ============================================================
+     * ESCAPE KEY
+     * ============================================================ */
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        closeProfileDropdown();
+        notifPanel.classList.remove('open');
+        notifBellBtn.setAttribute('aria-expanded', 'false');
+    });
+
+
+    /* ============================================================
+     * UTILITIES
+     * ============================================================ */
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function formatNow() {
+        var d = new Date();
+        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) +
+               ' at ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function showDevToast(message, type) {
+        var t = document.createElement('div');
+        t.className = 'dev-toast dev-toast--' + (type || 'success');
+        t.textContent = message;
+        document.body.appendChild(t);
+        setTimeout(function () { t.classList.add('show'); }, 10);
+        setTimeout(function () {
+            t.classList.remove('show');
+            setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 300);
+        }, 3000);
+    }
+
+</script>
+
+</body>
+</html>
+
+<!-- Django: {% endblock %} -->
