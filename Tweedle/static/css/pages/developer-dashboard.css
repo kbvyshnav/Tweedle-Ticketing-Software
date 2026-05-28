@@ -1589,9 +1589,15 @@
     animation: dev-pulse-border-amber 2s ease-in-out infinite;
 }
 
-/* Stat card — In UAT Review (uat_approval) — purple light tint */
+/* Stat card — In UAT Review (uat_approval) — purple light tint, pulsing border */
+@keyframes dev-pulse-border-purple {
+    0%,  100% { box-shadow: 0 0 0 0   rgba(139, 92, 246, 0.30), var(--tw-shadow-sm); }
+    50%       { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0),    var(--tw-shadow-sm); }
+}
+
 .dev-stat-card--uat-approval {
-    border-left-color: var(--tw-primary);
+    border-left: 3px solid var(--tw-primary);
+    animation: dev-pulse-border-purple 2s ease-in-out infinite;
 }
 
 .dev-stat-card--uat-approval .dev-stat-card__icon {

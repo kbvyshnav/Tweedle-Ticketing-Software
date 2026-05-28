@@ -262,7 +262,7 @@
              PAGE HEADER
              ========================================================= -->
         <!-- Django: href="{% url 'dev:dashboard' %}" -->
-        <a href="dashboard.html" class="dev-back-link">
+        <a id="devBackLink" href="dashboard.html" class="dev-back-link">
             <i class="bx bx-arrow-back" aria-hidden="true"></i>
             Back to My Tickets
         </a>
@@ -793,6 +793,24 @@
             currentSubstatus: 'uat',
             ticketStatus:     'closed',
             closedDate:       '28 Mar 2025'
+        },
+
+        'BGEX25010006': {
+            subject:          'Login page not redirecting after password reset',
+            client:           'Belhasa Global Exchange Co.LLC',
+            clientId:         'BGEX',
+            priority:         'Medium',
+            priorityClass:    'tw-priority-badge--medium',
+            issueDate:        '10 Feb 2025',
+            estResolution:    '25 Feb 2025',
+            isOverdue:        false,
+            category:         'Authentication',
+            description:      'After a successful password reset, users are not being redirected to the login page. They see a blank screen instead. Fixed in the Feb 2025 auth module patch.',
+            attachments:      [],
+            adminNotes:       '',
+            currentSubstatus: 'uat',
+            ticketStatus:     'closed',
+            closedDate:       '01 Mar 2025'
         }
     };
     /* Django: var DEV_TICKET_DATA = {{ tickets_json|safe }}; */
@@ -804,6 +822,8 @@
     var devTicketSubmittedForUAT = false;  /* set true after confirmSubmitForUAT() confirms */
     var devWorkAttachments       = [];     /* seeded from ticket.attachments in initPage() */
     var devConfirmCallback   = null;    /* set by openDevConfirmModal() */
+    var devPendingFile       = null;    /* file staged in preview modal */
+    var devPendingFileSource = null;    /* 'attachment' | 'chat' */
 
 
     /* ============================================================
@@ -858,6 +878,17 @@
         /* Restore UAT-submitted state from localStorage (survives navigation) */
         if (localStorage.getItem('dev_uat_submitted_' + TICKET_ID) === '1') {
             devTicketSubmittedForUAT = true;
+        }
+
+        /* ---- Back link — preserves active filter on return (M7) ---- */
+        var backLink = document.getElementById('devBackLink');
+        if (backLink) {
+            var backSubstatus = TICKET_SUBSTATUS;
+            if (ticket.ticketStatus === 'forwarded')    backSubstatus = 'forwarded';
+            if (ticket.ticketStatus === 'uat_approval') backSubstatus = 'uat_approval';
+            if (ticket.ticketStatus === 'closed')       backSubstatus = 'all';
+            if (ticket.ticketStatus === 'resolved')     backSubstatus = 'resolved';
+            backLink.href = 'dashboard.html?filter=' + backSubstatus;
         }
 
         /* ---- Page title ---- */
@@ -964,6 +995,9 @@
         /* ---- Scroll chat to bottom ---- */
         var thread = document.getElementById('devChatThread');
         if (thread) thread.scrollTop = thread.scrollHeight;
+
+        /* ---- Apply chat disabled state (closed/forwarded) ---- */
+        applyDevChatState();
     }
 
 
@@ -998,19 +1032,6 @@
                 addAttachBtn.style.cursor = 'not-allowed';
                 addAttachBtn.title = 'Ticket is paused — attachments disabled';
             }
-            return;
-        }
-
-        /* If already submitted for UAT, replace panel with submitted banner */
-        if (devTicketSubmittedForUAT) {
-            body.innerHTML =
-                '<div class="dev-resolved-banner">' +
-                '<i class="bx bx-check-circle" aria-hidden="true"></i>' +
-                '<div>' +
-                '<strong>Submitted for client UAT review.</strong><br>' +
-                '<span style="font-weight:normal">The client will test and approve your work.</span>' +
-                '</div>' +
-                '</div>';
             return;
         }
 
@@ -1064,9 +1085,14 @@
         var steps = [
             { key: 'development', label: 'Development' },
             { key: 'testing',     label: 'Testing' },
-            { key: 'uat',         label: 'UAT' }
+            { key: 'uat',         label: 'UAT' },
+            { key: 'resolved',    label: 'Resolved' }
         ];
-        var currentIdx = steps.map(function (s) { return s.key; }).indexOf(TICKET_SUBSTATUS);
+
+        /* When submitted for UAT, all sub-statuses are done and Resolved is the active step */
+        var currentIdx = devTicketSubmittedForUAT
+            ? 3
+            : steps.map(function (s) { return s.key; }).indexOf(TICKET_SUBSTATUS);
 
         /* ---- Stepper ---- */
         var stepperHtml = '<div class="dev-substatus-stepper" aria-label="Sub-status progress stepper">';
@@ -1098,7 +1124,18 @@
         /* ---- Action area ---- */
         var actionHtml = '<div style="margin-top:var(--tw-space-4)">';
 
-        if (TICKET_SUBSTATUS === 'development') {
+        if (devTicketSubmittedForUAT) {
+            /* Submitted — show confirmation banner below the completed stepper */
+            actionHtml +=
+                '<div class="dev-resolved-banner">' +
+                '<i class="bx bx-check-circle" aria-hidden="true"></i>' +
+                '<div>' +
+                '<strong>Submitted for client UAT review.</strong><br>' +
+                '<span style="font-weight:normal">The client will test and approve your work.</span>' +
+                '</div>' +
+                '</div>';
+
+        } else if (TICKET_SUBSTATUS === 'development') {
             actionHtml +=
                 '<button type="button" class="tw-btn tw-btn-primary" id="devActionBtn"' +
                 ' onclick="confirmSubstatusChange(\'testing\')">' +
@@ -1469,29 +1506,13 @@
         container.innerHTML = html;
     }
 
-    /* Wire "Add Work Attachment" file input */
+    /* Wire "Add Work Attachment" file input — shows preview modal before committing */
     document.addEventListener('DOMContentLoaded', function () {
         var attachInput = document.getElementById('devAttachInput');
         if (attachInput) {
             attachInput.addEventListener('change', function () {
-                var file = this.files && this.files[0];
-                if (!file) return;
-                var ext  = (file.name.split('.').pop() || '').toLowerCase();
-                var type = ['jpg','jpeg','png','gif','webp'].indexOf(ext) !== -1 ? 'img'
-                         : ext === 'pdf' ? 'pdf' : 'doc';
-                var kb   = Math.round(file.size / 1024);
-                var size = kb > 1024 ? (Math.round(kb / 102.4) / 10) + ' MB' : kb + ' KB';
-                devWorkAttachments.push({
-                    name: file.name,
-                    type: type,
-                    size: size,
-                    date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-                });
-                renderDevAttachments();
-                /* Django: fetch('{% url "dev:upload_attachment" ticket.id %}', {method:'POST', body: formData}) */
-                console.log('[Dev Portal] uploadAttachment stub:', { name: file.name });
-                showDevToast('Attachment uploaded.', 'success');
-                this.value = '';
+                if (!this.files || !this.files[0]) return;
+                showDevFilePreview(this.files[0], 'attachment');
             });
         }
     });
@@ -1534,33 +1555,13 @@
         showDevToast('Message sent.', 'success');
     }
 
-    /* Chat file attach — adds file chip bubble to thread */
+    /* Chat file attach — shows preview modal before committing */
     document.addEventListener('DOMContentLoaded', function () {
         var chatFileInput = document.getElementById('devChatFileInput');
         if (chatFileInput) {
             chatFileInput.addEventListener('change', function () {
-                var file = this.files && this.files[0];
-                if (!file) return;
-                var thread = document.getElementById('devChatThread');
-                if (thread) {
-                    var el = document.createElement('div');
-                    el.className = 'dev-msg dev-msg--dev';
-                    el.innerHTML =
-                        '<div class="tw-avatar tw-avatar--sm tw-avatar--developer" aria-hidden="true">' +
-                        escapeHtml(DEV_USER.initials) + '</div>' +
-                        '<div class="dev-msg-body">' +
-                        '<div class="dev-msg-sender">You <span class="tw-role-pill tw-role-pill--developer">Developer</span></div>' +
-                        '<div class="dev-msg-bubble" style="display:flex;align-items:center;gap:8px">' +
-                        '<i class="bx bx-paperclip" aria-hidden="true"></i>' +
-                        '<span>' + escapeHtml(file.name) + '</span>' +
-                        '</div>' +
-                        '<div class="dev-msg-time">' + formatNow() + '</div>' +
-                        '</div>';
-                    thread.appendChild(el);
-                    thread.scrollTop = thread.scrollHeight;
-                }
-                showDevToast('File attached.', 'success');
-                this.value = '';
+                if (!this.files || !this.files[0]) return;
+                showDevFilePreview(this.files[0], 'chat');
             });
         }
     });
@@ -1683,11 +1684,216 @@
 
 
     /* ============================================================
+     * processDevAttachment(file)
+     * Extracted from the devAttachInput handler.
+     * Called by confirmDevFileAttach() when source === 'attachment'.
+     * ============================================================ */
+    function processDevAttachment(file) {
+        var ext  = (file.name.split('.').pop() || '').toLowerCase();
+        var type = ['jpg','jpeg','png','gif','webp'].indexOf(ext) !== -1 ? 'img'
+                 : ext === 'pdf' ? 'pdf' : 'doc';
+        var kb   = Math.round(file.size / 1024);
+        var size = kb > 1024 ? (Math.round(kb / 102.4) / 10) + ' MB' : kb + ' KB';
+        devWorkAttachments.push({
+            name: file.name,
+            type: type,
+            size: size,
+            date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+        });
+        renderDevAttachments();
+        /* Django: fetch('{% url "dev:upload_attachment" ticket.id %}', {method:'POST', body: formData}) */
+        console.log('[Dev Portal] uploadAttachment stub:', { name: file.name });
+        showDevToast('Attachment uploaded.', 'success');
+    }
+
+
+    /* ============================================================
+     * processDevChatAttachment(file)
+     * Extracted from the devChatFileInput handler.
+     * Called by confirmDevFileAttach() when source === 'chat'.
+     * ============================================================ */
+    function processDevChatAttachment(file) {
+        var thread = document.getElementById('devChatThread');
+        if (thread) {
+            var el = document.createElement('div');
+            el.className = 'dev-msg dev-msg--dev';
+            el.innerHTML =
+                '<div class="tw-avatar tw-avatar--sm tw-avatar--developer" aria-hidden="true">' +
+                escapeHtml(DEV_USER.initials) + '</div>' +
+                '<div class="dev-msg-body">' +
+                '<div class="dev-msg-sender">You <span class="tw-role-pill tw-role-pill--developer">Developer</span></div>' +
+                '<div class="dev-msg-bubble" style="display:flex;align-items:center;gap:8px">' +
+                '<i class="bx bx-paperclip" aria-hidden="true"></i>' +
+                '<span>' + escapeHtml(file.name) + '</span>' +
+                '</div>' +
+                '<div class="dev-msg-time">' + formatNow() + '</div>' +
+                '</div>';
+            thread.appendChild(el);
+            thread.scrollTop = thread.scrollHeight;
+        }
+        /* Sync to Attachments section — mirrors client portal addSharedAttachment() pattern */
+        var chatExt  = (file.name.split('.').pop() || '').toLowerCase();
+        var chatType = ['jpg','jpeg','png','gif','webp'].indexOf(chatExt) !== -1 ? 'img'
+                     : chatExt === 'pdf' ? 'pdf' : 'doc';
+        var chatKb   = Math.round(file.size / 1024);
+        var chatSize = chatKb > 1024 ? (Math.round(chatKb / 102.4) / 10) + ' MB' : chatKb + ' KB';
+        devWorkAttachments.push({
+            name: file.name,
+            type: chatType,
+            size: chatSize,
+            date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+        });
+        renderDevAttachments();
+        /* Django: attachment uploaded via chat is also saved to ticket.attachments in the same POST */
+        showDevToast('File attached.', 'success');
+    }
+
+
+    /* ============================================================
+     * showDevFilePreview(file, source)
+     * Opens the preview modal before committing the attachment.
+     * source: 'attachment' | 'chat'
+     * ============================================================ */
+    function showDevFilePreview(file, source) {
+        devPendingFile       = file;
+        devPendingFileSource = source;
+
+        var modal = document.getElementById('devFilePreviewModal');
+        document.getElementById('devPreviewFileName').textContent = file.name;
+        document.getElementById('devPreviewFileSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
+        document.getElementById('devPreviewFileType').textContent = file.type || 'Unknown type';
+
+        var ext = (file.name.split('.').pop() || '').toLowerCase();
+        var iconClass = 'bx-file';
+        if (ext === 'pdf')                              iconClass = 'bx-file-pdf';
+        else if (['jpg','jpeg','png','gif','webp'].indexOf(ext) !== -1) iconClass = 'bx-image';
+        else if (['doc','docx'].indexOf(ext)  !== -1)  iconClass = 'bx-file-doc';
+        else if (['xls','xlsx'].indexOf(ext)  !== -1)  iconClass = 'bx-spreadsheet';
+        document.getElementById('devPreviewFileIcon').className = 'bx ' + iconClass;
+
+        var imgContainer = document.getElementById('devPreviewImageContainer');
+        var imgEl        = document.getElementById('devPreviewImage');
+        if (['jpg','jpeg','png','gif','webp'].indexOf(ext) !== -1) {
+            var reader = new FileReader();
+            reader.onload = function (e) { imgEl.src = e.target.result; };
+            reader.readAsDataURL(file);
+            imgContainer.style.display = 'block';
+        } else {
+            imgContainer.style.display = 'none';
+            imgEl.src = '';
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    function cancelDevFilePreview() {
+        devPendingFile       = null;
+        devPendingFileSource = null;
+        document.getElementById('devFilePreviewModal').style.display = 'none';
+        var attachInput = document.getElementById('devAttachInput');
+        var chatFileInput = document.getElementById('devChatFileInput');
+        if (attachInput)  attachInput.value  = '';
+        if (chatFileInput) chatFileInput.value = '';
+    }
+
+    function confirmDevFileAttach() {
+        if (!devPendingFile) return;
+        document.getElementById('devFilePreviewModal').style.display = 'none';
+        if (devPendingFileSource === 'attachment') {
+            processDevAttachment(devPendingFile);
+        } else if (devPendingFileSource === 'chat') {
+            processDevChatAttachment(devPendingFile);
+        }
+        devPendingFile       = null;
+        devPendingFileSource = null;
+    }
+
+
+    /* ============================================================
+     * applyDevChatState()
+     * Disables chat input for Closed and Awaiting Client states.
+     * Called at the end of initPage() after all render functions.
+     * Django: chat disabled state is enforced server-side by
+     *         checking ticket.status before rendering the chat form.
+     * ============================================================ */
+    function applyDevChatState() {
+        var ticketData = DEV_TICKET_DATA[TICKET_ID];
+        var chatInput  = document.getElementById('devChatInput') || document.querySelector('textarea[placeholder*="message"]');
+        var sendBtn    = document.getElementById('devChatSendBtn') || document.querySelector('.dev-chat-send-btn');
+        var chatNote   = document.getElementById('devChatNote');
+
+        var shouldDisable = false;
+        var disableReason = '';
+
+        if (ticketData && ticketData.ticketStatus === 'closed') {
+            shouldDisable = true;
+            disableReason = 'This ticket is closed — chat is disabled.';
+        } else if (ticketData && ticketData.ticketStatus === 'forwarded') {
+            shouldDisable = true;
+            disableReason = 'Chat is paused while the ticket is awaiting client response.';
+        }
+
+        if (shouldDisable) {
+            if (chatInput) {
+                chatInput.disabled = true;
+                chatInput.placeholder = disableReason;
+            }
+            if (sendBtn) {
+                sendBtn.disabled = true;
+                sendBtn.style.opacity = '0.5';
+                sendBtn.style.cursor = 'not-allowed';
+            }
+            if (chatNote) {
+                chatNote.textContent = disableReason;
+                chatNote.style.color = 'var(--tw-danger)';
+            }
+        }
+    }
+
+
+    /* ============================================================
      * BOOT — run initPage on DOMContentLoaded
      * ============================================================ */
     document.addEventListener('DOMContentLoaded', initPage);
 
 </script>
+
+<!-- ==============================================================
+     FILE PREVIEW MODAL — shown before attaching a file.
+     Triggered by showDevFilePreview(); confirmed by confirmDevFileAttach().
+     ============================================================== -->
+<div id="devFilePreviewModal"
+     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);
+            z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:var(--tw-bg-surface);border-radius:var(--tw-radius-lg);
+                padding:28px;width:420px;max-width:90vw;box-shadow:var(--tw-shadow-lg);">
+        <h3 style="font-size:var(--tw-text-lg);font-weight:600;color:var(--tw-text-primary);margin:0 0 4px;">Attach File</h3>
+        <p style="font-size:var(--tw-text-sm);color:var(--tw-text-muted);margin:0 0 20px;">Review before attaching</p>
+        <div style="display:flex;align-items:center;gap:14px;background:var(--tw-bg-body);
+                    border:1px solid var(--tw-border);border-radius:var(--tw-radius-md);
+                    padding:14px 16px;margin-bottom:20px;">
+            <i id="devPreviewFileIcon" class="bx bx-file"
+               style="font-size:32px;color:var(--tw-primary);flex-shrink:0;"></i>
+            <div>
+                <div id="devPreviewFileName"
+                     style="font-weight:600;color:var(--tw-text-primary);font-size:var(--tw-text-base);"></div>
+                <div id="devPreviewFileSize"
+                     style="font-size:var(--tw-text-sm);color:var(--tw-text-muted);margin-top:2px;"></div>
+                <div id="devPreviewFileType"
+                     style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:1px;"></div>
+            </div>
+        </div>
+        <div id="devPreviewImageContainer" style="display:none;margin-bottom:16px;">
+            <img id="devPreviewImage" src="" alt="Preview"
+                 style="max-width:100%;max-height:200px;border-radius:var(--tw-radius-md);
+                        border:1px solid var(--tw-border);object-fit:contain;">
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button onclick="cancelDevFilePreview()" class="tw-btn tw-btn-outline">Cancel</button>
+            <button onclick="confirmDevFileAttach()" class="tw-btn tw-btn-primary">Attach File</button>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

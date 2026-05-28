@@ -296,7 +296,7 @@
                     <i class='bx bx-task'></i>
                 </div>
                 <div>
-                    <!-- Django: {{ active_count }} -->
+                    <!-- Django: active_count = tickets.filter(assigned_to=request.user).exclude(status__in=['resolved','closed']).count() -->
                     <div class="dev-stat-card__count">7</div>
                     <div class="dev-stat-card__label">In progress</div>
                 </div>
@@ -350,19 +350,20 @@
                 </div>
             </div>
 
-            <!-- Card 5: Resolved This Month — green -->
+            <!-- Card 5: Resolved & Closed — green -->
             <div class="dev-stat-card dev-stat-card--resolved-month"
                  data-filter="resolved"
                  role="button" tabindex="0"
-                 aria-label="Resolved this month: 8"
+                 aria-label="Resolved and closed: 10"
                  onclick="filterByStatCard('resolved', this)">
                 <div class="dev-stat-card__icon" aria-hidden="true">
                     <i class='bx bx-check-double'></i>
                 </div>
                 <div>
-                    <!-- Django: {{ resolved_month_count }} -->
-                    <div class="dev-stat-card__count">8</div>
-                    <div class="dev-stat-card__label">Completed this month</div>
+                    <!-- Django: {{ resolved_closed_count }} -->
+                    <div class="dev-stat-card__count">10</div>
+                    <div class="dev-stat-card__label">Resolved & Closed</div>
+                    <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px;">All time history</div>
                 </div>
             </div>
 
@@ -1007,6 +1008,108 @@
                             </td>
                         </tr>
 
+                        <!--
+                            Row 11: GMEC25010005 | Session timeout too aggressive | GMEC
+                            Low | Closed (28 Mar 2025)
+                        -->
+                        <!-- Django: closed ticket row -->
+                        <tr data-substatus="closed"
+                            data-status="closed"
+                            data-priority="low"
+                            data-overdue="false"
+                            data-id="GMEC25010005"
+                            data-subject="session timeout too aggressive on dashboard"
+                            data-issue-date="2025-03-01"
+                            style="cursor:pointer"
+                            onclick="window.location.href='ticket-detail.html?id=GMEC25010005&amp;status=closed'"
+                            aria-label="View ticket GMEC25010005">
+                            <td>
+                                <div class="ticket-id-cell">
+                                    <i class="bx bx-star"
+                                       style="color:var(--tw-text-muted);font-size:14px;flex-shrink:0;"
+                                       aria-hidden="true"></i>
+                                    <span class="tw-ticket-id">GMEC25010005</span>
+                                </div>
+                            </td>
+                            <td>Session timeout too aggressive on dashboard</td>
+                            <td>GMEC</td>
+                            <td>01 Mar 2025</td>
+                            <td>28 Mar 2025</td>
+                            <td><span class="tw-priority-badge tw-priority-badge--low">Low</span></td>
+                            <td>
+                                <span class="tw-substatus-badge"
+                                      style="display:inline-flex;align-items:center;padding:3px 10px;
+                                             border-radius:var(--tw-radius-pill);font-size:var(--tw-text-xs);
+                                             font-weight:500;background:var(--tw-bg-body);color:var(--tw-text-muted);
+                                             border:1px solid var(--tw-border);">
+                                    Closed
+                                </span>
+                            </td>
+                            <td onclick="event.stopPropagation()">
+                                <div class="tw-row-actions">
+                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
+                                       onclick="openDevTimelinePanel('GMEC25010005', 'Session timeout too aggressive on dashboard')"
+                                       role="button" tabindex="0"
+                                       aria-label="View timeline"></i>
+                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
+                                       onclick="openDevChatPanel('GMEC25010005', 'Session timeout too aggressive on dashboard')"
+                                       role="button" tabindex="0"
+                                       aria-label="Open chat"></i>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!--
+                            Row 12: BGEX25010006 | Login page not redirecting after password reset | BGEX
+                            Medium | Closed (01 Mar 2025)
+                        -->
+                        <!-- Django: closed ticket row -->
+                        <tr data-substatus="closed"
+                            data-status="closed"
+                            data-priority="medium"
+                            data-overdue="false"
+                            data-id="BGEX25010006"
+                            data-subject="login page not redirecting after password reset"
+                            data-issue-date="2025-02-10"
+                            style="cursor:pointer"
+                            onclick="window.location.href='ticket-detail.html?id=BGEX25010006&amp;status=closed'"
+                            aria-label="View ticket BGEX25010006">
+                            <td>
+                                <div class="ticket-id-cell">
+                                    <i class="bx bx-star"
+                                       style="color:var(--tw-text-muted);font-size:14px;flex-shrink:0;"
+                                       aria-hidden="true"></i>
+                                    <span class="tw-ticket-id">BGEX25010006</span>
+                                </div>
+                            </td>
+                            <td>Login page not redirecting after password reset</td>
+                            <td>BGEX</td>
+                            <td>10 Feb 2025</td>
+                            <td>01 Mar 2025</td>
+                            <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
+                            <td>
+                                <span class="tw-substatus-badge"
+                                      style="display:inline-flex;align-items:center;padding:3px 10px;
+                                             border-radius:var(--tw-radius-pill);font-size:var(--tw-text-xs);
+                                             font-weight:500;background:var(--tw-bg-body);color:var(--tw-text-muted);
+                                             border:1px solid var(--tw-border);">
+                                    Closed
+                                </span>
+                            </td>
+                            <td onclick="event.stopPropagation()">
+                                <div class="tw-row-actions">
+                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
+                                       onclick="openDevTimelinePanel('BGEX25010006', 'Login page not redirecting after password reset')"
+                                       role="button" tabindex="0"
+                                       aria-label="View timeline"></i>
+                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
+                                       onclick="openDevChatPanel('BGEX25010006', 'Login page not redirecting after password reset')"
+                                       role="button" tabindex="0"
+                                       aria-label="Open chat"></i>
+                                </div>
+                            </td>
+                        </tr>
+
                         <!-- Empty state — shown by JS when no rows match the active filter -->
                         <!-- Django: {% empty %} -->
                         <tr id="devEmptyState" style="display:none;">
@@ -1094,6 +1197,14 @@
 
         <div class="tw-chat-footer">
             <div class="tw-chat-input-row">
+                <label for="devPanelChatFile"
+                       class="tw-btn-icon"
+                       title="Attach file"
+                       aria-label="Attach file"
+                       style="cursor:pointer;flex-shrink:0;">
+                    <i class="bx bx-paperclip" aria-hidden="true"></i>
+                </label>
+                <input type="file" id="devPanelChatFile" style="display:none;" accept="*/*">
                 <textarea
                     class="tw-chat-textarea"
                     id="devChatTextarea"
@@ -1228,6 +1339,28 @@
         /* Store original row order for sort-reset */
         var rows = document.querySelectorAll('#devTableBody tr[data-substatus]');
         rows.forEach(function (row, i) { row.dataset.originalOrder = i; });
+
+        /* Restore active filter from URL param (back-link navigation from ticket-detail) */
+        var _urlP = new URLSearchParams(window.location.search);
+        var _filterParam = _urlP.get('filter');
+        if (_filterParam && _filterParam !== 'all') {
+            if (_filterParam === 'forwarded') {
+                devFilters.substatus = 'forwarded';
+            } else if (_filterParam === 'uat_approval') {
+                devFilters.substatus = 'uat_approval';
+            } else if (_filterParam === 'resolved') {
+                devFilters.substatus = 'resolved';
+            } else if (['development', 'testing', 'uat', 'overdue'].indexOf(_filterParam) !== -1) {
+                devFilters.substatus = _filterParam;
+            }
+            var _matchingPill = document.querySelector('.dev-filter-pill[data-substatus="' + _filterParam + '"]');
+            if (_matchingPill) {
+                document.querySelectorAll('.dev-filter-pill').forEach(function (p) { p.classList.remove('active'); });
+                _matchingPill.classList.add('active');
+            }
+            applyDevFilters();
+        }
+        /* Django: substatus filter will be preserved via request.GET in the Django view */
     });
 
 
@@ -1280,8 +1413,8 @@
         var rowSubject   = (row.dataset.subject  || '').toLowerCase();
         var rowStatus    = row.getAttribute('data-status') || '';
 
-        /* Resolved rows: only visible when explicitly filtering for resolved */
-        if (rowStatus === 'resolved') {
+        /* Resolved and Closed rows: only visible when filtering for resolved/closed */
+        if (rowStatus === 'resolved' || rowStatus === 'closed') {
             return devFilters.substatus === 'resolved';
         }
 
@@ -1481,7 +1614,7 @@
                 'overdue':      'No overdue tickets. Great work!',
                 'forwarded':    'No tickets currently awaiting client response.',
                 'uat_approval': 'No tickets currently in UAT review.',
-                'resolved':     'No resolved tickets this month.'
+                'resolved':     'No resolved or closed tickets.'
             };
             var key = devFilters.overdue ? 'overdue' : devFilters.substatus;
             if (msg) msg.textContent = msgs[key] || 'No tickets match your filters.';
@@ -1715,6 +1848,42 @@
         return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) +
                ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
     }
+
+    /* Dashboard chat panel — file attachment handler */
+    document.addEventListener('DOMContentLoaded', function () {
+        var panelChatFile = document.getElementById('devPanelChatFile');
+        if (panelChatFile) {
+            panelChatFile.addEventListener('change', function () {
+                if (!this.files || !this.files[0]) return;
+                var file = this.files[0];
+                var area = document.getElementById('devMessagesArea');
+                if (area) {
+                    var bubble = document.createElement('div');
+                    bubble.className = 'tw-message sent';
+                    bubble.innerHTML =
+                        '<div class="tw-avatar tw-avatar--sm tw-avatar--developer" aria-hidden="true">AM</div>' +
+                        '<div>' +
+                        '<div class="tw-message-sender">You ' +
+                        '<span class="tw-role-pill tw-role-pill--developer">Developer</span></div>' +
+                        '<div class="tw-message-bubble">' +
+                        '<div class="tw-message-text" style="display:flex;align-items:center;gap:6px;">' +
+                        '<i class="bx bx-paperclip" aria-hidden="true"></i>' +
+                        escapeHtml(file.name) +
+                        '<span style="font-size:10px;opacity:0.8;margin-left:4px;">' +
+                        (file.size / 1024).toFixed(1) + ' KB</span>' +
+                        '</div>' +
+                        '<div class="tw-message-time">' + formatNow() + '</div>' +
+                        '</div></div>';
+                    area.appendChild(bubble);
+                    area.scrollTop = area.scrollHeight;
+                }
+                this.value = '';
+                showDevToast('File attached to chat.', 'success');
+                /* Django: POST file to {% url "dev:chat_attach" ticket_id %} with X-CSRFToken */
+                console.log('[Dev Portal] panelChatFile stub:', { name: file.name });
+            });
+        }
+    });
 
     /* showDevToast(message, type) — bottom-right transient notification */
     function showDevToast(message, type) {
