@@ -103,8 +103,7 @@
             <div class="tw-stat-card__body">
                 <!-- Django: {{ forwarded_count }} -->
                 <div class="tw-stat-card__count">34</div>
-                <div class="tw-stat-card__label">Awaiting</div>
-                <span class="tw-stat-card__sublabel" style="display:block;font-size:10px;color:var(--tw-text-muted);font-weight:500;margin-top:1px;">Client</span>
+                <div class="tw-stat-card__label">Awaiting Client</div>
             </div>
         </div>
 
@@ -375,6 +374,7 @@
                     <th scope="col">Issue Date</th>
                     <th scope="col">Client</th>
                     <th scope="col">Status</th>
+                    <th scope="col">Priority</th>
                     <th scope="col">Dev / Tester</th>
                     <th scope="col"><span class="visually-hidden">Actions</span></th>
                 </tr>
@@ -400,6 +400,8 @@
                     <td>10-12-2025</td>
                     <td>BGEX</td>
                     <td><span class="tw-status-badge tw-status-badge--new">New</span></td>
+                    <!-- Django: {{ ticket.priority }} -->
+                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
                     <td><div class="allottee-cell unassigned">—</div></td>
                     <td>
                         <div class="tw-row-actions">
@@ -421,6 +423,8 @@
                     <td>12-12-2025</td>
                     <td>GMEC</td>
                     <td><span class="tw-status-badge tw-status-badge--new">New</span></td>
+                    <!-- Django: {{ ticket.priority }} -->
+                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
                     <td><div class="allottee-cell unassigned">—</div></td>
                     <td>
                         <div class="tw-row-actions">
@@ -453,6 +457,7 @@
                     <th scope="col">Issue Date</th>
                     <th scope="col">Client</th>
                     <th scope="col">Status</th>
+                    <th scope="col">Priority</th>
                     <th scope="col">Stage</th>
                     <th scope="col">Dev / Tester</th>
                     <th scope="col"><span class="visually-hidden">Actions</span></th>
@@ -479,6 +484,8 @@
                     <td>11-09-2021</td>
                     <td>GMEC</td>
                     <td><span class="tw-status-badge tw-status-badge--progress">In Progress</span></td>
+                    <!-- Django: {{ ticket.priority }} -->
+                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
                     <td><span class="tw-status-badge tw-status-badge--testing">Testing</span></td>
                     <td>
                         <div class="allottee-cell">
@@ -513,6 +520,8 @@
                     <td>23-01-2022</td>
                     <td>GMEC</td>
                     <td><span class="tw-status-badge tw-status-badge--progress">In Progress</span></td>
+                    <!-- Django: {{ ticket.priority }} -->
+                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
                     <td><span class="tw-status-badge tw-status-badge--development">Development</span></td>
                     <td>
                         <div class="allottee-cell">
@@ -541,6 +550,8 @@
                     <td>24-04-2020</td>
                     <td>GMEC</td>
                     <td><span class="tw-status-badge tw-status-badge--progress">In Progress</span></td>
+                    <!-- Django: {{ ticket.priority }} -->
+                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
                     <td><span class="tw-status-badge tw-status-badge--uat">UAT</span></td>
                     <td>
                         <div class="allottee-cell">
@@ -569,6 +580,8 @@
                     <td>08-01-2022</td>
                     <td>GMEC</td>
                     <td><span class="tw-status-badge tw-status-badge--progress">In Progress</span></td>
+                    <!-- Django: {{ ticket.priority }} -->
+                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
                     <td><span class="tw-status-badge tw-status-badge--testing">Testing</span></td>
                     <td>
                         <div class="allottee-cell">
@@ -597,6 +610,8 @@
                     <td>22-11-2025</td>
                     <td>BGEX</td>
                     <td><span class="tw-status-badge tw-status-badge--progress">In Progress</span></td>
+                    <!-- Django: {{ ticket.priority }} -->
+                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
                     <td><span class="tw-status-badge tw-status-badge--development">Development</span></td>
                     <td>
                         <div class="allottee-cell">
@@ -625,6 +640,8 @@
                     <td>03-12-2025</td>
                     <td>BGEX</td>
                     <td><span class="tw-status-badge tw-status-badge--progress">In Progress</span></td>
+                    <!-- Django: {{ ticket.priority }} -->
+                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
                     <td><span class="tw-status-badge tw-status-badge--uat">UAT</span></td>
                     <td>
                         <div class="allottee-cell">
@@ -663,6 +680,7 @@
                     <th scope="col">Issue Date</th>
                     <th scope="col">Client</th>
                     <th scope="col">Status</th>
+                    <th scope="col">Priority</th>
                     <th scope="col">Dev / Tester</th>
                     <th scope="col"><span class="visually-hidden">Actions</span></th>
                 </tr>
@@ -688,6 +706,8 @@
                     <td>05-02-2025</td>
                     <td>BGEX</td>
                     <td><span class="tw-status-badge tw-status-badge--forwarded">Awaiting Client</span></td>
+                    <!-- Django: {{ ticket.priority }} -->
+                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
                     <td>
                         <div class="allottee-cell">
                             <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">A</div>
@@ -716,6 +736,8 @@
                     <td>14-02-2025</td>
                     <td>GMEC</td>
                     <td><span class="tw-status-badge tw-status-badge--forwarded">Awaiting Client</span></td>
+                    <!-- Django: {{ ticket.priority }} -->
+                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
                     <td>
                         <div class="allottee-cell">
                             <div class="tw-avatar tw-avatar--sm tw-avatar--rose" aria-hidden="true">R</div>
@@ -744,6 +766,8 @@
                     <td>21-02-2025</td>
                     <td>BGEX</td>
                     <td><span class="tw-status-badge tw-status-badge--forwarded">Awaiting Client</span></td>
+                    <!-- Django: {{ ticket.priority }} -->
+                    <td><span class="tw-priority-badge tw-priority-badge--low">Low</span></td>
                     <td>
                         <div class="allottee-cell">
                             <div class="tw-avatar tw-avatar--sm tw-avatar--teal" aria-hidden="true">S</div>
@@ -964,6 +988,7 @@
                     <th scope="col">Issue Date</th>
                     <th scope="col">Client</th>
                     <th scope="col">Status</th>
+                    <th scope="col">Priority</th>
                     <th scope="col">Dev / Tester</th>
                     <th scope="col"><span class="visually-hidden">Actions</span></th>
                 </tr>
@@ -983,6 +1008,8 @@
                     <td>10-10-2024</td>
                     <td>GMEC</td>
                     <td><span class="tw-status-badge tw-status-badge--closed">Closed</span></td>
+                    <!-- Django: {{ ticket.priority }} -->
+                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
                     <td>
                         <div class="allottee-cell">
                             <div class="tw-avatar tw-avatar--sm tw-avatar--purple" aria-hidden="true">M</div>
@@ -1010,6 +1037,8 @@
                     <td>22-10-2024</td>
                     <td>BGEX</td>
                     <td><span class="tw-status-badge tw-status-badge--closed">Closed</span></td>
+                    <!-- Django: {{ ticket.priority }} -->
+                    <td><span class="tw-priority-badge tw-priority-badge--low">Low</span></td>
                     <td>
                         <div class="allottee-cell">
                             <div class="tw-avatar tw-avatar--sm tw-avatar--violet" aria-hidden="true">A</div>
@@ -1037,6 +1066,8 @@
                     <td>31-10-2024</td>
                     <td>GMEC</td>
                     <td><span class="tw-status-badge tw-status-badge--closed">Closed</span></td>
+                    <!-- Django: {{ ticket.priority }} -->
+                    <td><span class="tw-priority-badge tw-priority-badge--low">Low</span></td>
                     <td>
                         <div class="allottee-cell">
                             <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">A</div>
@@ -1104,7 +1135,13 @@
                             Duplicate of TKT-00071 — already resolved
                         </div>
                     </td>
-                    <td><div class="tw-row-actions"></div></td>
+                    <!-- Django: chat and timeline available for audit purposes on rejected tickets -->
+                    <td onclick="event.stopPropagation()">
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                        </div>
+                    </td>
                 </tr>
 
                 <tr data-ticket-id="TKT-00063" data-ticket-type="rejected" data-subject="Dashboard stats not loading for sub-users" data-status="rejected" data-client="BGEX">
@@ -1125,7 +1162,13 @@
                             Insufficient information provided — client did not…
                         </div>
                     </td>
-                    <td><div class="tw-row-actions"></div></td>
+                    <!-- Django: chat and timeline available for audit purposes on rejected tickets -->
+                    <td onclick="event.stopPropagation()">
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                        </div>
+                    </td>
                 </tr>
 
                 <!-- Django: {% endfor %} -->
@@ -1396,7 +1439,7 @@
 
             <div class="tw-modal-section">
                 <h3 class="section-title">Attachments</h3>
-                <div class="tw-attachments-area">
+                <div class="tw-attachments-area" id="adminAttachArea">
                     <div class="tw-attachment-item">
                         <div class="tw-attachment-icon tw-attachment-icon--pdf" aria-hidden="true">
                             <i class="bx bxs-file-pdf"></i>
@@ -1414,6 +1457,20 @@
                             </button>
                         </div>
                     </div>
+                </div>
+                <input type="file" id="adminAttachInput" style="display:none;" accept="*/*">
+                <button class="tw-btn tw-btn-outline" onclick="document.getElementById('adminAttachInput').click()" style="margin-top:12px;">
+                    <i class="bx bx-upload"></i> Add Attachment
+                </button>
+                <div class="tw-attach-preview-strip" id="adminAttachPreviewStrip" style="margin-top:8px;" aria-live="polite">
+                    <i class="bx bx-file" aria-hidden="true"></i>
+                    <span id="adminAttachFileName"></span>
+                    <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="confirmAdminAttach()" style="margin-left:auto;margin-right:4px;">
+                        <i class="bx bx-check" aria-hidden="true"></i> Add
+                    </button>
+                    <button class="tw-file-chip-remove" onclick="cancelAdminAttach()" aria-label="Remove attachment">
+                        <i class="bx bx-x" aria-hidden="true"></i>
+                    </button>
                 </div>
             </div>
 
@@ -3274,6 +3331,62 @@
         chatFileInput.value       = '';
         strip.classList.remove('show');
         area.scrollTop = area.scrollHeight;
+    }
+
+
+    /* ============================================================
+     * ADMIN MODAL: ATTACHMENT UPLOAD
+     * Django: POST to {% url 'admin:add_attachment' ticket.id %} with X-CSRFToken
+     * ============================================================ */
+    (function () {
+        var adminAttachInput = document.getElementById('adminAttachInput');
+        if (adminAttachInput) {
+            adminAttachInput.addEventListener('change', function () {
+                if (!this.files || !this.files[0]) return;
+                var nameSpan = document.getElementById('adminAttachFileName');
+                var strip    = document.getElementById('adminAttachPreviewStrip');
+                if (nameSpan) nameSpan.textContent = this.files[0].name;
+                if (strip) strip.classList.add('show');
+            });
+        }
+    }());
+
+    function cancelAdminAttach() {
+        var input = document.getElementById('adminAttachInput');
+        if (input) input.value = '';
+        var strip = document.getElementById('adminAttachPreviewStrip');
+        if (strip) strip.classList.remove('show');
+    }
+
+    function confirmAdminAttach() {
+        var input = document.getElementById('adminAttachInput');
+        if (!input || !input.files || !input.files[0]) return;
+        var file = input.files[0];
+        var area = document.getElementById('adminAttachArea');
+        if (area) {
+            var ext      = (file.name.split('.').pop() || '').toLowerCase();
+            var iconCls  = ext === 'pdf' ? 'tw-attachment-icon--pdf' : 'tw-attachment-icon--doc';
+            var iconName = ext === 'pdf' ? 'bxs-file-pdf' : 'bx-file';
+            var size     = (file.size / 1024).toFixed(1) + ' KB';
+            var d        = new Date();
+            var today    = d.getDate().toString().padStart(2, '0') + '-' +
+                           (d.getMonth() + 1).toString().padStart(2, '0') + '-' + d.getFullYear();
+            var item = document.createElement('div');
+            item.className = 'tw-attachment-item';
+            item.innerHTML =
+                '<div class="tw-attachment-icon ' + iconCls + '" aria-hidden="true"><i class="bx ' + iconName + '"></i></div>' +
+                '<div class="tw-attachment-info">' +
+                '<div class="tw-attachment-name">' + file.name + '</div>' +
+                '<div class="tw-attachment-meta">Uploaded on ' + today + ' &bull; ' + size + '</div>' +
+                '</div>' +
+                '<div class="tw-attachment-actions">' +
+                '<button class="tw-icon-btn" title="Download" aria-label="Download ' + file.name + '"><i class="bx bx-download" aria-hidden="true"></i></button>' +
+                '<button class="tw-icon-btn" title="View" aria-label="View ' + file.name + '"><i class="bx bx-show" aria-hidden="true"></i></button>' +
+                '</div>';
+            area.appendChild(item);
+        }
+        cancelAdminAttach();
+        showDashToast('Attachment added.', 'success');
     }
 
 

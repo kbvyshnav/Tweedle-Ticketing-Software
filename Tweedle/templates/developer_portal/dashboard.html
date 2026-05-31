@@ -398,7 +398,11 @@
                     <button class="dev-filter-pill" data-substatus="testing"
                             onclick="filterByPill('testing', this)">Testing</button>
                     <button class="dev-filter-pill" data-substatus="uat"
-                            onclick="filterByPill('uat', this)">UAT</button>
+                            onclick="filterByPill('uat', this)">UAT Stage</button>
+                    <button class="dev-filter-pill" data-substatus="forwarded"
+                            onclick="filterByPill('forwarded', this)">Awaiting</button>
+                    <button class="dev-filter-pill" data-substatus="uat_approval"
+                            onclick="filterByPill('uat_approval', this)">UAT Review</button>
                     <button class="dev-filter-pill" data-substatus="overdue"
                             onclick="filterByPill('overdue', this)">Overdue</button>
                 </div>
@@ -503,7 +507,7 @@
                         <!-- Django: {% for ticket in assigned_tickets %} -->
 
                         <!--
-                            Row 1: GMEC25010001 | Payment gateway timeout | GMEC
+                            Row 1: GMEC25010001 | Wallet Option Agents | GMEC
                             High | Testing | OVERDUE (15 May 2025)
                         -->
                         <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
@@ -511,8 +515,8 @@
                             data-priority="high"
                             data-overdue="true"
                             data-id="GMEC25010001"
-                            data-subject="payment gateway timeout on checkout"
-                            data-issue-date="2025-04-10"
+                            data-subject="wallet option agents"
+                            data-issue-date="2021-09-11"
                             style="cursor:pointer"
                             onclick="window.location.href='ticket-detail.html?id=GMEC25010001&amp;substatus=testing'"
                             aria-label="View ticket GMEC25010001">
@@ -528,8 +532,8 @@
                                 </div>
                             </td>
                             <td>
-                                <div title="Payment gateway timeout on checkout">
-                                    Payment gateway timeout on checkout
+                                <div title="Wallet Option Agents">
+                                    Wallet Option Agents
                                 </div>
                                 <!-- Attachment chip -->
                                 <div class="dev-row-attachment">
@@ -538,7 +542,7 @@
                                 </div>
                             </td>
                             <td>GMEC</td>
-                            <td>10 Apr 2025</td>
+                            <td>11 Sep 2021</td>
                             <!-- Red date if overdue -->
                             <td style="color:var(--tw-danger);font-weight:600">15 May 2025</td>
                             <td>
@@ -550,11 +554,11 @@
                             <td>
                                 <div class="tw-row-actions">
                                     <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openDevTimelinePanel('GMEC25010001', 'Payment gateway timeout on checkout')"
+                                       onclick="event.stopPropagation(); openDevTimelinePanel('GMEC25010001', 'Wallet Option Agents')"
                                        role="button" tabindex="0"
                                        aria-label="View timeline"></i>
                                     <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openDevChatPanel('GMEC25010001', 'Payment gateway timeout on checkout')"
+                                       onclick="event.stopPropagation(); openDevChatPanel('GMEC25010001', 'Wallet Option Agents')"
                                        role="button" tabindex="0"
                                        aria-label="Open chat"></i>
                                 </div>
@@ -562,7 +566,7 @@
                         </tr>
 
                         <!--
-                            Row 2: GMEC25010004 | Invoice generation wrong totals | GMEC
+                            Row 2: GMEC25010004 | Kumari API Integration | GMEC
                             Medium | Development | OVERDUE (20 May 2025)
                         -->
                         <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
@@ -570,8 +574,8 @@
                             data-priority="medium"
                             data-overdue="true"
                             data-id="GMEC25010004"
-                            data-subject="invoice generation wrong totals"
-                            data-issue-date="2025-05-02"
+                            data-subject="kumari api integration"
+                            data-issue-date="2022-01-08"
                             style="cursor:pointer"
                             onclick="window.location.href='ticket-detail.html?id=GMEC25010004&amp;substatus=development'"
                             aria-label="View ticket GMEC25010004">
@@ -586,9 +590,9 @@
                                     <span class="tw-overdue-badge" aria-label="Overdue">Overdue</span>
                                 </div>
                             </td>
-                            <td>Invoice generation wrong totals</td>
+                            <td>Kumari API Integration</td>
                             <td>GMEC</td>
-                            <td>02 May 2025</td>
+                            <td>08 Jan 2022</td>
                             <td style="color:var(--tw-danger);font-weight:600">20 May 2025</td>
                             <td>
                                 <span class="tw-priority-badge tw-priority-badge--medium">Medium</span>
@@ -599,11 +603,11 @@
                             <td>
                                 <div class="tw-row-actions">
                                     <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openDevTimelinePanel('GMEC25010004', 'Invoice generation wrong totals')"
+                                       onclick="event.stopPropagation(); openDevTimelinePanel('GMEC25010004', 'Kumari API Integration')"
                                        role="button" tabindex="0"
                                        aria-label="View timeline"></i>
                                     <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openDevChatPanel('GMEC25010004', 'Invoice generation wrong totals')"
+                                       onclick="event.stopPropagation(); openDevChatPanel('GMEC25010004', 'Kumari API Integration')"
                                        role="button" tabindex="0"
                                        aria-label="Open chat"></i>
                                 </div>
@@ -612,15 +616,15 @@
 
                         <!--
                             Row 3: BGEX25010013 | User role permissions not saving | BGEX
-                            High | UAT | not overdue
+                            Medium | UAT | not overdue
                         -->
                         <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
                         <tr data-substatus="uat"
-                            data-priority="high"
+                            data-priority="medium"
                             data-overdue="false"
                             data-id="BGEX25010013"
                             data-subject="user role permissions not saving"
-                            data-issue-date="2025-04-18"
+                            data-issue-date="2025-05-05"
                             style="cursor:pointer"
                             onclick="window.location.href='ticket-detail.html?id=BGEX25010013&amp;substatus=uat'"
                             aria-label="View ticket BGEX25010013">
@@ -644,10 +648,10 @@
                                 </div>
                             </td>
                             <td>BGEX</td>
-                            <td>18 Apr 2025</td>
+                            <td>05 May 2025</td>
                             <td>30 May 2025</td>
                             <td>
-                                <span class="tw-priority-badge tw-priority-badge--high">High</span>
+                                <span class="tw-priority-badge tw-priority-badge--medium">Medium</span>
                             </td>
                             <td>
                                 <span class="tw-status-badge tw-status-badge--uat">UAT</span>
@@ -667,16 +671,16 @@
                         </tr>
 
                         <!--
-                            Row 4: GMEC25010010 | Bulk export CSV missing columns | GMEC
-                            Medium | Development | not overdue
+                            Row 4: GMEC25010010 | Payment gateway timeout on checkout | GMEC
+                            High | Development | not overdue
                         -->
                         <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
                         <tr data-substatus="development"
-                            data-priority="medium"
+                            data-priority="high"
                             data-overdue="false"
                             data-id="GMEC25010010"
-                            data-subject="bulk export csv missing columns"
-                            data-issue-date="2025-04-15"
+                            data-subject="payment gateway timeout on checkout"
+                            data-issue-date="2025-04-14"
                             style="cursor:pointer"
                             onclick="window.location.href='ticket-detail.html?id=GMEC25010010&amp;substatus=development'"
                             aria-label="View ticket GMEC25010010">
@@ -690,12 +694,12 @@
                                     <span class="tw-ticket-id">GMEC25010010</span>
                                 </div>
                             </td>
-                            <td>Bulk export CSV missing columns</td>
+                            <td>Payment gateway timeout on checkout</td>
                             <td>GMEC</td>
-                            <td>15 Apr 2025</td>
+                            <td>14 Apr 2025</td>
                             <td>25 May 2025</td>
                             <td>
-                                <span class="tw-priority-badge tw-priority-badge--medium">Medium</span>
+                                <span class="tw-priority-badge tw-priority-badge--high">High</span>
                             </td>
                             <td>
                                 <span class="tw-status-badge tw-status-badge--development">Development</span>
@@ -703,11 +707,11 @@
                             <td>
                                 <div class="tw-row-actions">
                                     <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openDevTimelinePanel('GMEC25010010', 'Bulk export CSV missing columns')"
+                                       onclick="event.stopPropagation(); openDevTimelinePanel('GMEC25010010', 'Payment gateway timeout on checkout')"
                                        role="button" tabindex="0"
                                        aria-label="View timeline"></i>
                                     <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openDevChatPanel('GMEC25010010', 'Bulk export CSV missing columns')"
+                                       onclick="event.stopPropagation(); openDevChatPanel('GMEC25010010', 'Payment gateway timeout on checkout')"
                                        role="button" tabindex="0"
                                        aria-label="Open chat"></i>
                                 </div>
@@ -715,7 +719,7 @@
                         </tr>
 
                         <!--
-                            Row 5: BGEX25020003 | API rate limit errors on sync | BGEX
+                            Row 5: BGEX25020003 | Mobile App Crash on Login | BGEX
                             Low | Testing | not overdue
                         -->
                         <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
@@ -723,8 +727,8 @@
                             data-priority="low"
                             data-overdue="false"
                             data-id="BGEX25020003"
-                            data-subject="api rate limit errors on sync"
-                            data-issue-date="2025-03-20"
+                            data-subject="mobile app crash on login"
+                            data-issue-date="2025-02-21"
                             style="cursor:pointer"
                             onclick="window.location.href='ticket-detail.html?id=BGEX25020003&amp;substatus=testing'"
                             aria-label="View ticket BGEX25020003">
@@ -738,9 +742,9 @@
                                     <span class="tw-ticket-id">BGEX25020003</span>
                                 </div>
                             </td>
-                            <td>API rate limit errors on sync</td>
+                            <td>Mobile App Crash on Login</td>
                             <td>BGEX</td>
-                            <td>20 Mar 2025</td>
+                            <td>21 Feb 2025</td>
                             <td>28 May 2025</td>
                             <td>
                                 <span class="tw-priority-badge tw-priority-badge--low">Low</span>
@@ -751,11 +755,11 @@
                             <td>
                                 <div class="tw-row-actions">
                                     <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openDevTimelinePanel('BGEX25020003', 'API rate limit errors on sync')"
+                                       onclick="event.stopPropagation(); openDevTimelinePanel('BGEX25020003', 'Mobile App Crash on Login')"
                                        role="button" tabindex="0"
                                        aria-label="View timeline"></i>
                                     <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openDevChatPanel('BGEX25020003', 'API rate limit errors on sync')"
+                                       onclick="event.stopPropagation(); openDevChatPanel('BGEX25020003', 'Mobile App Crash on Login')"
                                        role="button" tabindex="0"
                                        aria-label="Open chat"></i>
                                 </div>
@@ -763,16 +767,16 @@
                         </tr>
 
                         <!--
-                            Row 6: GMEC25010012 | Dashboard not loading on mobile | GMEC
-                            Medium | Development | not overdue
+                            Row 6: GMEC25010012 | Invoice generation incorrect totals | GMEC
+                            High | Development | not overdue
                         -->
                         <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
                         <tr data-substatus="development"
-                            data-priority="medium"
+                            data-priority="high"
                             data-overdue="false"
                             data-id="GMEC25010012"
-                            data-subject="dashboard not loading on mobile"
-                            data-issue-date="2025-03-28"
+                            data-subject="invoice generation incorrect totals"
+                            data-issue-date="2025-05-02"
                             style="cursor:pointer"
                             onclick="window.location.href='ticket-detail.html?id=GMEC25010012&amp;substatus=development'"
                             aria-label="View ticket GMEC25010012">
@@ -786,12 +790,12 @@
                                     <span class="tw-ticket-id">GMEC25010012</span>
                                 </div>
                             </td>
-                            <td>Dashboard not loading on mobile</td>
+                            <td>Invoice generation incorrect totals</td>
                             <td>GMEC</td>
-                            <td>28 Mar 2025</td>
+                            <td>02 May 2025</td>
                             <td>10 Jun 2025</td>
                             <td>
-                                <span class="tw-priority-badge tw-priority-badge--medium">Medium</span>
+                                <span class="tw-priority-badge tw-priority-badge--high">High</span>
                             </td>
                             <td>
                                 <span class="tw-status-badge tw-status-badge--development">Development</span>
@@ -799,11 +803,11 @@
                             <td>
                                 <div class="tw-row-actions">
                                     <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openDevTimelinePanel('GMEC25010012', 'Dashboard not loading on mobile')"
+                                       onclick="event.stopPropagation(); openDevTimelinePanel('GMEC25010012', 'Invoice generation incorrect totals')"
                                        role="button" tabindex="0"
                                        aria-label="View timeline"></i>
                                     <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openDevChatPanel('GMEC25010012', 'Dashboard not loading on mobile')"
+                                       onclick="event.stopPropagation(); openDevChatPanel('GMEC25010012', 'Invoice generation incorrect totals')"
                                        role="button" tabindex="0"
                                        aria-label="Open chat"></i>
                                 </div>
@@ -1196,15 +1200,20 @@
         </div>
 
         <div class="tw-chat-footer">
+
+            <div class="tw-attach-preview-strip" id="devPanelAttachStrip" aria-live="polite">
+                <i class="bx bx-file" aria-hidden="true"></i>
+                <span id="devPanelAttachFileName"></span>
+                <button class="tw-file-chip-remove" onclick="removeDevPanelAttachment()" aria-label="Remove attachment">
+                    <i class="bx bx-x" aria-hidden="true"></i>
+                </button>
+            </div>
+
             <div class="tw-chat-input-row">
-                <label for="devPanelChatFile"
-                       class="tw-btn-icon"
-                       title="Attach file"
-                       aria-label="Attach file"
-                       style="cursor:pointer;flex-shrink:0;">
-                    <i class="bx bx-paperclip" aria-hidden="true"></i>
-                </label>
                 <input type="file" id="devPanelChatFile" style="display:none;" accept="*/*">
+                <button class="tw-chat-attach-btn" onclick="document.getElementById('devPanelChatFile').click()" aria-label="Attach file">
+                    <i class="bx bx-paperclip" aria-hidden="true"></i>
+                </button>
                 <textarea
                     class="tw-chat-textarea"
                     id="devChatTextarea"
@@ -1216,6 +1225,7 @@
                     <i class="bx bx-send" aria-hidden="true"></i>
                 </button>
             </div>
+
         </div>
 
     </div>
@@ -1654,28 +1664,54 @@
 
     /* sendDevMessage() — purple sent bubbles via var(--tw-primary) */
     function sendDevMessage() {
-        var textarea = document.getElementById('devChatTextarea');
-        var text     = (textarea ? textarea.value : '').trim();
-        if (!text) { if (textarea) textarea.focus(); return; }
+        var textarea  = document.getElementById('devChatTextarea');
+        var panelFile = document.getElementById('devPanelChatFile');
+        var strip     = document.getElementById('devPanelAttachStrip');
+        var area      = document.getElementById('devMessagesArea');
+        var text      = textarea ? textarea.value.trim() : '';
 
-        var area  = document.getElementById('devMessagesArea');
+        if (!text && !(strip && strip.classList.contains('show'))) {
+            if (textarea) textarea.focus();
+            return;
+        }
+
+        var time = new Date().toLocaleString('en-US', {
+            month: 'short', day: 'numeric', year: 'numeric',
+            hour: 'numeric', minute: '2-digit', hour12: true
+        });
+
+        var attachHTML = '';
+        if (panelFile && panelFile.files && panelFile.files.length > 0) {
+            var file = panelFile.files[0];
+            if (file.type.startsWith('image/')) {
+                var url = URL.createObjectURL(file);
+                attachHTML = '<img src="' + url + '" alt="' + escapeHtml(file.name) + '" class="tw-chat-img-attachment">';
+            } else {
+                attachHTML =
+                    '<div class="tw-file-chip">' +
+                    '<i class="bx bx-paperclip" aria-hidden="true"></i>' +
+                    '<span class="tw-file-chip-name">' + escapeHtml(file.name) + '</span>' +
+                    '</div>';
+            }
+        }
+
         var msgEl = document.createElement('div');
         msgEl.className = 'tw-message sent';
         msgEl.innerHTML =
-            '<div class="tw-avatar tw-avatar--sm tw-avatar--developer" aria-hidden="true">AM</div>' +
+            '<div class="tw-avatar tw-avatar--sm tw-avatar--developer" aria-hidden="true">' + escapeHtml(DEV_USER.initials) + '</div>' +
             '<div>' +
-            '<div class="tw-message-sender">You ' +
-            '<span class="tw-role-pill tw-role-pill--developer">Developer</span></div>' +
+            '<div class="tw-message-sender">You <span class="tw-role-pill tw-role-pill--developer">Developer</span></div>' +
             '<div class="tw-message-bubble">' +
-            '<div class="tw-message-text">' + escapeHtml(text) + '</div>' +
-            '<div class="tw-message-time">' + formatNow() + '</div>' +
+            (text ? '<div class="tw-message-text">' + escapeHtml(text).replace(/\n/g, '<br>') + '</div>' : '') +
+            attachHTML +
+            '<div class="tw-message-time">' + time + '</div>' +
             '</div></div>';
 
-        area.appendChild(msgEl);
-        area.scrollTop = area.scrollHeight;
+        if (area) { area.appendChild(msgEl); area.scrollTop = area.scrollHeight; }
 
-        textarea.value = '';
-        textarea.style.height = 'auto';
+        if (textarea) { textarea.value = ''; textarea.style.height = 'auto'; }
+        if (panelFile) panelFile.value = '';
+        if (strip) strip.classList.remove('show');
 
         /* Django: fetch('{% url "dev:send_message" %}', {method:'POST', body: JSON.stringify({content: text})}) */
         console.log('[Dev Portal] sendDevMessage stub:', { content: text });
@@ -1849,41 +1885,27 @@
                ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
     }
 
-    /* Dashboard chat panel — file attachment handler */
+    /* Dashboard chat panel — file select shows inline preview card (admin pattern) */
     document.addEventListener('DOMContentLoaded', function () {
         var panelChatFile = document.getElementById('devPanelChatFile');
         if (panelChatFile) {
             panelChatFile.addEventListener('change', function () {
                 if (!this.files || !this.files[0]) return;
-                var file = this.files[0];
-                var area = document.getElementById('devMessagesArea');
-                if (area) {
-                    var bubble = document.createElement('div');
-                    bubble.className = 'tw-message sent';
-                    bubble.innerHTML =
-                        '<div class="tw-avatar tw-avatar--sm tw-avatar--developer" aria-hidden="true">AM</div>' +
-                        '<div>' +
-                        '<div class="tw-message-sender">You ' +
-                        '<span class="tw-role-pill tw-role-pill--developer">Developer</span></div>' +
-                        '<div class="tw-message-bubble">' +
-                        '<div class="tw-message-text" style="display:flex;align-items:center;gap:6px;">' +
-                        '<i class="bx bx-paperclip" aria-hidden="true"></i>' +
-                        escapeHtml(file.name) +
-                        '<span style="font-size:10px;opacity:0.8;margin-left:4px;">' +
-                        (file.size / 1024).toFixed(1) + ' KB</span>' +
-                        '</div>' +
-                        '<div class="tw-message-time">' + formatNow() + '</div>' +
-                        '</div></div>';
-                    area.appendChild(bubble);
-                    area.scrollTop = area.scrollHeight;
-                }
-                this.value = '';
-                showDevToast('File attached to chat.', 'success');
-                /* Django: POST file to {% url "dev:chat_attach" ticket_id %} with X-CSRFToken */
-                console.log('[Dev Portal] panelChatFile stub:', { name: file.name });
+                var file     = this.files[0];
+                var strip    = document.getElementById('devPanelAttachStrip');
+                var nameSpan = document.getElementById('devPanelAttachFileName');
+                if (nameSpan) nameSpan.textContent = file.name;
+                if (strip) strip.classList.add('show');
             });
         }
     });
+
+    function removeDevPanelAttachment() {
+        var input = document.getElementById('devPanelChatFile');
+        if (input) input.value = '';
+        var strip = document.getElementById('devPanelAttachStrip');
+        if (strip) strip.classList.remove('show');
+    }
 
     /* showDevToast(message, type) — bottom-right transient notification */
     function showDevToast(message, type) {

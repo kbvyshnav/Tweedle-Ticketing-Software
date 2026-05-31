@@ -1250,12 +1250,12 @@ Actual: only Ticket ID, Client, Subject, Priority, Status, and Issue Date column
             if (reasonBox) reasonBox.textContent = ticket.rejectionReason;
         }
 
-        /* Attachments — seed array and conditionally hide the card */
+        /* Attachments — seed array; always show card so "Add Attachment" is accessible */
         sharedAttachments = ticket.attachments.slice();
         var attachListEl = document.getElementById('attachmentList');
         if (attachListEl) {
             var attachCard = attachListEl.closest('.tw-detail-card');
-            if (attachCard) attachCard.style.display = ticket.attachments.length === 0 ? 'none' : '';
+            if (attachCard) attachCard.style.display = '';
         }
 
         /* Render right column */

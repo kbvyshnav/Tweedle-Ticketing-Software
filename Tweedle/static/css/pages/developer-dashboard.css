@@ -1701,3 +1701,48 @@
     color: var(--tw-text-secondary);
     line-height: 1.5;
 }
+
+
+/* ============================================================
+ * SECTION: CHAT ATTACH PREVIEW STRIP
+ * Required for ticket-detail page which does not load chat.css.
+ * Mirrors .tw-attach-preview-strip / .tw-file-chip-remove in chat.css.
+ * ============================================================ */
+
+.tw-attach-preview-strip {
+    display: none;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--tw-space-2);
+    padding: var(--tw-space-2) var(--tw-space-3);
+    background: var(--tw-bg-body);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-secondary);
+}
+
+.tw-attach-preview-strip.show {
+    display: flex;
+}
+
+.dev-chat-footer .tw-attach-preview-strip {
+    margin-bottom: var(--tw-space-2);
+}
+
+.tw-file-chip-remove {
+    background: none;
+    border: none;
+    color: var(--tw-danger);
+    cursor: pointer;
+    padding: 0;
+    font-size: 16px;
+    line-height: 1;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+}
+
+.tw-file-chip-remove:hover {
+    opacity: 0.75;
+}

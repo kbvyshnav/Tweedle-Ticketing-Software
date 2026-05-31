@@ -1109,6 +1109,20 @@ body > main {
     50%       { box-shadow: 0 0 0 4px var(--tw-primary-light); }
 }
 
+/* --- Resolved / Awaiting Closure card --- */
+.tw-stat-card--client-resolved { border-left-color: var(--tw-info, #3b82f6); }
+
+.tw-stat-card--client-resolved .tw-stat-card__icon {
+    background: var(--tw-info-bg, #eff6ff);
+    color: var(--tw-info, #3b82f6);
+}
+
+.tw-stat-card--client-resolved.active {
+    background: var(--tw-info-bg, #eff6ff);
+    border-color: var(--tw-info, #3b82f6);
+    border-left-color: var(--tw-info, #3b82f6);
+}
+
 /* --- Rejected card --- */
 .tw-stat-card--client-rejected { border-left-color: var(--tw-danger); }
 

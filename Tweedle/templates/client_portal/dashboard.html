@@ -297,11 +297,31 @@
                 <div class="tw-stat-card__body">
                     <!-- Django: {{ needs_action_count }} -->
                     <div class="tw-stat-card__count">2</div>
-                    <div class="tw-stat-card__label">Require your response</div>
+                    <div class="tw-stat-card__label">Needs Action</div>
                 </div>
             </div>
 
-            <!-- Card 3: Closed — green tint -->
+            <!-- Card 3: Awaiting Closure — blue tint -->
+            <!-- Django: {{ resolved_count }} -->
+            <div class="tw-stat-card tw-stat-card--client-resolved"
+                 data-filter="resolved"
+                 role="button" tabindex="0"
+                 aria-label="Awaiting closure: 2"
+                 onclick="filterByStatCard('resolved', this)">
+                <div class="tw-stat-card__left">
+                    <div class="tw-stat-card__icon" aria-hidden="true">
+                        <i class='bx bx-time-five'></i>
+                    </div>
+                </div>
+                <div class="tw-stat-card__body">
+                    <!-- Django: {{ resolved_count }} -->
+                    <div class="tw-stat-card__count">2</div>
+                    <div class="tw-stat-card__label">Awaiting Closure</div>
+                    <span style="display:block;font-size:10px;color:var(--tw-text-muted);font-weight:500;margin-top:1px;">Work done — pending admin</span>
+                </div>
+            </div>
+
+            <!-- Card 4: Closed — green tint -->
             <div class="tw-stat-card tw-stat-card--client-closed"
                  data-filter="closed"
                  role="button" tabindex="0"
@@ -315,7 +335,7 @@
                 <div class="tw-stat-card__body">
                     <!-- Django: {{ closed_count }} -->
                     <div class="tw-stat-card__count">12</div>
-                    <div class="tw-stat-card__label">Successfully resolved</div>
+                    <div class="tw-stat-card__label">Completed</div>
                 </div>
             </div>
 
@@ -359,6 +379,7 @@
                     <button class="tw-client-filter-btn active" data-status-filter="all"          onclick="filterTickets('all', this)">All</button>
                     <button class="tw-client-filter-btn"        data-status-filter="open"         onclick="filterTickets('open', this)">Open</button>
                     <button class="tw-client-filter-btn"        data-status-filter="needs-action" onclick="filterTickets('needs-action', this)">Needs Action</button>
+                    <button class="tw-client-filter-btn"        data-status-filter="resolved"     onclick="filterTickets('resolved', this)">Awaiting Closure</button>
                     <button class="tw-client-filter-btn"        data-status-filter="closed"       onclick="filterTickets('closed', this)">Closed</button>
                     <button class="tw-client-filter-btn"        data-status-filter="rejected"     onclick="filterTickets('rejected', this)">Rejected</button>
                 </div>
@@ -756,6 +777,47 @@
                             </td>
                         </tr>
 
+                        <!-- Row 7: Resolved | High | 10 Apr 2025 — "Awaiting Closure" -->
+                        <!-- Django: {% if ticket.status == 'resolved' %} -->
+                        <tr data-ticket-status="resolved"
+                            data-ticket-id="TKT-GMEC-007"
+                            data-subject="Payment gateway timeout on checkout"
+                            data-priority="high"
+                            data-submitted-date="2025-04-10"
+                            style="cursor:pointer"
+                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-001&amp;status=resolved'"
+                            aria-label="View ticket TKT-GMEC-007">
+                            <td>
+                                <div class="ticket-id-cell">
+                                    <i class="bx bxs-star tw-star-icon"
+                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
+                                       role="button" tabindex="0"
+                                       aria-label="Star this ticket"></i>
+                                    <!-- Django: {{ ticket.ticket_id }} -->
+                                    <span class="tw-ticket-id">TKT-GMEC-007</span>
+                                </div>
+                            </td>
+                            <td>Payment gateway timeout on checkout</td>
+                            <td>Billing</td>
+                            <td>10 Apr 2025</td>
+                            <td>02 May 2025</td>
+                            <td>
+                                <span class="tw-status-badge tw-status-badge--resolved">Resolved</span>
+                            </td>
+                            <td>
+                                <div class="tw-row-actions">
+                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
+                                       onclick="event.stopPropagation(); openClientTimelinePanel('TKT-GMEC-007', 'Payment gateway timeout on checkout')"
+                                       role="button" tabindex="0"
+                                       aria-label="View timeline"></i>
+                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
+                                       onclick="event.stopPropagation(); openClientChatPanel('TKT-GMEC-007', 'Payment gateway timeout on checkout')"
+                                       role="button" tabindex="0"
+                                       aria-label="Open chat"></i>
+                                </div>
+                            </td>
+                        </tr>
+
                         <!-- Empty state — shown by JS when no rows match the active filter -->
                         <!-- Django: {% empty %} -->
                         <tr id="clientEmptyState" style="display:none;">
@@ -849,7 +911,20 @@
         </div>
 
         <div class="tw-chat-footer">
+
+            <div class="tw-attach-preview-strip" id="clientPanelAttachStrip" aria-live="polite">
+                <i class="bx bx-file" aria-hidden="true"></i>
+                <span id="clientPanelAttachFileName"></span>
+                <button class="tw-file-chip-remove" onclick="removeClientPanelAttachment()" aria-label="Remove attachment">
+                    <i class="bx bx-x" aria-hidden="true"></i>
+                </button>
+            </div>
+
             <div class="tw-chat-input-row">
+                <input type="file" id="clientPanelChatFile" style="display:none;" accept="*/*">
+                <button class="tw-chat-attach-btn" onclick="document.getElementById('clientPanelChatFile').click()" title="Attach file" aria-label="Attach file">
+                    <i class="bx bx-paperclip" aria-hidden="true"></i>
+                </button>
                 <textarea
                     class="tw-chat-textarea"
                     id="clientChatTextarea"
@@ -1164,6 +1239,8 @@
         } else if (s === 'needs-action') {
             /* Needs Action = tickets requiring client response or approval */
             statusMatch = rowStatus === 'forwarded' || rowStatus === 'uat';
+        } else if (s === 'resolved') {
+            statusMatch = rowStatus === 'resolved';
         } else if (s === 'closed') {
             statusMatch = rowStatus === 'closed';
         } else if (s === 'rejected') {
@@ -1493,36 +1570,82 @@
         if (panel) panel.classList.remove('open');
     }
 
+    /* Client chat panel — file select shows inline preview card (admin pattern) */
+    document.addEventListener('DOMContentLoaded', function () {
+        var panelChatFile = document.getElementById('clientPanelChatFile');
+        if (panelChatFile) {
+            panelChatFile.addEventListener('change', function () {
+                if (!this.files || !this.files[0]) return;
+                var file     = this.files[0];
+                var strip    = document.getElementById('clientPanelAttachStrip');
+                var nameSpan = document.getElementById('clientPanelAttachFileName');
+                if (nameSpan) nameSpan.textContent = file.name;
+                if (strip) strip.classList.add('show');
+            });
+        }
+    });
+
+    function removeClientPanelAttachment() {
+        var input = document.getElementById('clientPanelChatFile');
+        if (input) input.value = '';
+        var strip = document.getElementById('clientPanelAttachStrip');
+        if (strip) strip.classList.remove('show');
+    }
+
     /*
      * sendClientMessage()
      * Appends the typed message as a client (sent) bubble.
      * Orange bubble via var(--tw-primary) in role-user theme.
+     * Supports text + optional file attachment (inline preview strip pattern).
      * Django: fetch('{% url "client_ticket_message" ticket.id %}', {method:'POST',...})
+     * Django: POST file to {% url 'client:chat_attach' ticket_id %} with X-CSRFToken
      */
     function sendClientMessage() {
-        var textarea = document.getElementById('clientChatTextarea');
+        var textarea  = document.getElementById('clientChatTextarea');
+        var panelFile = document.getElementById('clientPanelChatFile');
+        var strip     = document.getElementById('clientPanelAttachStrip');
         var emailCopy = document.getElementById('clientEmailNotif').checked;
-        var text = (textarea.value || '').trim();
+        var text      = (textarea ? textarea.value : '').trim();
 
-        if (!text) { textarea.focus(); return; }
+        if (!text && !(strip && strip.classList.contains('show'))) {
+            if (textarea) textarea.focus();
+            return;
+        }
+
+        var attachHTML = '';
+        if (panelFile && panelFile.files && panelFile.files.length > 0) {
+            var file = panelFile.files[0];
+            if (file.type.startsWith('image/')) {
+                var url = URL.createObjectURL(file);
+                attachHTML = '<img src="' + url + '" alt="' + escapeHtml(file.name) + '" class="tw-chat-img-attachment">';
+            } else {
+                attachHTML =
+                    '<div class="tw-file-chip">' +
+                    '<i class="bx bx-paperclip" aria-hidden="true"></i>' +
+                    '<span class="tw-file-chip-name">' + escapeHtml(file.name) + '</span>' +
+                    '</div>';
+            }
+        }
 
         var area  = document.getElementById('clientMessagesArea');
         var msgEl = document.createElement('div');
         msgEl.className = 'tw-message sent';
         msgEl.innerHTML =
-            '<div class="tw-avatar tw-avatar--sm tw-avatar--user" aria-hidden="true">AJ</div>' +
+            '<div class="tw-avatar tw-avatar--sm tw-avatar--user" aria-hidden="true">' + escapeHtml(CLIENT_USER.initials) + '</div>' +
             '<div>' +
             '<div class="tw-message-sender">You <span class="tw-role-pill tw-role-pill--user">Client</span></div>' +
             '<div class="tw-message-bubble">' +
-            '<div class="tw-message-text">' + escapeHtml(text) + '</div>' +
+            (text ? '<div class="tw-message-text">' + escapeHtml(text).replace(/\n/g, '<br>') + '</div>' : '') +
+            attachHTML +
             '<div class="tw-message-time">' + formatNow() + '</div>' +
             '</div></div>';
 
         area.appendChild(msgEl);
         area.scrollTop = area.scrollHeight;
 
-        textarea.value = '';
-        textarea.style.height = 'auto';
+        if (textarea)  { textarea.value = ''; textarea.style.height = 'auto'; }
+        if (panelFile) panelFile.value = '';
+        if (strip)     strip.classList.remove('show');
 
         /* Django: fetch stub */
         console.log('[Client Portal] Send message stub:', { content: text, email_copy: emailCopy });
@@ -1595,6 +1718,7 @@
                 'all':          "You haven't submitted any tickets yet.",
                 'open':         'No active tickets. Submit a new ticket if you need support.',
                 'needs-action': 'No tickets require your attention right now. Great job!',
+                'resolved':     'No tickets awaiting closure.',
                 'closed':       'No closed tickets yet.',
                 'rejected':     'No rejected tickets.'
             };

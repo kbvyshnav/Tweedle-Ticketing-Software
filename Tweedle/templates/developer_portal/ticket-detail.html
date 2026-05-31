@@ -490,6 +490,13 @@
 
                     <!-- Chat input -->
                     <div class="dev-chat-footer">
+                        <div class="tw-attach-preview-strip" id="devChatAttachStrip" aria-live="polite">
+                            <i class="bx bx-file" aria-hidden="true"></i>
+                            <span id="devChatAttachFileName"></span>
+                            <button class="tw-file-chip-remove" onclick="removeDevChatAttachment()" aria-label="Remove attachment">
+                                <i class="bx bx-x" aria-hidden="true"></i>
+                            </button>
+                        </div>
                         <div class="dev-chat-input-row">
                             <textarea
                                 class="dev-chat-textarea"
@@ -640,12 +647,12 @@
     var DEV_TICKET_DATA = {
 
         'GMEC25010001': {
-            subject:          'Payment gateway timeout on checkout',
+            subject:          'Wallet Option Agents',
             client:           'GlobalMec Industries',
             clientId:         'GMEC',
             priority:         'High',
             priorityClass:    'tw-priority-badge--high',
-            issueDate:        '10 Apr 2025',
+            issueDate:        '11 Sep 2021',
             estResolution:    '15 May 2025',
             isOverdue:        true,
             category:         'Payments',
@@ -658,12 +665,12 @@
         },
 
         'GMEC25010004': {
-            subject:          'Invoice generation wrong totals',
+            subject:          'Kumari API Integration',
             client:           'GlobalMec Industries',
             clientId:         'GMEC',
             priority:         'Medium',
             priorityClass:    'tw-priority-badge--medium',
-            issueDate:        '02 May 2025',
+            issueDate:        '08 Jan 2022',
             estResolution:    '20 May 2025',
             isOverdue:        true,
             category:         'Billing',
@@ -677,9 +684,9 @@
             subject:          'User role permissions not saving',
             client:           'BrightGEX Corp',
             clientId:         'BGEX',
-            priority:         'High',
-            priorityClass:    'tw-priority-badge--high',
-            issueDate:        '18 Apr 2025',
+            priority:         'Medium',
+            priorityClass:    'tw-priority-badge--medium',
+            issueDate:        '05 May 2025',
             estResolution:    '30 May 2025',
             isOverdue:        false,
             category:         'Access Control',
@@ -692,12 +699,12 @@
         },
 
         'GMEC25010010': {
-            subject:          'Bulk export CSV missing columns',
+            subject:          'Payment gateway timeout on checkout',
             client:           'GlobalMec Industries',
             clientId:         'GMEC',
-            priority:         'Medium',
-            priorityClass:    'tw-priority-badge--medium',
-            issueDate:        '15 Apr 2025',
+            priority:         'High',
+            priorityClass:    'tw-priority-badge--high',
+            issueDate:        '14 Apr 2025',
             estResolution:    '25 May 2025',
             isOverdue:        false,
             category:         'Reports',
@@ -708,12 +715,12 @@
         },
 
         'BGEX25020003': {
-            subject:          'API rate limit errors on sync',
+            subject:          'Mobile App Crash on Login',
             client:           'BrightGEX Corp',
             clientId:         'BGEX',
             priority:         'Low',
             priorityClass:    'tw-priority-badge--low',
-            issueDate:        '20 Mar 2025',
+            issueDate:        '21 Feb 2025',
             estResolution:    '28 May 2025',
             isOverdue:        false,
             category:         'Integration',
@@ -724,12 +731,12 @@
         },
 
         'GMEC25010012': {
-            subject:          'Dashboard not loading on mobile',
+            subject:          'Invoice generation incorrect totals',
             client:           'GlobalMec Industries',
             clientId:         'GMEC',
-            priority:         'Medium',
-            priorityClass:    'tw-priority-badge--medium',
-            issueDate:        '28 Mar 2025',
+            priority:         'High',
+            priorityClass:    'tw-priority-badge--high',
+            issueDate:        '02 May 2025',
             estResolution:    '10 Jun 2025',
             isOverdue:        false,
             category:         'UI/UX',
@@ -1524,30 +1531,37 @@
      * Django: fetch stub fires on send.
      * ============================================================ */
     function sendDevDetailMessage() {
-        var textarea = document.getElementById('devChatInput');
-        var text     = (textarea ? textarea.value : '').trim();
-        if (!text) { if (textarea) textarea.focus(); return; }
+        var textarea      = document.getElementById('devChatInput');
+        var chatFileInput = document.getElementById('devChatFileInput');
+        var strip         = document.getElementById('devChatAttachStrip');
+        var text          = (textarea ? textarea.value : '').trim();
+        var hasFile       = !!(strip && strip.classList.contains('show') &&
+                               chatFileInput && chatFileInput.files && chatFileInput.files[0]);
 
-        var thread = document.getElementById('devChatThread');
-        var el     = document.createElement('div');
-        el.className = 'dev-msg dev-msg--dev';
-        el.innerHTML =
-            '<div class="tw-avatar tw-avatar--sm tw-avatar--developer" aria-hidden="true">' +
-            escapeHtml(DEV_USER.initials) + '</div>' +
-            '<div class="dev-msg-body">' +
-            '<div class="dev-msg-sender">You ' +
-            '<span class="tw-role-pill tw-role-pill--developer">Developer</span></div>' +
-            '<div class="dev-msg-bubble">' + escapeHtml(text) + '</div>' +
-            '<div class="dev-msg-time">' + formatNow() + '</div>' +
-            '</div>';
+        if (!text && !hasFile) { if (textarea) textarea.focus(); return; }
 
-        if (thread) {
-            thread.appendChild(el);
-            thread.scrollTop = thread.scrollHeight;
+        if (text) {
+            var thread = document.getElementById('devChatThread');
+            var el     = document.createElement('div');
+            el.className = 'dev-msg dev-msg--dev';
+            el.innerHTML =
+                '<div class="tw-avatar tw-avatar--sm tw-avatar--developer" aria-hidden="true">' +
+                escapeHtml(DEV_USER.initials) + '</div>' +
+                '<div class="dev-msg-body">' +
+                '<div class="dev-msg-sender">You ' +
+                '<span class="tw-role-pill tw-role-pill--developer">Developer</span></div>' +
+                '<div class="dev-msg-bubble">' + escapeHtml(text) + '</div>' +
+                '<div class="dev-msg-time">' + formatNow() + '</div>' +
+                '</div>';
+            if (thread) { thread.appendChild(el); thread.scrollTop = thread.scrollHeight; }
+            if (textarea) { textarea.value = ''; textarea.style.height = 'auto'; }
         }
 
-        textarea.value         = '';
-        textarea.style.height  = 'auto';
+        if (hasFile) {
+            processDevChatAttachment(chatFileInput.files[0]);
+            if (chatFileInput) chatFileInput.value = '';
+            if (strip) strip.classList.remove('show');
+        }
 
         /* Django: fetch('{% url "dev:send_message" ticket.id %}', {method:'POST', body: JSON.stringify({content: text})}) */
         console.log('[Dev Portal] sendDevDetailMessage stub:', { id: TICKET_ID, content: text });
@@ -1555,16 +1569,27 @@
         showDevToast('Message sent.', 'success');
     }
 
-    /* Chat file attach — shows preview modal before committing */
+    /* Chat file attach — inline preview card (same pattern as admin; no modal) */
     document.addEventListener('DOMContentLoaded', function () {
         var chatFileInput = document.getElementById('devChatFileInput');
         if (chatFileInput) {
             chatFileInput.addEventListener('change', function () {
                 if (!this.files || !this.files[0]) return;
-                showDevFilePreview(this.files[0], 'chat');
+                var file     = this.files[0];
+                var strip    = document.getElementById('devChatAttachStrip');
+                var nameSpan = document.getElementById('devChatAttachFileName');
+                if (nameSpan) nameSpan.textContent = file.name;
+                if (strip) strip.classList.add('show');
             });
         }
     });
+
+    function removeDevChatAttachment() {
+        var input = document.getElementById('devChatFileInput');
+        if (input) input.value = '';
+        var strip = document.getElementById('devChatAttachStrip');
+        if (strip) strip.classList.remove('show');
+    }
 
 
     /* ============================================================
