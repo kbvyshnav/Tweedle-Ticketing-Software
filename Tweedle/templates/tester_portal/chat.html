@@ -38,6 +38,9 @@
     <link rel="stylesheet" href="../../static/css/tweedle-components.css">
     <!-- Django: href="{% static 'css/pages/notification.css' %}" -->
     <link rel="stylesheet" href="../../static/css/pages/notification.css">
+    <!-- chat.css: tw-chat-attach-btn, tw-attach-preview-strip, tw-file-chip classes -->
+    <!-- Django: href="{% static 'css/pages/chat.css' %}" -->
+    <link rel="stylesheet" href="../../static/css/pages/chat.css">
     <!-- Django: href="{% static 'css/pages/tester-dashboard.css' %}" -->
     <link rel="stylesheet" href="../../static/css/pages/tester-dashboard.css">
 </head>
@@ -328,7 +331,22 @@
 
                 <!-- Chat footer -->
                 <div style="border-top:1px solid var(--tw-border);padding:var(--tw-space-3) var(--tw-space-4);flex-shrink:0;">
+
+                    <div class="tw-attach-preview-strip" id="testerChatPageAttachStrip" aria-live="polite">
+                        <i class="bx bx-file" aria-hidden="true"></i>
+                        <span id="testerChatPageAttachFileName"></span>
+                        <button class="tw-file-chip-remove" onclick="removeTesterChatPageAttachment()" aria-label="Remove attachment">
+                            <i class="bx bx-x" aria-hidden="true"></i>
+                        </button>
+                    </div>
+
                     <div class="tester-chat-input-row">
+                        <input type="file" id="testerChatPageFile" style="display:none;" accept="*/*">
+                        <button class="tw-chat-attach-btn"
+                                onclick="document.getElementById('testerChatPageFile').click()"
+                                title="Attach file" aria-label="Attach file">
+                            <i class="bx bx-paperclip" aria-hidden="true"></i>
+                        </button>
                         <textarea
                             class="tester-chat-textarea"
                             id="chatInput"
@@ -408,6 +426,19 @@
 
         var thread = document.getElementById('testerChatThread');
         if (thread) thread.scrollTop = thread.scrollHeight;
+
+        /* Wire chat page file input — show inline strip on selection */
+        var pageFile = document.getElementById('testerChatPageFile');
+        if (pageFile) {
+            pageFile.addEventListener('change', function () {
+                if (!this.files || !this.files[0]) return;
+                var file     = this.files[0];
+                var strip    = document.getElementById('testerChatPageAttachStrip');
+                var nameSpan = document.getElementById('testerChatPageAttachFileName');
+                if (nameSpan) nameSpan.textContent = file.name;
+                if (strip) strip.classList.add('show');
+            });
+        }
     });
 
 
@@ -436,13 +467,37 @@
 
 
     /* ============================================================
-     * sendChatMessage() — teal tester bubble
+     * sendChatMessage() — teal tester bubble, supports file attachment
      * Django: fetch('{% url "tester:send_message" ticket_id %}', { ... })
+     * Django: POST file to {% url "tester:chat_attach" ticket_id %} with X-CSRFToken
      * ============================================================ */
     function sendChatMessage() {
-        var textarea = document.getElementById('chatInput');
-        var text     = (textarea ? textarea.value : '').trim();
-        if (!text) { if (textarea) textarea.focus(); return; }
+        var textarea  = document.getElementById('chatInput');
+        var pageFile  = document.getElementById('testerChatPageFile');
+        var strip     = document.getElementById('testerChatPageAttachStrip');
+        var text      = (textarea ? textarea.value : '').trim();
+
+        if (!text && !(strip && strip.classList.contains('show'))) {
+            if (textarea) textarea.focus();
+            return;
+        }
+
+        var time = formatNow();
+
+        var attachHTML = '';
+        if (pageFile && pageFile.files && pageFile.files.length > 0) {
+            var file = pageFile.files[0];
+            if (file.type.startsWith('image/')) {
+                var url = URL.createObjectURL(file);
+                attachHTML = '<img src="' + url + '" alt="' + escapeHtml(file.name) + '" class="tw-chat-img-attachment">';
+            } else {
+                attachHTML =
+                    '<div class="tw-file-chip">' +
+                    '<i class="bx bx-paperclip" aria-hidden="true"></i>' +
+                    '<span class="tw-file-chip-name">' + escapeHtml(file.name) + '</span>' +
+                    '</div>';
+            }
+        }
 
         var thread = document.getElementById('testerChatThread');
         var el     = document.createElement('div');
@@ -452,13 +507,17 @@
             escapeHtml(TESTER_USER.initials) + '</div>' +
             '<div class="tester-msg-body">' +
             '<div class="tester-msg-sender">You <span class="tw-role-pill tw-role-pill--tester">Tester</span></div>' +
-            '<div class="tester-msg-bubble">' + escapeHtml(text) + '</div>' +
-            '<div class="tester-msg-time">' + formatNow() + '</div>' +
+            '<div class="tester-msg-bubble">' +
+            (text ? escapeHtml(text) : '') +
+            attachHTML +
+            '</div>' +
+            '<div class="tester-msg-time">' + time + '</div>' +
             '</div>';
 
         if (thread) { thread.appendChild(el); thread.scrollTop = thread.scrollHeight; }
-        textarea.value = '';
-        textarea.style.height = 'auto';
+        if (textarea)  { textarea.value = ''; textarea.style.height = 'auto'; }
+        if (pageFile)  pageFile.value = '';
+        if (strip)     strip.classList.remove('show');
 
         /* Django: fetch('{% url "tester:send_message" ticket_id %}', {
            method: 'POST',
@@ -467,6 +526,13 @@
         }) */
         console.log('[Tester Portal] sendChatMessage stub:', { ticket: activeConversation, message: text });
         showTesterToast('Message sent.', 'success');
+    }
+
+    function removeTesterChatPageAttachment() {
+        var input = document.getElementById('testerChatPageFile');
+        if (input) input.value = '';
+        var strip = document.getElementById('testerChatPageAttachStrip');
+        if (strip) strip.classList.remove('show');
     }
 
 

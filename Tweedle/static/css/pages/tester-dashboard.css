@@ -14,6 +14,49 @@
 
 
 /* ============================================================
+ * SECTION 0: SIDEBAR USER SECTION (bottom of sidebar)
+ * Mirrors developer-dashboard.css pattern exactly.
+ * Required because tester pages load tester-dashboard.css,
+ * not developer-dashboard.css where these were defined.
+ * ============================================================ */
+
+.sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+    padding: var(--tw-space-3) var(--tw-space-4);
+    border-top: 1px solid var(--tw-border-light);
+    margin-top: auto;
+    overflow: hidden;
+}
+
+.sidebar-user-info {
+    overflow: hidden;
+}
+
+.sidebar-user-name {
+    font-size: var(--tw-text-base);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: var(--tw-font-secondary);
+    line-height: 1.3;
+}
+
+.sidebar-user-role {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    font-family: var(--tw-font-secondary);
+}
+
+.sidebar.hide .sidebar-user-info {
+    display: none;
+}
+
+
+/* ============================================================
  * SECTION 1: PAGE HEADER
  * ============================================================ */
 
@@ -1304,7 +1347,8 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow: hidden;
 }
 
 .tw-ticket-id {
@@ -1312,6 +1356,10 @@
     color: var(--tw-text-primary);
     font-size: 0.8rem;
     letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 130px;
 }
 
 .tw-ticket-id:hover {
