@@ -345,7 +345,7 @@
                     <div id="searchFeedback" class="search-feedback" aria-live="polite" aria-atomic="true"></div>
                 </div>
 
-                <button class="tw-toolbar-icon-btn" aria-label="Sort">
+                <button class="tw-toolbar-icon-btn" aria-label="Sort" onclick="cycleAdminSort()" title="Sort by issue date">
                     <i class="bx bx-sort" aria-hidden="true"></i>
                 </button>
 
@@ -2152,6 +2152,8 @@
         dateTo:    null
     };
 
+    var adminSortOrder = 'default'; /* 'default' | 'newest' | 'oldest' */
+
     function applyAllFilters() {
         document.querySelectorAll('.tab-content tbody tr').forEach(function(row) {
             var show = true;
@@ -2824,6 +2826,54 @@
             setTimeout(function() { toast.remove(); }, 300);
         }, 3000);
     }
+
+    /* ============================================================
+     * SORT TOGGLE
+     * Cycles: default → newest → oldest → default.
+     * Operates on the currently visible (active) tab only.
+     * data-original-order and data-issue-date set via DOMContentLoaded.
+     * Django: sort handled server-side via ?sort= query param
+     * ============================================================ */
+    function cycleAdminSort() {
+        if (adminSortOrder === 'default')       adminSortOrder = 'newest';
+        else if (adminSortOrder === 'newest')   adminSortOrder = 'oldest';
+        else                                    adminSortOrder = 'default';
+
+        /* Update button icon */
+        var btn  = document.querySelector('.tw-toolbar-icon-btn[aria-label="Sort"]');
+        var icon = btn ? btn.querySelector('i') : null;
+        if (icon) {
+            if (adminSortOrder === 'newest')       icon.className = 'bx bx-sort-down';
+            else if (adminSortOrder === 'oldest')  icon.className = 'bx bx-sort-up';
+            else                                   icon.className = 'bx bx-sort';
+        }
+        if (btn) {
+            if (adminSortOrder === 'newest')      btn.title = 'Sorting: Newest first — click for Oldest first';
+            else if (adminSortOrder === 'oldest') btn.title = 'Sorting: Oldest first — click to reset';
+            else                                  btn.title = 'Sort by issue date';
+        }
+
+        /* Sort visible rows in the currently active tab */
+        var activeTab = document.querySelector('.tab-content.active');
+        if (!activeTab) return;
+        var tbody = activeTab.querySelector('tbody');
+        if (!tbody) return;
+        var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr[data-ticket-id]'));
+
+        rows.sort(function(a, b) {
+            if (adminSortOrder === 'default') {
+                return parseInt(a.getAttribute('data-original-order') || 0, 10) -
+                       parseInt(b.getAttribute('data-original-order') || 0, 10);
+            }
+            var dateA = new Date(a.getAttribute('data-issue-date') || 0);
+            var dateB = new Date(b.getAttribute('data-issue-date') || 0);
+            return adminSortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+        });
+
+        rows.forEach(function(row) { tbody.appendChild(row); });
+        /* Django: sort handled server-side via ?sort= query param */
+    }
+
 
     /* Show/hide header action buttons and footer per ticket status */
     var _origOpenDetails = openTicketDetailsModal;
@@ -3900,5 +3950,35 @@
         var tsf = document.getElementById('topbarSearchForm');
         if (tsf) tsf.style.display = 'none';
     }());
+
+
+    /* ============================================================
+     * SORT INIT — store original row order + derive issue dates.
+     * Runs after DOM is ready. Dates read from the Issue Date cell
+     * (col index 3 for most tabs; col 6 for the Rejected tab whose
+     * date cell is "Rejected On" — detected by regex pattern check).
+     * Django: at wiring time data-issue-date comes from the model.
+     * ============================================================ */
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.tw-table tbody tr[data-ticket-id]').forEach(function(row, i) {
+            row.setAttribute('data-original-order', i);
+            if (!row.getAttribute('data-issue-date')) {
+                /* Try col[3] first (DD-MM-YYYY); fall back to col[6] (Rejected tab) */
+                var tryIdx = [3, 6];
+                for (var t = 0; t < tryIdx.length; t++) {
+                    var cell = row.cells[tryIdx[t]];
+                    if (cell) {
+                        var txt = cell.textContent.trim();
+                        if (/^\d{2}-\d{2}-\d{4}$/.test(txt)) {
+                            var parts = txt.split('-');
+                            row.setAttribute('data-issue-date',
+                                parts[2] + '-' + parts[1] + '-' + parts[0]);
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+    });
 </script>
 <!-- Django: {% endblock %} -->

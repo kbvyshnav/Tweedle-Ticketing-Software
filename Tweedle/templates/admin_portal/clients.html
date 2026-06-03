@@ -341,8 +341,8 @@
     /* ============================================================
      * CLIENT TABLE SEARCH
      * ============================================================ */
-    const clientSearchInput = document.getElementById('clientSearchInput');
-    const clientsTable      = document.getElementById('clientsTable');
+    var clientSearchInput = document.getElementById('clientSearchInput');
+    var clientsTable      = document.getElementById('clientsTable');
 
     clientSearchInput.addEventListener('input', function () {
         const filter = this.value.trim().toLowerCase();
@@ -358,9 +358,9 @@
     /* ============================================================
      * ONBOARD CLIENT MODAL
      * ============================================================ */
-    const onboardModal = document.getElementById('onboardModal');
-    const onboardBtn   = document.getElementById('onboardBtn');
-    const onboardClose = document.getElementById('onboardModalClose');
+    var onboardModal = document.getElementById('onboardModal');
+    var onboardBtn   = document.getElementById('onboardBtn');
+    var onboardClose = document.getElementById('onboardModalClose');
 
     function openOnboardModal() {
         onboardModal.classList.add('active');

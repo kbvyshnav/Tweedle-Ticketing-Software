@@ -38,6 +38,9 @@
     <link rel="stylesheet" href="../../static/css/tweedle-components.css">
     <!-- Django: href="{% static 'css/pages/notification.css' %}" -->
     <link rel="stylesheet" href="../../static/css/pages/notification.css">
+    <!-- chat.css: tw-chat-attach-btn, tw-attach-preview-strip, tw-file-chip classes -->
+    <!-- Django: href="{% static 'css/pages/chat.css' %}" -->
+    <link rel="stylesheet" href="../../static/css/pages/chat.css">
     <!-- Django: href="{% static 'css/pages/developer-dashboard.css' %}" -->
     <link rel="stylesheet" href="../../static/css/pages/developer-dashboard.css">
 </head>
@@ -415,11 +418,26 @@
 
                 <!-- Chat footer (input + send) -->
                 <div class="dev-chat-footer" style="flex-shrink:0;">
+
+                    <div class="tw-attach-preview-strip" id="devChatPageAttachStrip" aria-live="polite">
+                        <i class="bx bx-file" aria-hidden="true"></i>
+                        <span id="devChatPageAttachFileName"></span>
+                        <button class="tw-file-chip-remove" onclick="removeDevChatPageAttachment()" aria-label="Remove attachment">
+                            <i class="bx bx-x" aria-hidden="true"></i>
+                        </button>
+                    </div>
+
                     <div class="dev-chat-input-row">
+                        <input type="file" id="devChatPageFile" style="display:none;" accept="*/*">
+                        <button class="tw-chat-attach-btn"
+                                onclick="document.getElementById('devChatPageFile').click()"
+                                title="Attach file" aria-label="Attach file">
+                            <i class="bx bx-paperclip" aria-hidden="true"></i>
+                        </button>
                         <textarea
                             class="dev-chat-textarea"
                             id="chatInput"
-                            placeholder="Type a message…"
+                            placeholder="Type a message to admin…"
                             rows="1"
                             aria-label="Message input"
                             oninput="this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
@@ -504,6 +522,19 @@
 
         var thread = document.getElementById('devChatThread');
         if (thread) thread.scrollTop = thread.scrollHeight;
+
+        /* Wire chat page file input — show inline strip on selection */
+        var pageFile = document.getElementById('devChatPageFile');
+        if (pageFile) {
+            pageFile.addEventListener('change', function () {
+                if (!this.files || !this.files[0]) return;
+                var file     = this.files[0];
+                var strip    = document.getElementById('devChatPageAttachStrip');
+                var nameSpan = document.getElementById('devChatPageAttachFileName');
+                if (nameSpan) nameSpan.textContent = file.name;
+                if (strip) strip.classList.add('show');
+            });
+        }
     });
 
 
@@ -538,9 +569,32 @@
      * Appends purple developer bubble to thread. Console.log stub.
      * ============================================================ */
     function sendChatMessage() {
-        var textarea = document.getElementById('chatInput');
-        var text     = (textarea ? textarea.value : '').trim();
-        if (!text) { if (textarea) textarea.focus(); return; }
+        var textarea  = document.getElementById('chatInput');
+        var pageFile  = document.getElementById('devChatPageFile');
+        var strip     = document.getElementById('devChatPageAttachStrip');
+        var text      = (textarea ? textarea.value : '').trim();
+
+        if (!text && !(strip && strip.classList.contains('show'))) {
+            if (textarea) textarea.focus();
+            return;
+        }
+
+        var time = formatNow();
+
+        var attachHTML = '';
+        if (pageFile && pageFile.files && pageFile.files.length > 0) {
+            var file = pageFile.files[0];
+            if (file.type.startsWith('image/')) {
+                var url = URL.createObjectURL(file);
+                attachHTML = '<img src="' + url + '" alt="' + escapeHtml(file.name) + '" class="tw-chat-img-attachment">';
+            } else {
+                attachHTML =
+                    '<div class="tw-file-chip">' +
+                    '<i class="bx bx-paperclip" aria-hidden="true"></i>' +
+                    '<span class="tw-file-chip-name">' + escapeHtml(file.name) + '</span>' +
+                    '</div>';
+            }
+        }
 
         var thread = document.getElementById('devChatThread');
         var el     = document.createElement('div');
@@ -550,25 +604,34 @@
             escapeHtml(DEV_USER.initials) + '</div>' +
             '<div class="dev-msg-body">' +
             '<div class="dev-msg-sender">You <span class="tw-role-pill tw-role-pill--developer">Developer</span></div>' +
-            '<div class="dev-msg-bubble">' + escapeHtml(text) + '</div>' +
-            '<div class="dev-msg-time">' + formatNow() + '</div>' +
+            '<div class="dev-msg-bubble">' +
+            (text ? escapeHtml(text) : '') +
+            attachHTML +
+            '</div>' +
+            '<div class="dev-msg-time">' + time + '</div>' +
             '</div>';
 
-        if (thread) {
-            thread.appendChild(el);
-            thread.scrollTop = thread.scrollHeight;
-        }
-
-        textarea.value = '';
-        textarea.style.height = 'auto';
+        if (thread) { thread.appendChild(el); thread.scrollTop = thread.scrollHeight; }
+        if (textarea)  { textarea.value = ''; textarea.style.height = 'auto'; }
+        if (pageFile)  pageFile.value = '';
+        if (strip)     strip.classList.remove('show');
 
         /* Django: fetch('{% url "dev:send_message" ticket_id %}', {
            method: 'POST',
            headers: { 'X-CSRFToken': getCookie('csrftoken') },
            body: JSON.stringify({ message: text })
         }) */
+        /* Django: POST file to {% url "dev:chat_attach" ticket_id %} with X-CSRFToken */
         console.log('[Dev Portal] sendChatMessage stub:', { ticket: activeConversation, message: text });
         showDevToast('Message sent.', 'success');
+    }
+
+
+    function removeDevChatPageAttachment() {
+        var input = document.getElementById('devChatPageFile');
+        if (input) input.value = '';
+        var strip = document.getElementById('devChatPageAttachStrip');
+        if (strip) strip.classList.remove('show');
     }
 
 

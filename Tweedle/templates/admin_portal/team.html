@@ -312,8 +312,8 @@
     /* ============================================================
      * MEMBER TABLE SEARCH
      * ============================================================ */
-    const memberSearchInput = document.getElementById('memberSearchInput');
-    const teamTable         = document.getElementById('teamTable');
+    var memberSearchInput = document.getElementById('memberSearchInput');
+    var teamTable         = document.getElementById('teamTable');
 
     memberSearchInput.addEventListener('input', function () {
         const filter = this.value.trim().toLowerCase();
@@ -385,9 +385,9 @@
     /* ============================================================
      * ADD MEMBER MODAL
      * ============================================================ */
-    const addMemberModal = document.getElementById('addMemberModal');
-    const addMemberBtn   = document.getElementById('addMemberBtn');
-    const addMemberClose = document.getElementById('addMemberModalClose');
+    var addMemberModal = document.getElementById('addMemberModal');
+    var addMemberBtn   = document.getElementById('addMemberBtn');
+    var addMemberClose = document.getElementById('addMemberModalClose');
 
     function openAddMemberModal() {
         addMemberModal.classList.add('active');
