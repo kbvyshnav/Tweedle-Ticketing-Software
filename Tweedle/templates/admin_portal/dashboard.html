@@ -452,6 +452,13 @@
         <!-- ==================================================
              C3 — TAB CONTENT: IN PROGRESS
              data-ticket-type="existing" → opens ticketDetailsModal.
+             Django: sub_status='returned' is set automatically when
+             tester submits a fail result via tester:submit_result;
+             backend resets sub_status to 'development' and shows
+             a red "Returned from Testing" badge to alert the admin.
+             Django: sub_status='testing_passed' is set automatically
+             when tester submits a pass result via tester:submit_result;
+             admin must then click "Send to Client UAT" to advance.
              ================================================== -->
         <div class="tab-content" id="tab-progress" data-tab-content="progress" role="tabpanel" aria-label="In Progress tickets">
         <div class="table-scroll-wrapper">
@@ -654,6 +661,76 @@
                         <div class="allottee-cell">
                             <div class="tw-avatar tw-avatar--sm tw-avatar--rose" aria-hidden="true">R</div>
                             Rithik
+                        </div>
+                    </td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Row: testing_passed — "Testing Passed — Ready for UAT" green badge
+                     Django: sub_status='testing_passed' set by tester:submit_result {result:'pass'}
+                     Admin clicks "Send to Client UAT" → openConfirmModal → admin:send_to_uat -->
+                <tr data-ticket-id="GMEC25030002" data-ticket-type="existing" data-subject="PDF export includes extra blank page" data-status="In Progress" data-sub-status="testing_passed" data-allottee="Rithik" data-est-date="2026-06-25" data-client="GMEC">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25030002" aria-label="Select GMEC25030002"></td>
+                    <td>
+                        <div class="ticket-id-cell">
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <span class="tw-ticket-id">GMEC25030002</span>
+                        </div>
+                    </td>
+                    <td><div title="PDF export includes extra blank page">PDF export includes extra blank page</div></td>
+                    <td>20-05-2026</td>
+                    <td>GMEC</td>
+                    <td><span class="tw-status-badge tw-status-badge--progress">In Progress</span></td>
+                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
+                    <td><span class="tw-status-badge tw-status-badge--closed">Testing Passed — Ready for UAT</span></td>
+                    <td>
+                        <div class="allottee-cell">
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--rose" aria-hidden="true">R</div>
+                            Rithik
+                        </div>
+                    </td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                            <button class="tw-btn tw-btn-outline tw-btn--sm"
+                                    onclick="event.stopPropagation(); sendToClientUAT('GMEC25030002', 'PDF export includes extra blank page')"
+                                    style="white-space:nowrap"
+                                    aria-label="Send to Client UAT">
+                                <i class="bx bx-check-shield" aria-hidden="true"></i>
+                                Send to Client UAT
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Row: returned — "Returned from Testing" red badge
+                     Django: sub_status='returned' (alias for 'development') set by tester:submit_result {result:'fail'}
+                     Developer is automatically re-notified; no extra admin action required -->
+                <tr data-ticket-id="GMEC25030001" data-ticket-type="existing" data-subject="Dashboard widget not rendering correctly" data-status="In Progress" data-sub-status="returned" data-allottee="Arjun Mehta" data-est-date="2026-06-20" data-client="GMEC">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25030001" aria-label="Select GMEC25030001"></td>
+                    <td>
+                        <div class="ticket-id-cell">
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <span class="tw-ticket-id">GMEC25030001</span>
+                        </div>
+                    </td>
+                    <td><div title="Dashboard widget not rendering correctly">Dashboard widget not rendering correctly</div></td>
+                    <td>15-05-2026</td>
+                    <td>GMEC</td>
+                    <td><span class="tw-status-badge tw-status-badge--progress">In Progress</span></td>
+                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
+                    <td><span class="tw-status-badge tw-status-badge--rejected">Returned from Testing</span></td>
+                    <td>
+                        <div class="allottee-cell">
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--purple" aria-hidden="true">AM</div>
+                            Arjun Mehta
                         </div>
                     </td>
                     <td>
@@ -2800,7 +2877,11 @@
             alert('Please select an assignee and provide a reason.');
             return;
         }
-        /* Django: POST /api/tickets/{id}/reassign/ */
+        /* Django: fetch('{% url "admin:reassign_ticket" ticket_id %}', {
+           method: 'POST',
+           headers: { 'X-CSRFToken': getCookie('csrftoken') },
+           body: JSON.stringify({ assignee_id: assignee, reason: reason })
+        }) */
         console.log('[Dashboard] Reassign to:', assignee, 'Reason:', reason);
         closeDashActionPanel('dashReassignPanel');
         showDashToast('Ticket reassigned successfully');
@@ -2813,11 +2894,42 @@
             alert('Please select a recipient and provide a reason.');
             return;
         }
-        /* Django: POST /api/tickets/{id}/forward/ */
+        /* Django: fetch('{% url "admin:forward_ticket" ticket_id %}', {
+           method: 'POST',
+           headers: { 'X-CSRFToken': getCookie('csrftoken') },
+           body: JSON.stringify({ forward_to: forwardTo, reason: reason })
+        }) */
         console.log('[Dashboard] Forward to:', forwardTo, 'Reason:', reason);
         closeDashActionPanel('dashForwardPanel');
         showDashToast('Request sent — client notified.');
     }
+
+    /* ============================================================
+     * SEND TO CLIENT UAT
+     * Moves a testing_passed row from In Progress to UAT Approval.
+     * Triggered by the "Send to Client UAT" button on testing_passed rows.
+     * Django: POST {% url 'admin:send_to_uat' ticket_id %}
+     *   Sets ticket.status = 'uat', notifies client
+     * ============================================================ */
+    function sendToClientUAT(ticketId, subject) {
+        openConfirmModal({
+            type:    'success',
+            title:   'Send to Client UAT?',
+            message: 'This will move the ticket to UAT Approval and notify the client to review and approve.',
+            details: '<p><strong>Ticket:</strong> ' + ticketId + '</p>' +
+                     '<p><strong>Subject:</strong> ' + subject + '</p>',
+            onConfirm: function () {
+                /* Django: fetch('{% url "admin:send_to_uat" ticket_id %}', {
+                   method: 'POST',
+                   headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                   body: JSON.stringify({ ticket_id: ticketId, status: 'uat' })
+                }) */
+                console.log('[Dashboard] Send to Client UAT:', ticketId);
+                showDashToast('Ticket sent to Client UAT — client has been notified.', 'success');
+            }
+        });
+    }
+
 
     /* ============================================================
      * RESUME TICKET — moves a Pending Client row back to In Progress.
@@ -2870,6 +2982,11 @@
                 if (pendingCount)  pendingCount.textContent  = Math.max(0, parseInt(pendingCount.textContent)  - 1);
                 if (progressCount) progressCount.textContent = parseInt(progressCount.textContent) + 1;
 
+                /* Django: fetch('{% url "admin:resume_ticket" ticketId %}', {
+                   method: 'POST',
+                   headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                   body: JSON.stringify({ ticket_id: ticketId })
+                }) */
                 showDashToast('Ticket resumed — developer notified.', 'success');
             }
         });
@@ -3036,7 +3153,7 @@
         openConfirmModal({
             type:    'danger',
             title:   'Close Ticket',
-            message: 'Are you sure you want to close this ticket? This action will mark it as resolved.',
+            message: 'Are you sure you want to close this ticket? This action is permanent and cannot be undone.',
             details: `<p><strong>Ticket:</strong> ${ticketId}</p>`,
             onConfirm: function () {
                 /* Django: fetch(`/api/tickets/${ticketId}/close/`, { method: 'POST', ... }) */

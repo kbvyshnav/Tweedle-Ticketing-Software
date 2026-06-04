@@ -989,8 +989,8 @@
             iconHtml:  isPass ? '<i class="bx bx-check-circle"></i>' : '<i class="bx bx-x-circle"></i>',
             title:     isPass ? 'Mark as Passed?' : 'Mark as Failed?',
             message:   isPass
-                ? 'This will mark the test as passed and notify the admin. The ticket will proceed to UAT review.'
-                : 'This will mark the test as failed and return the ticket to the developer for fixes. The admin will be notified.',
+                ? 'This will mark the test as passed. The admin will be notified to proceed with UAT preparation.'
+                : 'This will mark the test as failed. The developer has been notified and the ticket has been returned to development.',
             okLabel:  isPass ? 'Yes, Mark as Passed' : 'Yes, Mark as Failed',
             okCls:    isPass ? 'tw-btn-success' : 'tw-btn-danger',
             onConfirm: function () {
@@ -1013,6 +1013,14 @@
                     status:  testerSelectedResult === 'pass' ? 'passed' : 'failed'
                 }));
                 /* Django: at wiring time, result state comes from server — remove localStorage */
+                /* Django: tester:submit_result with { result: 'pass' }
+                   automatically sets sub_status='testing_passed',
+                   sends notification to admin,
+                   creates TicketTimeline event: 'testing_passed' */
+                /* Django: tester:submit_result with { result: 'fail' }
+                   automatically sets sub_status='development' (returned),
+                   sends notification to assigned_developer and admin,
+                   creates TicketTimeline event: 'testing_failed' */
 
                 /* If evidence file attached, add to attachments */
                 if (evidenceFile) {
@@ -1049,8 +1057,8 @@
 
                 showTesterToast(
                     isPass
-                        ? 'Test marked as passed. Admin has been notified.'
-                        : 'Test marked as failed. Developer has been notified.',
+                        ? 'Test marked as passed. Admin has been notified to proceed with UAT preparation.'
+                        : 'Test failed — the developer has been notified and the ticket has been returned to development. You will be reassigned if further testing is needed.',
                     isPass ? 'success' : 'info'
                 );
 

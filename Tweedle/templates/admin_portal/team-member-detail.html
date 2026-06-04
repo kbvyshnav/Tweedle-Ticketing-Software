@@ -1,0 +1,563 @@
+<!--
+  File: templates/admin_portal/team-member-detail.html
+  Django template: extends 'base.html'
+  Django view: admin_portal.views.team_member_detail
+  Django url:  admin_team_member_detail (requires member_id URL param)
+  Linked from: admin_portal/team.html — "View Details" button per row
+-->
+<!-- Django: {% extends 'base.html' %} -->
+
+<!-- Django: {% block page_css %}{% endblock %} -->
+
+<!-- Django: {% block content %} -->
+<!-- Django: member = get_object_or_404(User, pk=member_id) -->
+
+    <!-- === PAGE HEADER ======================================= -->
+    <div class="tw-page-header">
+
+        <!-- Back link + member name -->
+        <div>
+            <!-- Django: href="{% url 'admin:team' %}" -->
+            <a href="#team"
+               class="tw-btn tw-btn-outline tw-btn--sm"
+               style="margin-bottom:var(--tw-space-3);display:inline-flex;align-items:center;gap:var(--tw-space-1)"
+               onclick="loadPage('admin_portal/team.html')">
+                <i class="bx bx-arrow-back" aria-hidden="true"></i>
+                Back to Team
+            </a>
+            <div style="display:flex;align-items:center;gap:var(--tw-space-3)">
+                <!-- Django: {{ member.get_full_name }} -->
+                <h1 id="memberDetailName">Arjun Mehta</h1>
+                <!-- Django: class="tw-role-badge tw-role-badge--{{ member.role }}" -->
+                <span class="tw-role-badge tw-role-badge--developer" id="memberDetailRoleBadge">Developer</span>
+                <!-- Django: {% if member.is_active %} -->
+                <span class="tw-status-badge tw-status-badge--closed" id="memberDetailStatusBadge">Active</span>
+                <!-- Django: {% else %} -->
+                <!-- Django: {% endif %} -->
+            </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div style="display:flex;gap:var(--tw-space-2);align-items:center">
+            <!-- Django: opens {% url 'admin_edit_team_member' member.id %} or modal -->
+            <button class="tw-btn tw-btn-outline" id="editMemberDetailBtn" onclick="openEditMemberModal()">
+                <i class="bx bx-edit-alt" aria-hidden="true"></i>
+                Edit Details
+            </button>
+            <!-- Django: POST {% url 'admin_deactivate_member' member.id %} -->
+            <button class="tw-btn tw-btn-danger" id="deactivateMemberBtn" onclick="openDeactivateMemberConfirm()">
+                <i class="bx bx-user-x" aria-hidden="true"></i>
+                Deactivate Account
+            </button>
+        </div>
+
+    </div>
+
+
+    <!-- === TWO-COLUMN LAYOUT ================================= -->
+    <div class="row g-4">
+
+        <!-- ======================================================
+             LEFT COLUMN — Profile card
+             ====================================================== -->
+        <div class="col-lg-4">
+
+            <div class="tw-table-card" style="padding:var(--tw-space-6)">
+
+                <!-- Avatar + name -->
+                <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding-bottom:var(--tw-space-5);border-bottom:1px solid var(--tw-border);margin-bottom:var(--tw-space-5)">
+                    <!-- Django: initials {{ member.initials }} -->
+                    <div class="tw-avatar tw-avatar--developer"
+                         style="width:72px;height:72px;font-size:26px;font-weight:700;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-bottom:var(--tw-space-3)"
+                         aria-hidden="true">AM</div>
+                    <!-- Django: {{ member.get_full_name }} -->
+                    <div style="font-size:var(--tw-text-xl);font-weight:var(--tw-weight-bold);color:var(--tw-text-primary)">Arjun Mehta</div>
+                    <!-- Django: {{ member.job_title }} -->
+                    <div style="font-size:var(--tw-text-sm);color:var(--tw-text-muted);margin-top:4px">Backend Developer</div>
+                </div>
+
+                <!-- Profile fields -->
+                <!-- Django: profile fields from member model -->
+                <div style="display:flex;flex-direction:column;gap:var(--tw-space-3)">
+
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--tw-border-light);padding-bottom:var(--tw-space-3)">
+                        <span style="font-size:var(--tw-text-sm);color:var(--tw-text-muted);flex-shrink:0">Email</span>
+                        <!-- Django: {{ member.email }} -->
+                        <span style="font-size:var(--tw-text-sm);font-weight:var(--tw-weight-medium);color:var(--tw-text-primary);text-align:right">arjun.mehta@tweedle.io</span>
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--tw-border-light);padding-bottom:var(--tw-space-3)">
+                        <span style="font-size:var(--tw-text-sm);color:var(--tw-text-muted)">Role</span>
+                        <span class="tw-role-badge tw-role-badge--developer">Developer</span>
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--tw-border-light);padding-bottom:var(--tw-space-3)">
+                        <span style="font-size:var(--tw-text-sm);color:var(--tw-text-muted)">Username</span>
+                        <!-- Django: {{ member.username }} -->
+                        <span style="font-size:var(--tw-text-sm);font-weight:var(--tw-weight-medium);color:var(--tw-text-primary)">arjun_mehta</span>
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--tw-border-light);padding-bottom:var(--tw-space-3)">
+                        <span style="font-size:var(--tw-text-sm);color:var(--tw-text-muted)">Department</span>
+                        <!-- Django: {{ member.department }} -->
+                        <span style="font-size:var(--tw-text-sm);font-weight:var(--tw-weight-medium);color:var(--tw-text-primary)">Backend</span>
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--tw-border-light);padding-bottom:var(--tw-space-3)">
+                        <span style="font-size:var(--tw-text-sm);color:var(--tw-text-muted)">Join Date</span>
+                        <!-- Django: {{ member.date_joined|date:"d M Y" }} -->
+                        <span style="font-size:var(--tw-text-sm);font-weight:var(--tw-weight-medium);color:var(--tw-text-primary)">15 Jan 2025</span>
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--tw-border-light);padding-bottom:var(--tw-space-3)">
+                        <span style="font-size:var(--tw-text-sm);color:var(--tw-text-muted)">Max Tickets</span>
+                        <!-- Django: {{ member.max_concurrent_tickets }} -->
+                        <span style="font-size:var(--tw-text-sm);font-weight:var(--tw-weight-medium);color:var(--tw-text-primary)">8</span>
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                        <span style="font-size:var(--tw-text-sm);color:var(--tw-text-muted)">Status</span>
+                        <!-- Django: {% if member.is_active %} -->
+                        <span class="tw-status-badge tw-status-badge--closed">Active</span>
+                        <!-- Django: {% endif %} -->
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Summary stats card -->
+            <!-- Django: stats computed from assigned tickets queryset -->
+            <div class="tw-table-card" style="padding:var(--tw-space-5);margin-top:var(--tw-space-4)">
+
+                <div style="font-size:var(--tw-text-md);font-weight:var(--tw-weight-semibold);color:var(--tw-text-primary);margin-bottom:var(--tw-space-4)">
+                    Workload Summary
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--tw-space-3)">
+
+                    <!-- Total assigned -->
+                    <div style="text-align:center;padding:var(--tw-space-4);background:var(--tw-bg-body);border-radius:var(--tw-radius-md)">
+                        <!-- Django: {{ total_assigned }} -->
+                        <div style="font-size:var(--tw-text-3xl);font-weight:var(--tw-weight-bold);color:var(--tw-text-primary)">6</div>
+                        <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px">Total Assigned</div>
+                    </div>
+
+                    <!-- In progress -->
+                    <div style="text-align:center;padding:var(--tw-space-4);background:var(--tw-status-progress-bg);border-radius:var(--tw-radius-md)">
+                        <!-- Django: {{ in_progress_count }} -->
+                        <div style="font-size:var(--tw-text-3xl);font-weight:var(--tw-weight-bold);color:var(--tw-status-progress-text)">3</div>
+                        <div style="font-size:var(--tw-text-xs);color:var(--tw-status-progress-text);margin-top:2px">In Progress</div>
+                    </div>
+
+                    <!-- Testing -->
+                    <div style="text-align:center;padding:var(--tw-space-4);background:var(--tw-status-uat-bg);border-radius:var(--tw-radius-md)">
+                        <!-- Django: {{ testing_count }} -->
+                        <div style="font-size:var(--tw-text-3xl);font-weight:var(--tw-weight-bold);color:var(--tw-status-uat-text)">1</div>
+                        <div style="font-size:var(--tw-text-xs);color:var(--tw-status-uat-text);margin-top:2px">In Testing</div>
+                    </div>
+
+                    <!-- Completed -->
+                    <div style="text-align:center;padding:var(--tw-space-4);background:var(--tw-status-closed-bg);border-radius:var(--tw-radius-md)">
+                        <!-- Django: {{ completed_count }} (resolved + closed) -->
+                        <div style="font-size:var(--tw-text-3xl);font-weight:var(--tw-weight-bold);color:var(--tw-status-closed-text)">2</div>
+                        <div style="font-size:var(--tw-text-xs);color:var(--tw-status-closed-text);margin-top:2px">Completed</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        <!-- END LEFT COLUMN -->
+
+
+        <!-- ======================================================
+             RIGHT COLUMN — Assigned tickets
+             ====================================================== -->
+        <div class="col-lg-8">
+
+            <div class="tw-table-card">
+
+                <!-- Card header -->
+                <div class="tw-table-head-row">
+                    <div class="tw-table-head-left">
+                        <h3 class="tw-table-title">
+                            Assigned Tickets
+                            <!-- Django: {{ assigned_tickets|length }} -->
+                            <span class="tw-count-badge">6</span>
+                        </h3>
+                        <div class="tw-table-search">
+                            <i class="bx bx-search search-icon" aria-hidden="true"></i>
+                            <input
+                                type="text"
+                                id="memberTicketSearch"
+                                placeholder="Search by ID or subject..."
+                                aria-label="Search assigned tickets">
+                        </div>
+                    </div>
+                    <div class="tw-table-head-right">
+                        <!-- Status filter pills -->
+                        <div style="display:flex;gap:var(--tw-space-2)">
+                            <button class="tw-btn tw-btn-primary tw-btn--sm"  data-ticket-filter="all"      onclick="filterMemberTickets('all', this)">All</button>
+                            <button class="tw-btn tw-btn-outline tw-btn--sm" data-ticket-filter="active"   onclick="filterMemberTickets('active', this)">Active</button>
+                            <button class="tw-btn tw-btn-outline tw-btn--sm" data-ticket-filter="closed"   onclick="filterMemberTickets('closed', this)">Closed</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ticket table -->
+                <div class="table-scroll-wrapper">
+                <table class="tw-table" id="memberTicketTable">
+                    <thead>
+                        <tr>
+                            <th scope="col">Ticket ID</th>
+                            <th scope="col">Subject</th>
+                            <th scope="col">Client</th>
+                            <th scope="col">Priority</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <!-- Django: {% for ticket in assigned_tickets %} -->
+
+                        <!-- Row 1: In Progress | High -->
+                        <tr data-ticket-status="active">
+                            <!-- Django: {{ ticket.ticket_id }} -->
+                            <td><span class="tw-ticket-id">GMEC25010001</span></td>
+                            <!-- Django: {{ ticket.subject }} -->
+                            <td>Payment gateway timeout on checkout</td>
+                            <!-- Django: {{ ticket.client.company_code }} -->
+                            <td><span class="tw-count-badge" style="background:var(--tw-status-inbox-bg);color:var(--tw-status-inbox-text)">GMEC</span></td>
+                            <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
+                            <td><span class="tw-status-badge tw-status-badge--progress">In Progress</span></td>
+                        </tr>
+
+                        <!-- Row 2: In Progress | Medium -->
+                        <tr data-ticket-status="active">
+                            <td><span class="tw-ticket-id">BGEX25020001</span></td>
+                            <td>Payment Gateway Integration — redirect loop</td>
+                            <td><span class="tw-count-badge" style="background:var(--tw-status-inbox-bg);color:var(--tw-status-inbox-text)">BGEX</span></td>
+                            <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
+                            <td><span class="tw-status-badge tw-status-badge--progress">In Progress</span></td>
+                        </tr>
+
+                        <!-- Row 3: In Progress | Medium -->
+                        <tr data-ticket-status="active">
+                            <td><span class="tw-ticket-id">GMEC25010004</span></td>
+                            <td>Invoice generation calculates wrong totals</td>
+                            <td><span class="tw-count-badge" style="background:var(--tw-status-inbox-bg);color:var(--tw-status-inbox-text)">GMEC</span></td>
+                            <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
+                            <td><span class="tw-status-badge tw-status-badge--progress">In Progress</span></td>
+                        </tr>
+
+                        <!-- Row 4: Testing | High -->
+                        <tr data-ticket-status="active">
+                            <td><span class="tw-ticket-id">BGEX25010013</span></td>
+                            <td>User role permissions not saving after update</td>
+                            <td><span class="tw-count-badge" style="background:var(--tw-status-inbox-bg);color:var(--tw-status-inbox-text)">BGEX</span></td>
+                            <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
+                            <td><span class="tw-status-badge tw-status-badge--development">Testing</span></td>
+                        </tr>
+
+                        <!-- Row 5: Resolved | Low -->
+                        <tr data-ticket-status="closed">
+                            <td><span class="tw-ticket-id">GMEC25010005</span></td>
+                            <td>Dashboard not loading on mobile devices</td>
+                            <td><span class="tw-count-badge" style="background:var(--tw-status-inbox-bg);color:var(--tw-status-inbox-text)">GMEC</span></td>
+                            <td><span class="tw-priority-badge tw-priority-badge--low">Low</span></td>
+                            <td><span class="tw-status-badge tw-status-badge--resolved">Resolved</span></td>
+                        </tr>
+
+                        <!-- Row 6: Closed | High -->
+                        <tr data-ticket-status="closed">
+                            <td><span class="tw-ticket-id">BGEX25010008</span></td>
+                            <td>API rate limit errors during overnight sync</td>
+                            <td><span class="tw-count-badge" style="background:var(--tw-status-inbox-bg);color:var(--tw-status-inbox-text)">BGEX</span></td>
+                            <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
+                            <td><span class="tw-status-badge tw-status-badge--closed">Closed</span></td>
+                        </tr>
+
+                        <!-- Django: {% empty %} -->
+                        <tr id="memberTicketEmptyRow" style="display:none">
+                            <td colspan="5" style="text-align:center;padding:var(--tw-space-8);color:var(--tw-text-muted)">
+                                <i class="bx bx-task" style="font-size:32px;display:block;margin-bottom:var(--tw-space-2);opacity:0.4" aria-hidden="true"></i>
+                                No tickets match the current filter.
+                            </td>
+                        </tr>
+                        <!-- Django: {% endfor %} -->
+
+                    </tbody>
+                </table>
+                </div>
+
+            </div>
+
+        </div>
+        <!-- END RIGHT COLUMN -->
+
+    </div>
+    <!-- END TWO-COLUMN LAYOUT -->
+
+
+    <!-- === EDIT MEMBER MODAL ================================= -->
+    <!-- Django: form action="{% url 'admin_edit_team_member' member.id %}" method="POST" {% csrf_token %} -->
+    <div class="tw-modal-overlay" id="editMemberDetailModal" role="dialog" aria-modal="true" aria-labelledby="editMemberDetailTitle">
+        <div class="tw-modal tw-modal--lg">
+
+            <div class="tw-modal-header tw-header-gradient">
+                <div>
+                    <h2 id="editMemberDetailTitle">
+                        <i class="bx bx-edit-alt" aria-hidden="true"></i>
+                        Edit Member Details
+                    </h2>
+                    <p style="font-size:var(--tw-text-sm);color:rgba(255,255,255,0.8);margin-top:2px">Arjun Mehta</p>
+                </div>
+                <button class="tw-btn-close" onclick="closeEditMemberModal()" aria-label="Close modal">
+                    <i class="bx bx-x" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div class="tw-modal-body">
+                <form id="editMemberDetailForm" novalidate>
+
+                    <div class="tw-form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--tw-space-4);align-items:start">
+                        <div class="tw-form-group" style="width:100%">
+                            <label class="tw-form-label" for="editDetailFullName">Full Name <span class="tw-required">*</span></label>
+                            <input class="tw-input" id="editDetailFullName" type="text" value="Arjun Mehta">
+                        </div>
+                        <div class="tw-form-group" style="width:100%">
+                            <label class="tw-form-label" for="editDetailJobTitle">Job Title</label>
+                            <input class="tw-input" id="editDetailJobTitle" type="text" value="Backend Developer">
+                        </div>
+                    </div>
+
+                    <div class="tw-form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--tw-space-4);align-items:start">
+                        <div class="tw-form-group" style="width:100%">
+                            <label class="tw-form-label" for="editDetailEmail">Email <span class="tw-required">*</span></label>
+                            <input class="tw-input" id="editDetailEmail" type="email" value="arjun.mehta@tweedle.io">
+                        </div>
+                        <div class="tw-form-group" style="width:100%">
+                            <label class="tw-form-label" for="editDetailDept">Department</label>
+                            <input class="tw-input" id="editDetailDept" type="text" value="Backend">
+                        </div>
+                    </div>
+
+                    <div class="tw-form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--tw-space-4);align-items:start">
+                        <div class="tw-form-group" style="width:100%">
+                            <label class="tw-form-label" for="editDetailRole">Role</label>
+                            <div class="tw-toggle-group">
+                                <button type="button" class="tw-toggle-btn active" onclick="setDetailRole('developer', this)">Developer</button>
+                                <button type="button" class="tw-toggle-btn" onclick="setDetailRole('tester', this)">Tester</button>
+                            </div>
+                            <input type="hidden" id="editDetailRoleValue" value="developer">
+                        </div>
+                        <div class="tw-form-group" style="width:100%">
+                            <label class="tw-form-label" for="editDetailMaxTickets">Max Concurrent Tickets</label>
+                            <input class="tw-input" id="editDetailMaxTickets" type="number" value="8" min="1" max="20" style="width:100px">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="tw-modal-footer">
+                <div class="tw-modal-footer-actions">
+                    <button class="tw-btn tw-btn-outline" type="button" onclick="closeEditMemberModal()">Cancel</button>
+                    <!-- Django: POST {% url 'admin_edit_team_member' member.id %} -->
+                    <button class="tw-btn tw-btn-primary" type="button" onclick="submitEditMemberDetail()">
+                        <i class="bx bx-save" aria-hidden="true"></i>
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- END EDIT MEMBER MODAL -->
+
+
+    <!-- === DEACTIVATE CONFIRM MODAL ========================== -->
+    <div class="tw-modal-overlay" id="deactivateMemberModal" role="dialog" aria-modal="true" aria-labelledby="deactivateMemberTitle">
+        <div class="tw-modal">
+            <div class="tw-modal-header">
+                <h2 id="deactivateMemberTitle" style="display:flex;align-items:center;gap:var(--tw-space-2)">
+                    <i class="bx bx-user-x" style="color:var(--tw-danger)" aria-hidden="true"></i>
+                    Deactivate Account
+                </h2>
+                <button class="tw-btn-close" onclick="closeDeactivateMemberModal()" aria-label="Close modal">
+                    <i class="bx bx-x" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="tw-modal-body">
+                <p style="font-size:var(--tw-text-base);color:var(--tw-text-secondary)">
+                    Are you sure you want to <strong>deactivate Arjun Mehta</strong>?
+                    Their account will be suspended and they will no longer be able to log in.
+                    Active ticket assignments will remain until manually reassigned.
+                </p>
+            </div>
+            <div class="tw-modal-footer">
+                <div class="tw-modal-footer-actions">
+                    <button class="tw-btn tw-btn-outline" type="button" onclick="closeDeactivateMemberModal()">Cancel</button>
+                    <!-- Django: POST {% url 'admin_deactivate_member' member.id %} -->
+                    <button class="tw-btn tw-btn-danger" type="button" onclick="confirmDeactivateMember()">
+                        <i class="bx bx-user-x" aria-hidden="true"></i>
+                        Deactivate
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END DEACTIVATE CONFIRM MODAL -->
+
+<!-- Django: {% endblock %} -->
+
+
+<!-- Django: {% block page_js %} -->
+<script>
+    /* ============================================================
+     * TICKET TABLE SEARCH
+     * ============================================================ */
+    var memberTicketSearch = document.getElementById('memberTicketSearch');
+
+    memberTicketSearch.addEventListener('input', function () {
+        var filter = this.value.trim().toLowerCase();
+        var rows   = document.querySelectorAll('#memberTicketTable tbody tr[data-ticket-status]');
+        var visible = 0;
+        rows.forEach(function (row) {
+            var match = row.textContent.toLowerCase().includes(filter);
+            row.classList.toggle('row-hidden', !match);
+            if (match) visible++;
+        });
+        var emptyRow = document.getElementById('memberTicketEmptyRow');
+        if (emptyRow) emptyRow.style.display = visible === 0 ? '' : 'none';
+    });
+
+
+    /* ============================================================
+     * TICKET STATUS FILTER
+     * ============================================================ */
+    function filterMemberTickets(status, btn) {
+        document.querySelectorAll('[data-ticket-filter]').forEach(function (b) {
+            b.classList.remove('tw-btn-primary');
+            b.classList.add('tw-btn-outline');
+        });
+        btn.classList.remove('tw-btn-outline');
+        btn.classList.add('tw-btn-primary');
+
+        var rows    = document.querySelectorAll('#memberTicketTable tbody tr[data-ticket-status]');
+        var visible = 0;
+        rows.forEach(function (row) {
+            var show = status === 'all' || row.dataset.ticketStatus === status;
+            row.classList.toggle('row-hidden', !show);
+            if (show) visible++;
+        });
+
+        var emptyRow = document.getElementById('memberTicketEmptyRow');
+        if (emptyRow) emptyRow.style.display = visible === 0 ? '' : 'none';
+    }
+
+
+    /* ============================================================
+     * EDIT MEMBER MODAL
+     * ============================================================ */
+    function openEditMemberModal() {
+        document.getElementById('editMemberDetailModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeEditMemberModal() {
+        document.getElementById('editMemberDetailModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function setDetailRole(role, btn) {
+        document.querySelectorAll('#editMemberDetailForm .tw-toggle-btn').forEach(function (b) {
+            b.classList.remove('active');
+        });
+        btn.classList.add('active');
+        document.getElementById('editDetailRoleValue').value = role;
+    }
+
+    /*
+     * submitEditMemberDetail()
+     * Django: POST to {% url 'admin_edit_team_member' member.id %}
+     */
+    function submitEditMemberDetail() {
+        var nameEl = document.getElementById('editDetailFullName');
+        if (!nameEl.value.trim()) {
+            nameEl.classList.add('tw-input--error');
+            nameEl.focus();
+            return;
+        }
+        console.log('[Team Member Detail] Edit member stub:', {
+            name:       nameEl.value.trim(),
+            job_title:  document.getElementById('editDetailJobTitle').value.trim(),
+            email:      document.getElementById('editDetailEmail').value.trim(),
+            department: document.getElementById('editDetailDept').value.trim(),
+            role:       document.getElementById('editDetailRoleValue').value,
+            max_tickets:document.getElementById('editDetailMaxTickets').value
+        });
+        closeEditMemberModal();
+        showMemberDetailToast('Member details updated.', 'success');
+    }
+
+
+    /* ============================================================
+     * DEACTIVATE CONFIRM MODAL
+     * ============================================================ */
+    function openDeactivateMemberConfirm() {
+        document.getElementById('deactivateMemberModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDeactivateMemberModal() {
+        document.getElementById('deactivateMemberModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    /*
+     * confirmDeactivateMember()
+     * Django: POST {% url 'admin_deactivate_member' member.id %}
+     *   Sets user.is_active = False
+     *   Returns JSON { success: true }
+     */
+    function confirmDeactivateMember() {
+        console.log('[Team Member Detail] Deactivate member stub: arjun_mehta');
+        closeDeactivateMemberModal();
+        document.getElementById('memberDetailStatusBadge').textContent = 'Inactive';
+        document.getElementById('memberDetailStatusBadge').className = 'tw-status-badge';
+        document.getElementById('memberDetailStatusBadge').style.cssText = 'background:var(--tw-bg-body);color:var(--tw-text-muted)';
+        showMemberDetailToast('Account deactivated. Open tickets remain assigned until reassigned.', 'info');
+    }
+
+
+    /* ============================================================
+     * ESCAPE KEY
+     * ============================================================ */
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        if (document.getElementById('editMemberDetailModal').classList.contains('active'))  closeEditMemberModal();
+        if (document.getElementById('deactivateMemberModal').classList.contains('active')) closeDeactivateMemberModal();
+    });
+
+
+    /* ============================================================
+     * TOAST
+     * ============================================================ */
+    function showMemberDetailToast(message, type) {
+        type = type || 'success';
+        var iconMap = { success: 'bx-check-circle', error: 'bx-error-circle', info: 'bx-info-circle' };
+        var toast = document.createElement('div');
+        toast.className = 'tw-toast tw-toast--' + type;
+        toast.innerHTML = '<i class=\'bx ' + (iconMap[type] || 'bx-info-circle') + '\'></i><span>' + message + '</span>';
+        document.body.appendChild(toast);
+        setTimeout(function () { toast.classList.add('show'); }, 10);
+        setTimeout(function () {
+            toast.classList.remove('show');
+            setTimeout(function () { toast.remove(); }, 300);
+        }, 3000);
+    }
+</script>
+<!-- Django: {% endblock %} -->

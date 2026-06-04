@@ -281,7 +281,7 @@
 
         <!-- =========================================================
              STAT STRIP — 5 cards
-             Django: {{ active_count }}, {{ forwarded_count }}, {{ uat_approval_count }},
+             Django: {{ active_count }}, {{ forwarded_count }}, {{ uat_count }},
                      {{ overdue_count }}, {{ resolved_month_count }}
              ========================================================= -->
         <div class="dev-stat-strip" aria-label="Ticket status summary">
@@ -320,15 +320,15 @@
 
             <!-- Card 3: In UAT Review — purple light tint -->
             <div class="dev-stat-card dev-stat-card--uat-approval"
-                 data-filter="uat_approval"
+                 data-filter="uat"
                  role="button" tabindex="0"
                  aria-label="In UAT review: 1"
-                 onclick="filterByStatCard('uat_approval', this)">
+                 onclick="filterByStatCard('uat', this)">
                 <div class="dev-stat-card__icon" aria-hidden="true">
                     <i class='bx bx-user-check'></i>
                 </div>
                 <div>
-                    <!-- Django: {{ uat_approval_count }} -->
+                    <!-- Django: {{ uat_count }} -->
                     <div class="dev-stat-card__count">1</div>
                     <div class="dev-stat-card__label">Pending client approval</div>
                 </div>
@@ -401,8 +401,8 @@
                             onclick="filterByPill('uat', this)">UAT Stage</button>
                     <button class="dev-filter-pill" data-substatus="forwarded"
                             onclick="filterByPill('forwarded', this)">Awaiting</button>
-                    <button class="dev-filter-pill" data-substatus="uat_approval"
-                            onclick="filterByPill('uat_approval', this)">UAT Review</button>
+                    <button class="dev-filter-pill" data-substatus="uat"
+                            onclick="filterByPill('uat', this)">UAT Review</button>
                     <button class="dev-filter-pill" data-substatus="overdue"
                             onclick="filterByPill('overdue', this)">Overdue</button>
                 </div>
@@ -963,16 +963,16 @@
                             Row 10: BGEX25010008 | Two-factor authentication not triggering | BGEX
                             High | UAT Review | OVERDUE (28 Apr 2025)
                         -->
-                        <!-- Django: uat_approval ticket row -->
-                        <tr data-substatus="uat_approval"
-                            data-status="uat_approval"
+                        <!-- Django: uat ticket row -->
+                        <tr data-substatus="uat"
+                            data-status="uat"
                             data-priority="high"
                             data-overdue="true"
                             data-id="BGEX25010008"
                             data-subject="two-factor authentication not triggering on login"
                             data-issue-date="2025-04-12"
                             style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html?id=BGEX25010008&amp;substatus=uat&amp;status=uat_approval'"
+                            onclick="window.location.href='ticket-detail.html?id=BGEX25010008&amp;substatus=uat&amp;status=uat'"
                             aria-label="View ticket BGEX25010008">
                             <td>
                                 <div class="ticket-id-cell">
@@ -1358,8 +1358,8 @@
         if (_filterParam && _filterParam !== 'all') {
             if (_filterParam === 'forwarded') {
                 devFilters.substatus = 'forwarded';
-            } else if (_filterParam === 'uat_approval') {
-                devFilters.substatus = 'uat_approval';
+            } else if (_filterParam === 'uat') {
+                devFilters.substatus = 'uat';
             } else if (_filterParam === 'resolved') {
                 devFilters.substatus = 'resolved';
             } else if (['development', 'testing', 'uat', 'overdue'].indexOf(_filterParam) !== -1) {
@@ -1430,9 +1430,9 @@
             return devFilters.substatus === 'resolved';
         }
 
-        /* UAT Approval rows: only visible under 'all' or 'uat_approval' filter */
-        if (rowStatus === 'uat_approval') {
-            return devFilters.substatus === 'all' || devFilters.substatus === 'uat_approval';
+        /* UAT Approval rows: only visible under 'all' or 'uat' filter */
+        if (rowStatus === 'uat') {
+            return devFilters.substatus === 'all' || devFilters.substatus === 'uat';
         }
 
         /* Forwarded rows: visible under 'all', 'forwarded', or overdue filter */
@@ -1529,9 +1529,9 @@
         } else if (filter === 'forwarded') {
             devFilters.substatus = 'forwarded';
             setActivePill('forwarded'); /* no pill matches → all pills cleared */
-        } else if (filter === 'uat_approval') {
-            devFilters.substatus = 'uat_approval';
-            setActivePill('uat_approval'); /* no pill matches → all pills cleared */
+        } else if (filter === 'uat') {
+            devFilters.substatus = 'uat';
+            setActivePill('uat'); /* no pill matches → all pills cleared */
         } else if (filter === 'resolved') {
             devFilters.substatus = 'resolved';
             setActivePill('resolved'); /* no pill matches → all pills cleared */
@@ -1625,7 +1625,7 @@
                 'uat':          'No tickets in UAT stage.',
                 'overdue':      'No overdue tickets. Great work!',
                 'forwarded':    'No tickets currently awaiting client response.',
-                'uat_approval': 'No tickets currently in UAT review.',
+                'uat': 'No tickets currently in UAT review.',
                 'resolved':     'No resolved or closed tickets.'
             };
             var key = devFilters.overdue ? 'overdue' : devFilters.substatus;

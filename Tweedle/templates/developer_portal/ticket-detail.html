@@ -615,6 +615,20 @@
 <script>
 
     /* ============================================================
+     * ARCHITECTURE DECISION: Sub-status advancement is developer-driven.
+     * Developers move tickets through:
+     *   development → testing → uat (internal UAT prep)
+     * Developer then submits for client UAT via confirmSubmitForUAT()
+     * which moves status from 'in_progress' to 'uat' (client-facing).
+     * Admin retains override ability at all stages.
+     *
+     * Django: dev:update_substatus handles all sub-status changes
+     *         (development ↔ testing ↔ uat).
+     *         dev:submit_for_uat handles the final client UAT submission
+     *         and sets ticket.status = 'uat'.
+     * ============================================================ */
+
+    /* ============================================================
      * DEVELOPER IDENTITY — single source of truth.
      * Django: var DEV_USER = {{ dev_user|safe }};
      * ============================================================ */
@@ -779,7 +793,7 @@
             ],
             adminNotes:       'Fix verified internally. Submitted for client UAT testing.',
             currentSubstatus: 'uat',
-            ticketStatus:     'uat_approval'
+            ticketStatus:     'uat'
         },
 
         'GMEC25010005': {
@@ -892,7 +906,7 @@
         if (backLink) {
             var backSubstatus = TICKET_SUBSTATUS;
             if (ticket.ticketStatus === 'forwarded')    backSubstatus = 'forwarded';
-            if (ticket.ticketStatus === 'uat_approval') backSubstatus = 'uat_approval';
+            if (ticket.ticketStatus === 'uat') backSubstatus = 'uat';
             if (ticket.ticketStatus === 'closed')       backSubstatus = 'all';
             if (ticket.ticketStatus === 'resolved')     backSubstatus = 'resolved';
             backLink.href = 'dashboard.html?filter=' + backSubstatus;
@@ -1043,7 +1057,7 @@
         }
 
         /* UAT Approval — in-testing banner, disable attachment button */
-        if (_ticketData && _ticketData.ticketStatus === 'uat_approval') {
+        if (_ticketData && _ticketData.ticketStatus === 'uat') {
             body.innerHTML =
                 '<div class="dev-uat-approval-banner">' +
                 '<i class="bx bx-user-check" aria-hidden="true"></i>' +
@@ -1273,7 +1287,7 @@
                        'Content-Type': 'application/json',
                        'X-CSRFToken': getCookie('csrftoken')
                    },
-                   body: JSON.stringify({ status: 'uat_approval' })
+                   body: JSON.stringify({ status: 'uat' })
                 }) */
                 console.log('[Dev Portal] submitForUAT stub:', { id: TICKET_ID });
 
@@ -1355,7 +1369,7 @@
         if (_tData && _tData.ticketStatus === 'forwarded') {
             displayStatus      = 'Awaiting Client';
             displayStatusClass = 'tw-status-badge--forwarded';
-        } else if (_tData && _tData.ticketStatus === 'uat_approval') {
+        } else if (_tData && _tData.ticketStatus === 'uat') {
             displayStatus      = 'UAT Review';
             displayStatusClass = 'tw-status-badge--uat';
         } else if (devTicketSubmittedForUAT) {
