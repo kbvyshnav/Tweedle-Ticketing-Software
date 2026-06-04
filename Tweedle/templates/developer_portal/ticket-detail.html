@@ -1808,13 +1808,13 @@
             imgEl.src = '';
         }
 
-        modal.style.display = 'flex';
+        modal.classList.add('show');
     }
 
     function cancelDevFilePreview() {
         devPendingFile       = null;
         devPendingFileSource = null;
-        document.getElementById('devFilePreviewModal').style.display = 'none';
+        document.getElementById('devFilePreviewModal').classList.remove('show');
         var attachInput = document.getElementById('devAttachInput');
         var chatFileInput = document.getElementById('devChatFileInput');
         if (attachInput)  attachInput.value  = '';
@@ -1823,7 +1823,7 @@
 
     function confirmDevFileAttach() {
         if (!devPendingFile) return;
-        document.getElementById('devFilePreviewModal').style.display = 'none';
+        document.getElementById('devFilePreviewModal').classList.remove('show');
         if (devPendingFileSource === 'attachment') {
             processDevAttachment(devPendingFile);
         } else if (devPendingFileSource === 'chat') {
@@ -1887,16 +1887,11 @@
      FILE PREVIEW MODAL — shown before attaching a file.
      Triggered by showDevFilePreview(); confirmed by confirmDevFileAttach().
      ============================================================== -->
-<div id="devFilePreviewModal"
-     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);
-            z-index:9999;align-items:center;justify-content:center;">
-    <div style="background:var(--tw-bg-surface);border-radius:var(--tw-radius-lg);
-                padding:28px;width:420px;max-width:90vw;box-shadow:var(--tw-shadow-lg);">
-        <h3 style="font-size:var(--tw-text-lg);font-weight:600;color:var(--tw-text-primary);margin:0 0 4px;">Attach File</h3>
-        <p style="font-size:var(--tw-text-sm);color:var(--tw-text-muted);margin:0 0 20px;">Review before attaching</p>
-        <div style="display:flex;align-items:center;gap:14px;background:var(--tw-bg-body);
-                    border:1px solid var(--tw-border);border-radius:var(--tw-radius-md);
-                    padding:14px 16px;margin-bottom:20px;">
+<div id="devFilePreviewModal" class="tw-file-preview-modal">
+    <div class="tw-file-preview-modal__box">
+        <h3 class="tw-file-preview-modal__title">Attach File</h3>
+        <p class="tw-file-preview-modal__subtitle">Review before attaching</p>
+        <div class="tw-file-preview-modal__file-card">
             <i id="devPreviewFileIcon" class="bx bx-file"
                style="font-size:32px;color:var(--tw-primary);flex-shrink:0;"></i>
             <div>
@@ -1913,7 +1908,7 @@
                  style="max-width:100%;max-height:200px;border-radius:var(--tw-radius-md);
                         border:1px solid var(--tw-border);object-fit:contain;">
         </div>
-        <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <div class="tw-file-preview-modal__actions">
             <button onclick="cancelDevFilePreview()" class="tw-btn tw-btn-outline">Cancel</button>
             <button onclick="confirmDevFileAttach()" class="tw-btn tw-btn-primary">Attach File</button>
         </div>

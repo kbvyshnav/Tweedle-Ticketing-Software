@@ -204,7 +204,7 @@ body > main {
     border-radius: var(--tw-radius-lg);
     padding: var(--tw-space-4) var(--tw-space-5);
     border: 1px solid var(--tw-border);
-    border-left: 3px solid transparent;
+    border-left: 4px solid transparent;
     cursor: pointer;
     flex: 1;
     min-width: 0;
@@ -411,59 +411,12 @@ body > main {
     flex-wrap: wrap;
 }
 
-/* Compact toolbar filter button */
-.tw-toolbar-btn {
-    height: 34px;
-    padding: 0 12px;
-    font-size: var(--tw-text-sm);
-    font-family: var(--tw-font-primary);
-    color: var(--tw-text-secondary);
-    border: 1px solid var(--tw-border);
-    border-radius: var(--tw-radius-sm);
-    background: var(--tw-bg-surface);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--tw-space-2);
-    transition: border-color var(--tw-transition-fast),
-                color var(--tw-transition-fast);
-    white-space: nowrap;
-}
-
-.tw-toolbar-btn:hover,
-.tw-toolbar-btn[aria-expanded="true"] {
-    border-color: var(--tw-primary);
-    color: var(--tw-primary);
-}
-
 /* Right-side cluster (search + sort + more) */
 .tw-toolbar-right {
     display: flex;
     align-items: center;
     gap: var(--tw-space-2);
     margin-left: auto;
-}
-
-/* Icon-only toolbar button (sort, more-options) */
-.tw-toolbar-icon-btn {
-    width: 34px;
-    height: 34px;
-    border: 1px solid var(--tw-border);
-    border-radius: var(--tw-radius-sm);
-    background: var(--tw-bg-surface);
-    color: var(--tw-text-muted);
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: border-color var(--tw-transition-fast),
-                color var(--tw-transition-fast);
-}
-
-.tw-toolbar-icon-btn:hover {
-    border-color: var(--tw-primary);
-    color: var(--tw-primary);
 }
 
 /* Table search inside toolbar (200px × 34px) */

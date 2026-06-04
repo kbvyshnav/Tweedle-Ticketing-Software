@@ -104,6 +104,12 @@
 
         <i class="bx bx-menu" id="hamburger-btn" role="button" aria-label="Toggle sidebar"></i>
 
+        <!-- Tweedle logo — mobile only -->
+        <div class="topbar-brand-mobile" style="display:none">
+            <!-- Django: src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" -->
+            <img src="../../static/images/tweedle-logo/tweedle-mark-blue.svg" alt="Tweedle" style="height:28px;">
+        </div>
+
         <!-- NOTIFICATION BELL -->
         <div class="tw-notif-bell-wrap" id="notifBellWrap">
             <button
@@ -849,12 +855,12 @@
         var modal = document.getElementById('clientDownloadModal');
         var label = document.getElementById('clientDownloadFormatLabel');
         if (label) label.textContent = (format || '').toUpperCase();
-        if (modal) modal.style.display = 'flex';
+        if (modal) modal.classList.add('active');
     }
 
     function closeClientDownloadModal() {
         var modal = document.getElementById('clientDownloadModal');
-        if (modal) modal.style.display = 'none';
+        if (modal) modal.classList.remove('active');
         clientDownloadFormat = '';
     }
 
@@ -878,14 +884,14 @@
         setTimeout(function () {
             t.classList.remove('show');
             setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 300);
-        }, 3500);
+        }, 3000);
     }
 </script>
 
 <!-- ============================================================
      DOWNLOAD CONFIRMATION MODAL
      ============================================================ -->
-<div id="clientDownloadModal" class="tw-confirm-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="clientDownloadModalTitle">
+<div id="clientDownloadModal" class="tw-confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="clientDownloadModalTitle">
     <div class="tw-confirm-box">
         <div class="tw-confirm-header">
             <i class="bx bx-download" aria-hidden="true"></i>

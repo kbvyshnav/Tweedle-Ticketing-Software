@@ -1146,7 +1146,7 @@
 
 .tester-profile-grid {
     display: grid;
-    grid-template-columns: 1fr 380px;
+    grid-template-columns: 1fr 360px;
     gap: var(--tw-space-5);
     align-items: start;
 }
@@ -1298,47 +1298,13 @@
  * Section: Missing shared classes — added in audit fix pass
  * ============================================================ */
 
-/* A1: Toolbar buttons */
-.tw-toolbar-btn {
-    display: inline-flex;
+/* Notification filter bar wrapper — notification page filter pills */
+.tester-notif-filter-bar {
+    display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 7px 14px;
-    border: 1px solid var(--tw-border);
-    border-radius: var(--tw-radius-md);
-    background: var(--tw-bg-surface);
-    color: var(--tw-text-secondary);
-    font-size: var(--tw-text-sm);
-    font-weight: 500;
-    cursor: pointer;
-    font-family: var(--tw-font-primary);
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-
-.tw-toolbar-btn:hover {
-    border-color: var(--tw-primary);
-    color: var(--tw-primary);
-}
-
-.tw-toolbar-icon-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    border: 1px solid var(--tw-border);
-    border-radius: var(--tw-radius-md);
-    background: var(--tw-bg-surface);
-    color: var(--tw-text-secondary);
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 16px;
-}
-
-.tw-toolbar-icon-btn:hover {
-    border-color: var(--tw-primary);
-    color: var(--tw-primary);
+    gap: var(--tw-space-2);
+    margin-bottom: var(--tw-space-4);
+    flex-wrap: wrap;
 }
 
 

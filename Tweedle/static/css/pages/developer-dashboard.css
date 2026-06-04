@@ -953,11 +953,11 @@
     gap: var(--tw-space-3);
     align-items: flex-start;
     background: #fff8e1;
-    border: 1px solid #f59e0b;
+    border: 1px solid var(--tw-amber-border);
     border-radius: var(--tw-radius-md);
     padding: var(--tw-space-3) var(--tw-space-4);
     font-size: var(--tw-text-sm);
-    color: #78350f;
+    color: var(--tw-amber-dark);
     line-height: 1.5;
     margin-top: var(--tw-space-4);
 }
@@ -966,7 +966,7 @@
     font-size: 18px;
     flex-shrink: 0;
     margin-top: 1px;
-    color: #d97706;
+    color: var(--tw-amber-border);
 }
 
 
@@ -1506,12 +1506,18 @@
     box-shadow: 0 0 0 4px var(--tw-primary-light);
 }
 
-/* Profile page two-column grid — left col flexible, right col fixed 340px */
+/* Profile page two-column grid — left col flexible, right col fixed 360px */
 .dev-profile-grid {
     display: grid;
-    grid-template-columns: 1fr 340px;
+    grid-template-columns: 1fr 360px;
     gap: 24px;
     align-items: start;
+}
+
+@media (max-width: 1024px) {
+    .dev-profile-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Form group label — small bottom gap so label doesn't sit on the input */
@@ -1563,20 +1569,20 @@
 
 /* Stat card — Awaiting Client (forwarded) — amber tint */
 .dev-stat-card--forwarded {
-    border-left-color: #f59e0b;
+    border-left-color: var(--tw-amber-border);
 }
 
 .dev-stat-card--forwarded .dev-stat-card__icon {
-    background: #fffbeb;
-    color: #b45309;
+    background: var(--tw-amber-bg);
+    color: var(--tw-amber-text);
 }
 
 .dev-stat-card--forwarded .dev-stat-card__count {
-    color: #b45309;
+    color: var(--tw-amber-text);
 }
 
 .dev-stat-card--forwarded.active {
-    background: #fffbeb;
+    background: var(--tw-amber-bg);
 }
 
 @keyframes dev-pulse-border-amber {
@@ -1671,20 +1677,34 @@
     line-height: 1.5;
 }
 
+/* Stage badge — Awaiting Client (used in dashboard.html ticket table rows) */
+.dev-stage-badge--awaiting {
+    display: inline-flex;
+    align-items: center;
+    background: var(--tw-amber-bg);
+    color: var(--tw-amber-text);
+    border: 1px solid var(--tw-amber-border);
+    border-radius: var(--tw-radius-pill);
+    padding: 3px 10px;
+    font-size: var(--tw-text-xs);
+    font-weight: 500;
+}
+
+
 /* Awaiting Client banner — ticket-detail.html substatus panel */
 .dev-awaiting-client-banner {
     display: flex;
     align-items: flex-start;
     gap: 14px;
-    background: #fffbeb;
-    border-left: 3px solid #f59e0b;
+    background: var(--tw-amber-bg);
+    border-left: 3px solid var(--tw-amber-border);
     border-radius: var(--tw-radius-md);
     padding: 16px 20px;
 }
 
 .dev-awaiting-client-banner i {
     font-size: 24px;
-    color: #f59e0b;
+    color: var(--tw-amber-border);
     flex-shrink: 0;
     margin-top: 2px;
 }

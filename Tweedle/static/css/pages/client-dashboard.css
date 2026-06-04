@@ -40,8 +40,8 @@ body > main {
 }
 
 .tw-client-header-subtitle {
-    font-size: var(--tw-text-sm);
-    color: var(--tw-text-muted);
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-secondary);
     margin-top: 4px;
 }
 

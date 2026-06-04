@@ -98,6 +98,12 @@
     --tw-info-dark:       #1677d7;
     --tw-info-light:      #CFE8FF;
 
+    /* Amber — used for Awaiting Client / paused states (developer portal) */
+    --tw-amber-bg:        #fffbeb;
+    --tw-amber-text:      #b45309;
+    --tw-amber-border:    #f59e0b;
+    --tw-amber-dark:      #78350f;
+
 
     /* === NOTIFICATION PANEL TYPES =================================
      * Icon background/text for the 4 notification variants in the

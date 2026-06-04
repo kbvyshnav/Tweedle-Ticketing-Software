@@ -2658,3 +2658,135 @@
     background: var(--tw-border);
     margin: var(--tw-space-1) 0;
 }
+
+
+/* ============================================================
+ * SECTION 22: FILE PREVIEW MODAL — used in developer and tester
+ *   ticket-detail pages before committing an attachment.
+ * ============================================================ */
+.tw-file-preview-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+.tw-file-preview-modal.show {
+    display: flex;
+}
+
+.tw-file-preview-modal__box {
+    background: var(--tw-bg-surface);
+    border-radius: var(--tw-radius-lg);
+    padding: 28px;
+    width: 420px;
+    max-width: 90vw;
+    box-shadow: var(--tw-shadow-xl);
+}
+
+.tw-file-preview-modal__title {
+    font-size: var(--tw-text-lg);
+    font-weight: 600;
+    color: var(--tw-text-primary);
+    margin: 0 0 4px;
+}
+
+.tw-file-preview-modal__subtitle {
+    font-size: var(--tw-text-sm);
+    color: var(--tw-text-muted);
+    margin: 0 0 20px;
+}
+
+.tw-file-preview-modal__file-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--tw-bg-body);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-md);
+    padding: 14px 16px;
+    margin-bottom: 20px;
+}
+
+.tw-file-preview-modal__actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+
+/* ============================================================
+ * SECTION 23: PAGE HEADER — shared across all admin portal pages.
+ * Defined here so clients.html, team.html, reports.html get it
+ * from tweedle-components.css without loading dashboard.css.
+ * ============================================================ */
+.tw-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--tw-space-5);
+    gap: var(--tw-space-4);
+    flex-wrap: wrap;
+}
+
+.tw-page-header h1 {
+    font-size: var(--tw-text-3xl);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    margin: 0;
+}
+
+
+/* ============================================================
+ * SECTION 23: TOOLBAR BUTTONS — shared across admin, client,
+ *   tester portals. Canonical definitions moved here from
+ *   dashboard.css and tester-dashboard.css.
+ *   Developer portal uses dev-toolbar-* variants (separate).
+ * ============================================================ */
+.tw-toolbar-btn {
+    height: 34px;
+    padding: 0 12px;
+    font-size: var(--tw-text-sm);
+    font-family: var(--tw-font-primary);
+    color: var(--tw-text-secondary);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    background: var(--tw-bg-surface);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    transition: border-color var(--tw-transition-fast),
+                color var(--tw-transition-fast);
+    white-space: nowrap;
+}
+
+.tw-toolbar-btn:hover,
+.tw-toolbar-btn[aria-expanded="true"] {
+    border-color: var(--tw-primary);
+    color: var(--tw-primary);
+}
+
+.tw-toolbar-icon-btn {
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    background: var(--tw-bg-surface);
+    color: var(--tw-text-muted);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color var(--tw-transition-fast),
+                color var(--tw-transition-fast);
+}
+
+.tw-toolbar-icon-btn:hover {
+    border-color: var(--tw-primary);
+    color: var(--tw-primary);
+}

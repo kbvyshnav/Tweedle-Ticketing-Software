@@ -386,7 +386,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010007" aria-label="Select GMEC25010007"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">GMEC25010007</span>
                         </div>
                     </td>
@@ -415,7 +415,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010008" aria-label="Select GMEC25010008"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">GMEC25010008</span>
                         </div>
                     </td>
@@ -435,6 +435,13 @@
                 </tr>
 
                 <!-- Django: {% endfor %} -->
+                <!-- Django: {% if not tickets %}{% endif %} replaces this at wiring time -->
+                <tr id="emptyState-inbox" class="tw-empty-state-row" style="display:none;">
+                    <td colspan="8" style="padding:48px 24px;text-align:center;">
+                        <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
+                        <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
+                    </td>
+                </tr>
             </tbody>
         </table>
         </div>
@@ -470,7 +477,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010001" aria-label="Select GMEC25010001"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">GMEC25010001</span>
                         </div>
                     </td>
@@ -506,7 +513,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010002" aria-label="Select GMEC25010002"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">GMEC25010002</span>
                         </div>
                     </td>
@@ -542,7 +549,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010003" aria-label="Select GMEC25010003"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">GMEC25010003</span>
                         </div>
                     </td>
@@ -572,7 +579,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010004" aria-label="Select GMEC25010004"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">GMEC25010004</span>
                         </div>
                     </td>
@@ -602,7 +609,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010005" aria-label="Select GMEC25010005"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">GMEC25010005</span>
                         </div>
                     </td>
@@ -632,7 +639,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010006" aria-label="Select GMEC25010006"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">GMEC25010006</span>
                         </div>
                     </td>
@@ -659,6 +666,13 @@
                 </tr>
 
                 <!-- Django: {% endfor %} -->
+                <!-- Django: {% if not tickets %}{% endif %} replaces this at wiring time -->
+                <tr id="emptyState-progress" class="tw-empty-state-row" style="display:none;">
+                    <td colspan="8" style="padding:48px 24px;text-align:center;">
+                        <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
+                        <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
+                    </td>
+                </tr>
             </tbody>
         </table>
         </div>
@@ -692,7 +706,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="BGEX25020001" aria-label="Select BGEX25020001"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">BGEX25020001</span>
                         </div>
                     </td>
@@ -728,7 +742,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25020002" aria-label="Select GMEC25020002"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">GMEC25020002</span>
                         </div>
                     </td>
@@ -758,7 +772,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="BGEX25020003" aria-label="Select BGEX25020003"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">BGEX25020003</span>
                         </div>
                     </td>
@@ -785,6 +799,13 @@
                 </tr>
 
                 <!-- Django: {% endfor %} -->
+                <!-- Django: {% if not tickets %}{% endif %} replaces this at wiring time -->
+                <tr id="emptyState-forwarded" class="tw-empty-state-row" style="display:none;">
+                    <td colspan="8" style="padding:48px 24px;text-align:center;">
+                        <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
+                        <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
+                    </td>
+                </tr>
             </tbody>
         </table>
         </div>
@@ -821,7 +842,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010012" aria-label="Select GMEC25010012"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">GMEC25010012</span>
                         </div>
                     </td>
@@ -853,7 +874,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="BGEX25010013" aria-label="Select BGEX25010013"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">BGEX25010013</span>
                         </div>
                     </td>
@@ -876,6 +897,13 @@
                 </tr>
 
                 <!-- Django: {% endfor %} -->
+                <!-- Django: {% if not tickets %}{% endif %} replaces this at wiring time -->
+                <tr id="emptyState-uat" class="tw-empty-state-row" style="display:none;">
+                    <td colspan="8" style="padding:48px 24px;text-align:center;">
+                        <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
+                        <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
+                    </td>
+                </tr>
             </tbody>
         </table>
         </div>
@@ -912,7 +940,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010010" aria-label="Select GMEC25010010"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">GMEC25010010</span>
                         </div>
                     </td>
@@ -944,7 +972,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="BGEX25010011" aria-label="Select BGEX25010011"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">BGEX25010011</span>
                         </div>
                     </td>
@@ -967,6 +995,13 @@
                 </tr>
 
                 <!-- Django: {% endfor %} -->
+                <!-- Django: {% if not tickets %}{% endif %} replaces this at wiring time -->
+                <tr id="emptyState-resolved" class="tw-empty-state-row" style="display:none;">
+                    <td colspan="8" style="padding:48px 24px;text-align:center;">
+                        <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
+                        <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
+                    </td>
+                </tr>
             </tbody>
         </table>
         </div>
@@ -1000,7 +1035,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010099" aria-label="Select GMEC25010099"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">GMEC25010099</span>
                         </div>
                     </td>
@@ -1029,7 +1064,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="BGEX25010098" aria-label="Select BGEX25010098"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">BGEX25010098</span>
                         </div>
                     </td>
@@ -1058,7 +1093,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010097" aria-label="Select GMEC25010097"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">GMEC25010097</span>
                         </div>
                     </td>
@@ -1084,6 +1119,13 @@
                 </tr>
 
                 <!-- Django: {% endfor %} -->
+                <!-- Django: {% if not tickets %}{% endif %} replaces this at wiring time -->
+                <tr id="emptyState-closed" class="tw-empty-state-row" style="display:none;">
+                    <td colspan="8" style="padding:48px 24px;text-align:center;">
+                        <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
+                        <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
+                    </td>
+                </tr>
             </tbody>
         </table>
         </div>
@@ -1121,7 +1163,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="TKT-00089" aria-label="Select TKT-00089"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">TKT-00089</span>
                         </div>
                     </td>
@@ -1148,7 +1190,7 @@
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="TKT-00063" aria-label="Select TKT-00063"></td>
                     <td>
                         <div class="ticket-id-cell">
-                            <i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
                             <span class="tw-ticket-id">TKT-00063</span>
                         </div>
                     </td>
@@ -1172,6 +1214,13 @@
                 </tr>
 
                 <!-- Django: {% endfor %} -->
+                <!-- Django: {% if not tickets %}{% endif %} replaces this at wiring time -->
+                <tr id="emptyState-rejected" class="tw-empty-state-row" style="display:none;">
+                    <td colspan="8" style="padding:48px 24px;text-align:center;">
+                        <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
+                        <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
+                    </td>
+                </tr>
             </tbody>
         </table>
         </div>
@@ -2155,7 +2204,7 @@
     var adminSortOrder = 'default'; /* 'default' | 'newest' | 'oldest' */
 
     function applyAllFilters() {
-        document.querySelectorAll('.tab-content tbody tr').forEach(function(row) {
+        document.querySelectorAll('.tab-content tbody tr[data-ticket-id]').forEach(function(row) {
             var show = true;
 
             /* Company filter */
@@ -2192,6 +2241,21 @@
 
             row.style.display = show ? '' : 'none';
         });
+
+        /* Show/hide empty state for the currently active tab */
+        var activeTabContent = document.querySelector('.tab-content.active');
+        if (activeTabContent) {
+            var dataRows = activeTabContent.querySelectorAll('tr[data-ticket-id]');
+            var visibleCount = 0;
+            dataRows.forEach(function(r) {
+                if (r.style.display !== 'none') visibleCount++;
+            });
+            var emptyStateRow = activeTabContent.querySelector('.tw-empty-state-row');
+            if (emptyStateRow) {
+                emptyStateRow.style.display = visibleCount === 0 ? 'table-row' : 'none';
+            }
+        }
+        /* Django: {% if not tickets %}{% endif %} replaces this at wiring time */
     }
 
 
@@ -3134,7 +3198,7 @@
                     newRow.setAttribute('data-status', 'rejected');
                     newRow.innerHTML =
                         '<td>' +
-                            '<i class="bx bx-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>' +
+                            '<i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>' +
                             '<span class="tw-ticket-id">' + ticketId + '</span>' +
                         '</td>' +
                         '<td><div title="' + subject + '">' + subject + '</div></td>' +

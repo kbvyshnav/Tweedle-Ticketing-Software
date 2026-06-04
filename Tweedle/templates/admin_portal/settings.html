@@ -329,7 +329,7 @@
 
         console.log('Save org settings:', { name: name, industry: industry, timezone: timezone, default_priority: priority });
         /* Django: POST to /admin-portal/settings/org/ with { name, industry, timezone, default_priority } */
-        showSettingsToast('Organisation settings saved (demo — not saved).');
+        showSettingsToast('Organisation settings saved.', 'success');
     }
 
 
@@ -341,7 +341,7 @@
     function saveNotificationSettings() {
         console.log('Save notification settings');
         /* Django: POST to /admin-portal/settings/notifications/ with toggle states as JSON */
-        showSettingsToast('Notification preferences saved (demo — not saved).');
+        showSettingsToast('Notification settings saved.', 'success');
     }
 
 
@@ -353,7 +353,7 @@
     function saveBrandingSettings() {
         console.log('Save branding settings');
         /* Django: POST to /admin-portal/settings/branding/ with form data (multipart for logo) */
-        showSettingsToast('Branding settings saved (demo — not saved).');
+        showSettingsToast('Branding settings saved.', 'success');
     }
 
 
@@ -396,13 +396,19 @@
      * SETTINGS PAGE TOAST
      * Local copy — showDashToast is scoped to dashboard.html only
      * ============================================================ */
-    function showSettingsToast(message) {
+    function showSettingsToast(message, type) {
+        type = type || 'success';
         var toast = document.createElement('div');
-        toast.className = 'tw-toast tw-toast--success show';
-        toast.innerHTML = '<i class="bx bx-check-circle"></i> ' + message;
-        toast.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:500;display:flex;align-items:center;gap:8px;background:var(--tw-success);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,0.15)';
+        toast.className = 'tw-toast tw-toast--' + type;
+        toast.innerHTML = '<i class=\'bx ' +
+            (type === 'success' ? 'bx-check-circle' : type === 'error' ? 'bx-error-circle' : 'bx-info-circle') +
+            '\'></i><span>' + message + '</span>';
         document.body.appendChild(toast);
-        setTimeout(function() { toast.remove(); }, 3000);
+        setTimeout(function() { toast.classList.add('show'); }, 10);
+        setTimeout(function() {
+            toast.classList.remove('show');
+            setTimeout(function() { toast.remove(); }, 300);
+        }, 3000);
     }
 </script>
 <!-- Django: {% endblock %} -->
