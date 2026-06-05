@@ -1,6 +1,6 @@
 <!--
   File: templates/client_portal/ticket-detail.html
-  Django template: extends 'base.html'
+  Django template: extends 'client_base.html'
   Django view:     client_portal.views.ticket_detail
   Django url:      client_ticket_detail
   Role:            User / Client — body class="role-user" (orange theme)
@@ -9,7 +9,7 @@
   Change var TICKET_STATUS at the top of the script to preview
   any of the 7 states: 'new'|'progress'|'forwarded'|'uat'|'resolved'|'closed'|'rejected'
 -->
-<!-- Django: {% extends 'base.html' %} -->
+<!-- Django: {% extends 'client_base.html' %} -->
 <!-- Django: {% block body_role %}user{% endblock %} -->
 <!-- Django: {% block page_css %}
 <link rel="stylesheet" href="{% static 'css/pages/client-dashboard.css' %}">
@@ -136,6 +136,7 @@
                     <!-- Django: {% endfor %} -->
                 </div>
                 <div class="tw-notif-panel-footer">
+                    <!-- Django: href="{% url 'client_notifications' %}" -->
                     <a href="#" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
                 </div>
             </div>

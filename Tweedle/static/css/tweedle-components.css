@@ -319,6 +319,23 @@
     color: var(--tw-status-closed-text);
 }
 
+/* Ticket rejection — admin rejected ticket, also used for portal-level rejection display */
+.tw-status-badge--rejected {
+    background: var(--tw-priority-high-bg);
+    color: var(--tw-priority-high-text);
+}
+
+/* Testing sub-status outcomes (admin In Progress tab stage badges) */
+.tw-status-badge--testing-passed {
+    background: var(--tw-status-closed-bg);
+    color: var(--tw-status-closed-text);
+}
+
+.tw-status-badge--returned {
+    background: var(--tw-priority-high-bg);
+    color: var(--tw-priority-high-text);
+}
+
 /* --- Smaller square-corner status tag (used in reports table) */
 .tw-status-tag {
     display: inline-block;

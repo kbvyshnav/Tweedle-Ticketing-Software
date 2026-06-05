@@ -952,7 +952,7 @@
     display: flex;
     gap: var(--tw-space-3);
     align-items: flex-start;
-    background: #fff8e1;
+    background: var(--tw-amber-bg);
     border: 1px solid var(--tw-amber-border);
     border-radius: var(--tw-radius-md);
     padding: var(--tw-space-3) var(--tw-space-4);
@@ -1437,13 +1437,6 @@
 /* ============================================================
  * SECTION 23: PROFILE PAGE
  * ============================================================ */
-
-/* Sidebar nav active item — add left accent border (developer portal) */
-.nav-link.active {
-    border-left: 3px solid var(--tw-primary);
-    padding-left: 9px; /* 12px default - 3px border = consistent visual padding */
-    border-radius: 0 var(--tw-radius-sm) var(--tw-radius-sm) 0;
-}
 
 /* Profile form row layout — 2-column responsive grid */
 .dev-form-row {

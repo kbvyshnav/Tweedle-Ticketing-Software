@@ -1,11 +1,11 @@
 <!--
   File: templates/client_portal/dashboard.html
-  Django template: extends 'base.html'
+  Django template: extends 'client_base.html'
   Django view:     client_portal.views.dashboard
   Django url:      client_dashboard
   Role:            User / Client — body class="role-user" (orange theme)
 -->
-<!-- Django: {% extends 'base.html' %} -->
+<!-- Django: {% extends 'client_base.html' %} -->
 <!-- Django: {% block body_role %}user{% endblock %} -->
 <!-- Django: {% block page_css %}
 <link rel="stylesheet" href="{% static 'css/pages/client-dashboard.css' %}">
@@ -183,6 +183,7 @@
                 </div>
 
                 <div class="tw-notif-panel-footer">
+                    <!-- Django: href="{% url 'client_notifications' %}" -->
                     <!-- Django: href="{% url 'client_notifications' %}" -->
                     <a href="#" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
                 </div>
