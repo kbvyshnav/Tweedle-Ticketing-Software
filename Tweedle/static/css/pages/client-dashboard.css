@@ -1287,7 +1287,7 @@ body > main {
  * ============================================================ */
 
 .tw-ticket-header-card[data-status="new"]       { border-left: 4px solid var(--tw-status-inbox-text); }
-.tw-ticket-header-card[data-status="progress"]  { border-left: 4px solid var(--tw-status-progress-text); }
+.tw-ticket-header-card[data-status="in_progress"]  { border-left: 4px solid var(--tw-status-progress-text); }
 .tw-ticket-header-card[data-status="forwarded"] { border-left: 4px solid var(--tw-primary); }
 .tw-ticket-header-card[data-status="uat"]       { border-left: 4px solid var(--tw-status-uat-text); }
 .tw-ticket-header-card[data-status="resolved"]  { border-left: 4px solid var(--tw-status-forwarded-text); }

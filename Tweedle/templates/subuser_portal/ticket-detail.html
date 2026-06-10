@@ -7,7 +7,7 @@
 
   TICKET_STATUS drives all page content.
   Change var TICKET_STATUS at the top of the script to preview
-  any of the 7 states: 'new'|'progress'|'forwarded'|'uat'|'resolved'|'closed'|'rejected'
+  any of the 7 states: 'new'|'in_progress'|'forwarded'|'uat'|'resolved'|'closed'|'rejected'
 
   SUB-USER RESTRICTIONS:
   - Cannot approve UAT. The UAT action card is read-only (info + Request Changes only).
@@ -236,8 +236,8 @@
                 </div>
                 <!-- Django: {% endif %} -->
 
-                <!-- STATUS: progress -->
-                <!-- Django: {% if ticket.status == 'progress' %} -->
+                <!-- STATUS: in_progress -->
+                <!-- Django: {% if ticket.status == 'in_progress' %} -->
                 <div class="tw-action-card tw-action-card--info-progress" id="actionCardProgress" style="display:none">
                     <div class="tw-action-card__inner">
                         <div class="tw-action-card__header">
@@ -797,7 +797,7 @@ This started happening on or around 14 Apr 2025.</p>
             chatHidden:   false
         },
 
-        'progress': {
+        'in_progress': {
             headerBadge: '<span class="tw-status-badge tw-status-badge--progress">In Progress</span>',
             showActionDot: false,
             timeline: [
@@ -983,7 +983,7 @@ This started happening on or around 14 Apr 2025.</p>
                     { label: 'Assigned To',     value: '<span style="color:var(--tw-text-muted);font-style:italic">Pending assignment</span>' },
                     { label: 'Est. Resolution', value: '<span style="color:var(--tw-text-muted)">To be confirmed</span>' }
                 ];
-            case 'progress':
+            case 'in_progress':
                 return [
                     { label: 'Status',          value: '<span class="tw-status-badge tw-status-badge--progress">In Progress</span>' },
                     { label: 'Priority',        value: pri },
@@ -1060,7 +1060,7 @@ This started happening on or around 14 Apr 2025.</p>
 
         var cardMap = {
             'new':      'actionCardNew',
-            'progress': 'actionCardProgress',
+            'in_progress': 'actionCardProgress',
             'forwarded':'awaitingActionCard',
             'uat':      'uatActionCard',
             'resolved': 'actionCardResolved',

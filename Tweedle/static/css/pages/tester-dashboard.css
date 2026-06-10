@@ -1293,6 +1293,28 @@
     }
 }
 
+@media screen and (max-width: 576px) {
+    /* Mirror developer-dashboard.css: single-column stats, stacked
+     * header, capped chat height. The ticket table already scrolls
+     * horizontally inside its .table-scroll-wrapper. */
+    .tester-page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .tester-stat-strip {
+        grid-template-columns: 1fr;
+    }
+
+    .tester-chat-thread {
+        max-height: 280px;
+    }
+
+    .tester-confirm-box {
+        padding: var(--tw-space-6);
+    }
+}
+
 
 /* ============================================================
  * Section: Missing shared classes — added in audit fix pass

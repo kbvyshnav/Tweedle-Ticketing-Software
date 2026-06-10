@@ -531,6 +531,86 @@ body > main {
 }
 
 
+/* === IN PROGRESS TAB — fixed-width layout =======================
+ * Scoped to #tab-progress only; the other six tab tables are untouched.
+ * table-layout:fixed + width:100% makes the 9 columns AND the action
+ * icons fit the content area with NO horizontal scrollbar at desktop
+ * widths (~1200px+). Flexible text (Subject, names) truncates instead
+ * of widening the table. On true mobile the shared .tw-table min-width
+ * still lets .table-scroll-wrapper scroll — that's acceptable.
+ * =========================================================== */
+#tab-progress .tw-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+/* Compact horizontal padding for this dense 9-column table */
+#tab-progress .tw-table thead th,
+#tab-progress .tw-table tbody td {
+    padding-left: var(--tw-space-2);
+    padding-right: var(--tw-space-2);
+}
+
+/* Fixed column widths (~855px total); Subject (col 3) has no width and
+   absorbs the remaining space.
+   1 checkbox · 2 Ticket ID · 3 Subject · 4 Issue Date · 5 Client
+   · 6 Priority · 7 Stage · 8 Dev/Tester · 9 Actions */
+#tab-progress .tw-table th:nth-child(1),
+#tab-progress .tw-table td:nth-child(1) { width: 40px; }
+#tab-progress .tw-table th:nth-child(2),
+#tab-progress .tw-table td:nth-child(2) { width: 150px; }
+#tab-progress .tw-table th:nth-child(4),
+#tab-progress .tw-table td:nth-child(4) { width: 95px; white-space: nowrap; }
+#tab-progress .tw-table th:nth-child(5),
+#tab-progress .tw-table td:nth-child(5) { width: 70px; }
+#tab-progress .tw-table th:nth-child(6),
+#tab-progress .tw-table td:nth-child(6) { width: 90px; }
+#tab-progress .tw-table th:nth-child(7),
+#tab-progress .tw-table td:nth-child(7) { width: 150px; }
+#tab-progress .tw-table th:nth-child(8),
+#tab-progress .tw-table td:nth-child(8) { width: 150px; }
+/* Actions: fixed width, normal flow (override the shared sticky rule),
+   always visible without scrolling */
+#tab-progress .tw-table th:nth-child(9),
+#tab-progress .tw-table td:nth-child(9) { width: 120px; position: static; }
+
+/* Tighten the action-icon spacing so all three icons fit the column
+   (and never spill over the Dev/Tester column) */
+#tab-progress .tw-row-actions { gap: var(--tw-space-2); justify-content: flex-end; }
+#tab-progress .tw-action-icon { padding: var(--tw-space-1); }
+
+/* Star + ID sit inline on line 1 (they fit the 150px column, so the star
+   never stacks above the ID); an Overdue badge, when present, wraps to a
+   second line below — it does not overflow into the Subject column. */
+#tab-progress .ticket-id-cell { flex-wrap: wrap; min-width: 0; }
+#tab-progress .tw-ticket-id {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Subject (col 3): clamp to 2 lines with ellipsis; full text in title tooltip */
+#tab-progress .tw-table tbody td:nth-child(3) { overflow: hidden; }
+#tab-progress .tw-table tbody td:nth-child(3) > div:first-child {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Stage (col 7) + Dev/Tester (col 8): single line, clip overflow */
+#tab-progress .tw-table tbody td:nth-child(7),
+#tab-progress .tw-table tbody td:nth-child(8) {
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* Dev/Tester name: stays on one line; the col-8 overflow:hidden above
+   clips any over-long name at the cell edge so it never widens the table.
+   (All current allottees fit within the 150px column.) */
+#tab-progress .allottee-cell { min-width: 0; }
+
+
 /* === SELECTED ROW =========================================== */
 .row-selected {
     background: var(--tw-primary-light) !important;

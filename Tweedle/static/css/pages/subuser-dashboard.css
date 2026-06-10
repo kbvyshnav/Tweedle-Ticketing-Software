@@ -9,7 +9,7 @@
  * DJANGO PATH: <!-- Django: {% static 'css/pages/subuser-dashboard.css' %} -->
  * DEPENDS ON:  tweedle-tokens.css, theme-subuser.css, tweedle-base.css,
  *              tweedle-components.css (all must load first)
- * NOTE:        Amber theme uses dark text (--tw-primary-text: #92711a) on
+ * NOTE:        Amber theme uses dark text (--tw-primary-text: #644d12) on
  *              primary-coloured backgrounds. All #ffffff overrides on
  *              var(--tw-primary) backgrounds are replaced with
  *              var(--tw-primary-text) for WCAG AA contrast.
@@ -1109,17 +1109,17 @@ body > main {
 }
 
 /* --- Resolved / Awaiting Closure card --- */
-.tw-stat-card--client-resolved { border-left-color: var(--tw-info, #3b82f6); }
+.tw-stat-card--client-resolved { border-left-color: var(--tw-info); }
 
 .tw-stat-card--client-resolved .tw-stat-card__icon {
     background: var(--tw-info-light);
-    color: var(--tw-info, #3b82f6);
+    color: var(--tw-info);
 }
 
 .tw-stat-card--client-resolved.active {
     background: var(--tw-info-light);
-    border-color: var(--tw-info, #3b82f6);
-    border-left-color: var(--tw-info, #3b82f6);
+    border-color: var(--tw-info);
+    border-left-color: var(--tw-info);
 }
 
 /* --- Rejected card --- */
@@ -1276,7 +1276,7 @@ body > main {
  * ============================================================ */
 
 .tw-ticket-header-card[data-status="new"]       { border-left: 4px solid var(--tw-status-inbox-text); }
-.tw-ticket-header-card[data-status="progress"]  { border-left: 4px solid var(--tw-status-progress-text); }
+.tw-ticket-header-card[data-status="in_progress"]  { border-left: 4px solid var(--tw-status-progress-text); }
 .tw-ticket-header-card[data-status="forwarded"] { border-left: 4px solid var(--tw-primary); }
 .tw-ticket-header-card[data-status="uat"]       { border-left: 4px solid var(--tw-status-uat-text); }
 .tw-ticket-header-card[data-status="resolved"]  { border-left: 4px solid var(--tw-status-forwarded-text); }

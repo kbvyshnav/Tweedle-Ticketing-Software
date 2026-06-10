@@ -62,3 +62,43 @@
     justify-content: flex-end;
     margin-top: var(--tw-space-6);
 }
+
+
+/* ============================================================
+ * RESPONSIVE — canonical breakpoints 1024 / 768 / 576
+ * The Email-Notifications table (event + 2 role columns) would
+ * crush on narrow screens, so let the section scroll horizontally
+ * while the table keeps a usable minimum width. No wrapper element
+ * is required (project tables normally use .table-scroll-wrapper;
+ * here the scroll is applied to the section instead).
+ * ============================================================ */
+
+@media screen and (max-width: 768px) {
+    .tw-settings-page {
+        max-width: 100%;
+    }
+
+    /* Only scrolls when its content actually overflows (the table). */
+    .tw-settings-section {
+        overflow-x: auto;
+    }
+
+    .tw-settings-table {
+        min-width: 520px;
+    }
+
+    .tw-settings-save-row {
+        justify-content: stretch;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .tw-settings-table th,
+    .tw-settings-table td {
+        padding: var(--tw-space-2) var(--tw-space-3);
+    }
+
+    .tw-settings-table td:last-child {
+        width: 88px;
+    }
+}

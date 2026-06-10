@@ -9,9 +9,11 @@
  * LOAD ORDER:  2 of 5 — after tweedle-tokens.css, before base
  * DJANGO PATH: <!-- Django: {% static 'css/themes/theme-subuser.css' %} -->
  * APPLIED VIA: <body class="role-subuser"> on the shell template
- * NOTE:        Amber is a light color. Primary text (#92711a) is
- *              dark brown to maintain contrast on white surfaces.
- *              White text on amber buttons passes WCAG AA at 14px bold.
+ * NOTE:        Amber is a light color. Primary text (#644d12) is a
+ *              dark brown that meets WCAG AA (>=4.5:1) both on the amber
+ *              button background (#ecbe25 -> 4.58:1) and on the light
+ *              amber tint (#FFF2C6 -> 7.19:1). On hover the button
+ *              darkens (#d1a513) and switches to white text.
  * MODIFIED:    <!-- Last modified: {{date}} -->
  * ============================================================
  */
@@ -22,7 +24,7 @@
     --tw-primary:       #ecbe25;
     --tw-primary-dark:  #d1a513;
     --tw-primary-light: #FFF2C6;
-    --tw-primary-text:  #92711a;
+    --tw-primary-text:  #644d12;
 
     --tw-shadow-primary: 0 4px 12px rgba(236, 190, 37, 0.35);
 }

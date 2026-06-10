@@ -182,7 +182,8 @@
                     <!-- Django: {% endfor %} -->
                 </div>
 
-                <div class="tw-notif-panel-footer">
+                <!-- Footer link hidden: no client notifications page exists yet (href="#"). -->
+                <div class="tw-notif-panel-footer" style="display: none;">
                     <!-- Django: href="{% url 'client_notifications' %}" -->
                     <!-- Django: href="{% url 'client_notifications' %}" -->
                     <a href="#" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
@@ -516,13 +517,13 @@
 
                         <!-- Row 1: In Progress | Medium | 10 Apr 2025 -->
                         <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
-                        <tr data-ticket-status="progress"
+                        <tr data-status="in_progress"
                             data-ticket-id="TKT-GMEC-001"
                             data-subject="Payment gateway timeout"
                             data-priority="medium"
                             data-submitted-date="2025-04-10"
                             style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-001&amp;status=progress'"
+                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-001&amp;status=in_progress'"
                             aria-label="View ticket TKT-GMEC-001">
                             <td>
                                 <!-- FIX 1: Star icon + ticket ID in flex wrapper -->
@@ -569,7 +570,7 @@
 
                         <!-- Row 2: UAT Approval | Medium | 15 Apr 2025 — "Your Review Needed" -->
                         <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
-                        <tr data-ticket-status="uat"
+                        <tr data-status="uat"
                             data-ticket-id="TKT-GMEC-002"
                             data-subject="Bulk export CSV missing columns"
                             data-priority="medium"
@@ -617,7 +618,7 @@
 
                         <!-- Row 3: Forwarded / Your Input Needed | High | 18 Apr 2025 — "Action Required" -->
                         <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
-                        <tr data-ticket-status="forwarded"
+                        <tr data-status="forwarded"
                             data-ticket-id="TKT-GMEC-003"
                             data-subject="User role permissions not saving"
                             data-priority="high"
@@ -665,7 +666,7 @@
 
                         <!-- Row 4: New | Low | 02 May 2025 — no attachment -->
                         <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
-                        <tr data-ticket-status="new"
+                        <tr data-status="new"
                             data-ticket-id="TKT-GMEC-004"
                             data-subject="Invoice generation wrong totals"
                             data-priority="low"
@@ -705,7 +706,7 @@
 
                         <!-- Row 5: Closed | Low | 28 Mar 2025 — no attachment -->
                         <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
-                        <tr data-ticket-status="closed"
+                        <tr data-status="closed"
                             data-ticket-id="TKT-GMEC-005"
                             data-subject="Dashboard not loading on mobile"
                             data-priority="low"
@@ -745,7 +746,7 @@
 
                         <!-- Row 6: Rejected | High | 20 Mar 2025 — no attachment -->
                         <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
-                        <tr data-ticket-status="rejected"
+                        <tr data-status="rejected"
                             data-ticket-id="TKT-GMEC-006"
                             data-subject="API rate limit errors on sync"
                             data-priority="high"
@@ -785,7 +786,7 @@
 
                         <!-- Row 7: Resolved | High | 10 Apr 2025 — "Awaiting Closure" -->
                         <!-- Django: {% if ticket.status == 'resolved' %} -->
-                        <tr data-ticket-status="resolved"
+                        <tr data-status="resolved"
                             data-ticket-id="TKT-GMEC-007"
                             data-subject="Payment gateway timeout on checkout"
                             data-priority="high"
@@ -1196,7 +1197,7 @@
 
     /* Store original DOM order so sort can be fully reset */
     (function storeOriginalOrder() {
-        var rows = document.querySelectorAll('#ticketTableBody tr[data-ticket-status]');
+        var rows = document.querySelectorAll('#ticketTableBody tr[data-status]');
         rows.forEach(function (row, i) { row.dataset.originalOrder = i; });
     })();
 
@@ -1207,7 +1208,7 @@
      * Runs after every state change, then applies sort.
      * ============================================================ */
     function applyClientFilters() {
-        var rows = document.querySelectorAll('#ticketTableBody tr[data-ticket-status]');
+        var rows = document.querySelectorAll('#ticketTableBody tr[data-status]');
 
         rows.forEach(function (row) {
             if (checkRowMatch(row)) {
@@ -1228,7 +1229,7 @@
      * Returns true if the row satisfies ALL active filters.
      */
     function checkRowMatch(row) {
-        var rowStatus   = row.dataset.ticketStatus || '';
+        var rowStatus   = row.dataset.status || '';
         var rowId       = (row.dataset.ticketId    || '').toLowerCase();
         var rowSubject  = (row.dataset.subject      || '').toLowerCase();
         var rowPriority = (row.dataset.priority     || '').toLowerCase();
@@ -1241,7 +1242,7 @@
             statusMatch = true;
         } else if (s === 'open') {
             /* Open = any active ticket: new, in progress, forwarded, or awaiting UAT */
-            statusMatch = ['new', 'progress', 'forwarded', 'uat'].indexOf(rowStatus) !== -1;
+            statusMatch = ['new', 'in_progress', 'forwarded', 'uat'].indexOf(rowStatus) !== -1;
         } else if (s === 'needs-action') {
             /* Needs Action = tickets requiring client response or approval */
             statusMatch = rowStatus === 'forwarded' || rowStatus === 'uat';
@@ -1290,7 +1291,7 @@
     function applySortOrder() {
         var tbody = document.getElementById('ticketTableBody');
         var rows  = Array.prototype.slice.call(
-            tbody.querySelectorAll('tr[data-ticket-status]')
+            tbody.querySelectorAll('tr[data-status]')
         );
 
         rows.sort(function (a, b) {
@@ -1713,7 +1714,7 @@
 
     function updateClientEmptyState() {
         var visibleRows = document.querySelectorAll(
-            '#ticketTableBody tr[data-ticket-status]:not(.row-hidden)'
+            '#ticketTableBody tr[data-status]:not(.row-hidden)'
         ).length;
         var emptyState = document.getElementById('clientEmptyState');
         var emptyMsg   = document.getElementById('clientEmptyMsg');

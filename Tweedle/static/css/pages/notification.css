@@ -244,3 +244,18 @@ body > .notif-preview-wrapper {
     margin-bottom: var(--tw-space-3);
     opacity: 0.4;
 }
+
+
+/* ============================================================
+ * RESPONSIVE — canonical breakpoints 1024 / 768 / 576
+ * The dropdown panel has a fixed 380px width; on narrow screens
+ * it would overflow the viewport. Clamp it so it always fits and
+ * stays pinned to the bell's right edge (panel is right:0 anchored).
+ * ============================================================ */
+
+@media screen and (max-width: 576px) {
+    .tw-notif-panel {
+        width: min(320px, calc(100vw - 32px));
+        max-height: 70vh;
+    }
+}

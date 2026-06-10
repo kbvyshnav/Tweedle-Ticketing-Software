@@ -164,7 +164,8 @@
                     </div>
                     <!-- Django: {% endfor %} -->
                 </div>
-                <div class="tw-notif-panel-footer">
+                <!-- Footer link hidden: this IS the notifications page (self-reference). -->
+                <div class="tw-notif-panel-footer" style="display: none;">
                     <!-- Django: href="{% url 'subuser:notifications' %}" -->
                     <a href="notifications.html" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
                 </div>
@@ -296,7 +297,7 @@
             <div class="tw-notif-item unread"
                  data-notif-type="needs-action"
                  data-ticket-id="TKT-GMEC-103"
-                 data-ticket-status="forwarded"
+                 data-status="forwarded"
                  role="button"
                  tabindex="0"
                  onclick="handleNotifClick(this)"
@@ -319,7 +320,7 @@
             <div class="tw-notif-item unread"
                  data-notif-type="needs-action"
                  data-ticket-id="TKT-GMEC-105"
-                 data-ticket-status="uat"
+                 data-status="uat"
                  role="button"
                  tabindex="0"
                  onclick="handleNotifClick(this)"
@@ -341,7 +342,7 @@
             <div class="tw-notif-item"
                  data-notif-type="resolved"
                  data-ticket-id="TKT-GMEC-102"
-                 data-ticket-status="resolved"
+                 data-status="resolved"
                  role="button"
                  tabindex="0"
                  onclick="handleNotifClick(this)"
@@ -362,7 +363,7 @@
             <div class="tw-notif-item"
                  data-notif-type="closed"
                  data-ticket-id="TKT-GMEC-098"
-                 data-ticket-status="closed"
+                 data-status="closed"
                  role="button"
                  tabindex="0"
                  onclick="handleNotifClick(this)"
@@ -385,7 +386,7 @@
             <div class="tw-notif-item"
                  data-notif-type="closed"
                  data-ticket-id="TKT-GMEC-101"
-                 data-ticket-status="progress"
+                 data-status="in_progress"
                  role="button"
                  tabindex="0"
                  onclick="handleNotifClick(this)"
@@ -408,7 +409,7 @@
             <div class="tw-notif-item"
                  data-notif-type="closed"
                  data-ticket-id="TKT-GMEC-098"
-                 data-ticket-status="closed"
+                 data-status="closed"
                  role="button"
                  tabindex="0"
                  onclick="handleNotifClick(this)"
@@ -592,7 +593,7 @@
 
         /* Navigate to ticket if ticket-id is set */
         var ticketId     = el.dataset.ticketId;
-        var ticketStatus = el.dataset.ticketStatus;
+        var ticketStatus = el.dataset.status;
         if (ticketId) {
             /* Django: href="{% url 'subuser:ticket_detail' notification.ticket_id %}" */
             window.location.href = 'ticket-detail.html?id=' + ticketId + (ticketStatus ? '&status=' + ticketStatus : '');

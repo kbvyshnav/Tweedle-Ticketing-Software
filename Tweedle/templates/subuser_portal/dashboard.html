@@ -497,13 +497,13 @@
 
                         <!-- Row 1: In Progress | Medium | 10 Apr 2025 -->
                         <!-- Django: onclick="window.location.href='{% url 'subuser:ticket_detail' ticket.id %}'" -->
-                        <tr data-ticket-status="progress"
+                        <tr data-status="in_progress"
                             data-ticket-id="TKT-GMEC-101"
                             data-subject="Login page error on Firefox"
                             data-priority="medium"
                             data-submitted-date="2025-04-10"
                             style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-101&amp;status=progress'"
+                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-101&amp;status=in_progress'"
                             aria-label="View ticket TKT-GMEC-101">
                             <td>
                                 <div class="ticket-id-cell">
@@ -548,7 +548,7 @@
 
                         <!-- Row 2: Your Input Needed | Medium | 15 Apr 2025 — "Action Required" -->
                         <!-- Django: onclick="window.location.href='{% url 'subuser:ticket_detail' ticket.id %}'" -->
-                        <tr data-ticket-status="forwarded"
+                        <tr data-status="forwarded"
                             data-ticket-id="TKT-GMEC-103"
                             data-subject="Email notification not received"
                             data-priority="medium"
@@ -591,7 +591,7 @@
 
                         <!-- Row 3: New | Low | 02 May 2025 -->
                         <!-- Django: onclick="window.location.href='{% url 'subuser:ticket_detail' ticket.id %}'" -->
-                        <tr data-ticket-status="new"
+                        <tr data-status="new"
                             data-ticket-id="TKT-GMEC-104"
                             data-subject="User dashboard slow loading"
                             data-priority="low"
@@ -631,7 +631,7 @@
 
                         <!-- Row 3b: Please Verify | Medium | 22 Apr 2025 — UAT state, action dot -->
                         <!-- Django: onclick="window.location.href='{% url 'subuser:ticket_detail' ticket.id %}'" -->
-                        <tr data-ticket-status="uat"
+                        <tr data-status="uat"
                             data-ticket-id="TKT-GMEC-105"
                             data-subject="Invoice download generates incorrect PDF"
                             data-priority="medium"
@@ -675,7 +675,7 @@
 
                         <!-- Row 4: Resolved | Medium | 10 Apr 2025 — "Awaiting Closure" -->
                         <!-- Django: onclick="window.location.href='{% url 'subuser:ticket_detail' ticket.id %}'" -->
-                        <tr data-ticket-status="resolved"
+                        <tr data-status="resolved"
                             data-ticket-id="TKT-GMEC-102"
                             data-subject="Export button not visible on reports page"
                             data-priority="medium"
@@ -716,7 +716,7 @@
 
                         <!-- Row 5: Closed | Low | 28 Feb 2025 -->
                         <!-- Django: onclick="window.location.href='{% url 'subuser:ticket_detail' ticket.id %}'" -->
-                        <tr data-ticket-status="closed"
+                        <tr data-status="closed"
                             data-ticket-id="TKT-GMEC-098"
                             data-subject="Password reset link expired too quickly"
                             data-priority="low"
@@ -1093,13 +1093,13 @@
     var clientSortOrder = 'default';
 
     (function storeOriginalOrder() {
-        var rows = document.querySelectorAll('#ticketTableBody tr[data-ticket-status]');
+        var rows = document.querySelectorAll('#ticketTableBody tr[data-status]');
         rows.forEach(function (row, i) { row.dataset.originalOrder = i; });
     })();
 
 
     function applyClientFilters() {
-        var rows = document.querySelectorAll('#ticketTableBody tr[data-ticket-status]');
+        var rows = document.querySelectorAll('#ticketTableBody tr[data-status]');
         rows.forEach(function (row) {
             if (checkRowMatch(row)) {
                 row.classList.remove('row-hidden');
@@ -1112,7 +1112,7 @@
     }
 
     function checkRowMatch(row) {
-        var rowStatus   = row.dataset.ticketStatus || '';
+        var rowStatus   = row.dataset.status || '';
         var rowId       = (row.dataset.ticketId    || '').toLowerCase();
         var rowSubject  = (row.dataset.subject      || '').toLowerCase();
         var rowPriority = (row.dataset.priority     || '').toLowerCase();
@@ -1123,7 +1123,7 @@
         if (s === 'all') {
             statusMatch = true;
         } else if (s === 'open') {
-            statusMatch = ['new', 'progress', 'forwarded', 'uat'].indexOf(rowStatus) !== -1;
+            statusMatch = ['new', 'in_progress', 'forwarded', 'uat'].indexOf(rowStatus) !== -1;
         } else if (s === 'needs-action') {
             statusMatch = rowStatus === 'forwarded' || rowStatus === 'uat';
         } else if (s === 'resolved') {
@@ -1160,7 +1160,7 @@
 
     function applySortOrder() {
         var tbody = document.getElementById('ticketTableBody');
-        var rows  = Array.prototype.slice.call(tbody.querySelectorAll('tr[data-ticket-status]'));
+        var rows  = Array.prototype.slice.call(tbody.querySelectorAll('tr[data-status]'));
         rows.sort(function (a, b) {
             if (clientSortOrder === 'oldest') {
                 return new Date(a.dataset.submittedDate) - new Date(b.dataset.submittedDate);
@@ -1440,7 +1440,7 @@
 
     function updateClientEmptyState() {
         var visibleRows = document.querySelectorAll(
-            '#ticketTableBody tr[data-ticket-status]:not(.row-hidden)'
+            '#ticketTableBody tr[data-status]:not(.row-hidden)'
         ).length;
         var emptyState = document.getElementById('clientEmptyState');
         var emptyMsg   = document.getElementById('clientEmptyMsg');

@@ -147,7 +147,8 @@
                     </div>
                     <!-- Django: {% endfor %} -->
                 </div>
-                <div class="tw-notif-panel-footer">
+                <!-- Footer link hidden: no client notifications page exists yet (href="#"). -->
+                <div class="tw-notif-panel-footer" style="display: none;">
                     <!-- Django: href="{% url 'client_notifications' %}" -->
                     <a href="#" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
                 </div>
@@ -363,6 +364,7 @@
                     style="display:none"
                     multiple
                     accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                    aria-label="Attach files (optional)"
                     onchange="addSelectedFiles(this)">
 
                 <!-- Drag & drop zone (compact) -->

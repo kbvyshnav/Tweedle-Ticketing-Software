@@ -322,7 +322,7 @@
 
                 <div class="tw-notif-panel-footer">
                     <!-- Django: href="{% url 'admin_notifications' %}" -->
-                    <a href="#" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
+                    <a href="#" class="tw-btn tw-btn-outline tw-btn--sm" onclick="loadPage('admin_portal/notifications.html'); return false;">View all notifications</a>
                 </div>
             </div>
         </div>
@@ -489,19 +489,24 @@
     }
 
 
-    notifBellBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        const isOpen = notifPanel.classList.toggle('open');
-        notifBellBtn.setAttribute('aria-expanded', isOpen);
-    });
-
-    document.getElementById('markAllReadBtn').addEventListener('click', function () {
-        document.querySelectorAll('.tw-notif-item.unread').forEach(function (item) {
-            item.classList.remove('unread');
+    if (notifBellBtn) {
+        notifBellBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const isOpen = notifPanel.classList.toggle('open');
+            notifBellBtn.setAttribute('aria-expanded', isOpen);
         });
-        const badge = document.getElementById('notifCount');
-        if (badge) badge.remove();
-    });
+    }
+
+    var markAllReadBtn = document.getElementById('markAllReadBtn');
+    if (markAllReadBtn) {
+        markAllReadBtn.addEventListener('click', function () {
+            document.querySelectorAll('.tw-notif-item.unread').forEach(function (item) {
+                item.classList.remove('unread');
+            });
+            const badge = document.getElementById('notifCount');
+            if (badge) badge.remove();
+        });
+    }
 
     document.addEventListener('click', function (e) {
         if (!notifBellBtn.contains(e.target) && !notifPanel.contains(e.target)) {

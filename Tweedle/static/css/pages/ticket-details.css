@@ -361,7 +361,7 @@ body {
 
 /* Fixed orange gradient header — overrides role-aware default */
 .tw-modal-header--new {
-    background: linear-gradient(135deg, #FD7238, #e65c2e);
+    background: linear-gradient(135deg, var(--tw-warning), var(--tw-warning-dark));
 }
 
 /* Form structure */
@@ -577,7 +577,7 @@ body {
                 box-shadow var(--tw-transition-fast);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    background: linear-gradient(135deg, var(--tw-success), #20a83a);
+    background: linear-gradient(135deg, var(--tw-success), var(--tw-success-dark));
     color: #ffffff;
     box-shadow: 0 4px 15px rgba(40, 199, 66, 0.30);
 }
@@ -612,7 +612,7 @@ body {
                 box-shadow var(--tw-transition-fast);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    background: linear-gradient(135deg, var(--tw-danger), #c93d37);
+    background: linear-gradient(135deg, var(--tw-danger), var(--tw-danger-dark));
     color: #ffffff;
     box-shadow: 0 4px 15px rgba(219, 80, 74, 0.30);
 }
@@ -713,7 +713,7 @@ body {
 }
 
 .tw-btn-close-ticket:hover {
-    background: #218838;
+    background: var(--tw-success-dark);
     color: #ffffff;
 }
 
@@ -1038,8 +1038,7 @@ body {
  * STATUS-DRIVEN LEFT BORDER ACCENT ON MODAL CONTAINER
  * Gives immediate visual identity based on ticket state.
  * ============================================================ */
-#ticketDetailsModal[data-status="progress"] .tw-modal-container,
-#ticketDetailsModal[data-status="inprogress"] .tw-modal-container,
+#ticketDetailsModal[data-status="in_progress"] .tw-modal-container,
 #ticketDetailsModal[data-status="new"] .tw-modal-container {
     border-left: 4px solid var(--tw-status-progress-text);
 }

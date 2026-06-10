@@ -7,7 +7,7 @@
 
   TICKET_STATUS drives all page content.
   Change var TICKET_STATUS at the top of the script to preview
-  any of the 7 states: 'new'|'progress'|'forwarded'|'uat'|'resolved'|'closed'|'rejected'
+  any of the 7 states: 'new'|'in_progress'|'forwarded'|'uat'|'resolved'|'closed'|'rejected'
 -->
 <!-- Django: {% extends 'client_base.html' %} -->
 <!-- Django: {% block body_role %}user{% endblock %} -->
@@ -135,7 +135,8 @@
                     </div>
                     <!-- Django: {% endfor %} -->
                 </div>
-                <div class="tw-notif-panel-footer">
+                <!-- Footer link hidden: no client notifications page exists yet (href="#"). -->
+                <div class="tw-notif-panel-footer" style="display: none;">
                     <!-- Django: href="{% url 'client_notifications' %}" -->
                     <a href="#" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
                 </div>
@@ -254,7 +255,7 @@
                 <!-- Django: {% endif %} -->
 
                 <!-- STATUS: progress — work in progress, information only -->
-                <!-- Django: {% if ticket.status == 'progress' %} -->
+                <!-- Django: {% if ticket.status == 'in_progress' %} -->
                 <div class="tw-action-card tw-action-card--info-progress" id="actionCardProgress" style="display:none">
                     <div class="tw-action-card__inner">
                         <div class="tw-action-card__header">
@@ -836,7 +837,7 @@ Actual: only Ticket ID, Client, Subject, Priority, Status, and Issue Date column
             chatHidden:   false
         },
 
-        'progress': {
+        'in_progress': {
             headerBadge: '<span class="tw-status-badge tw-status-badge--progress">In Progress</span>',
             showActionDot: false,
             infoRows: [
@@ -1116,7 +1117,7 @@ Actual: only Ticket ID, Client, Subject, Priority, Status, and Issue Date column
                     { label: 'Assigned To',     value: '<span style="color:var(--tw-text-muted);font-style:italic">Pending assignment</span>' },
                     { label: 'Est. Resolution', value: '<span style="color:var(--tw-text-muted)">To be confirmed</span>' }
                 ];
-            case 'progress':
+            case 'in_progress':
                 return [
                     { label: 'Status',          value: '<span class="tw-status-badge tw-status-badge--progress">In Progress</span>' },
                     { label: 'Sub-status',      value: '<span class="tw-status-badge tw-status-badge--development">Development</span>' },
@@ -1207,7 +1208,7 @@ Actual: only Ticket ID, Client, Subject, Priority, Status, and Issue Date column
         /* Show correct action card, hide all others */
         var cardMap = {
             'new':      'actionCardNew',
-            'progress': 'actionCardProgress',
+            'in_progress': 'actionCardProgress',
             'forwarded':'awaitingActionCard',
             'uat':      'uatActionCard',
             'resolved': 'actionCardResolved',

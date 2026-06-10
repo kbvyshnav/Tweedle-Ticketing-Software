@@ -223,7 +223,7 @@
                         <!-- Django: {% for ticket in assigned_tickets %} -->
 
                         <!-- Row 1: In Progress | High -->
-                        <tr data-ticket-status="active">
+                        <tr data-status="active">
                             <!-- Django: {{ ticket.ticket_id }} -->
                             <td><span class="tw-ticket-id">GMEC25010001</span></td>
                             <!-- Django: {{ ticket.subject }} -->
@@ -235,7 +235,7 @@
                         </tr>
 
                         <!-- Row 2: In Progress | Medium -->
-                        <tr data-ticket-status="active">
+                        <tr data-status="active">
                             <td><span class="tw-ticket-id">BGEX25020001</span></td>
                             <td>Payment Gateway Integration — redirect loop</td>
                             <td><span class="tw-count-badge" style="background:var(--tw-status-inbox-bg);color:var(--tw-status-inbox-text)">BGEX</span></td>
@@ -244,7 +244,7 @@
                         </tr>
 
                         <!-- Row 3: In Progress | Medium -->
-                        <tr data-ticket-status="active">
+                        <tr data-status="active">
                             <td><span class="tw-ticket-id">GMEC25010004</span></td>
                             <td>Invoice generation calculates wrong totals</td>
                             <td><span class="tw-count-badge" style="background:var(--tw-status-inbox-bg);color:var(--tw-status-inbox-text)">GMEC</span></td>
@@ -253,7 +253,7 @@
                         </tr>
 
                         <!-- Row 4: Testing | High -->
-                        <tr data-ticket-status="active">
+                        <tr data-status="active">
                             <td><span class="tw-ticket-id">BGEX25010013</span></td>
                             <td>User role permissions not saving after update</td>
                             <td><span class="tw-count-badge" style="background:var(--tw-status-inbox-bg);color:var(--tw-status-inbox-text)">BGEX</span></td>
@@ -262,7 +262,7 @@
                         </tr>
 
                         <!-- Row 5: Resolved | Low -->
-                        <tr data-ticket-status="closed">
+                        <tr data-status="closed">
                             <td><span class="tw-ticket-id">GMEC25010005</span></td>
                             <td>Dashboard not loading on mobile devices</td>
                             <td><span class="tw-count-badge" style="background:var(--tw-status-inbox-bg);color:var(--tw-status-inbox-text)">GMEC</span></td>
@@ -271,7 +271,7 @@
                         </tr>
 
                         <!-- Row 6: Closed | High -->
-                        <tr data-ticket-status="closed">
+                        <tr data-status="closed">
                             <td><span class="tw-ticket-id">BGEX25010008</span></td>
                             <td>API rate limit errors during overnight sync</td>
                             <td><span class="tw-count-badge" style="background:var(--tw-status-inbox-bg);color:var(--tw-status-inbox-text)">BGEX</span></td>
@@ -423,7 +423,7 @@
 
     memberTicketSearch.addEventListener('input', function () {
         var filter = this.value.trim().toLowerCase();
-        var rows   = document.querySelectorAll('#memberTicketTable tbody tr[data-ticket-status]');
+        var rows   = document.querySelectorAll('#memberTicketTable tbody tr[data-status]');
         var visible = 0;
         rows.forEach(function (row) {
             var match = row.textContent.toLowerCase().includes(filter);
@@ -446,10 +446,10 @@
         btn.classList.remove('tw-btn-outline');
         btn.classList.add('tw-btn-primary');
 
-        var rows    = document.querySelectorAll('#memberTicketTable tbody tr[data-ticket-status]');
+        var rows    = document.querySelectorAll('#memberTicketTable tbody tr[data-status]');
         var visible = 0;
         rows.forEach(function (row) {
-            var show = status === 'all' || row.dataset.ticketStatus === status;
+            var show = status === 'all' || row.dataset.status === status;
             row.classList.toggle('row-hidden', !show);
             if (show) visible++;
         });

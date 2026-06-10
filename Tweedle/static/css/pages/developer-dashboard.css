@@ -630,9 +630,9 @@
 }
 
 /* Border color by sub-status */
-.dev-ticket-header-card[data-substatus="development"] { border-left-color: var(--tw-status-development-text); }
-.dev-ticket-header-card[data-substatus="testing"]     { border-left-color: var(--tw-status-testing-text); }
-.dev-ticket-header-card[data-substatus="uat"]         { border-left-color: var(--tw-status-uat-text); }
+.dev-ticket-header-card[data-sub-status="development"] { border-left-color: var(--tw-status-development-text); }
+.dev-ticket-header-card[data-sub-status="testing"]     { border-left-color: var(--tw-status-testing-text); }
+.dev-ticket-header-card[data-sub-status="uat"]         { border-left-color: var(--tw-status-uat-text); }
 
 .dev-ticket-header-id {
     font-size: var(--tw-text-sm);
@@ -1426,6 +1426,19 @@
 @media (max-width: 576px) {
     .dev-page-header {
         flex-direction: column;
+        align-items: flex-start;
+    }
+
+    /* Backfill to match client-dashboard.css 576 coverage:
+     * stacked confirm buttons + capped chat height. Stat strip
+     * already collapses to one column at 768px; ticket table
+     * scrolls horizontally inside its .table-scroll-wrapper. */
+    .dev-confirm-buttons {
+        flex-direction: column;
+    }
+
+    .dev-chat-thread {
+        max-height: 280px;
     }
 
     .dev-confirm-box {

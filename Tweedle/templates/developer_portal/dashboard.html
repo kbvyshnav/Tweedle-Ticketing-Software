@@ -392,19 +392,19 @@
                      View should read: substatus_filter = request.GET.get('substatus', 'all') -->
                 <!-- Sub-status filter pills -->
                 <div class="dev-filter-pills" role="group" aria-label="Filter by stage">
-                    <button class="dev-filter-pill active" data-substatus="all"
+                    <button class="dev-filter-pill active" data-sub-status="all"
                             onclick="filterByPill('all', this)">All</button>
-                    <button class="dev-filter-pill" data-substatus="development"
+                    <button class="dev-filter-pill" data-sub-status="development"
                             onclick="filterByPill('development', this)">Development</button>
-                    <button class="dev-filter-pill" data-substatus="testing"
+                    <button class="dev-filter-pill" data-sub-status="testing"
                             onclick="filterByPill('testing', this)">Testing</button>
-                    <button class="dev-filter-pill" data-substatus="uat"
+                    <button class="dev-filter-pill" data-sub-status="uat"
                             onclick="filterByPill('uat', this)">UAT Stage</button>
-                    <button class="dev-filter-pill" data-substatus="forwarded"
+                    <button class="dev-filter-pill" data-sub-status="forwarded"
                             onclick="filterByPill('forwarded', this)">Awaiting</button>
-                    <button class="dev-filter-pill" data-substatus="uat"
+                    <button class="dev-filter-pill" data-sub-status="uat"
                             onclick="filterByPill('uat', this)">UAT Review</button>
-                    <button class="dev-filter-pill" data-substatus="overdue"
+                    <button class="dev-filter-pill" data-sub-status="overdue"
                             onclick="filterByPill('overdue', this)">Overdue</button>
                 </div>
 
@@ -512,13 +512,14 @@
                             High | Testing | OVERDUE (15 May 2025)
                         -->
                         <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
-                        <tr data-substatus="testing"
+                        <tr data-sub-status="testing"
                             data-priority="high"
                             data-overdue="true"
                             data-id="GMEC25010001"
                             data-subject="wallet option agents"
                             data-issue-date="2021-09-11"
                             style="cursor:pointer"
+                            data-status="in_progress"
                             onclick="window.location.href='ticket-detail.html?id=GMEC25010001&amp;substatus=testing'"
                             aria-label="View ticket GMEC25010001">
                             <td>
@@ -571,13 +572,14 @@
                             Medium | Development | OVERDUE (20 May 2025)
                         -->
                         <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
-                        <tr data-substatus="development"
+                        <tr data-sub-status="development"
                             data-priority="medium"
                             data-overdue="true"
                             data-id="GMEC25010004"
                             data-subject="kumari api integration"
                             data-issue-date="2022-01-08"
                             style="cursor:pointer"
+                            data-status="in_progress"
                             onclick="window.location.href='ticket-detail.html?id=GMEC25010004&amp;substatus=development'"
                             aria-label="View ticket GMEC25010004">
                             <td>
@@ -620,13 +622,14 @@
                             Medium | UAT | not overdue
                         -->
                         <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
-                        <tr data-substatus="uat"
+                        <tr data-sub-status="uat"
                             data-priority="medium"
                             data-overdue="false"
                             data-id="BGEX25010013"
                             data-subject="user role permissions not saving"
                             data-issue-date="2025-05-05"
                             style="cursor:pointer"
+                            data-status="in_progress"
                             onclick="window.location.href='ticket-detail.html?id=BGEX25010013&amp;substatus=uat'"
                             aria-label="View ticket BGEX25010013">
                             <td>
@@ -676,13 +679,14 @@
                             High | Development | not overdue
                         -->
                         <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
-                        <tr data-substatus="development"
+                        <tr data-sub-status="development"
                             data-priority="high"
                             data-overdue="false"
                             data-id="GMEC25010010"
                             data-subject="payment gateway timeout on checkout"
                             data-issue-date="2025-04-14"
                             style="cursor:pointer"
+                            data-status="in_progress"
                             onclick="window.location.href='ticket-detail.html?id=GMEC25010010&amp;substatus=development'"
                             aria-label="View ticket GMEC25010010">
                             <td>
@@ -724,13 +728,14 @@
                             Low | Testing | not overdue
                         -->
                         <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
-                        <tr data-substatus="testing"
+                        <tr data-sub-status="testing"
                             data-priority="low"
                             data-overdue="false"
                             data-id="BGEX25020003"
                             data-subject="mobile app crash on login"
                             data-issue-date="2025-02-21"
                             style="cursor:pointer"
+                            data-status="in_progress"
                             onclick="window.location.href='ticket-detail.html?id=BGEX25020003&amp;substatus=testing'"
                             aria-label="View ticket BGEX25020003">
                             <td>
@@ -772,13 +777,14 @@
                             High | Development | not overdue
                         -->
                         <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
-                        <tr data-substatus="development"
+                        <tr data-sub-status="development"
                             data-priority="high"
                             data-overdue="false"
                             data-id="GMEC25010012"
                             data-subject="invoice generation incorrect totals"
                             data-issue-date="2025-05-02"
                             style="cursor:pointer"
+                            data-status="in_progress"
                             onclick="window.location.href='ticket-detail.html?id=GMEC25010012&amp;substatus=development'"
                             aria-label="View ticket GMEC25010012">
                             <td>
@@ -821,7 +827,7 @@
                         -->
                         <!-- Django: {% if ticket.status == 'forwarded' %} render this row variant {% endif %} -->
                         <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
-                        <tr data-substatus="forwarded"
+                        <tr data-sub-status="forwarded"
                             data-status="forwarded"
                             data-priority="medium"
                             data-overdue="true"
@@ -873,7 +879,7 @@
                             High | Resolved
                         -->
                         <!-- Django: resolved ticket row -->
-                        <tr data-substatus="resolved"
+                        <tr data-sub-status="resolved"
                             data-status="resolved"
                             data-priority="high"
                             data-overdue="false"
@@ -919,7 +925,7 @@
                             Medium | Resolved
                         -->
                         <!-- Django: resolved ticket row -->
-                        <tr data-substatus="resolved"
+                        <tr data-sub-status="resolved"
                             data-status="resolved"
                             data-priority="medium"
                             data-overdue="false"
@@ -965,7 +971,7 @@
                             High | UAT Review | OVERDUE (28 Apr 2025)
                         -->
                         <!-- Django: uat ticket row -->
-                        <tr data-substatus="uat"
+                        <tr data-sub-status="uat"
                             data-status="uat"
                             data-priority="high"
                             data-overdue="true"
@@ -1018,7 +1024,7 @@
                             Low | Closed (28 Mar 2025)
                         -->
                         <!-- Django: closed ticket row -->
-                        <tr data-substatus="closed"
+                        <tr data-sub-status="closed"
                             data-status="closed"
                             data-priority="low"
                             data-overdue="false"
@@ -1070,7 +1076,7 @@
                             Medium | Closed (01 Mar 2025)
                         -->
                         <!-- Django: closed ticket row -->
-                        <tr data-substatus="closed"
+                        <tr data-sub-status="closed"
                             data-status="closed"
                             data-priority="medium"
                             data-overdue="false"
@@ -1350,7 +1356,7 @@
         });
 
         /* Store original row order for sort-reset */
-        var rows = document.querySelectorAll('#devTableBody tr[data-substatus]');
+        var rows = document.querySelectorAll('#devTableBody tr[data-sub-status]');
         rows.forEach(function (row, i) { row.dataset.originalOrder = i; });
 
         /* Restore active filter from URL param (back-link navigation from ticket-detail) */
@@ -1366,7 +1372,7 @@
             } else if (['development', 'testing', 'uat', 'overdue'].indexOf(_filterParam) !== -1) {
                 devFilters.substatus = _filterParam;
             }
-            var _matchingPill = document.querySelector('.dev-filter-pill[data-substatus="' + _filterParam + '"]');
+            var _matchingPill = document.querySelector('.dev-filter-pill[data-sub-status="' + _filterParam + '"]');
             if (_matchingPill) {
                 document.querySelectorAll('.dev-filter-pill').forEach(function (p) { p.classList.remove('active'); });
                 _matchingPill.classList.add('active');
@@ -1399,7 +1405,7 @@
      * Runs after every state change, then applies sort.
      * ============================================================ */
     function applyDevFilters() {
-        var rows = document.querySelectorAll('#devTableBody tr[data-substatus]');
+        var rows = document.querySelectorAll('#devTableBody tr[data-sub-status]');
         var visibleCount = 0;
 
         rows.forEach(function (row) {
@@ -1419,7 +1425,7 @@
 
     /* devRowMatches(row): returns true if ALL active filters match */
     function devRowMatches(row) {
-        var rowSubstatus = (row.dataset.substatus || '').toLowerCase();
+        var rowSubstatus = (row.dataset.subStatus || '').toLowerCase();
         var rowPriority  = (row.dataset.priority  || '').toLowerCase();
         var rowOverdue   = row.dataset.overdue === 'true';
         var rowId        = (row.dataset.id      || '').toLowerCase();
@@ -1468,7 +1474,7 @@
     function applyDevSortOrder() {
         var tbody = document.getElementById('devTableBody');
         var rows  = Array.prototype.slice.call(
-            tbody.querySelectorAll('tr[data-substatus]')
+            tbody.querySelectorAll('tr[data-sub-status]')
         );
 
         rows.sort(function (a, b) {
@@ -1544,7 +1550,7 @@
     function setActivePill(substatus) {
         document.querySelectorAll('.dev-filter-pill').forEach(function (p) {
             p.classList.remove('active');
-            if (p.dataset.substatus === substatus) p.classList.add('active');
+            if (p.dataset.subStatus === substatus) p.classList.add('active');
         });
     }
 

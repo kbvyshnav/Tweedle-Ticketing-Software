@@ -8,6 +8,11 @@ TODO.txt
 # ── AI and project meta files ───────────────────────────────────
 .claude/
 PROJECT_HANDOFF.md
+RECON_REPORT.md
+FRONTEND_QA.md
+STATUS_TAXONOMY.md
+TARGET_TICKET_FLOW.md
+CURRENT_TICKET_FLOW.md
 
 # ── OS generated files ──────────────────────────────────────────
 .DS_Store

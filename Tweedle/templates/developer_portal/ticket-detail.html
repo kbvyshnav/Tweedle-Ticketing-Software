@@ -278,10 +278,10 @@
 
         <!-- =========================================================
              TICKET HEADER CARD
-             data-substatus set by initPage() for CSS left-border color.
-             Django: data-substatus="{{ ticket.current_substatus }}"
+             data-sub-status set by initPage() for CSS left-border color.
+             Django: data-sub-status="{{ ticket.current_substatus }}"
              ========================================================= -->
-        <div class="dev-ticket-header-card" id="devHeaderCard" data-substatus="testing">
+        <div class="dev-ticket-header-card" id="devHeaderCard" data-sub-status="testing">
 
             <!-- Left: ticket ID + badge cluster -->
             <div>
@@ -928,7 +928,7 @@
 
         /* ---- Header card border color by substatus ---- */
         var headerCard = document.getElementById('devHeaderCard');
-        if (headerCard) headerCard.dataset.substatus = TICKET_SUBSTATUS;
+        if (headerCard) headerCard.dataset.subStatus = TICKET_SUBSTATUS;
 
         /* ---- Header badges ---- */
         var badgesEl = document.getElementById('devHeaderBadges');
@@ -1219,7 +1219,7 @@
 
                 /* Update header card border color */
                 var hc = document.getElementById('devHeaderCard');
-                if (hc) hc.dataset.substatus = newSubstatus;
+                if (hc) hc.dataset.subStatus = newSubstatus;
 
                 /* Update header badge */
                 var badgesEl = document.getElementById('devHeaderBadges');
