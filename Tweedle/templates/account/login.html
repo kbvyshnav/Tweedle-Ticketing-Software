@@ -1,0 +1,267 @@
+{% load static %}
+<!--
+  Override of allauth's account/login.html — the styled Tweedle sign-in page.
+  Standalone (own html/head/body); does NOT extend base.html (no shell/theme).
+  Renders allauth's LoginForm (fields: login, password, remember).
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sign In — Tweedle</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
+
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/favicon.svg' %}">
+
+    <!-- No theme file — role is unknown at login. -->
+    <link rel="stylesheet" href="{% static 'css/tweedle-tokens.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tweedle-base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tweedle-components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/pages/login.css' %}">
+</head>
+<body>
+
+<main class="tw-auth-page">
+<div class="tw-auth-card">
+
+
+    <!-- === LEFT PANEL — BRAND === -->
+    <div class="tw-auth-left" aria-hidden="true">
+
+        <div class="tw-auth-brand-logo">
+            <img src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}"
+                 alt="Tweedle"
+                 class="tw-auth-logo-img">
+            <span class="tw-auth-logo-text">Tweedle</span>
+        </div>
+
+        <div class="tw-auth-brand-mid">
+            <div class="tw-auth-icon-circle">
+                <img src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}"
+                     alt="Tweedle"
+                     class="tw-auth-icon-logo">
+            </div>
+            <p class="tw-auth-headline">Streamline your support.</p>
+            <p class="tw-auth-sub">One platform for tickets,&nbsp;teams and clients.</p>
+        </div>
+
+        <div class="tw-auth-brand-bottom">
+<p class="tw-auth-copy">&#169; 2026 Tweedle. All rights reserved.</p>
+        </div>
+
+    </div>
+    <!-- END LEFT PANEL -->
+
+
+    <!-- === RIGHT PANEL — FORM === -->
+    <div class="tw-auth-right">
+
+        <span class="tw-auth-eyebrow">Welcome Back</span>
+        <h1 class="tw-auth-title">Sign in to Tweedle</h1>
+        <p class="tw-auth-desc">Enter your credentials to access your dashboard.</p>
+
+        <!-- Server-side error alert — allauth non-field errors (e.g. bad creds) -->
+        {% if form.non_field_errors %}
+        <div class="tw-alert--error visible" id="serverAlert" role="alert" aria-live="polite">
+            <i class="bx bx-error-circle" aria-hidden="true"></i>
+            <span>{{ form.non_field_errors.0 }}</span>
+        </div>
+        {% endif %}
+
+        <!-- Login form (posts to allauth) -->
+        <form
+            id="loginForm"
+            action="{% url 'account_login' %}"
+            method="POST"
+            novalidate
+            aria-label="Sign in form">
+
+            {% csrf_token %}
+
+            <!-- Preserve ?next= so post-login role routing still flows -->
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+            {% endif %}
+
+            <!-- Username / Email -> allauth field "login" -->
+            <div class="tw-field-group">
+                <label class="tw-field-label" for="id_login">Username or Email</label>
+                <input
+                    class="tw-input{% if form.login.errors %} tw-input--error{% endif %}"
+                    type="text"
+                    id="id_login"
+                    name="login"
+                    value="{{ form.login.value|default:'' }}"
+                    placeholder="you@company.com"
+                    autocomplete="username"
+                    aria-describedby="login-error"
+                    required>
+                <p class="tw-field-error{% if form.login.errors %} show{% endif %}" id="login-error" role="alert" aria-live="polite">
+                    <i class="bx bx-error-circle" aria-hidden="true"></i>
+                    <span>{% if form.login.errors %}{{ form.login.errors.0 }}{% else %}Username is required.{% endif %}</span>
+                </p>
+            </div>
+
+            <!-- Password -->
+            <div class="tw-field-group">
+                <label class="tw-field-label" for="id_password">Password</label>
+                <div class="tw-auth-input-wrap">
+                    <input
+                        class="tw-input tw-input--password{% if form.password.errors %} tw-input--error{% endif %}"
+                        type="password"
+                        id="id_password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        aria-describedby="password-error"
+                        required>
+                    <button
+                        type="button"
+                        class="tw-toggle-pw"
+                        id="togglePw"
+                        aria-label="Show password"
+                        tabindex="0">
+                        <i class="bx bx-show" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <p class="tw-field-error{% if form.password.errors %} show{% endif %}" id="password-error" role="alert" aria-live="polite">
+                    <i class="bx bx-error-circle" aria-hidden="true"></i>
+                    <span id="passwordErrMsg">{% if form.password.errors %}{{ form.password.errors.0 }}{% else %}Password is required.{% endif %}</span>
+                </p>
+            </div>
+
+            <!-- Remember me + Forgot password -->
+            <div class="tw-auth-bottom-row">
+                <label class="tw-remember-label" for="id_remember">
+                    <input
+                        type="checkbox"
+                        id="id_remember"
+                        name="remember"
+                        class="tw-remember-input"
+                        {% if form.remember.value %}checked{% endif %}>
+                    <span class="tw-checkbox" aria-hidden="true"></span>
+                    Keep me signed in
+                </label>
+                <a href="{% url 'account_reset_password' %}" class="tw-forgot-link">Forgot password?</a>
+            </div>
+
+            <!-- Submit -->
+            <button
+                type="submit"
+                class="tw-submit-btn"
+                id="submitBtn"
+                aria-label="Sign in"
+                aria-busy="false">
+                <span class="tw-submit-text">Sign In</span>
+                <span class="tw-submit-spinner" aria-hidden="true"></span>
+            </button>
+
+            {# TODO: social login (Google) — deferred to a later layer; not rendered. #}
+
+        </form>
+        <!-- END LOGIN FORM -->
+
+        <footer class="tw-auth-form-footer">
+            Having trouble signing in?<br>
+            Contact your system administrator.
+        </footer>
+
+    </div>
+    <!-- END RIGHT PANEL -->
+
+
+</div>
+</main>
+
+
+<script>
+    /* ============================================================
+     * LOGIN: client-side UX only. allauth's server-side validation
+     * is authoritative; this never blocks a valid (non-empty) submit
+     * and no longer fakes a redirect — the form POSTs naturally.
+     * ============================================================ */
+    const loginForm     = document.getElementById('loginForm');
+    const usernameInput = document.getElementById('id_login');
+    const passwordInput = document.getElementById('id_password');
+    const usernameError = document.getElementById('login-error');
+    const passwordError = document.getElementById('password-error');
+    let   _submitted    = false;
+
+    function showFieldError(input, errorEl, message) {
+        input.classList.add('tw-input--error');
+        errorEl.querySelector('span').textContent = message;
+        errorEl.classList.add('show');
+    }
+
+    function clearFieldError(input, errorEl) {
+        input.classList.remove('tw-input--error');
+        errorEl.classList.remove('show');
+    }
+
+    usernameInput.addEventListener('input', function () {
+        if (_submitted) clearFieldError(this, usernameError);
+    });
+    passwordInput.addEventListener('input', function () {
+        if (_submitted) clearFieldError(this, passwordError);
+    });
+
+    loginForm.addEventListener('submit', function (e) {
+        _submitted = true;
+        let valid  = true;
+
+        clearFieldError(usernameInput, usernameError);
+        clearFieldError(passwordInput, passwordError);
+
+        /* Only block genuinely empty fields — never a valid submit. */
+        if (!usernameInput.value.trim()) {
+            showFieldError(usernameInput, usernameError, 'Username is required.');
+            valid = false;
+        }
+        if (!passwordInput.value) {
+            showFieldError(passwordInput, passwordError, 'Password is required.');
+            valid = false;
+        }
+
+        if (!valid) {
+            e.preventDefault();
+            (usernameInput.classList.contains('tw-input--error')
+                ? usernameInput : passwordInput).focus();
+            return;
+        }
+
+        /* Valid — show loading state and let the form POST naturally. */
+        const btn = document.getElementById('submitBtn');
+        btn.classList.add('loading');
+        btn.setAttribute('aria-busy', 'true');
+    });
+
+
+    /* === PASSWORD TOGGLE === */
+    const togglePw = document.getElementById('togglePw');
+    togglePw.addEventListener('click', function () {
+        const isHidden = passwordInput.type === 'password';
+        passwordInput.type = isHidden ? 'text' : 'password';
+        this.querySelector('i').className = isHidden ? 'bx bx-hide' : 'bx bx-show';
+        this.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+    });
+
+
+    /* === REMEMBER ME (restore checkbox UI only; session length is server-side) === */
+    const rememberCheck = document.getElementById('id_remember');
+    try {
+        if (localStorage.getItem('tweedle_remember') === 'true') {
+            rememberCheck.checked = true;
+        }
+    } catch (e) { /* localStorage blocked */ }
+    rememberCheck.addEventListener('change', function () {
+        try { localStorage.setItem('tweedle_remember', this.checked); } catch (e) {}
+    });
+</script>
+
+</body>
+</html>

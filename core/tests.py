@@ -121,3 +121,25 @@ class RootUrlTests(AuthRoutingTestBase):
         self.assertRedirects(
             resp, reverse("post_login_redirect"), fetch_redirect_response=False
         )
+
+
+class LoginTemplateTests(AuthRoutingTestBase):
+    def test_login_page_uses_styled_override(self):
+        resp = self.client.get(reverse("account_login"))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, "account/login.html")
+        # The styled markup + the allauth field names are present.
+        self.assertContains(resp, "Sign in to Tweedle")
+        self.assertContains(resp, 'name="login"')
+        self.assertContains(resp, 'name="password"')
+
+    def test_styled_login_still_authenticates_end_to_end(self):
+        # Proves the login/password field names are wired to allauth.
+        self.make_user("styled_login", "developer")
+        resp = self.client.post(
+            reverse("account_login"),
+            {"login": "styled_login", "password": self.PASSWORD},
+        )
+        self.assertRedirects(
+            resp, reverse("post_login_redirect"), fetch_redirect_response=False
+        )

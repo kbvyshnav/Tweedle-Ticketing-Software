@@ -142,6 +142,8 @@ ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 ACCOUNT_SIGNUP_FIELDS = ['username*', 'email*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_ADAPTER = 'core.adapters.NoSignupAccountAdapter'
+# Let the login page's "Keep me signed in" checkbox control session length.
+ACCOUNT_SESSION_REMEMBER = None
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
