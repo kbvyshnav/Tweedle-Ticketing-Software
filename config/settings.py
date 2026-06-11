@@ -156,3 +156,9 @@ STATICFILES_DIRS = [BASE_DIR / 'Tweedle' / 'static']
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# ── Tweedle domain constants ────────────────────────────────────────────────
+# After this many days a closed ticket can no longer be reopened by the client
+# (admins may reopen anytime). See TARGET_TICKET_FLOW.md §4 (T11).
+REOPEN_WINDOW_DAYS = 14
