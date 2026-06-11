@@ -4,6 +4,8 @@ notes.txt
 Github commands.txt
 TODO.txt
 *.log
+# requirements.txt is a real project file — keep it tracked despite *.txt
+!requirements.txt
 
 # ── AI and project meta files ───────────────────────────────────
 .claude/

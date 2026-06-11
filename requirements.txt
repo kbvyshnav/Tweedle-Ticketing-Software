@@ -1,0 +1,10 @@
+# Tweedle backend dependencies
+#
+# Django 5.2 is the current Long-Term Support (LTS) release line
+# (released April 2025, supported through April 2028). We pin to the
+# 5.2.x line so we keep receiving LTS security/bugfix point releases
+# without jumping to a non-LTS minor.
+Django>=5.2,<5.3
+
+# Phase 2: PostgreSQL driver — uncomment when switching off SQLite.
+# psycopg[binary]>=3.2
