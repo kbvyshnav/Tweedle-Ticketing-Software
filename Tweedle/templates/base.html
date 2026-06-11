@@ -7,8 +7,9 @@
   Phase 9 (Architecture fix): base.html is now the SINGLE entry point
   for standalone preview. A JS page router fetches admin_portal partials
   and injects them into <main id="main-content">.
-  Django: {% block content %} replaces the router at deploy time.
+  Phase 4.0: converted to a Django base template; the content block fills <main>.
 -->
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,10 +17,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- ============================================================
-         PAGE TITLE
-         Django: {% block title %}Tweedle{% endblock %}
+         PAGE TITLE — the title block is set below.
          ============================================================ -->
-    <title>Tweedle</title>
+    <title>{% block title %}Tweedle{% endblock %}</title>
 
     <!-- ============================================================
          GOOGLE FONTS — Poppins (UI) + Lato (sidebar/nav)
@@ -40,9 +40,8 @@
          FAVICON
          Django: {% static 'images/favicon.svg' %}
          ============================================================ -->
-    <!-- Django: {% static 'images/favicon.svg' %} -->
-    <link rel="icon" type="image/svg+xml" href="../static/images/favicon.svg">
-    <link rel="apple-touch-icon" href="../static/images/favicon.svg">
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/favicon.svg' %}">
 
     <!-- ============================================================
          BOOTSTRAP 5 — grid system and responsive utilities
@@ -60,50 +59,33 @@
          4. tweedle-components.css — all UI components
          5. notification.css     — bell dropdown component
          6. Page CSS (all preloaded for standalone preview)
-         Django: page-specific CSS is loaded via
-                 {% block page_css %}{% endblock %} in production.
-                 For standalone preview, all page CSS is preloaded here.
+         Page-specific CSS is loaded via the page_css block (see below).
          ============================================================ -->
 
     <!-- 1. Design tokens -->
-    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-tokens.css' %}"> -->
-    <link rel="stylesheet" href="../static/css/tweedle-tokens.css">
+    <link rel="stylesheet" href="{% static 'css/tweedle-tokens.css' %}">
 
     <!-- 2. Admin role theme (blue — #3C91E6) -->
-    <!-- Django: <link rel="stylesheet" href="{% static 'css/themes/theme-admin.css' %}"> -->
-    <link rel="stylesheet" href="../static/css/themes/theme-admin.css">
+    <link rel="stylesheet" href="{% static 'css/themes/theme-admin.css' %}">
 
     <!-- 3. Base layout -->
-    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-base.css' %}"> -->
-    <link rel="stylesheet" href="../static/css/tweedle-base.css">
+    <link rel="stylesheet" href="{% static 'css/tweedle-base.css' %}">
 
     <!-- 4. UI components -->
-    <!-- Django: <link rel="stylesheet" href="{% static 'css/tweedle-components.css' %}"> -->
-    <link rel="stylesheet" href="../static/css/tweedle-components.css">
+    <link rel="stylesheet" href="{% static 'css/tweedle-components.css' %}">
 
     <!-- 5. Notification bell component -->
-    <!-- Django: <link rel="stylesheet" href="{% static 'css/pages/notification.css' %}"> -->
-    <link rel="stylesheet" href="../static/css/pages/notification.css">
+    <link rel="stylesheet" href="{% static 'css/pages/notification.css' %}">
 
-    <!-- Django: {% block page_css %}{% endblock %} — each page loads only its own CSS here -->
-
-    <!-- STANDALONE PREVIEW ONLY: remove all lines below at Django deploy -->
-    <link rel="stylesheet" href="../static/css/pages/dashboard.css">
-    <link rel="stylesheet" href="../static/css/pages/clients.css">
-    <link rel="stylesheet" href="../static/css/pages/team.css">
-    <link rel="stylesheet" href="../static/css/pages/reports.css">
-    <link rel="stylesheet" href="../static/css/pages/chat.css">
-    <link rel="stylesheet" href="../static/css/pages/ticket-details.css">
-    <link rel="stylesheet" href="../static/css/pages/ticket-timeline.css">
-    <link rel="stylesheet" href="../static/css/pages/settings.css">
-    <!-- END STANDALONE PREVIEW ONLY -->
+    <!-- 6. Page-specific CSS — each page loads only its own stylesheets here -->
+    {% block page_css %}{% endblock %}
 </head>
 
 <!--
     BODY CLASS controls the active role theme.
-    Django: class="role-{% block body_role %}admin{% endblock %}"
+    The body_role block sets it (default: admin).
 -->
-<body class="role-admin">
+<body class="role-{% block body_role %}admin{% endblock %}">
 
 
 <!-- ==============================================================
@@ -114,25 +96,22 @@
 <nav class="sidebar" id="sidebar">
 
     <!-- Brand -->
-    <!-- Django: <a href="{% url 'admin_dashboard' %}"> -->
     <div class="sidebar-brand">
-        <img src="../static/images/tweedle-logo/tweedle-mark-blue.svg"
+        <img src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}"
              alt="Tweedle"
              class="sidebar-logo-img">
         <span class="brand-text">Tweedle</span>
     </div>
 
     <!-- Main Nav -->
-    <!-- Django active state: server-side adds class="nav-link active" /
-         class="nav-item active-item". The router manages this for preview. -->
+    <!-- Active state is set server-side per page. Only Dashboard is built
+         this step (Phase 4.0); the other targets land in Phase 4.0b. -->
     <ul class="sidebar-nav">
 
         <!-- Dashboard -->
-        <!-- Django: href="{% url 'admin_dashboard' %}" -->
         <li class="nav-item active-item">
-            <a href="#dashboard"
+            <a href="{% url 'admin_dashboard' %}"
                class="nav-link active"
-               data-page="admin_portal/dashboard.html"
                title="Dashboard">
                 <i class='bx bx-grid-alt'></i>
                 <span class="nav-label">Dashboard</span>
@@ -140,11 +119,10 @@
         </li>
 
         <!-- Clients -->
-        <!-- Django: href="{% url 'admin_clients' %}" -->
+        {# TODO 4.0b: href="{% url 'admin_clients' %}" — page not built yet #}
         <li class="nav-item">
-            <a href="#clients"
+            <a href="{% url 'admin_dashboard' %}"
                class="nav-link"
-               data-page="admin_portal/clients.html"
                title="Clients">
                 <i class="bx bx-buildings"></i>
                 <span class="nav-label">Clients</span>
@@ -152,11 +130,10 @@
         </li>
 
         <!-- Team -->
-        <!-- Django: href="{% url 'admin_team' %}" -->
+        {# TODO 4.0b: href="{% url 'admin_team' %}" — page not built yet #}
         <li class="nav-item">
-            <a href="#team"
+            <a href="{% url 'admin_dashboard' %}"
                class="nav-link"
-               data-page="admin_portal/team.html"
                title="Team">
                 <i class="bx bx-group"></i>
                 <span class="nav-label">Team</span>
@@ -164,11 +141,10 @@
         </li>
 
         <!-- Reports -->
-        <!-- Django: href="{% url 'admin_reports' %}" -->
+        {# TODO 4.0b: href="{% url 'admin_reports' %}" — page not built yet #}
         <li class="nav-item">
-            <a href="#reports"
+            <a href="{% url 'admin_dashboard' %}"
                class="nav-link"
-               data-page="admin_portal/reports.html"
                title="Reports">
                 <i class="bx bx-bar-chart-alt-2"></i>
                 <span class="nav-label">Reports</span>
@@ -179,10 +155,10 @@
 
     <!-- Bottom Nav -->
     <ul class="sidebar-nav sidebar-nav--bottom">
+        {# TODO 4.0b: href="{% url 'admin_settings' %}" — page not built yet #}
         <li class="nav-item">
-            <a href="#settings"
+            <a href="{% url 'admin_dashboard' %}"
                class="nav-link"
-               data-page="admin_portal/settings.html"
                title="Settings">
                 <i class='bx bx-cog'></i>
                 <span class="nav-label">Settings</span>
@@ -208,7 +184,7 @@
         <i class="bx bx-menu" id="hamburger-btn" role="button" aria-label="Toggle sidebar"></i>
 
         <!-- Global ticket search -->
-        <!-- Django: action="{% url 'admin:global_search' %}" method="GET" -->
+        <!-- TODO 4.0b: wire form action to the admin global-search URL (GET) -->
         <form action="#" class="topbar-search-form" id="topbarSearchForm">
             <div class="topbar-search">
                 <input
@@ -223,7 +199,7 @@
             </div>
         </form>
 
-        <!-- Django: replace this block with {% include 'components/notification-bell.html' %} -->
+        <!-- TODO 4.0b: extract to a components/notification-bell.html include -->
         <div class="tw-notif-bell-wrap" id="notifBellWrap">
             <button
                 class="tw-notif-bell-btn"
@@ -232,9 +208,8 @@
                 aria-expanded="false"
                 aria-controls="notifPanel">
                 <i class="bx bxs-bell" aria-hidden="true"></i>
-                <!-- Django: {% if unread_notification_count %} -->
+                <!-- TODO: render only when there are unread notifications -->
                 <span class="tw-notif-count-badge" id="notifCount">8</span>
-                <!-- Django: {% endif %} -->
             </button>
 
             <div class="tw-notif-panel" id="notifPanel" role="dialog" aria-label="Notifications">
@@ -249,7 +224,7 @@
                 </div>
 
                 <div class="tw-notif-list">
-                    <!-- Django: {% for notification in notifications %} -->
+                    <!-- TODO: loop over the user's notifications (dummy data for now) -->
 
                     <!-- Notification 1: GMEC25010001 → In Progress -->
                     <div class="tw-notif-item unread" role="button" style="cursor:pointer"
@@ -317,19 +292,19 @@
                         </div>
                     </div>
 
-                    <!-- Django: {% endfor %} -->
+                    <!-- TODO: end notifications loop -->
                 </div>
 
                 <div class="tw-notif-panel-footer">
-                    <!-- Django: href="{% url 'admin_notifications' %}" -->
-                    <a href="#" class="tw-btn tw-btn-outline tw-btn--sm" onclick="loadPage('admin_portal/notifications.html'); return false;">View all notifications</a>
+                    {# TODO 4.0b: href="{% url 'admin_notifications' %}" — page not built yet #}
+                    <a href="{% url 'admin_dashboard' %}" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
                 </div>
             </div>
         </div>
         <!-- END NOTIFICATION BELL -->
 
         <!-- COMPONENT: profile_dropdown -->
-        <!-- Django: {% include 'components/profile_dropdown.html' %} -->
+        <!-- TODO 4.0b: extract to a components/profile_dropdown.html include -->
         <div class="tw-profile-wrap" id="profileWrap">
 
             <div class="tw-avatar tw-avatar--admin" id="profile-avatar" role="button" aria-label="Profile" style="width:36px;height:36px;font-size:14px;cursor:pointer" onclick="toggleProfileDropdown(event)">JJ</div>
@@ -337,9 +312,7 @@
             <div class="tw-profile-panel" id="profilePanel" role="menu" aria-hidden="true">
 
                 <!-- Header section -->
-                <!-- Django: initials {{ request.user.get_full_name|slice:":2"|upper }},
-                     email {{ request.user.email }}, badge class role-{{ request.user.role }},
-                     Sign Out: window.location.href="{% url 'logout' %}" -->
+                <!-- TODO 4.0b: bind initials/email/role badge from request.user -->
                 <div class="tw-profile-header">
                     <div class="tw-avatar tw-avatar--admin" style="width:40px;height:40px;font-size:15px;flex-shrink:0">JJ</div>
                     <div>
@@ -360,18 +333,25 @@
                     <i class="bx bx-lock-alt" aria-hidden="true"></i>
                     <span>Change Password</span>
                 </div>
-                <div class="tw-profile-menu-item" role="menuitem" onclick="closeProfileDropdown(); loadPage('admin_portal/settings.html')">
+                <div class="tw-profile-menu-item" role="menuitem" onclick="closeProfileDropdown(); showProfileToast('Notification preferences coming in a future update.')">
                     <i class="bx bx-bell" aria-hidden="true"></i>
                     <span>Notification Preferences</span>
                 </div>
 
                 <div class="tw-profile-divider"></div>
 
-                <!-- Sign out -->
-                <div class="tw-profile-menu-item tw-profile-menu-item--danger" role="menuitem" onclick="window.location.href = 'login.html'">
-                    <i class="bx bx-log-out" aria-hidden="true"></i>
-                    <span>Sign Out</span>
-                </div>
+                <!-- Sign out — one-click CSRF-protected POST to allauth logout
+                     (allauth 65 logout is POST-only; this skips the confirm page) -->
+                <form method="post" action="{% url 'account_logout' %}" class="tw-profile-signout-form">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="tw-profile-menu-item tw-profile-menu-item--danger"
+                            role="menuitem"
+                            style="width:100%;border:none;background:none;cursor:pointer;text-align:left;font:inherit">
+                        <i class="bx bx-log-out" aria-hidden="true"></i>
+                        <span>Sign Out</span>
+                    </button>
+                </form>
 
             </div>
 
@@ -384,12 +364,10 @@
 
     <!-- ==========================================================
          MAIN PAGE CONTENT
-         Router injects partial HTML here for standalone preview.
-         Django: {% block content %}{% endblock %} at deploy time.
+         The content block fills this region (Django-served, no router).
          ========================================================== -->
     <main id="main-content">
-        <!-- Content loaded by page router on startup -->
-        <!-- Django: {% block content %}{% endblock %} -->
+        {% block content %}{% endblock %}
     </main>
     <!-- END MAIN PAGE CONTENT -->
 
@@ -405,7 +383,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- Page-specific JS slot -->
-<!-- Django: {% block page_js %}{% endblock %} -->
+{% block page_js %}{% endblock %}
 
 
 <!-- ==============================================================
@@ -534,124 +512,8 @@
     });
 
 
-    /* ============================================================
-     * PAGE ROUTER (standalone preview only)
-     * Django: remove this entire block — Django views handle routing.
-     * Fetches admin_portal partial pages and injects their content
-     * into <main id="main-content">, then re-executes any inline
-     * scripts so page-level JS initialises correctly.
-     * ============================================================ */
-    const mainContent  = document.getElementById('main-content');
-    const routerLinks  = document.querySelectorAll('.nav-link[data-page]');
-
-    /* Loading state shown during fetch */
-    function showLoader() {
-        mainContent.innerHTML = `
-            <div class="tw-router-loader">
-                <i class="bx bx-loader-alt bx-spin" aria-hidden="true"></i>
-            </div>`;
-    }
-
-    /* Extract only the meaningful page content from a fetched HTML string.
-     * For our partials (no html/head/body), the parser wraps everything in
-     * <body> — we return that body's innerHTML directly. */
-    function extractContent(html) {
-        const parser = new DOMParser();
-        const doc    = parser.parseFromString(html, 'text/html');
-
-        /* Standalone pages with <main> — e.g. chat.html dev view */
-        const main = doc.querySelector('main');
-        if (main) return main.innerHTML;
-
-        /* Partials: browser wraps fragment in <body> */
-        const body = doc.querySelector('body');
-        return body ? body.innerHTML : html;
-    }
-
-    /* Inject HTML into main content and re-execute any inline scripts
-     * (innerHTML does not run scripts; replacement does). */
-    function injectContent(html) {
-        mainContent.innerHTML = html;
-
-        mainContent.querySelectorAll('script').forEach(function (oldScript) {
-            const newScript = document.createElement('script');
-            if (oldScript.src) {
-                newScript.src   = oldScript.src;
-                newScript.defer = oldScript.defer;
-            } else {
-                newScript.textContent = oldScript.textContent;
-            }
-            oldScript.parentNode.replaceChild(newScript, oldScript);
-        });
-    }
-
-    /* Load a page partial into main content.
-     * pagePath may include a hash to target a specific tab:
-     *   "admin_portal/dashboard.html#inbox" → loads dashboard, then clicks
-     *   the [data-tab="inbox"] button after the content is ready. */
-    async function loadPage(pagePath) {
-        /* Fix 4: restore topbar search when navigating away from the dashboard */
-        var tsf = document.getElementById('topbarSearchForm');
-        if (tsf) tsf.style.display = '';
-        showLoader();
-
-        try {
-            const [path, tabHash] = pagePath.split('#');
-
-            const response = await fetch(path);
-            if (!response.ok) throw new Error(`HTTP ${response.status}: ${path}`);
-
-            const html    = await response.text();
-            const content = extractContent(html);
-            injectContent(content);
-
-            /* If a tab hash was specified, click that tab */
-            if (tabHash) {
-                setTimeout(function () {
-                    const tabBtn = mainContent.querySelector(`[data-tab="${tabHash}"]`);
-                    if (tabBtn) tabBtn.click();
-                }, 80);
-            }
-
-            /* Scroll main area back to top on page change */
-            mainContent.scrollTop = 0;
-
-        } catch (err) {
-            mainContent.innerHTML = `
-                <div class="tw-router-error">
-                    <i class="bx bx-error-circle" aria-hidden="true"></i>
-                    <p>Could not load page.</p>
-                    <p class="tw-router-error-detail">${err.message}</p>
-                    <p class="tw-router-error-hint">
-                        Serve this project via HTTP (e.g. <code>python -m http.server</code>
-                        from the project root) — fetch() requires a server, not file://.
-                    </p>
-                </div>`;
-            console.error('[Router]', err);
-        }
-    }
-
-    /* Wire each nav link to the router */
-    routerLinks.forEach(function (link) {
-        link.addEventListener('click', function (e) {
-            e.preventDefault();
-
-            /* Update sidebar active state */
-            routerLinks.forEach(function (l) {
-                l.classList.remove('active');
-                l.closest('.nav-item').classList.remove('active-item');
-            });
-            this.classList.add('active');
-            this.closest('.nav-item').classList.add('active-item');
-
-            loadPage(this.dataset.page);
-        });
-    });
-
-    /* Load the default page (Dashboard) on startup */
-    loadPage('admin_portal/dashboard.html');
-
-    /* === END PAGE ROUTER === */
+    /* Page router removed (Phase 4.0): Django serves each page server-side
+       via real URL links; there is no client-side fetch routing. */
 
 
     /* === TOPBAR SEARCH (standalone stub) === */
@@ -659,7 +521,7 @@
         e.preventDefault();
         var q = document.getElementById('topbarSearchInput').value.trim();
         if (q) console.log('[Topbar search stub] Query:', q);
-        // Django: fetch('{% url "admin:global_search" %}?q=' + encodeURIComponent(q)).then(...)
+        // TODO 4.0b: fetch the admin global-search endpoint with ?q=
     });
 </script>
 

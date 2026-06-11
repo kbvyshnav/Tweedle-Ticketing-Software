@@ -1,25 +1,18 @@
-<!--
-  File: templates/admin_portal/dashboard.html
-  Moved from: cAdmin_dashboard.html (Phase 6 restructure)
-  Phase 10: Dashboard full redesign
-    Task 2: compact stat strip, underline tabs, unified table card + toolbar
-    Task 3: timeline full view link
-    Task 4: forwarded/closed modal sections
-    Task 5: close ticket modal footer + confirm
-  Django template: extends 'base.html'
-  Django view: admin_portal.views.dashboard
-  Django url:  admin:dashboard
--->
-<!-- Django: {% extends 'base.html' %} -->
+{% extends 'base.html' %}
+{% load static %}
 
-<!-- Django: {% block page_css %}
+{% block title %}Dashboard — Tweedle{% endblock %}
+
+{% block page_css %}
 <link rel="stylesheet" href="{% static 'css/pages/dashboard.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/ticket-details.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/chat.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/ticket-timeline.css' %}">
-{% endblock %} -->
+{% endblock %}
 
-<!-- Django: {% block content %} -->
+{% block content %}
+{# Phase 4.0: demo markup + inline JS kept verbatim until later steps. #}
+{% verbatim %}
 
     <!-- =============================================================
          SECTION A: PAGE HEADER
@@ -4150,4 +4143,5 @@
         });
     });
 </script>
-<!-- Django: {% endblock %} -->
+{% endverbatim %}
+{% endblock %}
