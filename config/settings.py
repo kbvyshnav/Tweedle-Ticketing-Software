@@ -44,6 +44,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',          # required by allauth
+
+    # Authentication (Phase 3a) — local username/email + password only.
+    'allauth',
+    'allauth.account',
 
     # Project apps
     'accounts',          # custom user + identity
@@ -69,6 +74,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',  # required by allauth
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -118,6 +124,30 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+
+
+# ── Authentication (Phase 3a: django-allauth, minimal) ──────────────────────
+# Local username/email + password only: no email verification, no social
+# providers, no MFA (deferred). Public self-registration is CLOSED — this is an
+# admin-provisioned product (see core.adapters.NoSignupAccountAdapter).
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# New-style allauth settings (allauth 65+).
+ACCOUNT_LOGIN_METHODS = {'username', 'email'}
+ACCOUNT_SIGNUP_FIELDS = ['username*', 'email*', 'password1*', 'password2*']
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_ADAPTER = 'core.adapters.NoSignupAccountAdapter'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+LOGIN_URL = 'account_login'
+LOGIN_REDIRECT_URL = 'post_login_redirect'
+LOGOUT_REDIRECT_URL = 'account_login'
 
 
 # Password validation

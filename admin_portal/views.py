@@ -1,3 +1,13 @@
-from django.shortcuts import render
+from django.http import HttpResponse
+from django.views import View
 
-# Create your views here.
+from core.auth import RoleRequiredMixin
+
+
+class AdminDashboardView(RoleRequiredMixin, View):
+    """Placeholder admin portal landing (real template wired in Phase 4)."""
+
+    allowed_roles = {"admin"}
+
+    def get(self, request):
+        return HttpResponse("Admin portal — dashboard (placeholder)")

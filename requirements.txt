@@ -11,3 +11,6 @@ psycopg[binary]>=3.2
 
 # Loads DB_* credentials from a root .env file (kept out of version control).
 python-dotenv>=1.0
+
+# Authentication (local username/email + password; social/MFA deferred).
+django-allauth>=65,<66
