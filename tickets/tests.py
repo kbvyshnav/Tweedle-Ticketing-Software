@@ -175,6 +175,29 @@ class LegalTransitionTests(EngineTestBase):
         self.assertEqual(t.status, S.CANCELLED)
         self.assertIsNone(t.sub_status)
 
+    def test_cancel_from_in_progress(self):
+        t = self.in_development()  # in_progress + development
+        transition(t, "cancel", self.admin)
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.CANCELLED)
+        self.assertIsNone(t.sub_status)
+
+    def test_cancel_from_awaiting_client(self):
+        t = self.make_ticket(status=S.AWAITING_CLIENT, sub_status=None)
+        transition(t, "cancel", self.client_user)
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.CANCELLED)
+        self.assertIsNone(t.sub_status)
+
+    def test_admin_can_cancel_ticket_it_does_not_own(self):
+        # requester is self.client_user; the admin is not the requester.
+        t = self.in_development()
+        self.assertNotEqual(t.requester, self.admin)
+        transition(t, "cancel", self.admin)
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.CANCELLED)
+        self.assertIsNone(t.sub_status)
+
 
 class ConfirmAndReassignTests(EngineTestBase):
     def test_subuser_confirm_signal(self):
@@ -265,6 +288,20 @@ class ReopenTests(EngineTestBase):
         transition(t, "reopen", self.admin, reason="Admin override")
         t.refresh_from_db()
         self.assertEqual(t.status, S.IN_PROGRESS)
+
+    def test_reopen_resolved_reroutes_to_original_developer(self):
+        t = self._resolved()  # assigned_developer = self.developer
+        transition(t, "reopen", self.client_user, reason="Broke again")
+        t.refresh_from_db()
+        self.assertEqual(t.assigned_developer, self.developer)
+        self.assertEqual(t.sub_status, SS.DEVELOPMENT)
+
+    def test_reopen_closed_reroutes_to_original_developer(self):
+        t = self._closed(days_ago=2)  # assigned_developer = self.developer
+        transition(t, "reopen", self.admin, reason="Regression")
+        t.refresh_from_db()
+        self.assertEqual(t.assigned_developer, self.developer)
+        self.assertEqual(t.sub_status, SS.DEVELOPMENT)
 
 
 class AuthorizationTests(EngineTestBase):
