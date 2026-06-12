@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load admin_extras %}
 
 {% block title %}Dashboard — Tweedle{% endblock %}
 
@@ -60,7 +61,7 @@
          ============================================================= -->
     <div class="tw-stat-strip" aria-label="Ticket status summary">
 
-        <div class="tw-stat-card tw-stat-card--inbox" data-tab="inbox" role="button" tabindex="0" aria-label="Inbox: 10 tickets">
+        <div class="tw-stat-card tw-stat-card--inbox" data-tab="inbox" role="button" tabindex="0" aria-label="Inbox: {% endverbatim %}{{ inbox_count }} ticket{{ inbox_count|pluralize }}{% verbatim %}">
             <div class="tw-stat-card__left">
                 <div class="tw-stat-card__icon" aria-hidden="true">
                     <i class='bx bx-envelope'></i>
@@ -68,12 +69,12 @@
             </div>
             <div class="tw-stat-card__body">
                 <!-- Django: {{ inbox_count }} -->
-                <div class="tw-stat-card__count">10</div>
+                <div class="tw-stat-card__count">{% endverbatim %}{{ inbox_count }}{% verbatim %}</div>
                 <div class="tw-stat-card__label">Inbox</div>
             </div>
         </div>
 
-        <div class="tw-stat-card tw-stat-card--progress" data-tab="progress" role="button" tabindex="0" aria-label="In Progress: 28 tickets">
+        <div class="tw-stat-card tw-stat-card--progress" data-tab="progress" role="button" tabindex="0" aria-label="In Progress: {% endverbatim %}{{ inprogress_count }} ticket{{ inprogress_count|pluralize }}{% verbatim %}">
             <div class="tw-stat-card__left">
                 <div class="tw-stat-card__icon" aria-hidden="true">
                     <i class='bx bx-time-five'></i>
@@ -81,13 +82,13 @@
             </div>
             <div class="tw-stat-card__body">
                 <!-- Django: {{ inprogress_count }} -->
-                <div class="tw-stat-card__count">28</div>
+                <div class="tw-stat-card__count">{% endverbatim %}{{ inprogress_count }}{% verbatim %}</div>
                 <div class="tw-stat-card__label">In Progress</div>
             </div>
         </div>
 
         <!-- Django: rename data-tab to "pending_client" when backend is wired -->
-        <div class="tw-stat-card tw-stat-card--forwarded" data-tab="forwarded" role="button" tabindex="0" aria-label="Awaiting Client: 34 tickets">
+        <div class="tw-stat-card tw-stat-card--forwarded" data-tab="forwarded" role="button" tabindex="0" aria-label="Awaiting Client: {% endverbatim %}{{ forwarded_count }} ticket{{ forwarded_count|pluralize }}{% verbatim %}">
             <div class="tw-stat-card__left">
                 <div class="tw-stat-card__icon" aria-hidden="true">
                     <i class='bx bx-share'></i>
@@ -95,12 +96,12 @@
             </div>
             <div class="tw-stat-card__body">
                 <!-- Django: {{ forwarded_count }} -->
-                <div class="tw-stat-card__count">34</div>
+                <div class="tw-stat-card__count">{% endverbatim %}{{ forwarded_count }}{% verbatim %}</div>
                 <div class="tw-stat-card__label">Awaiting Client</div>
             </div>
         </div>
 
-        <div class="tw-stat-card tw-stat-card--uat" data-tab="uat" role="button" tabindex="0" aria-label="UAT Approval: 2 tickets">
+        <div class="tw-stat-card tw-stat-card--uat" data-tab="uat" role="button" tabindex="0" aria-label="UAT Approval: {% endverbatim %}{{ uat_count }} ticket{{ uat_count|pluralize }}{% verbatim %}">
             <div class="tw-stat-card__left">
                 <div class="tw-stat-card__icon" aria-hidden="true">
                     <i class='bx bx-user-check'></i>
@@ -108,12 +109,12 @@
             </div>
             <div class="tw-stat-card__body">
                 <!-- Django: {{ uat_count }} -->
-                <div class="tw-stat-card__count">2</div>
+                <div class="tw-stat-card__count">{% endverbatim %}{{ uat_count }}{% verbatim %}</div>
                 <div class="tw-stat-card__label">UAT Approval</div>
             </div>
         </div>
 
-        <div class="tw-stat-card tw-stat-card--resolved" data-tab="resolved" role="button" tabindex="0" aria-label="Resolved: 3 tickets">
+        <div class="tw-stat-card tw-stat-card--resolved" data-tab="resolved" role="button" tabindex="0" aria-label="Resolved: {% endverbatim %}{{ resolved_count }} ticket{{ resolved_count|pluralize }}{% verbatim %}">
             <div class="tw-stat-card__left">
                 <div class="tw-stat-card__icon" aria-hidden="true">
                     <i class='bx bx-check-circle'></i>
@@ -121,12 +122,12 @@
             </div>
             <div class="tw-stat-card__body">
                 <!-- Django: {{ resolved_count }} -->
-                <div class="tw-stat-card__count">3</div>
+                <div class="tw-stat-card__count">{% endverbatim %}{{ resolved_count }}{% verbatim %}</div>
                 <div class="tw-stat-card__label">Resolved</div>
             </div>
         </div>
 
-        <div class="tw-stat-card tw-stat-card--closed" data-tab="closed" role="button" tabindex="0" aria-label="Closed: 243 tickets">
+        <div class="tw-stat-card tw-stat-card--closed" data-tab="closed" role="button" tabindex="0" aria-label="Closed: {% endverbatim %}{{ closed_count }} ticket{{ closed_count|pluralize }}{% verbatim %}">
             <div class="tw-stat-card__left">
                 <div class="tw-stat-card__icon" aria-hidden="true">
                     <i class='bx bx-check-circle'></i>
@@ -134,12 +135,12 @@
             </div>
             <div class="tw-stat-card__body">
                 <!-- Django: {{ closed_count }} -->
-                <div class="tw-stat-card__count">243</div>
+                <div class="tw-stat-card__count">{% endverbatim %}{{ closed_count }}{% verbatim %}</div>
                 <div class="tw-stat-card__label">Closed</div>
             </div>
         </div>
 
-        <div class="tw-stat-card tw-stat-card--rejected" data-tab="rejected" role="button" tabindex="0" aria-label="Rejected: 3 tickets">
+        <div class="tw-stat-card tw-stat-card--rejected" data-tab="rejected" role="button" tabindex="0" aria-label="Rejected: {% endverbatim %}{{ rejected_count }} ticket{{ rejected_count|pluralize }}{% verbatim %}">
             <div class="tw-stat-card__left">
                 <div class="tw-stat-card__icon" aria-hidden="true">
                     <i class='bx bx-x-circle'></i>
@@ -147,7 +148,7 @@
             </div>
             <div class="tw-stat-card__body">
                 <!-- Django: {{ rejected_count }} -->
-                <div class="tw-stat-card__count">3</div>
+                <div class="tw-stat-card__count">{% endverbatim %}{{ rejected_count }}{% verbatim %}</div>
                 <div class="tw-stat-card__label">Rejected</div>
             </div>
         </div>
@@ -238,7 +239,7 @@
         <div class="tw-tab-status-bar">
             <div class="tw-tab-status-bar__left">
                 <h3 class="tw-tab-heading" id="tab-heading">Inbox Tickets</h3>
-                <span class="tw-tab-meta" id="tab-meta">10 tickets · New and unassigned</span>
+                <span class="tw-tab-meta" id="tab-meta">{% endverbatim %}{{ inbox_count }} ticket{{ inbox_count|pluralize }}{% verbatim %} · New and unassigned</span>
             </div>
             <div class="tw-tab-status-bar__right">
                 <!-- Django: bulk select controls -->
@@ -373,29 +374,31 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Django: {% for ticket in inbox_tickets %} -->
-
-                <tr data-ticket-id="GMEC25010007" data-ticket-type="new" data-subject="Federal bank API failure" data-status="new" data-client="BGEX">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010007" aria-label="Select GMEC25010007"></td>
+            {% endverbatim %}
+            {% for ticket in inbox_tickets %}
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-type="new" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
                             <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">GMEC25010007</span>
+                            <span class="tw-ticket-id">{{ ticket.reference }}</span>
                         </div>
                     </td>
+                    <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
+                    <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
+                    <td>{{ ticket.client.code|default:"—" }}</td>
+                    <td>{% ticket_badge ticket %}</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
+                    {% if ticket.assigned_developer %}
                     <td>
-                        <div title="Federal bank API failure">Federal bank API failure</div>
-                        <div class="tw-row-attachment">
-                            <i class="bx bxs-file-pdf attach-icon pdf" aria-hidden="true"></i>
-                            <span class="attach-name">wallet_specs.pdf</span>
+                        <div class="allottee-cell">
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">{{ ticket.assigned_developer.username|first|upper }}</div>
+                            {{ ticket.assigned_developer.username }}
                         </div>
                     </td>
-                    <td>10-12-2025</td>
-                    <td>BGEX</td>
-                    <td><span class="tw-status-badge tw-status-badge--new">New</span></td>
-                    <!-- Django: {{ ticket.priority }} -->
-                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
+                    {% else %}
                     <td><div class="allottee-cell unassigned">—</div></td>
+                    {% endif %}
                     <td>
                         <div class="tw-row-actions">
                             <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
@@ -403,38 +406,14 @@
                         </div>
                     </td>
                 </tr>
-
-                <tr data-ticket-id="GMEC25010008" data-ticket-type="new" data-subject="Bank transfer UI fix" data-status="new" data-client="GMEC">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010008" aria-label="Select GMEC25010008"></td>
-                    <td>
-                        <div class="ticket-id-cell">
-                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">GMEC25010008</span>
-                        </div>
-                    </td>
-                    <td><div title="Bank transfer UI fix">Bank transfer UI fix</div></td>
-                    <td>12-12-2025</td>
-                    <td>GMEC</td>
-                    <td><span class="tw-status-badge tw-status-badge--new">New</span></td>
-                    <!-- Django: {{ ticket.priority }} -->
-                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
-                    <td><div class="allottee-cell unassigned">—</div></td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Django: {% endfor %} -->
-                <!-- Django: {% if not tickets %}{% endif %} replaces this at wiring time -->
-                <tr id="emptyState-inbox" class="tw-empty-state-row" style="display:none;">
+            {% endfor %}
+                <tr id="emptyState-inbox" class="tw-empty-state-row"{% if inbox_tickets %} style="display:none;"{% endif %}>
                     <td colspan="8" style="padding:48px 24px;text-align:center;">
                         <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
                         <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
                     </td>
                 </tr>
+            {% verbatim %}
             </tbody>
         </table>
         </div>
@@ -470,33 +449,31 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Django: {% for ticket in inprogress_tickets %} -->
-
-                <tr data-ticket-id="GMEC25010001" data-ticket-type="existing" data-subject="Wallet Option Agents" data-status="in_progress" data-sub-status="testing" data-allottee="Manju" data-est-date="2026-04-10" data-client="GMEC">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010001" aria-label="Select GMEC25010001"></td>
+            {% endverbatim %}
+            {% for ticket in inprogress_tickets %}
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-sub-status="{{ ticket.sub_status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
                             <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">GMEC25010001</span>
+                            <span class="tw-ticket-id">{{ ticket.reference }}</span>
                         </div>
                     </td>
-                    <td>
-                        <div title="Wallet Option Agents">Wallet Option Agents</div>
-                        <div class="tw-row-attachment">
-                            <i class="bx bxs-file-pdf attach-icon pdf" aria-hidden="true"></i>
-                            <span class="attach-name">wallet_specs.pdf</span>
-                        </div>
-                    </td>
-                    <td>11-09-2021</td>
-                    <td>GMEC</td>                    <!-- Django: {{ ticket.priority }} -->
-                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
-                    <td><span class="tw-status-badge tw-status-badge--testing">Testing</span></td>
+                    <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
+                    <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
+                    <td>{{ ticket.client.code|default:"—" }}</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
+                    <td>{% ticket_badge ticket %}</td>
+                    {% if ticket.assigned_developer %}
                     <td>
                         <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--purple" aria-hidden="true">M</div>
-                            Manju
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">{{ ticket.assigned_developer.username|first|upper }}</div>
+                            {{ ticket.assigned_developer.username }}
                         </div>
                     </td>
+                    {% else %}
+                    <td><div class="allottee-cell unassigned">—</div></td>
+                    {% endif %}
                     <td>
                         <div class="tw-row-actions">
                             <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
@@ -505,226 +482,14 @@
                         </div>
                     </td>
                 </tr>
-
-                <tr data-ticket-id="GMEC25010002" data-ticket-type="existing" data-subject="Terra pay" data-status="in_progress" data-sub-status="development" data-allottee="Arun" data-est-date="2026-04-28" data-client="GMEC">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010002" aria-label="Select GMEC25010002"></td>
-                    <td>
-                        <div class="ticket-id-cell">
-                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">GMEC25010002</span>
-                        </div>
-                    </td>
-                    <td>
-                        <div title="Terra pay">Terra pay</div>
-                        <div class="tw-row-attachment">
-                            <i class="bx bxs-file-doc attach-icon doc" aria-hidden="true"></i>
-                            <span class="attach-name">terra_integration_guide.docx</span>
-                        </div>
-                    </td>
-                    <td>23-01-2022</td>
-                    <td>GMEC</td>                    <!-- Django: {{ ticket.priority }} -->
-                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
-                    <td><span class="tw-status-badge tw-status-badge--development">Development</span></td>
-                    <td>
-                        <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">A</div>
-                            Arun
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr data-ticket-id="GMEC25010003" data-ticket-type="existing" data-subject="Recon issue" data-status="in_progress" data-sub-status="uat" data-allottee="Sanoop" data-est-date="2026-07-15" data-client="GMEC">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010003" aria-label="Select GMEC25010003"></td>
-                    <td>
-                        <div class="ticket-id-cell">
-                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">GMEC25010003</span>
-                        </div>
-                    </td>
-                    <td><div title="Recon issue">Recon issue</div></td>
-                    <td>24-04-2020</td>
-                    <td>GMEC</td>                    <!-- Django: {{ ticket.priority }} -->
-                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
-                    <td><span class="tw-status-badge tw-status-badge--uat">UAT</span></td>
-                    <td>
-                        <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--teal" aria-hidden="true">S</div>
-                            Sanoop
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr data-ticket-id="GMEC25010004" data-ticket-type="existing" data-subject="Kumari API Integration" data-status="in_progress" data-sub-status="testing" data-allottee="Akhil" data-est-date="2026-08-01" data-client="GMEC">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010004" aria-label="Select GMEC25010004"></td>
-                    <td>
-                        <div class="ticket-id-cell">
-                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">GMEC25010004</span>
-                        </div>
-                    </td>
-                    <td><div title="Kumari API Integration">Kumari API Integration</div></td>
-                    <td>08-01-2022</td>
-                    <td>GMEC</td>                    <!-- Django: {{ ticket.priority }} -->
-                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
-                    <td><span class="tw-status-badge tw-status-badge--testing">Testing</span></td>
-                    <td>
-                        <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--violet" aria-hidden="true">A</div>
-                            Akhil
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr data-ticket-id="GMEC25010005" data-ticket-type="existing" data-subject="Missing March Data" data-status="in_progress" data-sub-status="development" data-allottee="Rithik" data-est-date="2026-09-10" data-client="BGEX">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010005" aria-label="Select GMEC25010005"></td>
-                    <td>
-                        <div class="ticket-id-cell">
-                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">GMEC25010005</span>
-                        </div>
-                    </td>
-                    <td><div title="Missing March Data">Missing March Data</div></td>
-                    <td>22-11-2025</td>
-                    <td>BGEX</td>                    <!-- Django: {{ ticket.priority }} -->
-                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
-                    <td><span class="tw-status-badge tw-status-badge--development">Development</span></td>
-                    <td>
-                        <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--rose" aria-hidden="true">R</div>
-                            Rithik
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr data-ticket-id="GMEC25010006" data-ticket-type="existing" data-subject="Federal bank API failure" data-status="in_progress" data-sub-status="uat" data-allottee="Rithik" data-est-date="2026-10-20" data-client="BGEX">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010006" aria-label="Select GMEC25010006"></td>
-                    <td>
-                        <div class="ticket-id-cell">
-                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">GMEC25010006</span>
-                        </div>
-                    </td>
-                    <td><div title="Federal bank API failure">Federal bank API failure</div></td>
-                    <td>03-12-2025</td>
-                    <td>BGEX</td>                    <!-- Django: {{ ticket.priority }} -->
-                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
-                    <td><span class="tw-status-badge tw-status-badge--uat">UAT</span></td>
-                    <td>
-                        <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--rose" aria-hidden="true">R</div>
-                            Rithik
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Row: testing_passed — "Testing Passed — Ready for UAT" green badge
-                     Django: sub_status='testing_passed' set by tester:submit_result {result:'pass'}
-                     Admin clicks "Send to Client UAT" → openConfirmModal → admin:send_to_uat -->
-                <tr data-ticket-id="GMEC25030002" data-ticket-type="existing" data-subject="PDF export includes extra blank page" data-status="in_progress" data-sub-status="testing_passed" data-allottee="Rithik" data-est-date="2026-06-25" data-client="GMEC">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25030002" aria-label="Select GMEC25030002"></td>
-                    <td>
-                        <div class="ticket-id-cell">
-                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">GMEC25030002</span>
-                        </div>
-                    </td>
-                    <td><div title="PDF export includes extra blank page">PDF export includes extra blank page</div></td>
-                    <td>20-05-2026</td>
-                    <td>GMEC</td>                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
-                    <td><span class="tw-status-badge tw-status-badge--testing-passed" title="Testing Passed — Ready for UAT">Ready for UAT</span></td>
-                    <td>
-                        <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--rose" aria-hidden="true">R</div>
-                            Rithik
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                            <i class="bx bx-check-shield tw-action-icon tw-action-icon--send-uat"
-                               role="button" tabindex="0"
-                               onclick="event.stopPropagation(); sendToClientUAT('GMEC25030002', 'PDF export includes extra blank page')"
-                               title="Send to Client UAT"
-                               aria-label="Send to Client UAT"
-                               style="color:var(--tw-success)"></i>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Row: returned — "Returned from Testing" red badge
-                     Django: sub_status='returned' (alias for 'development') set by tester:submit_result {result:'fail'}
-                     Developer is automatically re-notified; no extra admin action required -->
-                <tr data-ticket-id="GMEC25030001" data-ticket-type="existing" data-subject="Dashboard widget not rendering correctly" data-status="in_progress" data-sub-status="returned" data-allottee="Arjun Mehta" data-est-date="2026-06-20" data-client="GMEC">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25030001" aria-label="Select GMEC25030001"></td>
-                    <td>
-                        <div class="ticket-id-cell">
-                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">GMEC25030001</span>
-                        </div>
-                    </td>
-                    <td><div title="Dashboard widget not rendering correctly">Dashboard widget not rendering correctly</div></td>
-                    <td>15-05-2026</td>
-                    <td>GMEC</td>                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
-                    <td><span class="tw-status-badge tw-status-badge--returned" title="Returned from Testing">Returned</span></td>
-                    <td>
-                        <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--purple" aria-hidden="true">AM</div>
-                            Arjun Mehta
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Django: {% endfor %} -->
-                <!-- Django: {% if not tickets %}{% endif %} replaces this at wiring time -->
-                <tr id="emptyState-progress" class="tw-empty-state-row" style="display:none;">
+            {% endfor %}
+                <tr id="emptyState-progress" class="tw-empty-state-row"{% if inprogress_tickets %} style="display:none;"{% endif %}>
                     <td colspan="7" style="padding:48px 24px;text-align:center;">
                         <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
                         <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
                     </td>
                 </tr>
+            {% verbatim %}
             </tbody>
         </table>
         </div>
@@ -752,112 +517,47 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Django: {% for ticket in forwarded_tickets %} -->
-
-                <tr data-ticket-id="BGEX25020001" data-ticket-type="existing" data-subject="Payment Gateway Integration" data-status="forwarded" data-allottee="Arun" data-client="BGEX">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="BGEX25020001" aria-label="Select BGEX25020001"></td>
+            {% endverbatim %}
+            {% for ticket in forwarded_tickets %}
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
                             <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">BGEX25020001</span>
+                            <span class="tw-ticket-id">{{ ticket.reference }}</span>
                         </div>
                     </td>
-                    <td>
-                        <div title="Payment Gateway Integration">Payment Gateway Integration</div>
-                        <div class="tw-row-attachment">
-                            <i class="bx bxs-file-pdf attach-icon pdf" aria-hidden="true"></i>
-                            <span class="attach-name">client_requirements.pdf</span>
-                        </div>
-                    </td>
-                    <td>05-02-2025</td>
-                    <td>BGEX</td>
-                    <td><span class="tw-status-badge tw-status-badge--forwarded">Awaiting Client</span></td>
-                    <!-- Django: {{ ticket.priority }} -->
-                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
+                    <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
+                    <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
+                    <td>{{ ticket.client.code|default:"—" }}</td>
+                    <td>{% ticket_badge ticket %}</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
+                    {% if ticket.assigned_developer %}
                     <td>
                         <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">A</div>
-                            Arun
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">{{ ticket.assigned_developer.username|first|upper }}</div>
+                            {{ ticket.assigned_developer.username }}
                         </div>
                     </td>
+                    {% else %}
+                    <td><div class="allottee-cell unassigned">—</div></td>
+                    {% endif %}
                     <td>
                         <div class="tw-row-actions">
                             <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
                             <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                            <i class="bx bx-play-circle tw-action-icon tw-action-icon--resume" role="button" tabindex="0" aria-label="Resume ticket — client has responded" title="Resume — client has responded" onclick="resumeTicket(this)" style="color:var(--tw-success)"></i>
                             <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
                         </div>
                     </td>
                 </tr>
-
-                <tr data-ticket-id="GMEC25020002" data-ticket-type="existing" data-subject="Report Generation Bug" data-status="forwarded" data-allottee="Rithik" data-client="GMEC">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25020002" aria-label="Select GMEC25020002"></td>
-                    <td>
-                        <div class="ticket-id-cell">
-                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">GMEC25020002</span>
-                        </div>
-                    </td>
-                    <td><div title="Report Generation Bug">Report Generation Bug</div></td>
-                    <td>14-02-2025</td>
-                    <td>GMEC</td>
-                    <td><span class="tw-status-badge tw-status-badge--forwarded">Awaiting Client</span></td>
-                    <!-- Django: {{ ticket.priority }} -->
-                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
-                    <td>
-                        <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--rose" aria-hidden="true">R</div>
-                            Rithik
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                            <i class="bx bx-play-circle tw-action-icon tw-action-icon--resume" role="button" tabindex="0" aria-label="Resume ticket — client has responded" title="Resume — client has responded" onclick="resumeTicket(this)" style="color:var(--tw-success)"></i>
-                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr data-ticket-id="BGEX25020003" data-ticket-type="existing" data-subject="Mobile App Crash on Login" data-status="forwarded" data-allottee="Sanoop" data-client="BGEX">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="BGEX25020003" aria-label="Select BGEX25020003"></td>
-                    <td>
-                        <div class="ticket-id-cell">
-                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">BGEX25020003</span>
-                        </div>
-                    </td>
-                    <td><div title="Mobile App Crash on Login">Mobile App Crash on Login</div></td>
-                    <td>21-02-2025</td>
-                    <td>BGEX</td>
-                    <td><span class="tw-status-badge tw-status-badge--forwarded">Awaiting Client</span></td>
-                    <!-- Django: {{ ticket.priority }} -->
-                    <td><span class="tw-priority-badge tw-priority-badge--low">Low</span></td>
-                    <td>
-                        <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--teal" aria-hidden="true">S</div>
-                            Sanoop
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                            <i class="bx bx-play-circle tw-action-icon tw-action-icon--resume" role="button" tabindex="0" aria-label="Resume ticket — client has responded" title="Resume — client has responded" onclick="resumeTicket(this)" style="color:var(--tw-success)"></i>
-                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Django: {% endfor %} -->
-                <!-- Django: {% if not tickets %}{% endif %} replaces this at wiring time -->
-                <tr id="emptyState-forwarded" class="tw-empty-state-row" style="display:none;">
+            {% endfor %}
+                <tr id="emptyState-forwarded" class="tw-empty-state-row"{% if forwarded_tickets %} style="display:none;"{% endif %}>
                     <td colspan="8" style="padding:48px 24px;text-align:center;">
                         <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
                         <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
                     </td>
                 </tr>
+            {% verbatim %}
             </tbody>
         </table>
         </div>
@@ -888,32 +588,30 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Django: {% for ticket in uat_tickets %} -->
-
-                <tr data-ticket-id="GMEC25010012" data-ticket-type="existing" data-subject="Invoice generation incorrect totals" data-status="uat" data-client="GMEC">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010012" aria-label="Select GMEC25010012"></td>
+            {% endverbatim %}
+            {% for ticket in uat_tickets %}
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
                             <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">GMEC25010012</span>
+                            <span class="tw-ticket-id">{{ ticket.reference }}</span>
                         </div>
                     </td>
-                    <td>
-                        <div title="Invoice generation incorrect totals">Invoice generation incorrect totals</div>
-                        <div class="tw-row-attachment">
-                            <i class="bx bxs-file-doc attach-icon doc" aria-hidden="true"></i>
-                            <span class="attach-name">uat_test_cases.xlsx</span>
-                        </div>
-                    </td>
-                    <td>02-05-2025</td>
-                    <td>GMEC</td>
-                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
+                    <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
+                    <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
+                    <td>{{ ticket.client.code|default:"—" }}</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
+                    {% if ticket.assigned_developer %}
                     <td>
                         <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--teal" aria-hidden="true">A</div>
-                            Arjun Mehta / Priya S
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">{{ ticket.assigned_developer.username|first|upper }}</div>
+                            {{ ticket.assigned_developer.username }}
                         </div>
                     </td>
+                    {% else %}
+                    <td><div class="allottee-cell unassigned">—</div></td>
+                    {% endif %}
                     <td>
                         <div class="tw-row-actions">
                             <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
@@ -921,41 +619,14 @@
                         </div>
                     </td>
                 </tr>
-
-                <tr data-ticket-id="BGEX25010013" data-ticket-type="existing" data-subject="User role permissions not saving" data-status="uat" data-client="BGEX">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="BGEX25010013" aria-label="Select BGEX25010013"></td>
-                    <td>
-                        <div class="ticket-id-cell">
-                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">BGEX25010013</span>
-                        </div>
-                    </td>
-                    <td><div title="User role permissions not saving">User role permissions not saving</div></td>
-                    <td>05-05-2025</td>
-                    <td>BGEX</td>
-                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
-                    <td>
-                        <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">K</div>
-                            Kiran Das
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Django: {% endfor %} -->
-                <!-- Django: {% if not tickets %}{% endif %} replaces this at wiring time -->
-                <tr id="emptyState-uat" class="tw-empty-state-row" style="display:none;">
+            {% endfor %}
+                <tr id="emptyState-uat" class="tw-empty-state-row"{% if uat_tickets %} style="display:none;"{% endif %}>
                     <td colspan="8" style="padding:48px 24px;text-align:center;">
                         <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
                         <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
                     </td>
                 </tr>
+            {% verbatim %}
             </tbody>
         </table>
         </div>
@@ -986,32 +657,30 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Django: {% for ticket in resolved_tickets %} -->
-
-                <tr data-ticket-id="GMEC25010010" data-ticket-type="existing" data-subject="Payment gateway timeout on checkout" data-status="resolved" data-client="GMEC">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010010" aria-label="Select GMEC25010010"></td>
+            {% endverbatim %}
+            {% for ticket in resolved_tickets %}
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
                             <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">GMEC25010010</span>
+                            <span class="tw-ticket-id">{{ ticket.reference }}</span>
                         </div>
                     </td>
-                    <td>
-                        <div title="Payment gateway timeout on checkout">Payment gateway timeout on checkout</div>
-                        <div class="tw-row-attachment">
-                            <i class="bx bxs-file-pdf attach-icon pdf" aria-hidden="true"></i>
-                            <span class="attach-name">resolution_report.pdf</span>
-                        </div>
-                    </td>
-                    <td>14-04-2025</td>
-                    <td>GMEC</td>
-                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
+                    <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
+                    <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
+                    <td>{{ ticket.client.code|default:"—" }}</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
+                    {% if ticket.assigned_developer %}
                     <td>
                         <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--teal" aria-hidden="true">A</div>
-                            Arjun Mehta / Priya S
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">{{ ticket.assigned_developer.username|first|upper }}</div>
+                            {{ ticket.assigned_developer.username }}
                         </div>
                     </td>
+                    {% else %}
+                    <td><div class="allottee-cell unassigned">—</div></td>
+                    {% endif %}
                     <td>
                         <div class="tw-row-actions">
                             <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
@@ -1019,41 +688,14 @@
                         </div>
                     </td>
                 </tr>
-
-                <tr data-ticket-id="BGEX25010011" data-ticket-type="existing" data-subject="Bulk export CSV missing columns" data-status="resolved" data-client="BGEX">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="BGEX25010011" aria-label="Select BGEX25010011"></td>
-                    <td>
-                        <div class="ticket-id-cell">
-                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">BGEX25010011</span>
-                        </div>
-                    </td>
-                    <td><div title="Bulk export CSV missing columns">Bulk export CSV missing columns</div></td>
-                    <td>18-04-2025</td>
-                    <td>BGEX</td>
-                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
-                    <td>
-                        <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">K</div>
-                            Kiran Das
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Django: {% endfor %} -->
-                <!-- Django: {% if not tickets %}{% endif %} replaces this at wiring time -->
-                <tr id="emptyState-resolved" class="tw-empty-state-row" style="display:none;">
+            {% endfor %}
+                <tr id="emptyState-resolved" class="tw-empty-state-row"{% if resolved_tickets %} style="display:none;"{% endif %}>
                     <td colspan="8" style="padding:48px 24px;text-align:center;">
                         <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
                         <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
                     </td>
                 </tr>
+            {% verbatim %}
             </tbody>
         </table>
         </div>
@@ -1081,28 +723,31 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Django: {% for ticket in closed_tickets %} -->
-
-                <tr data-ticket-id="GMEC25010099" data-ticket-type="existing" data-subject="Authentication Flow Fix" data-status="closed" data-allottee="Manju" data-client="GMEC">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010099" aria-label="Select GMEC25010099"></td>
+            {% endverbatim %}
+            {% for ticket in closed_tickets %}
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
                             <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">GMEC25010099</span>
+                            <span class="tw-ticket-id">{{ ticket.reference }}</span>
                         </div>
                     </td>
-                    <td><div title="Authentication Flow Fix">Authentication Flow Fix</div></td>
-                    <td>10-10-2024</td>
-                    <td>GMEC</td>
-                    <td><span class="tw-status-badge tw-status-badge--closed">Closed</span></td>
-                    <!-- Django: {{ ticket.priority }} -->
-                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
+                    <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
+                    <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
+                    <td>{{ ticket.client.code|default:"—" }}</td>
+                    <td>{% ticket_badge ticket %}</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
+                    {% if ticket.assigned_developer %}
                     <td>
                         <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--purple" aria-hidden="true">M</div>
-                            Manju
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">{{ ticket.assigned_developer.username|first|upper }}</div>
+                            {{ ticket.assigned_developer.username }}
                         </div>
                     </td>
+                    {% else %}
+                    <td><div class="allottee-cell unassigned">—</div></td>
+                    {% endif %}
                     <td>
                         <div class="tw-row-actions">
                             <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
@@ -1111,73 +756,14 @@
                         </div>
                     </td>
                 </tr>
-
-                <tr data-ticket-id="BGEX25010098" data-ticket-type="existing" data-subject="DB Connection Pooling" data-status="closed" data-allottee="Akhil" data-client="BGEX">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="BGEX25010098" aria-label="Select BGEX25010098"></td>
-                    <td>
-                        <div class="ticket-id-cell">
-                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">BGEX25010098</span>
-                        </div>
-                    </td>
-                    <td><div title="DB Connection Pooling">DB Connection Pooling</div></td>
-                    <td>22-10-2024</td>
-                    <td>BGEX</td>
-                    <td><span class="tw-status-badge tw-status-badge--closed">Closed</span></td>
-                    <!-- Django: {{ ticket.priority }} -->
-                    <td><span class="tw-priority-badge tw-priority-badge--low">Low</span></td>
-                    <td>
-                        <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--violet" aria-hidden="true">A</div>
-                            Akhil
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr data-ticket-id="GMEC25010097" data-ticket-type="existing" data-subject="UI Responsive Fix" data-status="closed" data-allottee="Arun" data-client="GMEC">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="GMEC25010097" aria-label="Select GMEC25010097"></td>
-                    <td>
-                        <div class="ticket-id-cell">
-                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">GMEC25010097</span>
-                        </div>
-                    </td>
-                    <td><div title="UI Responsive Fix">UI Responsive Fix</div></td>
-                    <td>31-10-2024</td>
-                    <td>GMEC</td>
-                    <td><span class="tw-status-badge tw-status-badge--closed">Closed</span></td>
-                    <!-- Django: {{ ticket.priority }} -->
-                    <td><span class="tw-priority-badge tw-priority-badge--low">Low</span></td>
-                    <td>
-                        <div class="allottee-cell">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">A</div>
-                            Arun
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Django: {% endfor %} -->
-                <!-- Django: {% if not tickets %}{% endif %} replaces this at wiring time -->
-                <tr id="emptyState-closed" class="tw-empty-state-row" style="display:none;">
+            {% endfor %}
+                <tr id="emptyState-closed" class="tw-empty-state-row"{% if closed_tickets %} style="display:none;"{% endif %}>
                     <td colspan="8" style="padding:48px 24px;text-align:center;">
                         <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
                         <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
                     </td>
                 </tr>
+            {% verbatim %}
             </tbody>
         </table>
         </div>
@@ -1209,27 +795,23 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Django: {% for ticket in rejected_tickets %} -->
-
-                <tr data-ticket-id="TKT-00089" data-ticket-type="rejected" data-subject="Login page broken on Safari" data-status="rejected" data-client="GMEC">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="TKT-00089" aria-label="Select TKT-00089"></td>
+            {% endverbatim %}
+            {% for ticket in rejected_tickets %}
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-type="rejected" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
                             <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">TKT-00089</span>
+                            <span class="tw-ticket-id">{{ ticket.reference }}</span>
                         </div>
                     </td>
-                    <td><div title="Login page broken on Safari">Login page broken on Safari</div></td>
-                    <td>GMEC</td>
-                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
-                    <td>Jinoy Jose</td>
-                    <td>15-01-2025</td>
-                    <td>
-                        <div title="Duplicate of TKT-00071 — already resolved">
-                            Duplicate of TKT-00071 — already resolved
-                        </div>
-                    </td>
-                    <!-- Django: chat and timeline available for audit purposes on rejected tickets -->
+                    <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
+                    <td>{{ ticket.client.code|default:"—" }}</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
+                    {# Rejected By / Reason come from the reject TicketEvent (audit) — wired later. #}
+                    <td>—</td>
+                    <td>{{ ticket.updated_at|date:"d-m-Y" }}</td>
+                    <td><div>—</div></td>
                     <td onclick="event.stopPropagation()">
                         <div class="tw-row-actions">
                             <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
@@ -1237,42 +819,14 @@
                         </div>
                     </td>
                 </tr>
-
-                <tr data-ticket-id="TKT-00063" data-ticket-type="rejected" data-subject="Dashboard stats not loading for sub-users" data-status="rejected" data-client="BGEX">
-                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="TKT-00063" aria-label="Select TKT-00063"></td>
-                    <td>
-                        <div class="ticket-id-cell">
-                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
-                            <span class="tw-ticket-id">TKT-00063</span>
-                        </div>
-                    </td>
-                    <td><div title="Dashboard stats not loading for sub-users">Dashboard stats not loading for sub-users</div></td>
-                    <td>BGEX</td>
-                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
-                    <td>Jinoy Jose</td>
-                    <td>08-01-2025</td>
-                    <td>
-                        <div title="Insufficient information provided — client did not respond to follow-up within 7 days">
-                            Insufficient information provided — client did not…
-                        </div>
-                    </td>
-                    <!-- Django: chat and timeline available for audit purposes on rejected tickets -->
-                    <td onclick="event.stopPropagation()">
-                        <div class="tw-row-actions">
-                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
-                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Django: {% endfor %} -->
-                <!-- Django: {% if not tickets %}{% endif %} replaces this at wiring time -->
-                <tr id="emptyState-rejected" class="tw-empty-state-row" style="display:none;">
+            {% endfor %}
+                <tr id="emptyState-rejected" class="tw-empty-state-row"{% if rejected_tickets %} style="display:none;"{% endif %}>
                     <td colspan="8" style="padding:48px 24px;text-align:center;">
                         <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
                         <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
                     </td>
                 </tr>
+            {% verbatim %}
             </tbody>
         </table>
         </div>
@@ -2572,13 +2126,13 @@
     var searchFeedback   = document.getElementById('searchFeedback');
 
     var tabHeadings = {
-        inbox:     { heading: 'Inbox Tickets',        meta: '10 tickets · New and unassigned' },
-        progress:  { heading: 'In Progress Tickets',  meta: '28 tickets · Currently being worked on' },
-        forwarded: { heading: 'Awaiting Client',       meta: 'Tickets pending client response — TAT paused' },
-        uat:       { heading: 'UAT Approval',          meta: 'Awaiting client testing and sign-off' },
-        resolved:  { heading: 'Resolved Tickets',      meta: 'Awaiting your confirmation to close' },
-        closed:    { heading: 'Closed Tickets',        meta: '243 tickets · Successfully resolved' },
-        rejected:  { heading: 'Rejected Tickets',      meta: 'Tickets declined by admin — client has been notified.' },
+        inbox:     { heading: 'Inbox Tickets',       desc: 'New and unassigned' },
+        progress:  { heading: 'In Progress Tickets', desc: 'Currently being worked on' },
+        forwarded: { heading: 'Awaiting Client',     desc: 'Pending client response — TAT paused' },
+        uat:       { heading: 'UAT Approval',        desc: 'Awaiting client testing and sign-off' },
+        resolved:  { heading: 'Resolved Tickets',    desc: 'Awaiting your confirmation to close' },
+        closed:    { heading: 'Closed Tickets',      desc: 'Successfully resolved' },
+        rejected:  { heading: 'Rejected Tickets',    desc: 'Declined by admin — client has been notified' },
     };
 
     function updateTabHeading(tabId) {
@@ -2586,10 +2140,14 @@
         const metaEl    = document.getElementById('tab-meta');
         if (!headingEl || !metaEl) return;
         const data = tabHeadings[tabId];
-        if (data) {
-            headingEl.textContent = data.heading;
-            metaEl.textContent    = data.meta;
-        }
+        if (!data) return;
+        headingEl.textContent = data.heading;
+        /* Derive the count from the real server-rendered rows for this tab
+           (the empty-state row has no data-ticket-id, so it's excluded). This
+           always matches the stat card / queryset — no hardcoded numbers. */
+        const panel = document.getElementById('tab-' + tabId);
+        const count = panel ? panel.querySelectorAll('tbody tr[data-ticket-id]').length : 0;
+        metaEl.textContent = count + ' ticket' + (count === 1 ? '' : 's') + ' · ' + data.desc;
     }
 
     /* Activate the first stat card and heading on load */
