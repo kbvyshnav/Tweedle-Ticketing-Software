@@ -88,7 +88,24 @@ def ticket_transition(request, pk):
     try:
         transition(ticket, action, actor=request.user, **data)
     except (TransitionNotAllowed, InvalidTransition, TransitionValidationError) as exc:
-        messages.error(request, f"{ticket.reference}: {exc}")
+        messages.error(request, f"Couldn't update ticket {ticket.reference}: {exc}")
     else:
-        messages.success(request, f"{ticket.reference}: {action} done.")
+        messages.success(request, _success_message(action, ticket, data))
     return redirect("admin_dashboard")
+
+
+def _success_message(action, ticket, data):
+    ref = ticket.reference
+    if action == "assign":
+        dev = data["developer"].username
+        tester = data.get("tester")
+        if tester:
+            return f"Ticket {ref} assigned to {dev} (tester {tester.username})."
+        return f"Ticket {ref} assigned to {dev}."
+    if action == "reject":
+        return f"Ticket {ref} rejected."
+    if action == "resume":
+        return f"Ticket {ref} resumed — back in progress."
+    if action == "send_to_uat":
+        return f"Ticket {ref} sent to client for UAT."
+    return f"Ticket {ref} updated."

@@ -99,6 +99,24 @@ class AdminDashboardDataBindingTests(TestCase):
             resp, 'id="emptyState-inbox" class="tw-empty-state-row" style="display:none;"'
         )
 
+    def test_server_empty_tab_shows_status_message_not_filter_message(self):
+        # A genuinely empty status shows the per-tab status text; the filter
+        # message exists in the DOM but is the hidden (display:none) one.
+        resp = self.client.get(self.url)
+        self.assertContains(resp, "No tickets in the inbox.")
+        self.assertContains(resp, "Nothing awaiting client response.")
+        self.assertContains(resp, "No rejected tickets.")
+        # The filter text is present but hidden by default.
+        self.assertContains(
+            resp,
+            'class="tw-empty-filter" style="color:var(--tw-text-muted);'
+            'font-size:var(--tw-text-base);margin:0;display:none;"',
+        )
+
+    def test_empty_state_spans_full_width(self):
+        resp = self.client.get(self.url)
+        self.assertContains(resp, '<td colspan="9"')
+
     def test_stage_badge_reflects_sub_status(self):
         self._make(S.IN_PROGRESS, SS.READY_FOR_UAT)
         resp = self.client.get(self.url)
@@ -180,11 +198,26 @@ class AdminTicketTransitionTests(TestCase):
         self.assertEqual(t.assigned_tester, self.tester)
         self.assertEqual(t.events.count(), 1)
 
+    def test_assign_success_message_is_human_friendly(self):
+        t = self._make(S.NEW)
+        resp = self.client.post(
+            self._url(t), {"action": "assign", "developer": self.developer.pk}, follow=True
+        )
+        msgs = [str(m) for m in resp.context["messages"]]
+        self.assertTrue(
+            any(f"Ticket {t.reference} assigned to {self.developer.username}." == m for m in msgs),
+            msgs,
+        )
+
     def test_reject_with_reason(self):
         t = self._make(S.NEW)
-        self.client.post(self._url(t), {"action": "reject", "reason": "Duplicate"})
+        resp = self.client.post(
+            self._url(t), {"action": "reject", "reason": "Duplicate"}, follow=True
+        )
         t.refresh_from_db()
         self.assertEqual(t.status, S.REJECTED)
+        msgs = [str(m) for m in resp.context["messages"]]
+        self.assertIn(f"Ticket {t.reference} rejected.", msgs)
 
     def test_resume_restores_paused_sub_status(self):
         t = self._make(

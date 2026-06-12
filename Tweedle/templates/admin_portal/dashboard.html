@@ -50,19 +50,8 @@
 
     </div>
     <!-- END PAGE HEADER -->
+    <!-- Flash messages render as corner toasts at the end of this block (Phase 4.2b). -->
 
-    {% endverbatim %}
-    {% if messages %}
-    <div class="tw-messages" aria-live="polite">
-        {% for message in messages %}
-        <div class="tw-alert tw-alert--{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}info{% endif %}" role="alert">
-            <i class="bx {% if message.tags == 'error' %}bx-error-circle{% elif message.tags == 'success' %}bx-check-circle{% else %}bx-info-circle{% endif %}" aria-hidden="true"></i>
-            <span>{{ message }}</span>
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    {% verbatim %}
 
     <!-- =============================================================
          SECTION B: STAT STRIP
@@ -420,9 +409,10 @@
                 </tr>
             {% endfor %}
                 <tr id="emptyState-inbox" class="tw-empty-state-row"{% if inbox_tickets %} style="display:none;"{% endif %}>
-                    <td colspan="8" style="padding:48px 24px;text-align:center;">
+                    <td colspan="9" style="padding:48px 24px;text-align:center;">
                         <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
-                        <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
+                        <p class="tw-empty-status" style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets in the inbox.</p>
+                        <p class="tw-empty-filter" style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;display:none;">No tickets match your filters.</p>
                     </td>
                 </tr>
             {% verbatim %}
@@ -508,9 +498,10 @@
                 </tr>
             {% endfor %}
                 <tr id="emptyState-progress" class="tw-empty-state-row"{% if inprogress_tickets %} style="display:none;"{% endif %}>
-                    <td colspan="7" style="padding:48px 24px;text-align:center;">
+                    <td colspan="9" style="padding:48px 24px;text-align:center;">
                         <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
-                        <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
+                        <p class="tw-empty-status" style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets in progress.</p>
+                        <p class="tw-empty-filter" style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;display:none;">No tickets match your filters.</p>
                     </td>
                 </tr>
             {% verbatim %}
@@ -586,9 +577,10 @@
                 </tr>
             {% endfor %}
                 <tr id="emptyState-forwarded" class="tw-empty-state-row"{% if forwarded_tickets %} style="display:none;"{% endif %}>
-                    <td colspan="8" style="padding:48px 24px;text-align:center;">
+                    <td colspan="9" style="padding:48px 24px;text-align:center;">
                         <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
-                        <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
+                        <p class="tw-empty-status" style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">Nothing awaiting client response.</p>
+                        <p class="tw-empty-filter" style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;display:none;">No tickets match your filters.</p>
                     </td>
                 </tr>
             {% verbatim %}
@@ -655,9 +647,10 @@
                 </tr>
             {% endfor %}
                 <tr id="emptyState-uat" class="tw-empty-state-row"{% if uat_tickets %} style="display:none;"{% endif %}>
-                    <td colspan="8" style="padding:48px 24px;text-align:center;">
+                    <td colspan="9" style="padding:48px 24px;text-align:center;">
                         <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
-                        <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
+                        <p class="tw-empty-status" style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets awaiting UAT approval.</p>
+                        <p class="tw-empty-filter" style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;display:none;">No tickets match your filters.</p>
                     </td>
                 </tr>
             {% verbatim %}
@@ -724,9 +717,10 @@
                 </tr>
             {% endfor %}
                 <tr id="emptyState-resolved" class="tw-empty-state-row"{% if resolved_tickets %} style="display:none;"{% endif %}>
-                    <td colspan="8" style="padding:48px 24px;text-align:center;">
+                    <td colspan="9" style="padding:48px 24px;text-align:center;">
                         <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
-                        <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
+                        <p class="tw-empty-status" style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No resolved tickets awaiting closure.</p>
+                        <p class="tw-empty-filter" style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;display:none;">No tickets match your filters.</p>
                     </td>
                 </tr>
             {% verbatim %}
@@ -792,9 +786,10 @@
                 </tr>
             {% endfor %}
                 <tr id="emptyState-closed" class="tw-empty-state-row"{% if closed_tickets %} style="display:none;"{% endif %}>
-                    <td colspan="8" style="padding:48px 24px;text-align:center;">
+                    <td colspan="9" style="padding:48px 24px;text-align:center;">
                         <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
-                        <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
+                        <p class="tw-empty-status" style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No closed tickets.</p>
+                        <p class="tw-empty-filter" style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;display:none;">No tickets match your filters.</p>
                     </td>
                 </tr>
             {% verbatim %}
@@ -855,9 +850,10 @@
                 </tr>
             {% endfor %}
                 <tr id="emptyState-rejected" class="tw-empty-state-row"{% if rejected_tickets %} style="display:none;"{% endif %}>
-                    <td colspan="8" style="padding:48px 24px;text-align:center;">
+                    <td colspan="9" style="padding:48px 24px;text-align:center;">
                         <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
-                        <p style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No tickets found matching your filters.</p>
+                        <p class="tw-empty-status" style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No rejected tickets.</p>
+                        <p class="tw-empty-filter" style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;display:none;">No tickets match your filters.</p>
                     </td>
                 </tr>
             {% verbatim %}
@@ -1900,10 +1896,19 @@
             });
             var emptyStateRow = activeTabContent.querySelector('.tw-empty-state-row');
             if (emptyStateRow) {
-                emptyStateRow.style.display = visibleCount === 0 ? 'table-row' : 'none';
+                var isEmpty = visibleCount === 0;
+                emptyStateRow.style.display = isEmpty ? 'table-row' : 'none';
+                /* Server-empty (no rows at all) vs filter-empty (rows exist but
+                   all hidden by the active filter) get different messages. */
+                var statusMsg = emptyStateRow.querySelector('.tw-empty-status');
+                var filterMsg = emptyStateRow.querySelector('.tw-empty-filter');
+                if (isEmpty && statusMsg && filterMsg) {
+                    var filteredOut = dataRows.length > 0;
+                    statusMsg.style.display = filteredOut ? 'none' : '';
+                    filterMsg.style.display = filteredOut ? '' : 'none';
+                }
             }
         }
-        /* Django: {% if not tickets %}{% endif %} replaces this at wiring time */
     }
 
 
@@ -2287,11 +2292,11 @@
      * data-ticket-type="existing" → ticketDetailsModal
      * data-ticket-type="new"      → newTicketModal
      * ============================================================ */
-    document.querySelectorAll('.tab-content tbody tr').forEach(function(row) {
+    document.querySelectorAll('.tab-content tbody tr[data-ticket-id]').forEach(function(row) {
         row.addEventListener('click', function(e) {
             if (e.target.closest('.tw-star-icon') || e.target.closest('.tw-row-actions')) return;
 
-            document.querySelectorAll('.tab-content tbody tr').forEach(function(r) {
+            document.querySelectorAll('.tab-content tbody tr[data-ticket-id]').forEach(function(r) {
                 r.classList.remove('row-selected');
             });
             this.classList.add('row-selected');
@@ -2503,17 +2508,24 @@
     /* === TOAST NOTIFICATION === */
     function showDashToast(message, type) {
         type = type || 'success';
+        var icon = type === 'success' ? 'bx-check-circle'
+                 : type === 'error'   ? 'bx-error-circle'
+                 : 'bx-info-circle';
         const toast = document.createElement('div');
         toast.className = 'tw-toast tw-toast--' + type;
-        toast.innerHTML = '<i class=\'bx ' +
-            (type === 'success' ? 'bx-check-circle' : 'bx-error-circle') +
-            '\'></i><span>' + message + '</span>';
-        document.body.appendChild(toast);
-        setTimeout(function() { toast.classList.add('show'); }, 10);
-        setTimeout(function() {
+        toast.setAttribute('role', 'status');
+        toast.title = 'Click to dismiss';
+        toast.innerHTML = '<i class="bx ' + icon + '"></i><span>' + message + '</span>';
+
+        function dismiss() {
             toast.classList.remove('show');
             setTimeout(function() { toast.remove(); }, 300);
-        }, 3000);
+        }
+        toast.addEventListener('click', dismiss);
+
+        document.body.appendChild(toast);
+        setTimeout(function() { toast.classList.add('show'); }, 10);
+        setTimeout(dismiss, 4000);  /* auto-dismiss after a few seconds */
     }
 
     /* ============================================================
@@ -3636,4 +3648,14 @@
     });
 </script>
 {% endverbatim %}
+{% if messages %}
+<script>
+    /* Phase 4.2b: surface Django flash messages as corner toasts (reuses showDashToast). */
+    document.addEventListener('DOMContentLoaded', function () {
+        {% for message in messages %}
+        showDashToast("{{ message|escapejs }}", "{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}info{% endif %}");
+        {% endfor %}
+    });
+</script>
+{% endif %}
 {% endblock %}
