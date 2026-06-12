@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.test import Client as DjangoTestClient
 from django.test import TestCase
 from django.urls import reverse
 
@@ -129,3 +130,121 @@ class AdminDashboardDataBindingTests(TestCase):
         self.assertContains(resp, 'aria-label="UAT Approval: 1 ticket"')
         # The stale hardcoded value is gone.
         self.assertNotContains(resp, 'aria-label="Inbox: 10 tickets"')
+
+
+class AdminTicketTransitionTests(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_user(
+            "admin_x", email="admin_x@tweedle.local", password="pw", role="admin"
+        )
+        self.requester = User.objects.create_user(
+            "client_x", email="client_x@tweedle.local", password="pw", role="client"
+        )
+        self.developer = User.objects.create_user(
+            "dev_x", email="dev_x@tweedle.local", password="pw", role="developer"
+        )
+        self.tester = User.objects.create_user(
+            "tester_x", email="tester_x@tweedle.local", password="pw", role="tester"
+        )
+        self.org = Client.objects.create(name="Acme", code="ACME")
+        self.client.force_login(self.admin)
+
+    def _make(self, status, sub_status=None, **kw):
+        return Ticket.objects.create(
+            subject="A ticket",
+            requester=self.requester,
+            client=self.org,
+            status=status,
+            sub_status=sub_status,
+            **kw,
+        )
+
+    def _url(self, ticket):
+        return reverse("ticket_transition", args=[ticket.pk])
+
+    def _errors(self, resp):
+        return [m for m in resp.context["messages"] if m.level_tag == "error"]
+
+    # ── happy paths ──────────────────────────────────────────────────────
+    def test_assign_persists_assignees_and_writes_event(self):
+        t = self._make(S.NEW)
+        resp = self.client.post(
+            self._url(t),
+            {"action": "assign", "developer": self.developer.pk, "tester": self.tester.pk},
+        )
+        self.assertRedirects(resp, reverse("admin_dashboard"))
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.IN_PROGRESS)
+        self.assertEqual(t.sub_status, SS.DEVELOPMENT)
+        self.assertEqual(t.assigned_developer, self.developer)
+        self.assertEqual(t.assigned_tester, self.tester)
+        self.assertEqual(t.events.count(), 1)
+
+    def test_reject_with_reason(self):
+        t = self._make(S.NEW)
+        self.client.post(self._url(t), {"action": "reject", "reason": "Duplicate"})
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.REJECTED)
+
+    def test_resume_restores_paused_sub_status(self):
+        t = self._make(
+            S.AWAITING_CLIENT,
+            paused_sub_status=SS.TESTING,
+            assigned_developer=self.developer,
+        )
+        self.client.post(self._url(t), {"action": "resume"})
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.IN_PROGRESS)
+        self.assertEqual(t.sub_status, SS.TESTING)
+
+    def test_send_to_uat(self):
+        t = self._make(S.IN_PROGRESS, SS.READY_FOR_UAT, assigned_developer=self.developer)
+        self.client.post(self._url(t), {"action": "send_to_uat"})
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.UAT)
+
+    # ── bad input is surfaced, never a 500, and changes nothing ──────────
+    def test_assign_without_developer_surfaces_error(self):
+        t = self._make(S.NEW)
+        resp = self.client.post(self._url(t), {"action": "assign"}, follow=True)
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.NEW)
+        self.assertEqual(t.events.count(), 0)
+        self.assertTrue(self._errors(resp))
+
+    def test_illegal_transition_surfaces_error_and_unchanged(self):
+        t = self._make(S.NEW)  # send_to_uat is illegal from 'new'
+        resp = self.client.post(self._url(t), {"action": "send_to_uat"}, follow=True)
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.NEW)
+        self.assertEqual(t.events.count(), 0)
+        self.assertTrue(self._errors(resp))
+
+    def test_unsupported_action_surfaces_error(self):
+        t = self._make(S.RESOLVED)  # 'close' is valid in the engine but not exposed here
+        resp = self.client.post(self._url(t), {"action": "close"}, follow=True)
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.RESOLVED)
+        self.assertTrue(self._errors(resp))
+
+    # ── auth / CSRF ──────────────────────────────────────────────────────
+    def test_non_admin_forbidden(self):
+        t = self._make(S.NEW)
+        self.client.force_login(self.requester)  # client role
+        resp = self.client.post(self._url(t), {"action": "reject", "reason": "x"})
+        self.assertEqual(resp.status_code, 403)
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.NEW)
+
+    def test_csrf_required(self):
+        t = self._make(S.NEW)
+        csrf_client = DjangoTestClient(enforce_csrf_checks=True)
+        csrf_client.force_login(self.admin)
+        resp = csrf_client.post(self._url(t), {"action": "reject", "reason": "x"})
+        self.assertEqual(resp.status_code, 403)
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.NEW)
+
+    def test_get_not_allowed(self):
+        t = self._make(S.NEW)
+        self.assertEqual(self.client.get(self._url(t)).status_code, 405)

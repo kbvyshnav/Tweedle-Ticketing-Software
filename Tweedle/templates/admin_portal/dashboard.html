@@ -51,6 +51,18 @@
     </div>
     <!-- END PAGE HEADER -->
 
+    {% endverbatim %}
+    {% if messages %}
+    <div class="tw-messages" aria-live="polite">
+        {% for message in messages %}
+        <div class="tw-alert tw-alert--{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}info{% endif %}" role="alert">
+            <i class="bx {% if message.tags == 'error' %}bx-error-circle{% elif message.tags == 'success' %}bx-check-circle{% else %}bx-info-circle{% endif %}" aria-hidden="true"></i>
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% verbatim %}
 
     <!-- =============================================================
          SECTION B: STAT STRIP
@@ -376,7 +388,7 @@
             <tbody>
             {% endverbatim %}
             {% for ticket in inbox_tickets %}
-                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-type="new" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="new" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
@@ -478,6 +490,18 @@
                         <div class="tw-row-actions">
                             <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
                             <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                            {% if ticket.sub_status == 'ready_for_uat' %}
+                            <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-inline-action-form" style="display:inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="send_to_uat">
+                                <button type="button" class="tw-action-icon tw-action-icon--send-uat"
+                                        onclick="confirmInlineAction(this, 'Send to Client UAT?', 'This moves the ticket to UAT Approval and notifies the client to review and approve.')"
+                                        title="Send to Client UAT" aria-label="Send to Client UAT"
+                                        style="color:var(--tw-success);background:none;border:none;cursor:pointer;padding:0">
+                                    <i class="bx bx-check-shield" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                            {% endif %}
                             <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
                         </div>
                     </td>
@@ -546,6 +570,16 @@
                         <div class="tw-row-actions">
                             <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
                             <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                            <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-inline-action-form" style="display:inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="resume">
+                                <button type="button" class="tw-action-icon tw-action-icon--resume"
+                                        onclick="confirmInlineAction(this, 'Resume Ticket', 'Move this ticket back to In Progress? The assigned developer is re-notified and the TAT clock resumes.')"
+                                        title="Resume — client has responded" aria-label="Resume ticket"
+                                        style="color:var(--tw-success);background:none;border:none;cursor:pointer;padding:0">
+                                    <i class="bx bx-play-circle" aria-hidden="true"></i>
+                                </button>
+                            </form>
                             <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
                         </div>
                     </td>
@@ -1409,6 +1443,12 @@
             </div>
 
             <div class="tw-assignment-section">
+            {% endverbatim %}
+            <form id="newTicketForm" method="post" action="." data-url-template="{% url 'ticket_transition' 0 %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" id="newTicketAction" value="">
+                <input type="hidden" name="reason" id="formRejectReason" value="">
+            {% verbatim %}
 
                 <div class="tw-assignment-title">
                     <i class="bx bx-user-check" aria-hidden="true"></i>
@@ -1419,14 +1459,13 @@
                     <label class="tw-form-label" for="developerSelect">
                         Select Developer <span class="tw-required">*</span>
                     </label>
-                    <!-- Django: populated from {{ developers }} -->
-                    <select class="tw-developer-select" id="developerSelect" onchange="showDeveloperInfo()">
+                    <select class="tw-developer-select" id="developerSelect" name="developer" onchange="showDeveloperInfo()">
+                        {% endverbatim %}
                         <option value="">-- Choose Developer --</option>
-                        <option value="dev1" data-tickets="5" data-completed="23" data-pending="5">Rajesh Kumar (5 tickets)</option>
-                        <option value="dev2" data-tickets="3" data-completed="31" data-pending="3">Priya Sharma (3 tickets)</option>
-                        <option value="dev3" data-tickets="7" data-completed="18" data-pending="7">Amit Patel (7 tickets)</option>
-                        <option value="dev4" data-tickets="4" data-completed="27" data-pending="4">Sarah Johnson (4 tickets)</option>
-                        <option value="dev5" data-tickets="2" data-completed="35" data-pending="2">Michael Chen (2 tickets)</option>
+                        {% for d in developers %}
+                        <option value="{{ d.pk }}">{{ d.username }}</option>
+                        {% endfor %}
+                        {% verbatim %}
                     </select>
 
                     <div class="tw-developer-info" id="developerInfo" aria-live="polite">
@@ -1461,13 +1500,13 @@
                         <label class="tw-form-label" for="testerSelect">
                             Select Tester <span class="tw-required">*</span>
                         </label>
-                        <!-- Django: populated from {{ testers }} -->
-                        <select class="tw-select" id="testerSelect" onchange="showTesterInfo()">
+                        <select class="tw-select" id="testerSelect" name="tester" onchange="showTesterInfo()">
+                        {% endverbatim %}
                             <option value="">Select a tester</option>
-                            <option value="t1" data-tickets-pending="3" data-tickets-completed="18" data-tickets-total="21">Arjun Menon</option>
-                            <option value="t2" data-tickets-pending="1" data-tickets-completed="24" data-tickets-total="25">Priya Nair</option>
-                            <option value="t3" data-tickets-pending="5" data-tickets-completed="12" data-tickets-total="17">Rahul Sharma</option>
-                            <option value="t4" data-tickets-pending="0" data-tickets-completed="30" data-tickets-total="30">Sneha Das</option>
+                            {% for t in testers %}
+                            <option value="{{ t.pk }}">{{ t.username }}</option>
+                            {% endfor %}
+                        {% verbatim %}
                         </select>
 
                         <div class="tw-developer-info" id="testerWorkloadStats" aria-live="polite" style="display:none">
@@ -1506,15 +1545,18 @@
                 </div>
 
                 <div class="tw-modal-action-buttons">
-                    <button class="tw-btn-assign" id="assignBtn" onclick="confirmAssignment()" disabled aria-label="Assign ticket to selected developer">
+                    <button type="button" class="tw-btn-assign" id="assignBtn" onclick="confirmAssignment()" disabled aria-label="Assign ticket to selected developer">
                         <i class="bx bx-check-circle" aria-hidden="true"></i>
                         Assign Ticket
                     </button>
-                    <button class="tw-btn-reject" id="rejectBtn" onclick="confirmRejection()" aria-label="Reject or close ticket">
+                    <button type="button" class="tw-btn-reject" id="rejectBtn" onclick="confirmRejection()" aria-label="Reject ticket">
                         <i class="bx bx-x-circle" aria-hidden="true"></i>
                         Reject Ticket
                     </button>
                 </div>
+            {% endverbatim %}
+            </form>
+            {% verbatim %}
 
             </div>
 
@@ -2440,93 +2482,20 @@
     }
 
     /* ============================================================
-     * SEND TO CLIENT UAT
-     * Moves a testing_passed row from In Progress to UAT Approval.
-     * Triggered by the "Send to Client UAT" button on testing_passed rows.
-     * Django: POST {% url 'admin:send_to_uat' ticket_id %}
-     *   Sets ticket.status = 'uat', notifies client
+     * INLINE LIST ACTIONS (Phase 4.2)
+     * Resume + Send-to-Client-UAT are CSRF POST forms in the rows that
+     * call transition(). This gates a form's submit behind the confirm
+     * dialog (replaces the old DOM-move stubs).
      * ============================================================ */
-    function sendToClientUAT(ticketId, subject) {
+    function confirmInlineAction(btn, title, message) {
+        var form = btn.closest('form');
+        if (!form) return;
         openConfirmModal({
             type:    'success',
-            title:   'Send to Client UAT?',
-            message: 'This will move the ticket to UAT Approval and notify the client to review and approve.',
-            details: '<p><strong>Ticket:</strong> ' + ticketId + '</p>' +
-                     '<p><strong>Subject:</strong> ' + subject + '</p>',
+            title:   title,
+            message: message,
             onConfirm: function () {
-                /* Django: fetch('{% url "admin:send_to_uat" ticket_id %}', {
-                   method: 'POST',
-                   headers: { 'X-CSRFToken': getCookie('csrftoken') },
-                   body: JSON.stringify({ ticket_id: ticketId, status: 'uat' })
-                }) */
-                console.log('[Dashboard] Send to Client UAT:', ticketId);
-                showDashToast('Ticket sent to Client UAT — client has been notified.', 'success');
-            }
-        });
-    }
-
-
-    /* ============================================================
-     * RESUME TICKET — moves a Pending Client row back to In Progress.
-     * Django: POST /api/tickets/<id>/resume/
-     *   ticket.status = 'in_progress', ticket.sub_status = 'development'
-     *   TicketEvent created with event_type='client_responded'
-     * ============================================================ */
-    function resumeTicket(btn) {
-        var row      = btn.closest('tr');
-        var ticketId = row.dataset.ticketId || '';
-        var subject  = row.cells[1] ? row.cells[1].textContent.trim() : '';
-
-        openConfirmModal({
-            type:    'success',
-            title:   'Resume Ticket',
-            message: 'Move this ticket back to In Progress?',
-            details: 'Confirm that the client has provided the needed information. The ticket will return to the assigned developer and the TAT clock will resume.',
-            onConfirm: function() {
-                var inProgressTbody = document.querySelector('#tab-progress tbody');
-                if (!inProgressTbody) return;
-
-                /* Update row data attributes */
-                row.dataset.status    = 'in_progress';
-                row.dataset.subStatus = 'development';
-
-                /* The Awaiting-Client (forwarded) row carries a Status cell
-                   (index 5). The In Progress table has no Status column, so
-                   remove it to keep the column count aligned. */
-                if (row.cells[5]) row.deleteCell(5);
-
-                /* Insert a Stage cell immediately before the Dev/Tester cell so
-                   the moved row matches the In Progress column order:
-                   … Client, Priority, Stage, Dev/Tester, Actions. */
-                var stageCell = document.createElement('td');
-                stageCell.innerHTML = '<span class="tw-status-badge tw-status-badge--development">Development</span>';
-                var devCell = row.querySelector('.allottee-cell');
-                var devTd   = devCell ? devCell.closest('td') : null;
-                if (devTd) {
-                    row.insertBefore(stageCell, devTd);
-                } else {
-                    row.appendChild(stageCell);
-                }
-
-                /* Remove Resume icon from the Actions cell (now index 7) */
-                var resumeIcon = row.querySelector('.tw-action-icon--resume');
-                if (resumeIcon) resumeIcon.remove();
-
-                /* Move row from Pending Client tbody to In Progress tbody */
-                inProgressTbody.appendChild(row);
-
-                /* Update stat counts (frontend DOM only — Django uses context vars) */
-                var pendingCount  = document.querySelector('[data-tab="forwarded"] .tw-stat-card__count');
-                var progressCount = document.querySelector('[data-tab="progress"] .tw-stat-card__count');
-                if (pendingCount)  pendingCount.textContent  = Math.max(0, parseInt(pendingCount.textContent)  - 1);
-                if (progressCount) progressCount.textContent = parseInt(progressCount.textContent) + 1;
-
-                /* Django: fetch('{% url "admin:resume_ticket" ticketId %}', {
-                   method: 'POST',
-                   headers: { 'X-CSRFToken': getCookie('csrftoken') },
-                   body: JSON.stringify({ ticket_id: ticketId })
-                }) */
-                showDashToast('Ticket resumed — developer notified.', 'success');
+                if (form.requestSubmit) { form.requestSubmit(); } else { form.submit(); }
             }
         });
     }
@@ -2712,6 +2681,11 @@
         document.getElementById('newModalTicketId').textContent = ticketId;
         document.getElementById('newModalSubject').textContent  = subject;
         document.getElementById('newModalStatus').textContent   = status || 'New Ticket';
+        /* Point the form at this ticket's transition endpoint (pk from its row). */
+        var form = document.getElementById('newTicketForm');
+        var row  = document.querySelector('#tab-inbox tbody tr[data-ticket-id="' + ticketId + '"]');
+        var pk   = row ? row.dataset.ticketPk : '';
+        if (form && pk) form.action = form.dataset.urlTemplate.replace('/0/', '/' + pk + '/');
         document.getElementById('newTicketModal').classList.add('active');
         document.body.style.overflow = 'hidden';
     }
@@ -2766,8 +2740,11 @@
     }
 
     function confirmAssignment() {
-        var ticketId        = document.getElementById('newModalTicketId').textContent;
         var developerSelect = document.getElementById('developerSelect');
+        if (!developerSelect.value) {
+            showDashToast('Please select a developer.', 'error');
+            return;
+        }
         var devName         = developerSelect.options[developerSelect.selectedIndex].text;
         var assignTesterNow = document.getElementById('assignTesterNow').checked;
         var testerSelect    = document.getElementById('testerSelect');
@@ -2778,27 +2755,20 @@
             testerSelect.focus();
             return;
         }
+        /* If not assigning a tester now, make sure none is posted. */
+        if (!assignTesterNow) testerSelect.value = '';
 
-        var testerName    = assignTesterNow
+        var testerName = assignTesterNow
             ? testerSelect.options[testerSelect.selectedIndex].text
             : null;
-        var assignmentMsg = testerName
-            ? 'Assign ' + devName + ' (developer) and ' + testerName + ' (tester) to this ticket?'
-            : 'Assign ' + devName + ' as developer? A tester can be assigned later.';
 
         openConfirmModal({
             type:    'success',
             title:   'Confirm Assignment',
-            message: assignmentMsg,
-            details: '<p><strong>Ticket:</strong> ' + ticketId + '</p>' +
-                     '<p><strong>Developer:</strong> ' + devName + '</p>' +
-                     (testerName ? '<p><strong>Tester:</strong> ' + testerName + '</p>' : ''),
-            onConfirm: function () {
-                /* Django: POST to {% url 'admin:assign_ticket' %}
-                   Body: { developer_id, tester_id (null if skipped), comments, notify_email } */
-                console.log('[NewTicket] Assigned:', ticketId, 'dev:', devName, 'tester:', testerName || 'none');
-                closeNewTicketModal();
-            }
+            message: testerName
+                ? 'Assign ' + devName + ' (developer) and ' + testerName + ' (tester) to this ticket?'
+                : 'Assign ' + devName + ' as developer? A tester can be assigned later.',
+            onConfirm: function () { submitNewTicket('assign'); }
         });
     }
 
@@ -2809,7 +2779,7 @@
         openConfirmModal({
             type:    'danger',
             title:   'Reject Ticket',
-            message: 'Are you sure you want to reject this ticket? This action cannot be undone.',
+            message: 'Are you sure you want to reject this ticket? The requester will be notified.',
             details: `
                 <p><strong>Ticket:</strong> ${ticketId}</p>
                 <p><strong>Subject:</strong> ${subject}</p>
@@ -2832,54 +2802,18 @@
                     textarea.classList.add('tw-input--error');
                     return false;
                 }
-
-                /* Move row from Inbox table into Rejected table */
-                var inboxRow      = document.querySelector('#tab-inbox tbody tr[data-ticket-id="' + ticketId + '"]');
-                var rejectedTbody = document.querySelector('#tab-rejected tbody');
-
-                if (inboxRow && rejectedTbody) {
-                    var clientText   = inboxRow.cells[3] ? inboxRow.cells[3].textContent.trim() : '—';
-                    var priorityEl   = document.querySelector('#newTicketModal .tw-priority-badge');
-                    var priorityHTML = priorityEl ? priorityEl.outerHTML : '<span>—</span>';
-                    var today        = new Date();
-                    var rejectedOn   = today.getDate().toString().padStart(2, '0') + '-' +
-                                       (today.getMonth() + 1).toString().padStart(2, '0') + '-' +
-                                       today.getFullYear();
-                    var reasonTrunc  = reason.length > 60 ? reason.substring(0, 60) + '…' : reason;
-
-                    var newRow = document.createElement('tr');
-                    newRow.setAttribute('data-ticket-id', ticketId);
-                    newRow.setAttribute('data-ticket-type', 'rejected');
-                    newRow.setAttribute('data-subject', subject);
-                    newRow.setAttribute('data-status', 'rejected');
-                    newRow.innerHTML =
-                        '<td>' +
-                            '<i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>' +
-                            '<span class="tw-ticket-id">' + ticketId + '</span>' +
-                        '</td>' +
-                        '<td><div title="' + subject + '">' + subject + '</div></td>' +
-                        '<td>' + clientText + '</td>' +
-                        '<td>' + priorityHTML + '</td>' +
-                        '<td>' + CURRENT_USER.name + '</td>' +
-                        '<td>' + rejectedOn + '</td>' +
-                        '<td><div title="' + reason + '">' + reasonTrunc + '</div></td>' +
-                        '<td>' +
-                            '<div class="tw-row-actions">' +
-                                '<i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>' +
-                                '<i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>' +
-                            '</div>' +
-                        '</td>';
-
-                    rejectedTbody.appendChild(newRow);
-                    inboxRow.remove();
-                }
-
-                /* Django: POST to /api/tickets/<id>/reject/ with { reason: reason }
-                   On success, refresh inbox_count and rejected_count stat cards via fetch. */
-                closeNewTicketModal();
-                showDashToast('Ticket rejected and client notified.');
+                /* Carry the reason on the real form and POST to the engine. */
+                document.getElementById('formRejectReason').value = reason;
+                submitNewTicket('reject');
             }
         });
+    }
+
+    /* Set the action and submit the New-Ticket form to transition(). */
+    function submitNewTicket(action) {
+        document.getElementById('newTicketAction').value = action;
+        var f = document.getElementById('newTicketForm');
+        if (f.requestSubmit) { f.requestSubmit(); } else { f.submit(); }
     }
 
     function resetNewTicketForm() {

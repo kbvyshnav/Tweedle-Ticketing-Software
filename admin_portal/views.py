@@ -1,8 +1,19 @@
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404, redirect
+from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 
-from core.auth import RoleRequiredMixin
+from core.auth import RoleRequiredMixin, role_required
 from tickets.models import Ticket
+from tickets.transitions import (
+    InvalidTransition,
+    TransitionNotAllowed,
+    TransitionValidationError,
+    transition,
+)
 
+User = get_user_model()
 S = Ticket.Status
 
 # Dashboard tab key -> the ticket status it lists.
@@ -16,12 +27,16 @@ TAB_STATUS = {
     "rejected": S.REJECTED,
 }
 
+# List-level actions this admin endpoint exposes (Phase 4.2). The details-modal
+# actions (request_info/reassign/recall/close) arrive in 4.3.
+ALLOWED_ACTIONS = {"assign", "reject", "resume", "send_to_uat"}
+
 
 class AdminDashboardView(RoleRequiredMixin, TemplateView):
     """Admin portal dashboard.
 
-    Phase 4.1b: read-only data binding — each tab renders its real tickets
-    from the DB with per-tab counts. No mutations; action wiring is 4.2.
+    Phase 4.1b: read-only data binding — each tab renders its real tickets.
+    Phase 4.2: list-level action forms post to `ticket_transition`.
     (cancelled tickets have no tab in this 7-tab design — admin-only for now.)
     """
 
@@ -37,4 +52,43 @@ class AdminDashboardView(RoleRequiredMixin, TemplateView):
             qs = base.filter(status=status)
             ctx[f"{tab}_tickets"] = qs
             ctx[f"{tab}_count"] = qs.count()
+        # Assignment-modal selects come from real users.
+        ctx["developers"] = User.objects.filter(role="developer").order_by("username")
+        ctx["testers"] = User.objects.filter(role="tester").order_by("username")
         return ctx
+
+
+@require_POST
+@role_required("admin")
+def ticket_transition(request, pk):
+    """Generic admin action endpoint: POST action -> transition() -> redirect.
+
+    Admin-only for this phase. transition() re-checks role/legal/guard, so the
+    engine remains the real authority. Engine errors surface as messages (never
+    a 500); always redirects back to the dashboard.
+    """
+    ticket = get_object_or_404(Ticket, pk=pk)
+    action = request.POST.get("action", "")
+
+    if action not in ALLOWED_ACTIONS:
+        messages.error(request, f"Unsupported action: '{action}'.")
+        return redirect("admin_dashboard")
+
+    data = {}
+    if action == "assign":
+        dev_pk = request.POST.get("developer")
+        if dev_pk:
+            data["developer"] = get_object_or_404(User, pk=dev_pk, role="developer")
+        tester_pk = request.POST.get("tester")
+        if tester_pk:
+            data["tester"] = get_object_or_404(User, pk=tester_pk, role="tester")
+    elif action == "reject":
+        data["reason"] = request.POST.get("reason", "").strip()
+
+    try:
+        transition(ticket, action, actor=request.user, **data)
+    except (TransitionNotAllowed, InvalidTransition, TransitionValidationError) as exc:
+        messages.error(request, f"{ticket.reference}: {exc}")
+    else:
+        messages.success(request, f"{ticket.reference}: {action} done.")
+    return redirect("admin_dashboard")
