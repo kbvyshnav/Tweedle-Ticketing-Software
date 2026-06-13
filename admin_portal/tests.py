@@ -4,7 +4,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts.models import Client
-from tickets.models import Ticket
+from tickets.models import Ticket, TicketEvent, TicketMessage
+from tickets.transitions import transition
 
 User = get_user_model()
 S = Ticket.Status
@@ -254,8 +255,11 @@ class AdminTicketTransitionTests(TestCase):
         self.assertTrue(self._errors(resp))
 
     def test_unsupported_action_surfaces_error(self):
-        t = self._make(S.RESOLVED)  # 'close' is valid in the engine but not exposed here
-        resp = self.client.post(self._url(t), {"action": "close"}, follow=True)
+        # 'reopen' is a real engine action but is NOT exposed by this endpoint.
+        t = self._make(S.RESOLVED)
+        resp = self.client.post(
+            self._url(t), {"action": "reopen", "reason": "x"}, follow=True
+        )
         t.refresh_from_db()
         self.assertEqual(t.status, S.RESOLVED)
         self.assertTrue(self._errors(resp))
@@ -281,3 +285,189 @@ class AdminTicketTransitionTests(TestCase):
     def test_get_not_allowed(self):
         t = self._make(S.NEW)
         self.assertEqual(self.client.get(self._url(t)).status_code, 405)
+
+    # ── 4.3 modal actions ────────────────────────────────────────────────
+    def test_request_info(self):
+        t = self._make(S.IN_PROGRESS, SS.DEVELOPMENT, assigned_developer=self.developer)
+        self.client.post(
+            self._url(t), {"action": "request_info", "message": "Need the account no."}
+        )
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.AWAITING_CLIENT)
+        self.assertEqual(t.paused_sub_status, SS.DEVELOPMENT)
+
+    def test_reassign_changes_developer_without_status_change(self):
+        t = self._make(S.IN_PROGRESS, SS.DEVELOPMENT, assigned_developer=self.developer)
+        other = User.objects.create_user("dev2", role="developer")
+        self.client.post(self._url(t), {"action": "reassign", "developer": other.pk})
+        t.refresh_from_db()
+        self.assertEqual(t.assigned_developer, other)
+        self.assertEqual(t.status, S.IN_PROGRESS)
+        self.assertEqual(t.sub_status, SS.DEVELOPMENT)
+
+    def test_recall_request_changes_from_uat(self):
+        t = self._make(S.UAT, assigned_developer=self.developer)
+        self.client.post(
+            self._url(t), {"action": "request_changes", "feedback": "Still wrong"}
+        )
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.IN_PROGRESS)
+        self.assertEqual(t.sub_status, SS.DEVELOPMENT)
+
+    def test_close_from_resolved(self):
+        t = self._make(S.RESOLVED, assigned_developer=self.developer)
+        self.client.post(self._url(t), {"action": "close"})
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.CLOSED)
+        self.assertIsNotNone(t.closed_at)
+
+    def test_close_illegal_on_in_progress(self):
+        t = self._make(S.IN_PROGRESS, SS.DEVELOPMENT, assigned_developer=self.developer)
+        resp = self.client.post(self._url(t), {"action": "close"}, follow=True)
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.IN_PROGRESS)
+        self.assertEqual(t.events.count(), 0)
+        self.assertTrue(self._errors(resp))
+
+    def test_request_info_without_message_errors(self):
+        t = self._make(S.IN_PROGRESS, SS.DEVELOPMENT, assigned_developer=self.developer)
+        resp = self.client.post(self._url(t), {"action": "request_info"}, follow=True)
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.IN_PROGRESS)
+        self.assertTrue(self._errors(resp))
+
+
+class AdminTicketDetailTests(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_user("admin_dt", role="admin")
+        self.requester = User.objects.create_user("client_dt", role="client")
+        self.developer = User.objects.create_user("dev_dt", role="developer")
+        self.org = Client.objects.create(name="Acme", code="ACME")
+        self.client.force_login(self.admin)
+
+    def _make(self, status, sub_status=None, **kw):
+        return Ticket.objects.create(
+            subject="Login is broken",
+            description="Steps to reproduce…",
+            requester=self.requester,
+            client=self.org,
+            status=status,
+            sub_status=sub_status,
+            **kw,
+        )
+
+    def _url(self, t):
+        return reverse("admin_ticket_detail", args=[t.pk])
+
+    def test_detail_shows_fields_only_no_timeline_or_chat(self):
+        # 4.3b: timeline + chat moved to their own drawers; the detail modal
+        # shows details + actions only, and must not leak the stray comment.
+        t = self._make(S.NEW)
+        transition(t, "assign", self.admin, developer=self.developer)
+        TicketMessage.objects.create(ticket=t, author=self.requester, body="Any update?")
+        resp = self.client.get(self._url(t))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, "admin_portal/_ticket_detail.html")
+        self.assertContains(resp, t.reference)
+        self.assertContains(resp, "Login is broken")
+        # No timeline/chat sections in the detail partial anymore.
+        self.assertNotContains(resp, '<h3 class="section-title">Timeline</h3>')
+        self.assertNotContains(resp, '<h3 class="section-title">Chat</h3>')
+        self.assertNotContains(resp, "Any update?")
+        # The stray multi-line {# #} comment must not render as text.
+        self.assertNotContains(resp, "Injected into")
+
+    def test_non_admin_forbidden(self):
+        t = self._make(S.NEW)
+        self.client.force_login(self.requester)
+        self.assertEqual(self.client.get(self._url(t)).status_code, 403)
+
+    # ── button visibility mirrors the engine ─────────────────────────────
+    def test_resolved_shows_only_close(self):
+        t = self._make(S.RESOLVED, assigned_developer=self.developer)
+        resp = self.client.get(self._url(t))
+        self.assertContains(resp, 'name="action" value="close"')
+        self.assertNotContains(resp, 'value="request_info"')
+        self.assertNotContains(resp, 'value="request_changes"')
+        self.assertNotContains(resp, 'value="reassign"')
+
+    def test_uat_shows_only_recall(self):
+        t = self._make(S.UAT, assigned_developer=self.developer)
+        resp = self.client.get(self._url(t))
+        self.assertContains(resp, 'name="action" value="request_changes"')
+        self.assertNotContains(resp, 'value="close"')
+        self.assertNotContains(resp, 'value="request_info"')
+        self.assertNotContains(resp, 'value="reassign"')
+
+    def test_in_progress_shows_request_info_and_reassign_not_close(self):
+        t = self._make(S.IN_PROGRESS, SS.DEVELOPMENT, assigned_developer=self.developer)
+        resp = self.client.get(self._url(t))
+        self.assertContains(resp, 'name="action" value="request_info"')
+        self.assertContains(resp, 'name="action" value="reassign"')
+        self.assertNotContains(resp, 'value="close"')
+        self.assertNotContains(resp, 'value="request_changes"')
+
+    def test_awaiting_client_shows_resume_and_reassign_not_request_info(self):
+        t = self._make(S.AWAITING_CLIENT, paused_sub_status=SS.DEVELOPMENT,
+                       assigned_developer=self.developer)
+        resp = self.client.get(self._url(t))
+        self.assertContains(resp, 'name="action" value="resume"')
+        self.assertContains(resp, 'name="action" value="reassign"')
+        self.assertNotContains(resp, 'value="request_info"')
+
+    def test_closed_shows_no_action_forms(self):
+        t = self._make(S.CLOSED, assigned_developer=self.developer)
+        resp = self.client.get(self._url(t))
+        self.assertNotContains(resp, 'name="action"')
+        self.assertContains(resp, "no further actions")
+
+
+class AdminTicketDrawerTests(TestCase):
+    """Timeline + chat drawers (Phase 4.3b)."""
+
+    def setUp(self):
+        self.admin = User.objects.create_user("admin_dr", role="admin")
+        self.requester = User.objects.create_user("client_dr", role="client")
+        self.developer = User.objects.create_user("dev_dr", role="developer")
+        self.org = Client.objects.create(name="Acme", code="ACME")
+        self.client.force_login(self.admin)
+
+    def _make(self):
+        return Ticket.objects.create(
+            subject="Login is broken", requester=self.requester, client=self.org,
+            status=S.NEW,
+        )
+
+    def test_timeline_drawer_renders_real_events(self):
+        t = self._make()
+        transition(t, "assign", self.admin, developer=self.developer)  # writes an event
+        resp = self.client.get(reverse("admin_ticket_timeline", args=[t.pk]))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, "admin_portal/_ticket_timeline.html")
+        self.assertContains(resp, "assign")          # the event action
+        self.assertContains(resp, self.admin.username)
+
+    def test_chat_drawer_renders_real_messages_readonly(self):
+        t = self._make()
+        TicketMessage.objects.create(ticket=t, author=self.requester, body="Any update?")
+        resp = self.client.get(reverse("admin_ticket_chat", args=[t.pk]))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, "admin_portal/_ticket_chat.html")
+        self.assertContains(resp, "Any update?")
+        self.assertContains(resp, self.requester.username)
+        # Read-only: the partial carries no compose form/textarea.
+        self.assertNotContains(resp, "<textarea")
+
+    def test_timeline_drawer_admin_only(self):
+        t = self._make()
+        self.client.force_login(self.requester)
+        self.assertEqual(
+            self.client.get(reverse("admin_ticket_timeline", args=[t.pk])).status_code, 403
+        )
+
+    def test_chat_drawer_admin_only(self):
+        t = self._make()
+        self.client.force_login(self.requester)
+        self.assertEqual(
+            self.client.get(reverse("admin_ticket_chat", args=[t.pk])).status_code, 403
+        )

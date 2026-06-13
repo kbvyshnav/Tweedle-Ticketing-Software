@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 
@@ -27,9 +27,12 @@ TAB_STATUS = {
     "rejected": S.REJECTED,
 }
 
-# List-level actions this admin endpoint exposes (Phase 4.2). The details-modal
-# actions (request_info/reassign/recall/close) arrive in 4.3.
-ALLOWED_ACTIONS = {"assign", "reject", "resume", "send_to_uat"}
+# Actions this admin endpoint exposes: list-level (Phase 4.2) plus the
+# details-modal actions (Phase 4.3). The engine still re-checks each one.
+ALLOWED_ACTIONS = {
+    "assign", "reject", "resume", "send_to_uat",      # 4.2 list-level
+    "request_info", "reassign", "request_changes", "close",  # 4.3 modal
+}
 
 
 class AdminDashboardView(RoleRequiredMixin, TemplateView):
@@ -75,7 +78,9 @@ def ticket_transition(request, pk):
         return redirect("admin_dashboard")
 
     data = {}
-    if action == "assign":
+    if action in ("assign", "reassign"):
+        # assign requires a developer; reassign needs developer and/or tester
+        # (the engine guard enforces "at least one" for reassign).
         dev_pk = request.POST.get("developer")
         if dev_pk:
             data["developer"] = get_object_or_404(User, pk=dev_pk, role="developer")
@@ -84,6 +89,10 @@ def ticket_transition(request, pk):
             data["tester"] = get_object_or_404(User, pk=tester_pk, role="tester")
     elif action == "reject":
         data["reason"] = request.POST.get("reason", "").strip()
+    elif action == "request_info":
+        data["message"] = request.POST.get("message", "").strip()
+    elif action == "request_changes":
+        data["feedback"] = request.POST.get("feedback", "").strip()
 
     try:
         transition(ticket, action, actor=request.user, **data)
@@ -102,10 +111,67 @@ def _success_message(action, ticket, data):
         if tester:
             return f"Ticket {ref} assigned to {dev} (tester {tester.username})."
         return f"Ticket {ref} assigned to {dev}."
+    if action == "reassign":
+        who = []
+        if data.get("developer"):
+            who.append(f"developer {data['developer'].username}")
+        if data.get("tester"):
+            who.append(f"tester {data['tester'].username}")
+        return f"Ticket {ref} reassigned ({', '.join(who)})."
     if action == "reject":
         return f"Ticket {ref} rejected."
     if action == "resume":
         return f"Ticket {ref} resumed — back in progress."
     if action == "send_to_uat":
         return f"Ticket {ref} sent to client for UAT."
+    if action == "request_info":
+        return f"Ticket {ref} — information requested from the client."
+    if action == "request_changes":
+        return f"Ticket {ref} recalled to development."
+    if action == "close":
+        return f"Ticket {ref} closed."
     return f"Ticket {ref} updated."
+
+
+@role_required("admin")
+def admin_ticket_detail(request, pk):
+    """Server-rendered detail partial for the admin ticket-details modal.
+
+    Read-only details + timeline (TicketEvents) + chat (TicketMessages), plus
+    the action forms whose visibility matches what the engine allows for the
+    ticket's current status. Admin-only; fetched and injected by the dashboard.
+    """
+    ticket = get_object_or_404(
+        Ticket.objects.select_related(
+            "requester", "client", "assigned_developer", "assigned_tester", "accepted_by"
+        ),
+        pk=pk,
+    )
+    context = {
+        "ticket": ticket,
+        "developers": User.objects.filter(role="developer").order_by("username"),
+        "testers": User.objects.filter(role="tester").order_by("username"),
+    }
+    return render(request, "admin_portal/_ticket_detail.html", context)
+
+
+@role_required("admin")
+def admin_ticket_timeline(request, pk):
+    """Admin-only timeline drawer: the ticket's real TicketEvents (ordered)."""
+    ticket = get_object_or_404(Ticket, pk=pk)
+    return render(
+        request,
+        "admin_portal/_ticket_timeline.html",
+        {"ticket": ticket, "events": ticket.events.select_related("actor").all()},
+    )
+
+
+@role_required("admin")
+def admin_ticket_chat(request, pk):
+    """Admin-only chat drawer: the ticket's real TicketMessages (read-only)."""
+    ticket = get_object_or_404(Ticket, pk=pk)
+    return render(
+        request,
+        "admin_portal/_ticket_chat.html",
+        {"ticket": ticket, "chat_messages": ticket.messages.select_related("author").all()},
+    )

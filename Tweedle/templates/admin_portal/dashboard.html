@@ -453,7 +453,7 @@
             <tbody>
             {% endverbatim %}
             {% for ticket in inprogress_tickets %}
-                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-sub-status="{{ ticket.sub_status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-sub-status="{{ ticket.sub_status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
@@ -534,7 +534,7 @@
             <tbody>
             {% endverbatim %}
             {% for ticket in forwarded_tickets %}
-                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
@@ -616,7 +616,7 @@
             <tbody>
             {% endverbatim %}
             {% for ticket in uat_tickets %}
-                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
@@ -686,7 +686,7 @@
             <tbody>
             {% endverbatim %}
             {% for ticket in resolved_tickets %}
-                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
@@ -753,7 +753,7 @@
             <tbody>
             {% endverbatim %}
             {% for ticket in closed_tickets %}
-                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
@@ -826,7 +826,7 @@
             <tbody>
             {% endverbatim %}
             {% for ticket in rejected_tickets %}
-                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-type="rejected" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="rejected" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
@@ -912,363 +912,9 @@
          data-ticket-id set by JS on open — used by Close Ticket confirm.
          Django: {% include 'components/ticket_details_modal.html' %}
          ============================================================== -->
-    <div class="tw-modal-overlay" id="ticketDetailsModal" role="dialog" aria-modal="true" aria-labelledby="modalTicketId" data-status="" data-ticket-id="">
-    <div class="tw-modal-container">
-
-        <div class="tw-modal-header">
-            <div class="tw-modal-header-left">
-
-                <h2 class="tw-modal-title">
-                    <i class="bx bx-receipt" aria-hidden="true"></i>
-                    <!-- Django: {{ ticket.id }} -->
-                    <span id="modalTicketId">GMEC25010001</span>
-                </h2>
-
-                <!-- Django: {{ ticket.subject }} -->
-                <p class="tw-modal-subtitle" id="modalSubject">Wallet Option Agents</p>
-
-                <div class="tw-modal-header-meta">
-                    <span class="tw-modal-status-pill" id="modalStatus">Testing</span>
-                    <span class="tw-modal-allottee-tag">
-                        <i class="bx bx-user" aria-hidden="true"></i>
-                        <!-- Django: {{ ticket.allottee.get_full_name }} -->
-                        <span id="modalAllottee">Manju</span>
-                    </span>
-                </div>
-
-                <div class="tw-modal-header-actions">
-                    <button class="tw-modal-action-btn" id="detailsChatBtn" aria-label="Open chat for this ticket">
-                        <i class="bx bx-chat" aria-hidden="true"></i>
-                        Chat
-                    </button>
-                    <button class="tw-modal-action-btn" id="detailsTimelineBtn" aria-label="View ticket timeline">
-                        <i class="bx bx-time-five" aria-hidden="true"></i>
-                        Timeline
-                    </button>
-                    <button class="tw-modal-action-btn" id="detailsReassignBtn" onclick="openDashReassignPanel()" title="Reassign Developer or Tester" aria-label="Reassign ticket">
-                        <i class='bx bx-transfer' aria-hidden="true"></i>
-                        Reassign
-                    </button>
-                    <button class="tw-modal-action-btn tw-modal-action-btn--warning" id="detailsForwardBtn" onclick="openDashForwardPanel()" title="Request client information" aria-label="Request client information">
-                        <i class='bx bx-share' aria-hidden="true"></i>
-                        Request Info
-                    </button>
-                    <button class="tw-btn tw-btn-success tw-btn--sm" id="detailsResumeBtn" style="display:none" aria-label="Resume ticket — client has responded">
-                        <i class='bx bx-play-circle' aria-hidden="true"></i>
-                        Resume Ticket
-                    </button>
-                    <button class="tw-btn tw-btn-outline tw-btn--sm" id="detailsUatRecallBtn" style="display:none" aria-label="Recall ticket to In Progress">
-                        <i class='bx bx-undo' aria-hidden="true"></i>
-                        Recall to In Progress
-                    </button>
-                </div>
-
-            </div>
-
-            <button class="tw-modal-close" id="detailsModalClose" aria-label="Close ticket details">
-                <i class="bx bx-x" aria-hidden="true"></i>
-            </button>
-        </div>
-
-        <div class="tw-modal-body">
-
-            <!-- Fix 4: shown by JS only when data-status="closed" -->
-            <div id="modalReadOnlyNotice" style="display:none; background: var(--tw-status-closed-bg); color: var(--tw-status-closed-text); padding: 8px 14px; border-radius: var(--tw-radius-sm); font-size: var(--tw-text-sm); margin-bottom: 12px;">
-                <i class='bx bx-lock-alt' style="margin-right:6px;" aria-hidden="true"></i>
-                This ticket is closed — no further actions are available.
-            </div>
-
-            <!-- Shown by JS only when data-status="uat" -->
-            <div id="modalUatNotice" style="display:none; background: var(--tw-status-uat-bg); color: var(--tw-status-uat-text); padding: 8px 14px; border-radius: var(--tw-radius-sm); font-size: var(--tw-text-sm); margin-bottom: 12px;">
-                <i class='bx bx-user-check' style="margin-right:6px;" aria-hidden="true"></i>
-                This ticket is awaiting client UAT approval. No admin actions are available until the client responds.
-            </div>
-
-            <div class="tw-info-grid">
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Ticket Maker</div>
-                    <div class="tw-info-value">John Doe</div>
-                </div>
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Issue Date</div>
-                    <div class="tw-info-value">11-09-2021</div>
-                </div>
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Priority</div>
-                    <div class="tw-info-value">
-                        <span class="tw-priority-badge tw-priority-badge--high">High</span>
-                    </div>
-                </div>
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Est. Completion</div>
-                    <div class="tw-info-value">25-12-2025</div>
-                </div>
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Allottee Date</div>
-                    <div class="tw-info-value">12-09-2021</div>
-                </div>
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Category</div>
-                    <div class="tw-info-value">Integration</div>
-                </div>
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Client</div>
-                    <div class="tw-info-value">GMEC</div>
-                </div>
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Department</div>
-                    <div class="tw-info-value">Development</div>
-                </div>
-                <!-- Stage info-item: shown only for In Progress tickets (JS sets display) -->
-                <!-- Django: {{ ticket.get_sub_status_display }} — visible when ticket.status == 'in_progress' -->
-                <div class="tw-info-item" id="modalStageItem" style="display:none">
-                    <div class="tw-info-label">Stage</div>
-                    <div class="tw-info-value" id="modalStage"></div>
-                </div>
-            </div>
-
-            <!-- Overdue warning — JS shows/hides based on data-est-date vs today -->
-            <!-- Django: {% if ticket.is_overdue %}data-is-overdue="true"{% endif %} on the row tr -->
-            <div id="modalOverdueWarning" style="display:none;background:var(--tw-priority-high-bg);color:var(--tw-priority-high-text);border-radius:var(--tw-radius-md);padding:var(--tw-space-3) var(--tw-space-4);font-size:var(--tw-text-sm);font-weight:500;margin-bottom:var(--tw-space-4)"></div>
-
-            <div class="tw-modal-section">
-                <h3 class="section-title">Description</h3>
-                <div class="tw-description-box">
-                    Need to implement wallet payment options for agents in the system. This includes integration with multiple payment gateways, transaction history tracking, and automated reconciliation features.
-                </div>
-            </div>
-
-            <!-- Task 4: Forwarding Details — shown only when data-status="forwarded" -->
-            <div class="tw-modal-section tw-forwarded-section">
-                <div class="tw-modal-section-title">
-                    <i class='bx bx-share'></i> Info Request Details
-                </div>
-                <div class="tw-info-grid tw-info-grid--3col">
-                    <div class="tw-info-item">
-                        <div class="tw-info-label">Requested By</div>
-                        <div class="tw-info-value">
-                            <!-- Django: {{ ticket.forwarded_by.get_full_name }} -->
-                            Rajagopal P
-                        </div>
-                    </div>
-                    <div class="tw-info-item">
-                        <div class="tw-info-label">Client Contact Notified</div>
-                        <div class="tw-info-value">
-                            <!-- Django: {{ ticket.forwarded_to }} -->
-                            External Support Team
-                        </div>
-                    </div>
-                    <div class="tw-info-item">
-                        <div class="tw-info-label">Requested On</div>
-                        <div class="tw-info-value">
-                            <!-- Django: {{ ticket.forwarded_at|date:"d-m-Y" }} -->
-                            18-01-2025
-                        </div>
-                    </div>
-                </div>
-                <div class="tw-info-item" style="width:100%">
-                    <div class="tw-info-label">Message Sent to Client</div>
-                    <div class="tw-description-box">
-                        <!-- Django: {{ ticket.forwarding_reason }} -->
-                        Issue requires escalation to the payment gateway provider for API-level access.
-                    </div>
-                </div>
-            </div>
-
-            <!-- Task 4: Closure Details — shown only when data-status="closed" -->
-            <div class="tw-modal-section tw-closure-section">
-                <div class="tw-modal-section-title">
-                    <i class='bx bx-check-shield'></i> Closure Details
-                </div>
-                <div class="tw-info-grid tw-info-grid--4col">
-                    <div class="tw-info-item">
-                        <div class="tw-info-label">Closed By</div>
-                        <div class="tw-info-value">
-                            <!-- Django: {{ ticket.closed_by.get_full_name }} -->
-                            Rajagopal P
-                        </div>
-                    </div>
-                    <div class="tw-info-item">
-                        <div class="tw-info-label">Closed On</div>
-                        <div class="tw-info-value">
-                            <!-- Django: {{ ticket.closed_at|date:"d-m-Y" }} -->
-                            20-01-2025
-                        </div>
-                    </div>
-                    <div class="tw-info-item">
-                        <div class="tw-info-label">Resolution Time</div>
-                        <div class="tw-info-value">
-                            <!-- Django: {{ ticket.resolution_days }} days -->
-                            5 days
-                        </div>
-                    </div>
-                    <div class="tw-info-item">
-                        <div class="tw-info-label">TAT Status</div>
-                        <div class="tw-info-value">
-                            <span class="tw-tat-badge tw-tat-badge--met">
-                                <!-- Django: {{ ticket.tat_status }} -->
-                                Met
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="tw-info-item" style="width:100%">
-                    <div class="tw-info-label">Resolution Summary</div>
-                    <div class="tw-description-box">
-                        <!-- Django: {{ ticket.resolution_summary }} -->
-                        IBAN validation issue was resolved by updating the bank API endpoint configuration.
-                        Client confirmed resolution on 20-01-2025.
-                    </div>
-                </div>
-            </div>
-
-            <div class="tw-modal-section">
-                <h3 class="section-title">Attachments</h3>
-                <div class="tw-attachments-area" id="adminAttachArea">
-                    <div class="tw-attachment-item">
-                        <div class="tw-attachment-icon tw-attachment-icon--pdf" aria-hidden="true">
-                            <i class="bx bxs-file-pdf"></i>
-                        </div>
-                        <div class="tw-attachment-info">
-                            <div class="tw-attachment-name">wallet_specifications.pdf</div>
-                            <div class="tw-attachment-meta">Uploaded on 11-09-2021 at 10:30 AM &bull; 2.4 MB</div>
-                        </div>
-                        <div class="tw-attachment-actions">
-                            <button class="tw-icon-btn" title="Download" aria-label="Download wallet_specifications.pdf">
-                                <i class="bx bx-download" aria-hidden="true"></i>
-                            </button>
-                            <button class="tw-icon-btn" title="View" aria-label="View wallet_specifications.pdf">
-                                <i class="bx bx-show" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <input type="file" id="adminAttachInput" style="display:none;" accept="*/*">
-                <button class="tw-btn tw-btn-outline" onclick="document.getElementById('adminAttachInput').click()" style="margin-top:12px;">
-                    <i class="bx bx-upload"></i> Add Attachment
-                </button>
-                <div class="tw-attach-preview-strip" id="adminAttachPreviewStrip" style="margin-top:8px;" aria-live="polite">
-                    <i class="bx bx-file" aria-hidden="true"></i>
-                    <span id="adminAttachFileName"></span>
-                    <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="confirmAdminAttach()" style="margin-left:auto;margin-right:4px;">
-                        <i class="bx bx-check" aria-hidden="true"></i> Add
-                    </button>
-                    <button class="tw-file-chip-remove" onclick="cancelAdminAttach()" aria-label="Remove attachment">
-                        <i class="bx bx-x" aria-hidden="true"></i>
-                    </button>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Task 5: Modal footer — hidden by CSS when data-status="closed" -->
-        <!-- Django: {% if ticket.status != 'closed' %} -->
-        <div class="tw-modal-footer">
-            <div class="tw-modal-footer-actions">
-                <span class="tw-modal-footer-status">
-                    Current Status:
-                    <span class="tw-status-badge tw-status-badge--progress" id="footerStatusBadge">In Progress</span>
-                </span>
-                <button
-                    class="tw-btn-close-ticket"
-                    id="closeTicketBtn"
-                    onclick="openCloseTicketConfirm()">
-                    <i class='bx bx-x-circle'></i>
-                    Close Ticket
-                </button>
-            </div>
-        </div>
-        <!-- Django: {% endif %} -->
-
-    </div>
-    <!-- END MODAL FOOTER -->
-
-    <!-- Reassign panel (dashboard copy) -->
-    <div class="tw-action-panel" id="dashReassignPanel" role="dialog" aria-label="Reassign ticket">
-        <div class="tw-action-panel__header">
-            <h4><i class='bx bx-transfer'></i> Reassign Ticket</h4>
-            <button onclick="closeDashActionPanel('dashReassignPanel')" aria-label="Close">
-                <i class='bx bx-x'></i>
-            </button>
-        </div>
-        <div class="tw-action-panel__body">
-            <div class="tw-field-group">
-                <label>Reassign Type</label>
-                <div class="tw-toggle-group">
-                    <button class="tw-toggle-btn active" data-type="developer">Developer</button>
-                    <button class="tw-toggle-btn" data-type="tester">Tester</button>
-                </div>
-            </div>
-            <div class="tw-field-group">
-                <label for="dashReassignSelect">Select New Assignee *</label>
-                <select class="tw-select" id="dashReassignSelect">
-                    <option value="">Choose developer...</option>
-                    <option value="dev1">Arun Kumar (3 active tickets)</option>
-                    <option value="dev2">Rithik S (5 active tickets)</option>
-                    <option value="dev3">John Mathew (2 active tickets)</option>
-                </select>
-            </div>
-            <div class="tw-field-group">
-                <label for="dashReassignReason">Reason for Reassignment *</label>
-                <textarea class="tw-comment-textarea" id="dashReassignReason" rows="3"
-                    placeholder="Explain why this ticket is being reassigned..."></textarea>
-            </div>
-            <div class="tw-field-group">
-                <label class="tw-checkbox-label">
-                    <input type="checkbox" id="dashReassignNotify" checked>
-                    <span>Notify new assignee via email</span>
-                </label>
-            </div>
-            <div class="tw-action-panel__footer">
-                <button class="tw-btn tw-btn-outline" onclick="closeDashActionPanel('dashReassignPanel')">Cancel</button>
-                <button class="tw-btn tw-btn-success" onclick="confirmDashReassign()">
-                    <i class='bx bx-check'></i> Confirm Reassignment
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Forward panel (dashboard copy) -->
-    <div class="tw-action-panel" id="dashForwardPanel" role="dialog" aria-label="Request client information">
-        <div class="tw-action-panel__header">
-            <h4><i class='bx bx-share'></i> Request Client Information</h4>
-            <button onclick="closeDashActionPanel('dashForwardPanel')" aria-label="Close">
-                <i class='bx bx-x'></i>
-            </button>
-        </div>
-        <div class="tw-action-panel__body">
-            <div class="tw-forward-info-box">
-                <i class='bx bx-info-circle'></i>
-                <p>Sending this request will move the ticket to <strong>Pending Client Response</strong> and notify the client to provide additional information or clarification.</p>
-            </div>
-            <div class="tw-field-group">
-                <label for="dashForwardToSelect">Forward To (Client Contact) *</label>
-                <select class="tw-select" id="dashForwardToSelect">
-                    <option value="">Select client contact...</option>
-                    <option value="gmec1">GMEC — contact@gmec.com.np</option>
-                    <option value="bgex1">BGEX — info@bgex.com.bd</option>
-                </select>
-            </div>
-            <div class="tw-field-group">
-                <label for="dashForwardReason">Reason / Message to Client *</label>
-                <textarea class="tw-comment-textarea" id="dashForwardReason" rows="4"
-                    placeholder="Describe what information or action is needed from the client..."></textarea>
-            </div>
-            <div class="tw-field-group">
-                <label class="tw-checkbox-label">
-                    <input type="checkbox" id="dashForwardNotify" checked>
-                    <span>Send email notification to client</span>
-                </label>
-            </div>
-            <div class="tw-action-panel__footer">
-                <button class="tw-btn tw-btn-outline" onclick="closeDashActionPanel('dashForwardPanel')">Cancel</button>
-                <button class="tw-btn tw-btn-danger" onclick="confirmDashForward()">
-                    <i class='bx bx-share'></i> Send Request
-                </button>
-            </div>
-        </div>
-    </div>
-
+    <div class="tw-modal-overlay" id="ticketDetailsModal" role="dialog" aria-modal="true">
+    <div class="tw-modal-container tw-modal-container--wide" id="detailsModalContent" {% endverbatim %}data-detail-url-template="{% url 'admin_ticket_detail' 0 %}"{% verbatim %}>
+        <!-- Server-rendered ticket detail partial is fetched and injected here (Phase 4.3). -->
     </div>
     </div>
     <!-- END TICKET DETAILS MODAL -->
@@ -1585,7 +1231,7 @@
          CHAT PANEL
          Django: {% include 'components/chat_panel.html' %}
          ============================================================== -->
-    <div class="tw-chat-panel" id="chatPanel" role="dialog" aria-modal="false" aria-label="Ticket chat">
+    <div class="tw-chat-panel" id="chatPanel" role="dialog" aria-modal="false" aria-label="Ticket chat" style="width:min(460px, 92vw)" {% endverbatim %}data-url-template="{% url 'admin_ticket_chat' 0 %}"{% verbatim %}>
 
         <div class="tw-chat-header">
             <div class="chat-header-info">
@@ -1597,101 +1243,29 @@
             </button>
         </div>
 
-        <div class="tw-messages-area" id="messagesArea">
-
-            <div class="tw-chat-status-msg">
-                Ticket created
-                <span class="tw-chat-status-time">• Jan 15, 2025 at 10:30 AM</span>
-            </div>
-
-            <div class="tw-message received">
-                <div class="tw-avatar tw-avatar--sm tw-avatar--chat-user" aria-hidden="true">K</div>
-                <div>
-                    <div class="tw-message-sender">
-                        KINGSHUK DEBNATH
-                        <span class="tw-role-pill tw-role-pill--user">User</span>
-                    </div>
-                    <div class="tw-message-bubble">
-                        <div class="tw-message-text">Team please enable the UPI Services for Federal bank API.</div>
-                        <div class="tw-message-time">Jan 15, 2025 at 10:32 AM</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tw-chat-status-msg">
-                Admin accepted ticket
-                <span class="tw-chat-status-time">• Jan 15, 2025 at 11:15 AM</span>
-            </div>
-
-            <div class="tw-message received">
-                <div class="tw-avatar tw-avatar--sm tw-avatar--chat-developer" aria-hidden="true">R</div>
-                <div>
-                    <div class="tw-message-sender">
-                        RITHIK SUNIL <span class="tw-role-pill tw-role-pill--developer">Developer</span>
-                    </div>
-                    <div class="tw-message-bubble">
-                        <div class="tw-message-text">Waiting for the approval of Federal API Team</div>
-                        <div class="tw-message-time">Jan 15, 2025 at 2:02 PM</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tw-message sent">
-                <div class="tw-avatar tw-avatar--sm tw-avatar--chat-admin" aria-hidden="true">A</div>
-                <div>
-                    <div class="tw-message-sender">
-                        RAJAGOPAL P <span class="tw-role-pill tw-role-pill--admin">Admin</span>
-                    </div>
-                    <div class="tw-message-bubble">
-                        <div class="tw-message-text">GMEC team, please contact the Federal bank API team for approval.</div>
-                        <div class="tw-message-time">Jan 15, 2025 at 4:18 PM</div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
+        <!-- Real TicketMessages are fetched and injected here (Phase 4.3b). -->
+        <div class="tw-messages-area" id="messagesArea"></div>
 
         <div class="tw-chat-footer">
-
-            <div class="tw-attach-preview-strip" id="attachPreviewStrip" aria-live="polite">
-                <i class="bx bx-file" aria-hidden="true"></i>
-                <span id="attachFileName"></span>
-                <button class="tw-file-chip-remove" onclick="removeAttachment()" aria-label="Remove attachment">
-                    <i class="bx bx-x" aria-hidden="true"></i>
-                </button>
-            </div>
-
+            <!-- Compose is disabled — posting replies is a later phase (no fake submit). -->
             <div class="tw-chat-input-row">
                 <textarea
                     class="tw-chat-textarea"
                     id="chatTextarea"
-                    placeholder="Type your message…"
+                    placeholder="Replies are read-only for now…"
                     rows="1"
-                    aria-label="Message input"></textarea>
+                    aria-label="Message input"
+                    disabled></textarea>
 
-                <input
-                    type="file"
-                    id="chat-file-input"
-                    multiple
-                    accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
-                    aria-hidden="true"
-                    tabindex="-1"
-                    style="display:none">
-
-                <button class="tw-chat-attach-btn" id="attach-btn" aria-label="Attach file">
-                    <i class="bx bx-paperclip" aria-hidden="true"></i>
-                </button>
-
-                <button class="tw-chat-send-btn" id="sendBtn" onclick="sendMessage()" aria-label="Send message">
+                <button class="tw-chat-send-btn" id="sendBtn" aria-label="Send message" disabled>
                     <i class="bx bx-send" aria-hidden="true"></i>
                 </button>
             </div>
 
-            <div class="tw-chat-email-row">
-                <input type="checkbox" id="emailNotification" aria-label="Send email notification to client">
-                <label for="emailNotification">Send email notification to Client</label>
+            <div class="tw-chat-email-row" style="color:var(--tw-text-muted);font-size:var(--tw-text-xs);">
+                <i class="bx bx-info-circle" aria-hidden="true"></i>
+                Posting replies is coming in a later phase — this chat is read-only.
             </div>
-
         </div>
 
     </div>
@@ -1703,7 +1277,7 @@
          "View Full Timeline" link updates href via JS.
          Django: {% include 'components/timeline_panel.html' %}
          ============================================================== -->
-    <div class="tw-timeline-panel" id="timelinePanel" role="dialog" aria-modal="false" aria-label="Ticket timeline">
+    <div class="tw-timeline-panel" id="timelinePanel" role="dialog" aria-modal="false" aria-label="Ticket timeline" style="width:min(460px, 92vw)" {% endverbatim %}data-url-template="{% url 'admin_ticket_timeline' 0 %}"{% verbatim %}>
 
         <div class="tw-timeline-panel-header">
             <div>
@@ -1715,106 +1289,15 @@
             </button>
         </div>
 
-        <!-- === TIMELINE: VIEW FULL LINK ===
-             Django: {% url 'admin:ticket_timeline' ticket.id %} -->
-        <button
-            class="tw-view-full-link"
-            id="timeline-full-link"
-            onclick="openFullTimeline(currentTimelineTicketId)">
-            <i class='bx bx-expand-alt'></i>
-            View Full Timeline
-        </button>
-
-        <div class="tw-timeline-panel-body">
-
-            <div class="tw-tl-panel-entry">
-                <div class="tw-tl-panel-dot tw-tl-panel-dot--created">
-                    <i class="bx bx-plus" aria-hidden="true"></i>
-                </div>
-                <div class="tw-tl-panel-content">
-                    <div class="tw-tl-panel-event">Ticket Created</div>
-                    <div class="tw-tl-panel-meta">Jan 15, 2025 at 10:30 AM</div>
-                </div>
-            </div>
-
-            <div class="tw-tl-panel-entry">
-                <div class="tw-tl-panel-dot tw-tl-panel-dot--accepted">
-                    <i class="bx bx-check" aria-hidden="true"></i>
-                </div>
-                <div class="tw-tl-panel-content">
-                    <div class="tw-tl-panel-event">Admin Accepted</div>
-                    <div class="tw-tl-panel-meta">Jan 15, 2025 at 11:15 AM · RAJAGOPAL P</div>
-                </div>
-            </div>
-
-            <div class="tw-tl-panel-entry">
-                <div class="tw-tl-panel-dot tw-tl-panel-dot--assigned">
-                    <i class="bx bx-user" aria-hidden="true"></i>
-                </div>
-                <div class="tw-tl-panel-content">
-                    <div class="tw-tl-panel-event">Assigned to Developer</div>
-                    <div class="tw-tl-panel-meta">Jan 15, 2025 at 11:30 AM · RITHIK SUNIL</div>
-                </div>
-            </div>
-
-            <div class="tw-tl-panel-entry">
-                <div class="tw-tl-panel-dot tw-tl-panel-dot--testing">
-                    <i class="bx bx-test-tube" aria-hidden="true"></i>
-                </div>
-                <div class="tw-tl-panel-content">
-                    <div class="tw-tl-panel-event">Moved to Testing</div>
-                    <div class="tw-tl-panel-meta">Jan 15, 2025 at 2:45 PM · AKHIL SAGAR</div>
-                </div>
-            </div>
-
-            <div class="tw-tl-panel-entry">
-                <div class="tw-tl-panel-dot tw-tl-panel-dot--current">
-                    <i class="bx bx-revision" aria-hidden="true"></i>
-                </div>
-                <div class="tw-tl-panel-content">
-                    <div class="tw-tl-panel-event">Back to Development</div>
-                    <div class="tw-tl-panel-meta">Jan 16, 2025 at 8:49 PM</div>
-                </div>
-            </div>
-
-        </div>
+        <!-- Real TicketEvents are fetched and injected here (Phase 4.3b). -->
+        <div class="tw-timeline-panel-body" id="timelinePanelBody"></div>
 
     </div>
     <!-- END TIMELINE PANEL -->
 
 
-    <!-- ==============================================================
-         FULL TIMELINE MODAL (Task 5)
-         Opened by openFullTimeline() when "View Full Timeline" is clicked.
-         Content fetched from ticket-timeline.html via JS.
-         Django: {% include 'admin_portal/ticket-timeline.html' %}
-         ============================================================== -->
-    <div class="tw-modal-overlay tw-timeline-modal-overlay" id="fullTimelineModal" role="dialog" aria-modal="true" aria-labelledby="fullTimelineTitle">
-        <div class="tw-timeline-modal-container">
-            <div class="tw-timeline-modal-header">
-                <h3 id="fullTimelineTitle">
-                    <i class='bx bx-time-five'></i>
-                    Full Ticket Timeline
-                </h3>
-                <button class="tw-modal-close"
-                        id="fullTimelineCloseBtn"
-                        onclick="closeFullTimeline()"
-                        aria-label="Close timeline modal">
-                    <i class='bx bx-x'></i>
-                </button>
-            </div>
-            <div class="tw-timeline-modal-body" id="fullTimelineContent">
-                <!-- Content injected by openFullTimeline() via fetch -->
-                <!-- Django: {% include 'admin_portal/ticket-timeline.html' %} -->
-            </div>
-            <button class="tw-scroll-top-btn"
-                    id="timelineScrollTop"
-                    title="Scroll to top"
-                    aria-label="Scroll to top">
-                <i class='bx bx-up-arrow-alt'></i>
-            </button>
-        </div>
-    </div>
+    <!-- Full-timeline modal removed (Phase 4.3b): the timeline drawer now shows
+         the complete real timeline (scrollable); the dead fetch is gone. -->
     <!-- END FULL TIMELINE MODAL -->
 
 <!-- Django: {% endblock %} -->
@@ -2301,37 +1784,15 @@
             });
             this.classList.add('row-selected');
 
-            var ticketId  = this.dataset.ticketId   || '';
-            var type      = this.dataset.ticketType || 'existing';
-            var subject   = this.dataset.subject    || '';
-            var status    = this.dataset.status     || '';
-            var allottee  = this.dataset.allottee   || '';
-            var subStatus = this.dataset.subStatus  || '';
+            var ticketId = this.dataset.ticketId || '';
+            var type     = this.dataset.ticketType || 'existing';
+            var subject  = this.dataset.subject || '';
 
             if (type === 'new') {
-                openNewTicketModal(ticketId, subject, status || 'New Ticket');
-            } else if (type === 'rejected') {
-                /* Fix 4: read rejected data from table cells */
-                var cells   = this.cells;
-                /* cells[0]=checkbox, [1]=ticketId, [2]=subject, [3]=client,
-                   [4]=priority, [5]=rejectedBy, [6]=rejectedOn, [7]=reason */
-                var reasonDiv = cells[7] ? cells[7].querySelector('div') : null;
-                var fullReason = reasonDiv
-                    ? (reasonDiv.getAttribute('title') || reasonDiv.textContent.trim())
-                    : '—';
-                openRejectedModal(
-                    ticketId,
-                    subject,
-                    cells[3] ? cells[3].textContent.trim() : '—',
-                    cells[4] ? cells[4].textContent.trim() : '—',
-                    '—',       /* issue date not in rejected table */
-                    cells[5] ? cells[5].textContent.trim() : '—',
-                    cells[6] ? cells[6].textContent.trim() : '—',
-                    '—',       /* category not in rejected table */
-                    fullReason
-                );
+                openNewTicketModal(ticketId, subject, 'New Ticket');
             } else {
-                openTicketDetailsModal(ticketId, subject, status, allottee, subStatus);
+                /* existing AND rejected -> the server-rendered detail modal */
+                openTicketDetails(this.dataset.ticketPk);
             }
         });
     });
@@ -2340,60 +1801,25 @@
     /* ============================================================
      * TICKET DETAILS MODAL
      * ============================================================ */
-    function openTicketDetailsModal(ticketId, subject, status, allottee, subStatus) {
-        var modal     = document.getElementById('ticketDetailsModal');
-        /* Canonical status values are already lowercase (e.g. in_progress);
-           lowercase defensively but preserve underscores. */
-        var statusKey = (status || '').toLowerCase();
-        subStatus     = subStatus || '';
-
-        modal.dataset.status   = statusKey;
-        modal.dataset.ticketId = ticketId;
-
-        document.getElementById('modalTicketId').textContent  = ticketId;
-        document.getElementById('modalSubject').textContent   = subject;
-        document.getElementById('modalStatus').textContent    = status;
-        document.getElementById('modalAllottee').textContent  = allottee || '—';
-
-        /* Stage info-item — visible only for In Progress tickets */
-        var stageItem = document.getElementById('modalStageItem');
-        var stageEl   = document.getElementById('modalStage');
-        if (stageItem && stageEl) {
-            if (statusKey === 'in_progress' && subStatus) {
-                var subStatusChips = {
-                    development: '<span class="tw-status-badge tw-status-badge--development">Development</span>',
-                    testing:     '<span class="tw-status-badge tw-status-badge--testing">Testing</span>',
-                    uat:         '<span class="tw-status-badge tw-status-badge--uat">UAT</span>'
-                };
-                stageEl.innerHTML       = subStatusChips[subStatus] || subStatus;
-                stageItem.style.display = '';
-            } else {
-                stageItem.style.display = 'none';
-                stageEl.innerHTML       = '';
-            }
-        }
-
-        var footerBadge = document.getElementById('footerStatusBadge');
-        if (footerBadge) footerBadge.textContent = status;
-
-        /* Overdue warning — look up the In Progress row by ticketId */
-        var overdueWarning = document.getElementById('modalOverdueWarning');
-        if (overdueWarning) {
-            var inProgressRow = document.querySelector('#tab-progress tbody tr[data-ticket-id="' + ticketId + '"]');
-            if (inProgressRow && inProgressRow.dataset.isOverdue === 'true') {
-                var estDate  = inProgressRow.dataset.estDate;
-                var diffDays = Math.floor((new Date() - new Date(estDate)) / (1000 * 60 * 60 * 24));
-                overdueWarning.textContent = '⚠ This ticket is overdue by ' + diffDays +
-                    ' day' + (diffDays !== 1 ? 's' : '') +
-                    '. Estimated close date was ' + estDate + '.';
-                overdueWarning.style.display = 'block';
-            } else {
-                overdueWarning.style.display = 'none';
-            }
-        }
-
+    /* Phase 4.3: fetch a server-rendered detail partial and inject it. The
+       partial carries the read-only details + timeline + chat and the action
+       forms (visibility per the engine), so there is no per-button JS. */
+    function openTicketDetails(pk) {
+        var modal   = document.getElementById('ticketDetailsModal');
+        var content = document.getElementById('detailsModalContent');
+        if (!modal || !content || !pk) return;
+        content.innerHTML = '<div style="padding:48px;text-align:center;color:var(--tw-text-muted)">' +
+            '<i class="bx bx-loader-alt bx-spin" style="font-size:28px"></i></div>';
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
+        var url = content.dataset.detailUrlTemplate.replace('/0/', '/' + pk + '/');
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function(r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+            .then(function(html) { content.innerHTML = html; })
+            .catch(function() {
+                content.innerHTML = '<div style="padding:48px;text-align:center;color:var(--tw-text-muted)">' +
+                    'Could not load ticket details.</div>';
+            });
     }
 
     function closeTicketDetailsModal() {
@@ -2401,90 +1827,10 @@
         document.body.style.overflow = '';
     }
 
-    document.getElementById('detailsModalClose').addEventListener('click', closeTicketDetailsModal);
-
     document.getElementById('ticketDetailsModal').addEventListener('click', function(e) {
         if (e.target === this) closeTicketDetailsModal();
     });
 
-    document.getElementById('detailsChatBtn').addEventListener('click', function() {
-        const ticketId = document.getElementById('modalTicketId').textContent;
-        const subject  = document.getElementById('modalSubject').textContent;
-        closeTicketDetailsModal();
-        openChatPanel(ticketId, subject);
-    });
-
-    document.getElementById('detailsTimelineBtn').addEventListener('click', function() {
-        const ticketId = document.getElementById('modalTicketId').textContent;
-        const subject  = document.getElementById('modalSubject').textContent;
-        closeTicketDetailsModal();
-        openTimelinePanel(ticketId, subject);
-    });
-
-
-    /* ============================================================
-     * DASHBOARD ACTION PANELS (Reassign / Forward)
-     * === MODAL: ACTION PANELS ===
-     * ============================================================ */
-
-    /* Toggle buttons (developer/tester) inside dashboard panels */
-    document.querySelectorAll('#dashReassignPanel .tw-toggle-btn, #dashForwardPanel .tw-toggle-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            this.closest('.tw-toggle-group')
-                .querySelectorAll('.tw-toggle-btn')
-                .forEach(function(b) { b.classList.remove('active'); });
-            this.classList.add('active');
-        });
-    });
-
-    function openDashReassignPanel() {
-        closeDashActionPanel('dashForwardPanel');
-        document.getElementById('dashReassignPanel').classList.add('open');
-    }
-
-    function openDashForwardPanel() {
-        closeDashActionPanel('dashReassignPanel');
-        document.getElementById('dashForwardPanel').classList.add('open');
-    }
-
-    function closeDashActionPanel(panelId) {
-        const panel = document.getElementById(panelId);
-        if (panel) panel.classList.remove('open');
-    }
-
-    function confirmDashReassign() {
-        const assignee = document.getElementById('dashReassignSelect').value;
-        const reason   = document.getElementById('dashReassignReason').value;
-        if (!assignee || !reason.trim()) {
-            alert('Please select an assignee and provide a reason.');
-            return;
-        }
-        /* Django: fetch('{% url "admin:reassign_ticket" ticket_id %}', {
-           method: 'POST',
-           headers: { 'X-CSRFToken': getCookie('csrftoken') },
-           body: JSON.stringify({ assignee_id: assignee, reason: reason })
-        }) */
-        console.log('[Dashboard] Reassign to:', assignee, 'Reason:', reason);
-        closeDashActionPanel('dashReassignPanel');
-        showDashToast('Ticket reassigned successfully');
-    }
-
-    function confirmDashForward() {
-        const forwardTo = document.getElementById('dashForwardToSelect').value;
-        const reason    = document.getElementById('dashForwardReason').value;
-        if (!forwardTo || !reason.trim()) {
-            alert('Please select a recipient and provide a reason.');
-            return;
-        }
-        /* Django: fetch('{% url "admin:forward_ticket" ticket_id %}', {
-           method: 'POST',
-           headers: { 'X-CSRFToken': getCookie('csrftoken') },
-           body: JSON.stringify({ forward_to: forwardTo, reason: reason })
-        }) */
-        console.log('[Dashboard] Forward to:', forwardTo, 'Reason:', reason);
-        closeDashActionPanel('dashForwardPanel');
-        showDashToast('Request sent — client notified.');
-    }
 
     /* ============================================================
      * INLINE LIST ACTIONS (Phase 4.2)
@@ -2576,112 +1922,8 @@
     }
 
 
-    /* Show/hide header action buttons and footer per ticket status */
-    var _origOpenDetails = openTicketDetailsModal;
-    openTicketDetailsModal = function(ticketId, subject, status, allottee, subStatus) {
-        _origOpenDetails(ticketId, subject, status, allottee, subStatus);
-        var statusKey = (status || '').toLowerCase().replace(/\s+/g, '');
-
-        var rb  = document.getElementById('detailsReassignBtn');
-        var fb  = document.getElementById('detailsForwardBtn');
-        var rsb = document.getElementById('detailsResumeBtn');
-        var ctb = document.getElementById('closeTicketBtn');
-        var urb = document.getElementById('detailsUatRecallBtn');
-
-        /* Hide Forward/Request Info for forwarded, closed, and UAT */
-        if (fb) fb.style.display = (statusKey === 'closed' || statusKey === 'forwarded' || statusKey === 'uat') ? 'none' : '';
-
-        /* Hide Reassign for closed and UAT (ticket is with client) */
-        if (rb) rb.style.display = (statusKey === 'closed' || statusKey === 'uat') ? 'none' : '';
-
-        /* Fix 2: show Resume only for forwarded (Awaiting Client) */
-        if (rsb) rsb.style.display = statusKey === 'forwarded' ? '' : 'none';
-
-        /* Fix 4: show Close Ticket only for resolved */
-        if (ctb) ctb.style.display = statusKey === 'resolved' ? '' : 'none';
-
-        /* Show Recall only for UAT */
-        if (urb) urb.style.display = statusKey === 'uat' ? '' : 'none';
-
-        /* Fix 3: update footer badge CSS class to match actual status */
-        var footerBadge = document.getElementById('footerStatusBadge');
-        if (footerBadge) {
-            var statusClassMap = {
-                'new':        'tw-status-badge--new',
-                'in_progress': 'tw-status-badge--progress',
-                'forwarded':  'tw-status-badge--forwarded',
-                'uat':        'tw-status-badge--uat',
-                'closed':     'tw-status-badge--closed',
-                'resolved':   'tw-status-badge--resolved'
-            };
-            /* Remove any existing tw-status-badge--* modifier */
-            footerBadge.className = footerBadge.className
-                .split(' ')
-                .filter(function(c) { return !c.startsWith('tw-status-badge--'); })
-                .join(' ');
-            var newClass = statusClassMap[statusKey];
-            if (newClass) footerBadge.classList.add(newClass);
-        }
-
-        /* Fix 4: show read-only banner only for closed tickets */
-        var roNotice = document.getElementById('modalReadOnlyNotice');
-        if (roNotice) roNotice.style.display = statusKey === 'closed' ? '' : 'none';
-
-        /* Show UAT notice only for UAT tickets */
-        var uatNotice = document.getElementById('modalUatNotice');
-        if (uatNotice) uatNotice.style.display = statusKey === 'uat' ? '' : 'none';
-
-        closeDashActionPanel('dashReassignPanel');
-        closeDashActionPanel('dashForwardPanel');
-    };
-
-    /* Fix 2: wire Resume button — finds the matching row and calls resumeTicket() */
-    document.getElementById('detailsResumeBtn').addEventListener('click', function() {
-        var ticketId = document.getElementById('modalTicketId').textContent;
-        var row = document.querySelector('.tab-content tbody tr[data-ticket-id="' + ticketId + '"]');
-        if (row) {
-            closeTicketDetailsModal();
-            resumeTicket(row.querySelector('.tw-action-icon--resume'));
-        }
-    });
-
-    /* Wire Recall button — returns UAT ticket to In Progress (backend does the move) */
-    document.getElementById('detailsUatRecallBtn').addEventListener('click', function() {
-        var ticketId = document.getElementById('modalTicketId').textContent;
-        openConfirmModal({
-            type:    'danger',
-            title:   'Recall Ticket',
-            message: 'Recall this ticket? It will return to In Progress at Development stage.',
-            details: '<p><strong>Ticket:</strong> ' + ticketId + '</p>',
-            onConfirm: function() {
-                /* Django: POST /api/tickets/<id>/recall/ */
-                console.log('[Dashboard] UAT recalled:', ticketId);
-                closeTicketDetailsModal();
-                showDashToast('Ticket recalled to In Progress.', 'info');
-            }
-        });
-    });
-
-
-    /* ============================================================
-     * MODAL: CLOSE TICKET CONFIRM
-     * ============================================================ */
-    function openCloseTicketConfirm() {
-        const modal    = document.getElementById('ticketDetailsModal');
-        const ticketId = modal.dataset.ticketId || 'this ticket';
-
-        openConfirmModal({
-            type:    'danger',
-            title:   'Close Ticket',
-            message: 'Are you sure you want to close this ticket? This action is permanent and cannot be undone.',
-            details: `<p><strong>Ticket:</strong> ${ticketId}</p>`,
-            onConfirm: function () {
-                /* Django: fetch(`/api/tickets/${ticketId}/close/`, { method: 'POST', ... }) */
-                console.log('[Dashboard] Ticket closed:', ticketId);
-                closeTicketDetailsModal();
-            }
-        });
-    }
+    /* Phase 4.3: button visibility is server-rendered in the detail partial
+       (per the transition engine); the old JS show/hide override is gone. */
 
 
     /* ============================================================
@@ -2903,38 +2145,23 @@
     /* ============================================================
      * CHAT PANEL
      * ============================================================ */
-    function openChatPanel(ticketId, subject) {
-        closeTimelinePanel(); /* Fix 3: ensure Timeline panel is closed first */
-        document.getElementById('chatTicketId').textContent      = 'Ticket ID: ' + ticketId;
+    /* Phase 4.3b: fetch the ticket's real TicketMessages (read-only) and inject. */
+    function openChatPanel(pk, ticketRef, subject) {
+        closeTimelinePanel();
+        document.getElementById('chatTicketId').textContent      = 'Ticket ID: ' + (ticketRef || '—');
         document.getElementById('chatTicketSubject').textContent = subject || '';
+        var area = document.getElementById('messagesArea');
+        area.innerHTML = '<div style="padding:32px;text-align:center;color:var(--tw-text-muted)">' +
+            '<i class="bx bx-loader-alt bx-spin" style="font-size:24px"></i></div>';
         document.getElementById('chatPanel').classList.add('open');
-        const area = document.getElementById('messagesArea');
-        if (area) area.scrollTop = area.scrollHeight;
-
-        /* Fix 3: disable send UI for closed tickets */
-        var closedRow = document.querySelector('#tab-closed tbody tr[data-ticket-id="' + ticketId + '"]');
-        var isClosed  = !!closedRow;
-        var textarea  = document.getElementById('chatTextarea');
-        var sendBtn   = document.getElementById('sendBtn');
-        var attachBtn = document.getElementById('attach-btn');
-
-        if (textarea)  textarea.disabled  = isClosed;
-        if (sendBtn)   sendBtn.disabled   = isClosed;
-        if (attachBtn) attachBtn.disabled = isClosed;
-
-        /* Create the read-only notice once; show/hide on every open */
-        var notice = document.getElementById('chatReadOnlyNotice');
-        if (!notice) {
-            notice = document.createElement('div');
-            notice.id = 'chatReadOnlyNotice';
-            notice.textContent = 'This ticket is closed. Chat is read-only.';
-            notice.style.cssText = 'background:var(--tw-status-closed-bg);color:var(--tw-status-closed-text);' +
-                'padding:8px 12px;border-radius:var(--tw-radius-sm);font-size:var(--tw-text-sm);' +
-                'margin-bottom:8px;display:none';
-            var inputRow = document.querySelector('.tw-chat-input-row');
-            if (inputRow) inputRow.parentNode.insertBefore(notice, inputRow);
-        }
-        notice.style.display = isClosed ? 'block' : 'none';
+        if (!pk) return;
+        var tpl = document.getElementById('chatPanel').dataset.urlTemplate;
+        fetch(tpl.replace('/0/', '/' + pk + '/'), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function(r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+            .then(function(html) { area.innerHTML = html; area.scrollTop = area.scrollHeight; })
+            .catch(function() {
+                area.innerHTML = '<p style="padding:24px;text-align:center;color:var(--tw-text-muted)">Could not load chat.</p>';
+            });
     }
 
     function closeChatPanel() {
@@ -2944,110 +2171,14 @@
     document.querySelectorAll('.tw-action-icon--chat').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
-            const row = this.closest('tr');
-            openChatPanel(
-                row ? (row.dataset.ticketId || '') : '',
-                row ? (row.dataset.subject  || '') : ''
-            );
+            var row = this.closest('tr');
+            if (!row) return;
+            openChatPanel(row.dataset.ticketPk, row.dataset.ticketId, row.dataset.subject);
         });
     });
 
     document.getElementById('chatCloseBtn').addEventListener('click', closeChatPanel);
-
-
-    /* ============================================================
-     * CHAT: AUTO-RESIZE TEXTAREA
-     * ============================================================ */
-    var chatTextarea = document.getElementById('chatTextarea');
-
-    chatTextarea.addEventListener('input', function () {
-        this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 80) + 'px';
-    });
-
-    chatTextarea.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
-
-
-    /* ============================================================
-     * CHAT: FILE ATTACHMENT HANDLER
-     * ============================================================ */
-    var chatFileInput = document.getElementById('chat-file-input');
-    var attachBtn     = document.getElementById('attach-btn');
-
-    attachBtn.addEventListener('click', function () {
-        chatFileInput.click();
-    });
-
-    chatFileInput.addEventListener('change', function () {
-        if (!this.files || this.files.length === 0) return;
-        const file     = this.files[0];
-        const strip    = document.getElementById('attachPreviewStrip');
-        const nameSpan = document.getElementById('attachFileName');
-        nameSpan.textContent = file.name;
-        strip.classList.add('show');
-    });
-
-    function removeAttachment() {
-        chatFileInput.value = '';
-        document.getElementById('attachPreviewStrip').classList.remove('show');
-    }
-
-
-    /* ============================================================
-     * CHAT: SEND MESSAGE
-     * ============================================================ */
-    function sendMessage() {
-        const text  = chatTextarea.value.trim();
-        const strip = document.getElementById('attachPreviewStrip');
-        const area  = document.getElementById('messagesArea');
-
-        if (!text && !strip.classList.contains('show')) return;
-
-        const time = new Date().toLocaleString('en-US', {
-            month: 'short', day: 'numeric', year: 'numeric',
-            hour: 'numeric', minute: '2-digit', hour12: true
-        });
-
-        let attachHTML = '';
-        if (chatFileInput.files.length > 0) {
-            const file = chatFileInput.files[0];
-            if (file.type.startsWith('image/')) {
-                const url  = URL.createObjectURL(file);
-                attachHTML = `<img src="${url}" alt="${file.name}" class="tw-chat-img-attachment">`;
-            } else {
-                attachHTML = `
-                    <div class="tw-file-chip">
-                        <i class="bx bx-paperclip" aria-hidden="true"></i>
-                        <span class="tw-file-chip-name">${file.name}</span>
-                    </div>`;
-            }
-        }
-
-        const msgEl = document.createElement('div');
-        msgEl.className = 'tw-message sent';
-        msgEl.innerHTML = `
-            <div class="tw-avatar tw-avatar--sm tw-avatar--chat-admin" aria-hidden="true">${CURRENT_USER.initials}</div>
-            <div>
-                <div class="tw-message-sender">${CURRENT_USER.name} <span class="tw-role-pill tw-role-pill--admin">Admin</span></div>
-                <div class="tw-message-bubble">
-                    ${text ? `<div class="tw-message-text">${text.replace(/\n/g, '<br>')}</div>` : ''}
-                    ${attachHTML}
-                    <div class="tw-message-time">${time}</div>
-                </div>
-            </div>`;
-
-        area.appendChild(msgEl);
-        chatTextarea.value        = '';
-        chatTextarea.style.height = 'auto';
-        chatFileInput.value       = '';
-        strip.classList.remove('show');
-        area.scrollTop = area.scrollHeight;
-    }
+    /* Compose is disabled (posting replies is a later phase) — no send handler. */
 
 
     /* ============================================================
@@ -3107,93 +2238,24 @@
 
 
     /* ============================================================
-     * TIMELINE PANEL — tracks current ticket ID for the full modal
-     * === TIMELINE: VIEW FULL LINK ===
+     * TIMELINE PANEL (Phase 4.3b) — fetch the ticket's real TicketEvents.
      * ============================================================ */
-    var currentTimelineTicketId = '';
-
-    function openTimelinePanel(ticketId, subject) {
-        closeChatPanel(); /* Fix 3: ensure Chat panel is closed first */
-        currentTimelineTicketId = ticketId;
-
-        document.getElementById('timelineTicketId').textContent = 'Ticket ID: ' + ticketId;
+    function openTimelinePanel(pk, ticketRef, subject) {
+        closeChatPanel();
+        document.getElementById('timelineTicketId').textContent = 'Ticket ID: ' + (ticketRef || '—');
         document.getElementById('timelineSubject').textContent  = subject || '';
-
+        var body = document.getElementById('timelinePanelBody');
+        body.innerHTML = '<div style="padding:32px;text-align:center;color:var(--tw-text-muted)">' +
+            '<i class="bx bx-loader-alt bx-spin" style="font-size:24px"></i></div>';
         document.getElementById('timelinePanel').classList.add('open');
-    }
-
-
-    /* ============================================================
-     * TASK 5: FULL TIMELINE MODAL
-     * === TIMELINE: OPEN FULL MODAL ===
-     * ============================================================ */
-    function openFullTimeline(ticketId) {
-        const modal   = document.getElementById('fullTimelineModal');
-        const content = document.getElementById('fullTimelineContent');
-
-        /* Show loading state */
-        content.innerHTML = `
-            <div style="text-align:center;padding:48px;color:var(--tw-text-muted)">
-                <i class='bx bx-loader-alt bx-spin' style="font-size:36px"></i>
-                <p style="margin-top:12px">Loading timeline...</p>
-            </div>`;
-
-        /* Fetch timeline page and extract its content */
-        fetch('admin_portal/dev/ticket-timeline.html')
-            .then(function(r) { return r.text(); })
-            .then(function(html) {
-                const parser = new DOMParser();
-                const doc    = parser.parseFromString(html, 'text/html');
-                const main   = doc.querySelector('main') || doc.querySelector('.tl-container') || doc.querySelector('body');
-                if (main) content.innerHTML = main.innerHTML;
-            })
+        if (!pk) return;
+        var tpl = document.getElementById('timelinePanel').dataset.urlTemplate;
+        fetch(tpl.replace('/0/', '/' + pk + '/'), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function(r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+            .then(function(html) { body.innerHTML = html; })
             .catch(function() {
-                content.innerHTML = `
-                    <div style="text-align:center;padding:48px;color:var(--tw-text-muted)">
-                        <i class='bx bx-time-five' style="font-size:48px;opacity:0.4"></i>
-                        <p style="margin-top:12px">Timeline will load when served via HTTP.</p>
-                        <p style="font-size:12px;margin-top:4px">Ticket: ${ticketId || '—'}</p>
-                    </div>`;
+                body.innerHTML = '<p style="padding:24px;text-align:center;color:var(--tw-text-muted)">Could not load timeline.</p>';
             });
-
-        /* Django: fetch('/api/tickets/${ticketId}/timeline/') */
-
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeFullTimeline() {
-        document.getElementById('fullTimelineModal').classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    /* Wire close button via event listener (belt-and-suspenders with onclick) */
-    var fullTimelineCloseBtn = document.getElementById('fullTimelineCloseBtn');
-    if (fullTimelineCloseBtn) {
-        fullTimelineCloseBtn.addEventListener('click', closeFullTimeline);
-    }
-
-    /* Close full timeline on backdrop click */
-    document.getElementById('fullTimelineModal').addEventListener('click', function(e) {
-        if (e.target === this) closeFullTimeline();
-    });
-
-    /* === TIMELINE MODAL: SCROLL TO TOP === */
-    var timelineModalBody = document.getElementById('fullTimelineContent');
-    var scrollTopBtn = document.getElementById('timelineScrollTop');
-
-    if (timelineModalBody && scrollTopBtn) {
-        timelineModalBody.addEventListener('scroll', function() {
-            if (this.scrollTop > 200) {
-                scrollTopBtn.classList.add('visible');
-            } else {
-                scrollTopBtn.classList.remove('visible');
-            }
-        });
-
-        scrollTopBtn.addEventListener('click', function() {
-            timelineModalBody.scrollTo({ top: 0, behavior: 'smooth' });
-        });
     }
 
     function closeTimelinePanel() {
@@ -3203,11 +2265,9 @@
     document.querySelectorAll('.tw-action-icon--timeline').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
-            const row = this.closest('tr');
-            openTimelinePanel(
-                row ? (row.dataset.ticketId || '') : '',
-                row ? (row.dataset.subject  || '') : ''
-            );
+            var row = this.closest('tr');
+            if (!row) return;
+            openTimelinePanel(row.dataset.ticketPk, row.dataset.ticketId, row.dataset.subject);
         });
     });
 
@@ -3301,30 +2361,12 @@
                         row.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         setTimeout(function() { row.classList.remove('row-highlight'); }, 1800);
 
-                        /* Fix 1: open the appropriate modal for this ticket */
-                        var type      = row.dataset.ticketType || 'existing';
-                        var status    = row.dataset.status     || '';
-                        var allottee  = row.dataset.allottee   || '';
-                        var subStatus = row.dataset.subStatus  || '';
+                        /* Open the appropriate modal for this ticket */
+                        var type = row.dataset.ticketType || 'existing';
                         if (type === 'new') {
-                            openNewTicketModal(ticket.id, ticket.subject, status || 'New Ticket');
-                        } else if (type === 'rejected') {
-                            var cells     = row.cells;
-                            var reasonDiv = cells[7] ? cells[7].querySelector('div') : null;
-                            var reason    = reasonDiv
-                                ? (reasonDiv.getAttribute('title') || reasonDiv.textContent.trim())
-                                : '—';
-                            openRejectedModal(
-                                ticket.id, ticket.subject,
-                                cells[3] ? cells[3].textContent.trim() : '—',
-                                cells[4] ? cells[4].textContent.trim() : '—',
-                                '—',
-                                cells[5] ? cells[5].textContent.trim() : '—',
-                                cells[6] ? cells[6].textContent.trim() : '—',
-                                '—', reason
-                            );
+                            openNewTicketModal(ticket.id, ticket.subject, 'New Ticket');
                         } else {
-                            openTicketDetailsModal(ticket.id, ticket.subject, status, allottee, subStatus);
+                            openTicketDetails(row.dataset.ticketPk);
                         }
                     }, 120);
                 });
@@ -3378,9 +2420,6 @@
         }
         if (document.getElementById('rejectedTicketModal').classList.contains('active')) {
             closeRejectedModal(); return;
-        }
-        if (document.getElementById('fullTimelineModal').classList.contains('active')) {
-            closeFullTimeline(); return;
         }
         if (document.getElementById('chatPanel').classList.contains('open')) {
             closeChatPanel(); return;
@@ -3529,23 +2568,10 @@
 
 
     /* ============================================================
-     * REJECTED TICKET MODAL — Fix 4
+     * REJECTED TICKET MODAL — retired in Phase 4.3.
+     * Rejected rows now open the same server-rendered detail modal
+     * (read-only); the rejection reason shows in its timeline.
      * ============================================================ */
-    function openRejectedModal(id, subject, client, priority, issueDate,
-                                rejectedBy, rejectedOn, category, reason) {
-        document.getElementById('rejModalTicketId').textContent  = id;
-        document.getElementById('rejModalSubject').textContent   = subject;
-        document.getElementById('rejModalClient').textContent    = client;
-        document.getElementById('rejModalPriority').textContent  = priority;
-        document.getElementById('rejModalIssueDate').textContent = issueDate;
-        document.getElementById('rejModalRejectedBy').textContent = rejectedBy;
-        document.getElementById('rejModalRejectedOn').textContent = rejectedOn;
-        document.getElementById('rejModalCategory').textContent  = category;
-        document.getElementById('rejModalReason').textContent    = reason;
-        document.getElementById('rejectedTicketModal').classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
     function closeRejectedModal() {
         document.getElementById('rejectedTicketModal').classList.remove('active');
         document.body.style.overflow = '';
@@ -3571,29 +2597,11 @@
             var row = document.querySelector('.tab-content tbody tr[data-ticket-id="' + ticketId + '"]');
             if (!row) return;
             row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            var type      = row.dataset.ticketType || 'existing';
-            var status    = row.dataset.status     || '';
-            var allottee  = row.dataset.allottee   || '';
-            var subStatus = row.dataset.subStatus  || '';
+            var type = row.dataset.ticketType || 'existing';
             if (type === 'new') {
-                openNewTicketModal(ticketId, row.dataset.subject || '', status || 'New Ticket');
-            } else if (type === 'rejected') {
-                var cells     = row.cells;
-                var reasonDiv = cells[7] ? cells[7].querySelector('div') : null;
-                var reason    = reasonDiv
-                    ? (reasonDiv.getAttribute('title') || reasonDiv.textContent.trim())
-                    : '—';
-                openRejectedModal(
-                    ticketId, row.dataset.subject || '',
-                    cells[3] ? cells[3].textContent.trim() : '—',
-                    cells[4] ? cells[4].textContent.trim() : '—',
-                    '—',
-                    cells[5] ? cells[5].textContent.trim() : '—',
-                    cells[6] ? cells[6].textContent.trim() : '—',
-                    '—', reason
-                );
+                openNewTicketModal(ticketId, row.dataset.subject || '', 'New Ticket');
             } else {
-                openTicketDetailsModal(ticketId, row.dataset.subject || '', status, allottee, subStatus);
+                openTicketDetails(row.dataset.ticketPk);
             }
         }, 150);
     }

@@ -12,4 +12,19 @@ urlpatterns = [
         views.ticket_transition,
         name="ticket_transition",
     ),
+    path(
+        "ticket/<int:pk>/detail/",
+        views.admin_ticket_detail,
+        name="admin_ticket_detail",
+    ),
+    path(
+        "ticket/<int:pk>/timeline/",
+        views.admin_ticket_timeline,
+        name="admin_ticket_timeline",
+    ),
+    path(
+        "ticket/<int:pk>/chat/",
+        views.admin_ticket_chat,
+        name="admin_ticket_chat",
+    ),
 ]

@@ -1,0 +1,174 @@
+{% load admin_extras %}
+<div class="tw-modal-header">
+    <div class="tw-modal-header-left">
+        <h2 class="tw-modal-title">
+            <i class="bx bx-receipt" aria-hidden="true"></i>
+            <span>{{ ticket.reference }}</span>
+        </h2>
+        <p class="tw-modal-subtitle">{{ ticket.subject }}</p>
+        <div class="tw-modal-header-meta">
+            {% ticket_badge ticket %}
+            {% if ticket.assigned_developer %}
+            <span class="tw-modal-allottee-tag">
+                <i class="bx bx-user" aria-hidden="true"></i>
+                <span>{{ ticket.assigned_developer.username }}</span>
+            </span>
+            {% endif %}
+        </div>
+    </div>
+    <button class="tw-modal-close" onclick="closeTicketDetailsModal()" aria-label="Close ticket details">
+        <i class="bx bx-x" aria-hidden="true"></i>
+    </button>
+</div>
+
+<div class="tw-modal-body">
+
+    {% if ticket.status == 'closed' %}
+    <div style="background:var(--tw-status-closed-bg);color:var(--tw-status-closed-text);padding:8px 14px;border-radius:var(--tw-radius-sm);font-size:var(--tw-text-sm);margin-bottom:12px;">
+        <i class="bx bx-lock-alt" style="margin-right:6px;" aria-hidden="true"></i>
+        This ticket is closed — no further actions are available.
+    </div>
+    {% elif ticket.status == 'rejected' %}
+    <div style="background:var(--tw-priority-high-bg);color:var(--tw-priority-high-text);padding:8px 14px;border-radius:var(--tw-radius-sm);font-size:var(--tw-text-sm);margin-bottom:12px;">
+        <i class="bx bx-x-circle" style="margin-right:6px;" aria-hidden="true"></i>
+        This ticket was rejected — see the timeline below for the reason.
+    </div>
+    {% elif ticket.status == 'uat' %}
+    <div style="background:var(--tw-status-uat-bg);color:var(--tw-status-uat-text);padding:8px 14px;border-radius:var(--tw-radius-sm);font-size:var(--tw-text-sm);margin-bottom:12px;">
+        <i class="bx bx-user-check" style="margin-right:6px;" aria-hidden="true"></i>
+        This ticket is with the client for UAT approval.
+    </div>
+    {% endif %}
+
+    <div class="tw-info-grid">
+        <div class="tw-info-item">
+            <div class="tw-info-label">Ticket Maker</div>
+            <div class="tw-info-value">{{ ticket.requester.username }}</div>
+        </div>
+        <div class="tw-info-item">
+            <div class="tw-info-label">Issue Date</div>
+            <div class="tw-info-value">{{ ticket.created_at|date:"d-m-Y" }}</div>
+        </div>
+        <div class="tw-info-item">
+            <div class="tw-info-label">Priority</div>
+            <div class="tw-info-value">
+                <span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
+            </div>
+        </div>
+        <div class="tw-info-item">
+            <div class="tw-info-label">Category</div>
+            <div class="tw-info-value">{{ ticket.category|default:"—" }}</div>
+        </div>
+        <div class="tw-info-item">
+            <div class="tw-info-label">Client</div>
+            <div class="tw-info-value">{{ ticket.client.code|default:"—" }}</div>
+        </div>
+        <div class="tw-info-item">
+            <div class="tw-info-label">Developer</div>
+            <div class="tw-info-value">{{ ticket.assigned_developer.username|default:"—" }}</div>
+        </div>
+        <div class="tw-info-item">
+            <div class="tw-info-label">Tester</div>
+            <div class="tw-info-value">{{ ticket.assigned_tester.username|default:"—" }}</div>
+        </div>
+        {% if ticket.status == 'in_progress' %}
+        <div class="tw-info-item">
+            <div class="tw-info-label">Stage</div>
+            <div class="tw-info-value">{{ ticket.get_sub_status_display }}</div>
+        </div>
+        {% endif %}
+        {% if ticket.accepted_at %}
+        <div class="tw-info-item">
+            <div class="tw-info-label">Accepted On</div>
+            <div class="tw-info-value">{{ ticket.accepted_at|date:"d-m-Y" }}</div>
+        </div>
+        {% endif %}
+        {% if ticket.closed_at %}
+        <div class="tw-info-item">
+            <div class="tw-info-label">Closed On</div>
+            <div class="tw-info-value">{{ ticket.closed_at|date:"d-m-Y" }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="tw-modal-section">
+        <h3 class="section-title">Description</h3>
+        <div class="tw-description-box">{{ ticket.description|default:"—"|linebreaksbr }}</div>
+    </div>
+
+    {# ── Admin actions — visibility mirrors the transition engine ────────── #}
+    {% if ticket.status == 'in_progress' or ticket.status == 'awaiting_client' or ticket.status == 'uat' or ticket.status == 'resolved' %}
+    <div class="tw-modal-section" id="adminActions">
+        <h3 class="section-title">Actions</h3>
+
+        {% if ticket.status == 'awaiting_client' %}
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="resume">
+            <button type="submit" class="tw-btn tw-btn-success" id="detailResumeBtn">
+                <i class="bx bx-play-circle" aria-hidden="true"></i> Resume Ticket
+            </button>
+        </form>
+        {% endif %}
+
+        {% if ticket.status == 'in_progress' %}
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="request_info">
+            <label class="tw-form-label" for="requestInfoMsg">Request info from the client <span class="tw-required">*</span></label>
+            <textarea class="tw-comment-textarea" id="requestInfoMsg" name="message" rows="2" required placeholder="What do you need from the client?"></textarea>
+            <button type="submit" class="tw-btn tw-modal-action-btn--warning" id="detailRequestInfoBtn">
+                <i class="bx bx-share" aria-hidden="true"></i> Request Info
+            </button>
+        </form>
+        {% endif %}
+
+        {% if ticket.status == 'in_progress' or ticket.status == 'awaiting_client' %}
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reassign">
+            <label class="tw-form-label" for="reassignDev">Reassign developer</label>
+            <select class="tw-select" id="reassignDev" name="developer">
+                <option value="">— keep current —</option>
+                {% for d in developers %}
+                <option value="{{ d.pk }}">{{ d.username }}</option>
+                {% endfor %}
+            </select>
+            <label class="tw-form-label" for="reassignTester">Reassign tester</label>
+            <select class="tw-select" id="reassignTester" name="tester">
+                <option value="">— keep current —</option>
+                {% for t in testers %}
+                <option value="{{ t.pk }}">{{ t.username }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="tw-btn tw-modal-action-btn" id="detailReassignBtn">
+                <i class="bx bx-transfer" aria-hidden="true"></i> Reassign
+            </button>
+        </form>
+        {% endif %}
+
+        {% if ticket.status == 'uat' %}
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="request_changes">
+            <label class="tw-form-label" for="recallFeedback">Recall to In Progress — feedback <span class="tw-required">*</span></label>
+            <textarea class="tw-comment-textarea" id="recallFeedback" name="feedback" rows="2" required placeholder="Why is this being recalled?"></textarea>
+            <button type="submit" class="tw-btn tw-btn-outline" id="detailRecallBtn">
+                <i class="bx bx-undo" aria-hidden="true"></i> Recall to In Progress
+            </button>
+        </form>
+        {% endif %}
+
+        {% if ticket.status == 'resolved' %}
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="close">
+            <button type="submit" class="tw-btn-close-ticket" id="detailCloseBtn">
+                <i class="bx bx-x-circle" aria-hidden="true"></i> Close Ticket
+            </button>
+        </form>
+        {% endif %}
+    </div>
+    {% endif %}
+
+</div>

@@ -1,0 +1,22 @@
+{# Chat drawer body (4.3b): real TicketMessages, read-only. Posting deferred. #}
+<div class="tw-chat-status-msg">
+    Ticket created
+    <span class="tw-chat-status-time">• {{ ticket.created_at|date:"d-m-Y H:i" }}</span>
+</div>
+{% for m in chat_messages %}
+<div class="tw-message received">
+    <div class="tw-avatar tw-avatar--sm tw-avatar--chat-user" aria-hidden="true">{{ m.author.username|first|upper }}</div>
+    <div>
+        <div class="tw-message-sender">
+            {{ m.author.username }}
+            <span class="tw-role-pill tw-role-pill--{{ m.author.role }}">{{ m.author.get_role_display }}</span>
+        </div>
+        <div class="tw-message-bubble">
+            <div class="tw-message-text">{{ m.body|linebreaksbr }}</div>
+            <div class="tw-message-time">{{ m.created_at|date:"d-m-Y H:i" }}</div>
+        </div>
+    </div>
+</div>
+{% empty %}
+<p style="color:var(--tw-text-muted);padding:16px;text-align:center;">No messages yet.</p>
+{% endfor %}
