@@ -404,3 +404,151 @@ class ConstraintTests(EngineTestBase):
         with self.assertRaises(IntegrityError):
             with transaction.atomic():
                 self.make_ticket(status=S.IN_PROGRESS, sub_status=None)
+
+
+class OwnershipTests(EngineTestBase):
+    """Object-level authorization: _check_ownership inside transition()."""
+
+    def setUp(self):
+        super().setUp()
+        self.other_org = Client.objects.create(name="Intercore", code="INTC")
+        self.other_client = User.objects.create_user(
+            "client_intc", role="client", client=self.other_org
+        )
+        self.other_subuser = User.objects.create_user(
+            "sub_intc", role="subuser", client=self.other_org
+        )
+        self.tester2 = User.objects.create_user("qa2", role="tester")
+
+    # ── Developer ownership ──────────────────────────────────────────────────
+
+    def test_developer_blocked_on_unassigned_ticket(self):
+        # assigned_developer is None — developer should be rejected.
+        t = self.make_ticket(
+            status=S.IN_PROGRESS,
+            sub_status=SS.DEVELOPMENT,
+            assigned_tester=self.tester,
+            # no assigned_developer
+        )
+        with self.assertRaises(TransitionNotAllowed):
+            transition(t, "submit_for_testing", self.developer)
+        t.refresh_from_db()
+        self.assertEqual(t.sub_status, SS.DEVELOPMENT)
+        self.assertEqual(t.events.count(), 0)
+
+    def test_developer_blocked_on_other_devs_ticket(self):
+        # ticket belongs to developer2; developer (dev1) should be rejected.
+        t = self.make_ticket(
+            status=S.IN_PROGRESS,
+            sub_status=SS.DEVELOPMENT,
+            assigned_developer=self.developer2,
+            assigned_tester=self.tester,
+        )
+        with self.assertRaises(TransitionNotAllowed):
+            transition(t, "submit_for_testing", self.developer)
+        t.refresh_from_db()
+        self.assertEqual(t.sub_status, SS.DEVELOPMENT)
+        self.assertEqual(t.events.count(), 0)
+
+    def test_developer_passes_on_own_ticket(self):
+        t = self.make_ticket(
+            status=S.IN_PROGRESS,
+            sub_status=SS.DEVELOPMENT,
+            assigned_developer=self.developer,
+            assigned_tester=self.tester,
+        )
+        transition(t, "submit_for_testing", self.developer)
+        t.refresh_from_db()
+        self.assertEqual(t.sub_status, SS.TESTING)
+
+    # ── Tester ownership ─────────────────────────────────────────────────────
+
+    def test_tester_blocked_on_ticket_with_no_assigned_tester(self):
+        t = self.make_ticket(
+            status=S.IN_PROGRESS,
+            sub_status=SS.TESTING,
+            assigned_developer=self.developer,
+            # no assigned_tester
+        )
+        with self.assertRaises(TransitionNotAllowed):
+            transition(t, "pass", self.tester)
+        t.refresh_from_db()
+        self.assertEqual(t.sub_status, SS.TESTING)
+        self.assertEqual(t.events.count(), 0)
+
+    def test_tester_blocked_on_other_testers_ticket(self):
+        t = self.make_ticket(
+            status=S.IN_PROGRESS,
+            sub_status=SS.TESTING,
+            assigned_developer=self.developer,
+            assigned_tester=self.tester2,
+        )
+        with self.assertRaises(TransitionNotAllowed):
+            transition(t, "pass", self.tester)
+        t.refresh_from_db()
+        self.assertEqual(t.sub_status, SS.TESTING)
+        self.assertEqual(t.events.count(), 0)
+
+    def test_tester_passes_on_own_ticket(self):
+        t = self.make_ticket(
+            status=S.IN_PROGRESS,
+            sub_status=SS.TESTING,
+            assigned_developer=self.developer,
+            assigned_tester=self.tester,
+        )
+        transition(t, "pass", self.tester)
+        t.refresh_from_db()
+        self.assertEqual(t.sub_status, SS.READY_FOR_UAT)
+
+    # ── Client ownership ─────────────────────────────────────────────────────
+
+    def test_client_blocked_on_other_orgs_ticket(self):
+        # ticket.client = self.org (GMEC); actor belongs to other_org (INTC).
+        t = self.make_ticket(status=S.UAT)
+        with self.assertRaises(TransitionNotAllowed):
+            transition(t, "approve", self.other_client)
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.UAT)
+        self.assertEqual(t.events.count(), 0)
+
+    def test_client_passes_on_own_org_ticket(self):
+        # client_user belongs to self.org; ticket.client = self.org.
+        t = self.make_ticket(status=S.UAT)
+        transition(t, "approve", self.client_user)
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.RESOLVED)
+
+    # ── Subuser ownership ────────────────────────────────────────────────────
+
+    def test_subuser_passes_on_org_ticket_not_submitted_by_them(self):
+        # ticket was submitted by client_user (not the subuser), same org.
+        # guard_confirm allows same-org non-requesters, so this must succeed.
+        t = self.make_ticket(status=S.UAT, requester=self.client_user)
+        self.assertNotEqual(t.requester, self.subuser)
+        self.assertEqual(t.client, self.subuser.client)
+        transition(t, "confirm", self.subuser)
+        t.refresh_from_db()
+        self.assertTrue(t.subuser_confirmed)
+        self.assertEqual(t.status, S.UAT)
+
+    def test_subuser_blocked_on_different_org_ticket(self):
+        t = self.make_ticket(status=S.UAT)  # ticket.client = self.org (GMEC)
+        with self.assertRaises(TransitionNotAllowed):
+            transition(t, "confirm", self.other_subuser)
+        t.refresh_from_db()
+        self.assertFalse(t.subuser_confirmed)
+        self.assertEqual(t.events.count(), 0)
+
+    # ── Admin has no ownership restriction ───────────────────────────────────
+
+    def test_admin_passes_ownership_on_any_ticket(self):
+        # Ticket belongs to other_org; admin should still be able to act on it.
+        t = Ticket.objects.create(
+            subject="Admin override test",
+            requester=self.other_client,
+            client=self.other_org,
+            status=S.NEW,
+        )
+        transition(t, "reject", self.admin, reason="Out of scope")
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.REJECTED)

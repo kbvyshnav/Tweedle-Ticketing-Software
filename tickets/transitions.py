@@ -430,6 +430,36 @@ def _message_for(rule, ticket, actor):
     return f"{ticket.reference}: '{label}' by {actor.get_username()}"
 
 
+# ── Object-level ownership check ────────────────────────────────────────────
+def _check_ownership(ticket, actor):
+    """Raise TransitionNotAllowed if actor has no object-level access to ticket.
+
+    Called after the role check (which verifies the role type is allowed) and
+    before the legal-state check.  Admin is unrestricted.  Developer/tester
+    must be the assigned assignee.  Client/subuser must belong to the ticket's
+    client org (org-level, not requester-only — guard callables enforce the
+    finer requester restriction where needed).
+    """
+    role = actor.role
+    if role == "admin":
+        return
+    if role == "developer":
+        if ticket.assigned_developer_id != actor.pk:
+            raise TransitionNotAllowed(
+                f"Developer '{actor}' is not assigned to {ticket.reference}."
+            )
+    elif role == "tester":
+        if ticket.assigned_tester_id != actor.pk:
+            raise TransitionNotAllowed(
+                f"Tester '{actor}' is not assigned to {ticket.reference}."
+            )
+    elif role in ("client", "subuser"):
+        if ticket.client_id != actor.client_id:
+            raise TransitionNotAllowed(
+                f"'{actor}' does not belong to the client org for {ticket.reference}."
+            )
+
+
 # ── The one service every view calls ────────────────────────────────────────
 def transition(ticket, action, actor, **data):
     """Perform `action` on `ticket` as `actor`, atomically and guarded.
@@ -445,6 +475,7 @@ def transition(ticket, action, actor, **data):
 
     # All checks run BEFORE the atomic block, so a failure changes nothing.
     rule.check_role(actor)
+    _check_ownership(ticket, actor)
     rule.check_legal(ticket)
     rule.validate(data)
     if rule.guard:
