@@ -1,948 +1,477 @@
-<!--
-  File: templates/client_portal/submit-ticket.html
-  Django template: extends 'client_base.html'
-  Django view:     client_portal.views.submit_ticket
-  Django url:      client_submit_ticket
-  Role:            User / Client — body class="role-user" (orange theme)
--->
-<!-- Django: {% extends 'client_base.html' %} -->
-<!-- Django: {% block body_role %}user{% endblock %} -->
+{% extends 'client_base.html' %}
+{% load static %}
 
-<!-- Django: {% block page_css %}
+{% block title %}Submit a Ticket — Tweedle{% endblock %}
+
+{% block page_css %}
 <link rel="stylesheet" href="{% static 'css/pages/client-dashboard.css' %}">
-{% endblock %} -->
+<link rel="stylesheet" href="{% static 'css/pages/dashboard.css' %}">
+{% endblock %}
 
-<!-- Django: {% block content %} -->
+{% block content %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit a Ticket — Tweedle</title>
+    <!-- Back link -->
+    <a href="{% url 'client_dashboard' %}" class="tw-client-back-link">
+        <i class="bx bx-arrow-back" aria-hidden="true"></i>
+        Back to My Tickets
+    </a>
 
-    <!-- Django: {% load static %} -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
-    <!-- Django: href="{% static 'images/favicon.svg' %}" -->
-    <link rel="icon" type="image/svg+xml" href="../../static/images/favicon.svg">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-
-    <!-- CSS load order: 1 tokens → 2 theme-user → 3 base → 4 components → 5 notification → 6 page -->
-    <!-- Django: href="{% static 'css/tweedle-tokens.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-tokens.css">
-    <!-- Django: href="{% static 'css/themes/theme-user.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/themes/theme-user.css">
-    <!-- Django: href="{% static 'css/tweedle-base.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-base.css">
-    <!-- Django: href="{% static 'css/tweedle-components.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-components.css">
-    <!-- Django: href="{% static 'css/pages/notification.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/notification.css">
-    <!-- Django: href="{% static 'css/pages/client-dashboard.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/client-dashboard.css">
-    <!-- Django: href="{% static 'css/pages/dashboard.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/dashboard.css">
-</head>
-
-<body class="role-user">
-
-
-<!-- SIDEBAR — Submit Ticket page: Submit Ticket is active -->
-<nav class="sidebar" id="sidebar">
-
-    <div class="sidebar-brand">
-        <!-- Django: src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" -->
-        <img src="../../static/images/tweedle-logo/tweedle-mark-blue.svg"
-             alt="Tweedle"
-             class="sidebar-logo-img">
-        <span class="brand-text">Tweedle</span>
+    <!-- Page header -->
+    <div class="tw-client-page-header">
+        <div class="tw-client-header-left">
+            <h1 class="tw-submit-page-title">Submit a Ticket</h1>
+            <p class="tw-client-header-subtitle">Describe your issue and our support team will get back to you shortly.</p>
+        </div>
     </div>
 
-    <ul class="sidebar-nav">
-
-        <!-- Django: href="{% url 'client_dashboard' %}" -->
-        <li class="nav-item">
-            <a href="dashboard.html" class="nav-link" title="My Tickets">
-                <i class='bx bx-receipt'></i>
-                <span class="nav-label">My Tickets</span>
-            </a>
-        </li>
-
-        <!-- Django: href="{% url 'client_submit_ticket' %}" -->
-        <li class="nav-item active-item">
-            <a href="submit-ticket.html" class="nav-link active" title="Submit Ticket">
-                <i class='bx bx-plus-circle'></i>
-                <span class="nav-label">Submit Ticket</span>
-            </a>
-        </li>
-
-        <!-- Reports -->
-        <!-- Django: href="{% url 'client_reports' %}" -->
-        <li class="nav-item">
-            <a href="reports.html" class="nav-link" title="Reports">
-                <i class='bx bx-bar-chart-alt-2'></i>
-                <span class="nav-label">Reports</span>
-            </a>
-        </li>
-
-    </ul>
-
-</nav>
-
-
-<section id="content">
-
-    <!-- TOPBAR -->
-    <nav class="topbar">
-
-        <i class="bx bx-menu" id="hamburger-btn" role="button" aria-label="Toggle sidebar"></i>
-
-        <!-- Tweedle logo — mobile only -->
-        <div class="topbar-brand-mobile" style="display:none">
-            <!-- Django: src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" -->
-            <img src="../../static/images/tweedle-logo/tweedle-mark-blue.svg" alt="Tweedle" style="height:28px;">
-        </div>
-
-        <!-- Notification Bell -->
-        <div class="tw-notif-bell-wrap" id="notifBellWrap">
-            <button class="tw-notif-bell-btn" id="notifBellBtn"
-                    aria-label="Notifications" aria-expanded="false" aria-controls="notifPanel">
-                <i class="bx bxs-bell" aria-hidden="true"></i>
-                <!-- Django: {% if unread_notification_count %} -->
-                <span class="tw-notif-count-badge" id="notifCount">2</span>
-                <!-- Django: {% endif %} -->
-            </button>
-
-            <div class="tw-notif-panel" id="notifPanel" role="dialog" aria-label="Notifications">
-                <div class="tw-notif-panel-header">
-                    <span class="tw-notif-panel-title">Notifications</span>
-                    <button class="tw-btn tw-btn-outline tw-btn--sm" id="markAllReadBtn">Mark all read</button>
-                </div>
-                <div class="tw-notif-list">
-                    <!-- Django: {% for notification in notifications %} -->
-                    <div class="tw-notif-item unread" role="button" style="cursor:pointer">
-                        <div class="tw-notif-item-body">
-                            <div class="tw-notif-type-icon tw-notif-type-icon--warning">
-                                <i class="bx bx-check-shield" aria-hidden="true"></i>
-                            </div>
-                            <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">Ready for your review — TKT-GMEC-002</div>
-                                <div class="tw-notif-item-msg">Bulk export CSV fix is ready for UAT.</div>
-                                <div class="tw-notif-item-time">2 hours ago</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tw-notif-item unread" role="button" style="cursor:pointer">
-                        <div class="tw-notif-item-body">
-                            <div class="tw-notif-type-icon tw-notif-type-icon--info">
-                                <i class="bx bx-info-circle" aria-hidden="true"></i>
-                            </div>
-                            <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">Response needed — TKT-GMEC-003</div>
-                                <div class="tw-notif-item-msg">Support team has requested additional information.</div>
-                                <div class="tw-notif-item-time">Yesterday</div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Django: {% endfor %} -->
-                </div>
-                <!-- Footer link hidden: no client notifications page exists yet (href="#"). -->
-                <div class="tw-notif-panel-footer" style="display: none;">
-                    <!-- Django: href="{% url 'client_notifications' %}" -->
-                    <a href="#" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
-                </div>
+    <!-- Progress steps -->
+    <div class="tw-progress-wrap">
+        <div class="tw-progress-steps" aria-label="Submission progress">
+            <div class="tw-progress-step tw-progress-step--active">
+                <div class="tw-progress-step__circle" aria-current="step">1</div>
+                <span class="tw-progress-step__label">Ticket Details</span>
+            </div>
+            <div class="tw-progress-connector" aria-hidden="true"></div>
+            <div class="tw-progress-step">
+                <div class="tw-progress-step__circle">2</div>
+                <span class="tw-progress-step__label">Review</span>
+            </div>
+            <div class="tw-progress-connector" aria-hidden="true"></div>
+            <div class="tw-progress-step">
+                <div class="tw-progress-step__circle">3</div>
+                <span class="tw-progress-step__label">Submitted</span>
             </div>
         </div>
+    </div>
 
-        <!-- Profile Dropdown -->
-        <div class="tw-profile-wrap" id="profileWrap">
-            <div class="tw-avatar tw-avatar--user" role="button" aria-label="Profile"
-                 style="width:36px;height:36px;font-size:14px;cursor:pointer"
-                 onclick="toggleProfileDropdown(event)" id="clientUserInitials">SJ</div>
+    <!-- Tips bar -->
+    <div class="tw-tips-bar" role="note" aria-label="Tips for a great ticket">
+        <span class="tw-tips-bar-label"><i class="bx bx-bulb" aria-hidden="true"></i>Tips:</span>
+        <span class="tw-tip-pill"><i class="bx bx-edit-alt" aria-hidden="true"></i>Be specific</span>
+        <span class="tw-tip-pill"><i class="bx bx-list-ol" aria-hidden="true"></i>Add steps</span>
+        <span class="tw-tip-pill"><i class="bx bx-paperclip" aria-hidden="true"></i>Attach files</span>
+        <span class="tw-tip-pill"><i class="bx bx-group" aria-hidden="true"></i>Name affected users</span>
+    </div>
 
-            <div class="tw-profile-panel" id="profilePanel" role="menu" aria-hidden="true">
-                <div class="tw-profile-header">
-                    <div class="tw-avatar tw-avatar--user" style="width:40px;height:40px;font-size:15px;flex-shrink:0" id="clientUserInitials2">SJ</div>
-                    <div>
-                        <!-- Django: {{ request.user.get_full_name }} -->
-                        <div style="font-size:var(--tw-text-base);font-weight:600;color:var(--tw-text-primary);line-height:1.3" id="clientUserName">Sarah Johnson</div>
-                        <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px" id="clientUserEmail">sarah.johnson@globaltech.com</div>
-                        <span class="tw-role-pill tw-role-pill--user" style="margin-top:4px;display:inline-block">Client</span>
-                    </div>
-                </div>
-                <div class="tw-profile-divider"></div>
-                <div class="tw-profile-menu-item" role="menuitem"
-                     onclick="closeProfileDropdown(); showClientToast('Profile settings coming soon.', 'info')">
-                    <i class="bx bx-user" aria-hidden="true"></i><span>View Profile</span>
-                </div>
-                <div class="tw-profile-menu-item" role="menuitem"
-                     onclick="closeProfileDropdown(); showClientToast('Password settings coming soon.', 'info')">
-                    <i class="bx bx-lock-alt" aria-hidden="true"></i><span>Change Password</span>
-                </div>
-                <div class="tw-profile-divider"></div>
-                <!-- Django: window.location.href="{% url 'logout' %}" -->
-                <div class="tw-profile-menu-item tw-profile-menu-item--danger" role="menuitem"
-                     onclick="window.location.href = '../login.html'">
-                    <i class="bx bx-log-out" aria-hidden="true"></i><span>Sign Out</span>
-                </div>
-            </div>
+    <!-- FORM -->
+    <form method="post" action="{% url 'client_submit_ticket' %}">
+    {% csrf_token %}
+
+    <div class="tw-submit-card">
+
+        <!-- Section 1: Subject -->
+        <div class="tw-submit-section">
+            <label class="tw-submit-label" for="subjectInput">
+                What's the issue? <span aria-hidden="true" style="color:var(--tw-danger)">&#9679;</span>
+            </label>
+            <input type="text"
+                   id="subjectInput"
+                   name="subject"
+                   value="{{ form.subject.value|default:'' }}"
+                   class="tw-input {% if form.subject.errors %}tw-input--error{% endif %}"
+                   placeholder="Brief summary of your issue"
+                   required maxlength="160"
+                   oninput="validateForm(); clearFieldError(this, document.getElementById('subjectError')); updatePreviewIfOpen()"
+                   aria-describedby="subjectError">
+            {% if form.subject.errors %}
+            <span id="subjectError" class="tw-error-text" aria-live="polite"
+                  style="font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px;display:block">
+                {{ form.subject.errors.0 }}
+            </span>
+            {% else %}
+            <span id="subjectError" class="tw-error-text" aria-live="polite"
+                  style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
+            {% endif %}
         </div>
 
-    </nav>
-    <!-- END TOPBAR -->
+        <!-- Section 2: Category + Priority -->
+        <div class="tw-submit-section">
+            <div class="tw-submit-two-col">
 
-
-    <main id="main-content">
-    <div style="max-width:1100px;margin:0 auto;padding:32px 32px 40px;">
-
-        <!-- PAGE HEADER -->
-        <!-- Django: href="{% url 'client_dashboard' %}" -->
-        <a href="dashboard.html" class="tw-client-back-link">
-            <i class="bx bx-arrow-back" aria-hidden="true"></i>
-            Back to My Tickets
-        </a>
-
-        <div class="tw-client-page-header">
-            <div class="tw-client-header-left">
-                <h1 class="tw-submit-page-title">Submit a Ticket</h1>
-                <p class="tw-client-header-subtitle">Describe your issue and our support team will get back to you shortly.</p>
-            </div>
-        </div>
-
-        <!-- Progress steps (centered, 760px) -->
-        <div class="tw-progress-wrap">
-            <div class="tw-progress-steps" aria-label="Submission progress">
-                <div class="tw-progress-step tw-progress-step--active">
-                    <div class="tw-progress-step__circle" aria-current="step">1</div>
-                    <span class="tw-progress-step__label">Ticket Details</span>
-                </div>
-                <div class="tw-progress-connector" aria-hidden="true"></div>
-                <div class="tw-progress-step">
-                    <div class="tw-progress-step__circle">2</div>
-                    <span class="tw-progress-step__label">Review</span>
-                </div>
-                <div class="tw-progress-connector" aria-hidden="true"></div>
-                <div class="tw-progress-step">
-                    <div class="tw-progress-step__circle">3</div>
-                    <span class="tw-progress-step__label">Submitted</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tips bar -->
-        <div class="tw-tips-bar" role="note" aria-label="Tips for a great ticket">
-            <span class="tw-tips-bar-label">
-                <i class="bx bx-bulb" aria-hidden="true"></i>
-                Tips:
-            </span>
-            <span class="tw-tip-pill">
-                <i class="bx bx-edit-alt" aria-hidden="true"></i>
-                Be specific
-            </span>
-            <span class="tw-tip-pill">
-                <i class="bx bx-list-ol" aria-hidden="true"></i>
-                Add steps
-            </span>
-            <span class="tw-tip-pill">
-                <i class="bx bx-paperclip" aria-hidden="true"></i>
-                Attach files
-            </span>
-            <span class="tw-tip-pill">
-                <i class="bx bx-group" aria-hidden="true"></i>
-                Name affected users
-            </span>
-        </div>
-
-        <!-- Single submit card -->
-        <!-- Django: action="{% url 'client_submit_ticket' %}" method="POST" -->
-        <!-- Django: {% csrf_token %} -->
-        <div class="tw-submit-card">
-
-            <!-- Section 1: Subject -->
-            <div class="tw-submit-section">
-                <label class="tw-submit-label" for="subjectInput">
-                    What's the issue? <span aria-hidden="true" style="color:var(--tw-danger)">&#9679;</span>
-                </label>
-                <input
-                    type="text"
-                    id="subjectInput"
-                    class="tw-input"
-                    placeholder="Brief summary of your issue"
-                    required
-                    maxlength="160"
-                    oninput="validateForm(); clearFieldError(this, document.getElementById('subjectError')); updatePreviewIfOpen()"
-                    aria-describedby="subjectError">
-                <span id="subjectError" class="tw-error-text" aria-live="polite" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
-            </div>
-
-            <!-- Section 2: Category + Priority (two-col) -->
-            <div class="tw-submit-section">
-                <div class="tw-submit-two-col">
-
-                    <!-- Category -->
-                    <div>
-                        <label class="tw-submit-label" for="categorySelect">
-                            Category <span aria-hidden="true" style="color:var(--tw-danger)">&#9679;</span>
-                        </label>
-                        <select
-                            id="categorySelect"
-                            class="tw-select"
+                <!-- Category -->
+                <div>
+                    <label class="tw-submit-label" for="categorySelect">
+                        Category <span aria-hidden="true" style="color:var(--tw-danger)">&#9679;</span>
+                    </label>
+                    <select id="categorySelect" name="category"
+                            class="tw-select {% if form.category.errors %}tw-input--error{% endif %}"
                             required
                             onchange="validateForm(); clearFieldError(this, document.getElementById('categoryError')); updatePreviewIfOpen()"
                             aria-describedby="categoryError">
-                            <option value="">Select a category</option>
-                            <!-- Django: {% for category in ticket_categories %} -->
-                            <option value="billing">Billing</option>
-                            <option value="access-control">Access Control</option>
-                            <option value="reports">Reports</option>
-                            <option value="integration">Integration</option>
-                            <option value="ui-ux">UI/UX</option>
-                            <option value="performance">Performance</option>
-                            <option value="other">Other</option>
-                            <!-- Django: {% endfor %} -->
-                        </select>
-                        <span id="categoryError" class="tw-error-text" aria-live="polite" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
-                    </div>
-
-                    <!-- Priority -->
-                    <div>
-                        <label class="tw-submit-label" for="prioritySelect">Priority</label>
-                        <select id="prioritySelect" class="tw-select"
-                                onchange="updatePriorityHint(); updatePreviewIfOpen()">
-                            <!-- Django: {% for priority in priority_choices %} -->
-                            <option value="low">Low</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="high">High</option>
-                            <!-- Django: {% endfor %} -->
-                        </select>
-                        <!-- SLA hint — updated by updatePriorityHint() -->
-                        <div id="priorityHint" class="tw-priority-hint tw-priority-hint--medium" aria-live="polite">
-                            <i class="bx bx-info-circle" aria-hidden="true"></i>
-                            <span id="priorityHintText">Medium priority tickets are reviewed within 24 hours.</span>
-                        </div>
-                        <p class="tw-field-hint">
-                            <i class="bx bx-info-circle" aria-hidden="true"></i>
-                            Priority is a suggestion — final priority is set by our support team.
-                        </p>
-                    </div>
-
+                        {% with cval=form.category.value %}
+                        {% for val, label in form.category.field.choices %}
+                        <option value="{{ val }}" {% if cval == val %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                        {% endwith %}
+                    </select>
+                    {% if form.category.errors %}
+                    <span id="categoryError" class="tw-error-text" aria-live="polite"
+                          style="font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px;display:block">
+                        {{ form.category.errors.0 }}
+                    </span>
+                    {% else %}
+                    <span id="categoryError" class="tw-error-text" aria-live="polite"
+                          style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
+                    {% endif %}
                 </div>
-            </div>
 
-            <!-- Section 3: Description -->
-            <div class="tw-submit-section">
-                <label class="tw-submit-label" for="descTextarea">
-                    Description <span aria-hidden="true" style="color:var(--tw-danger)">&#9679;</span>
-                </label>
-                <span class="tw-submit-sublabel">Describe the issue in detail. Include steps to reproduce, expected vs actual behaviour.</span>
-                <textarea
-                    id="descTextarea"
-                    class="tw-textarea"
-                    rows="7"
-                    required
-                    minlength="20"
-                    placeholder="e.g. When I click Export on the Reports page, the download starts but the file is empty…"
-                    oninput="updateCharCount(); validateForm(); clearFieldError(this, document.getElementById('descError')); updatePreviewIfOpen()"
-                    aria-describedby="descError descCharCount"
-                    style="resize:vertical;min-height:160px;"></textarea>
-                <span id="descError" class="tw-error-text" aria-live="polite" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
-                <div class="tw-char-counter" id="descCharCount" aria-live="polite">0 characters (minimum 20)</div>
-            </div>
-
-            <!-- Section 4: Attachments -->
-            <div class="tw-submit-section">
-                <label class="tw-submit-label">
-                    Attachments
-                    <span style="font-weight:400;color:var(--tw-text-muted);font-size:var(--tw-text-sm)">(optional)</span>
-                </label>
-
-                <!-- Hidden multi-file input -->
-                <input
-                    type="file"
-                    id="fileInput"
-                    style="display:none"
-                    multiple
-                    accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-                    aria-label="Attach files (optional)"
-                    onchange="addSelectedFiles(this)">
-
-                <!-- Drag & drop zone (compact) -->
-                <div class="tw-upload-area"
-                     id="uploadArea"
-                     onclick="document.getElementById('fileInput').click()"
-                     ondragover="handleDragOver(event)"
-                     ondragleave="handleDragLeave(event)"
-                     ondrop="handleDrop(event)"
-                     role="button"
-                     tabindex="0"
-                     aria-label="Upload files — click or drag to upload"
-                     onkeydown="if(event.key==='Enter'||event.key===' '){document.getElementById('fileInput').click();}"
-                     style="padding:20px;min-height:100px">
-                    <i class="bx bx-cloud-upload" aria-hidden="true"></i>
-                    <p>
-                        Drag &amp; drop files here or
-                        <span class="tw-upload-link">Browse Files</span>
+                <!-- Priority -->
+                <div>
+                    <label class="tw-submit-label" for="prioritySelect">Priority</label>
+                    <select id="prioritySelect" name="priority" class="tw-select"
+                            onchange="updatePriorityHint(); updatePreviewIfOpen()">
+                        {% with pval=form.priority.value|default:"medium" %}
+                        {% for val, label in form.priority.field.choices %}
+                        <option value="{{ val }}" {% if pval == val %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                        {% endwith %}
+                    </select>
+                    <div id="priorityHint" class="tw-priority-hint tw-priority-hint--medium" aria-live="polite">
+                        <i class="bx bx-info-circle" aria-hidden="true"></i>
+                        <span id="priorityHintText">Medium priority tickets are reviewed within 24 hours.</span>
+                    </div>
+                    <p class="tw-field-hint">
+                        <i class="bx bx-info-circle" aria-hidden="true"></i>
+                        Priority is a suggestion — final priority is set by our support team.
                     </p>
-                    <p class="tw-upload-meta">Supports PDF, DOC, DOCX, PNG, JPG — Max 10MB</p>
                 </div>
-                <div class="tw-upload-hint" id="uploadHint">Up to 3 files allowed</div>
 
-                <!-- File chips (rendered by renderFileChips()) -->
-                <div id="fileChipsList" class="tw-file-chips-list"></div>
             </div>
-
-            <!-- Divider -->
-            <hr class="tw-submit-divider">
-
-            <!-- Section 5: Notify + Contact (two-col) -->
-            <div class="tw-submit-section">
-                <div class="tw-submit-two-col">
-
-                    <!-- Notify -->
-                    <div>
-                        <label class="tw-submit-label">Notifications</label>
-                        <label class="tw-notif-pref">
-                            <input type="checkbox" id="notifEmailCheck" checked>
-                            Notify me by email when this ticket's status changes
-                        </label>
-                    </div>
-
-                    <!-- Contact -->
-                    <div>
-                        <label class="tw-submit-label" for="contactSelect">Point of Contact</label>
-                        <select id="contactSelect" class="tw-select" onchange="updatePreviewIfOpen()">
-                            <!-- Django: {% for contact in client_contacts %} -->
-                            <option value="primary">Primary Contact</option>
-                            <option value="account-manager">Account Manager</option>
-                            <option value="technical-lead">Technical Lead</option>
-                            <!-- Django: {% endfor %} -->
-                        </select>
-                    </div>
-
-                </div>
-            </div>
-
         </div>
-        <!-- END SUBMIT CARD -->
+
+        <!-- Section 3: Description -->
+        <div class="tw-submit-section">
+            <label class="tw-submit-label" for="descTextarea">
+                Description <span aria-hidden="true" style="color:var(--tw-danger)">&#9679;</span>
+            </label>
+            <span class="tw-submit-sublabel">Describe the issue in detail. Include steps to reproduce, expected vs actual behaviour.</span>
+            <textarea id="descTextarea" name="description"
+                      class="tw-textarea {% if form.description.errors %}tw-input--error{% endif %}"
+                      rows="7" required minlength="20"
+                      placeholder="e.g. When I click Export on the Reports page, the download starts but the file is empty…"
+                      oninput="updateCharCount(); validateForm(); clearFieldError(this, document.getElementById('descError')); updatePreviewIfOpen()"
+                      aria-describedby="descError descCharCount"
+                      style="resize:vertical;min-height:160px;">{{ form.description.value|default:'' }}</textarea>
+            {% if form.description.errors %}
+            <span id="descError" class="tw-error-text" aria-live="polite"
+                  style="font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px;display:block">
+                {{ form.description.errors.0 }}
+            </span>
+            {% else %}
+            <span id="descError" class="tw-error-text" aria-live="polite"
+                  style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
+            {% endif %}
+            <div class="tw-char-counter" id="descCharCount" aria-live="polite">0 characters (minimum 20)</div>
+        </div>
+
+        <!-- Section 4: Attachments (UI only — no file upload in Phase 4.4) -->
+        <div class="tw-submit-section">
+            <label class="tw-submit-label">
+                Attachments
+                <span style="font-weight:400;color:var(--tw-text-muted);font-size:var(--tw-text-sm)">(optional)</span>
+            </label>
+            <input type="file" id="fileInput" style="display:none" multiple
+                   accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                   aria-label="Attach files (optional)"
+                   onchange="addSelectedFiles(this)">
+            <div class="tw-upload-area" id="uploadArea"
+                 onclick="document.getElementById('fileInput').click()"
+                 ondragover="handleDragOver(event)"
+                 ondragleave="handleDragLeave(event)"
+                 ondrop="handleDrop(event)"
+                 role="button" tabindex="0"
+                 aria-label="Upload files — click or drag to upload"
+                 onkeydown="if(event.key==='Enter'||event.key===' '){document.getElementById('fileInput').click();}"
+                 style="padding:20px;min-height:100px">
+                <i class="bx bx-cloud-upload" aria-hidden="true"></i>
+                <p>Drag &amp; drop files here or <span class="tw-upload-link">Browse Files</span></p>
+                <p class="tw-upload-meta">Supports PDF, DOC, DOCX, PNG, JPG — Max 10MB</p>
+            </div>
+            <div class="tw-upload-hint" id="uploadHint">Up to 3 files allowed</div>
+            <div id="fileChipsList" class="tw-file-chips-list"></div>
+        </div>
+
+        <hr class="tw-submit-divider">
+
+        <!-- Section 5: Notifications + Contact (UI only) -->
+        <div class="tw-submit-section">
+            <div class="tw-submit-two-col">
+                <div>
+                    <label class="tw-submit-label">Notifications</label>
+                    <label class="tw-notif-pref">
+                        <input type="checkbox" id="notifEmailCheck" checked>
+                        Notify me by email when this ticket's status changes
+                    </label>
+                </div>
+                <div>
+                    <label class="tw-submit-label" for="contactSelect">Point of Contact</label>
+                    <select id="contactSelect" class="tw-select" onchange="updatePreviewIfOpen()">
+                        <option value="primary">Primary Contact</option>
+                        <option value="account-manager">Account Manager</option>
+                        <option value="technical-lead">Technical Lead</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- END SUBMIT CARD -->
 
 
-        <!-- Submit footer -->
-        <div class="tw-submit-footer">
-            <button type="button" class="tw-submit-cancel" onclick="window.location.href='dashboard.html'">Cancel</button>
-            <button
-                type="button"
-                id="submitBtn"
-                class="tw-btn tw-btn-primary"
-                disabled
-                onclick="submitTicket()"
-                style="min-width:180px;">
-                <i class="bx bx-send" aria-hidden="true"></i>
-                Submit Ticket
+    <!-- Submit footer -->
+    <div class="tw-submit-footer">
+        <button type="button" class="tw-submit-cancel"
+                onclick="window.location.href='{% url 'client_dashboard' %}'">Cancel</button>
+        <button type="submit" id="submitBtn" class="tw-btn tw-btn-primary"
+                disabled style="min-width:180px">
+            <i class="bx bx-send" aria-hidden="true"></i>
+            Submit Ticket
+        </button>
+    </div>
+
+    </form>
+
+
+    <!-- Ticket preview panel -->
+    <div style="max-width:960px;margin:0 auto">
+        <div class="tw-preview-toggle-wrap">
+            <button class="tw-preview-toggle" type="button"
+                    onclick="togglePreview()"
+                    id="previewToggleBtn"
+                    aria-expanded="false"
+                    aria-controls="previewPanel">
+                <i class="bx bx-show" aria-hidden="true"></i>
+                Preview ticket before submitting
+                <i class="bx bx-chevron-down" id="previewChevron" aria-hidden="true"></i>
             </button>
         </div>
-
-        <!-- Collapsible ticket preview panel -->
-        <div style="max-width:960px;margin:0 auto">
-            <div class="tw-preview-toggle-wrap">
-                <button class="tw-preview-toggle" type="button"
-                        onclick="togglePreview()"
-                        id="previewToggleBtn"
-                        aria-expanded="false"
-                        aria-controls="previewPanel">
-                    <i class="bx bx-show" aria-hidden="true"></i>
-                    Preview ticket before submitting
-                    <i class="bx bx-chevron-down" id="previewChevron" aria-hidden="true"></i>
-                </button>
-            </div>
-
-            <div class="tw-preview-panel" id="previewPanel" role="region" aria-label="Ticket preview" aria-hidden="true">
-                <p class="tw-preview-panel__title">
-                    <i class="bx bx-file-blank" aria-hidden="true" style="color:var(--tw-primary);margin-right:6px;vertical-align:middle"></i>
-                    Ticket Preview
-                </p>
-                <div class="tw-preview-grid">
-                    <div>
-                        <div class="tw-preview-label">Subject</div>
-                        <div class="tw-preview-value tw-preview-value--empty" id="previewSubject">—</div>
-                    </div>
-                    <div>
-                        <div class="tw-preview-label">Category</div>
-                        <div class="tw-preview-value tw-preview-value--empty" id="previewCategory">—</div>
-                    </div>
-                    <div>
-                        <div class="tw-preview-label">Priority</div>
-                        <div class="tw-preview-value" id="previewPriority">Medium</div>
-                    </div>
-                    <div>
-                        <div class="tw-preview-label">Contact</div>
-                        <div class="tw-preview-value" id="previewContact">Primary Contact</div>
-                    </div>
-                    <div class="tw-preview-desc-item">
-                        <div class="tw-preview-label">Description</div>
-                        <div class="tw-preview-value tw-preview-value--empty" id="previewDesc" style="white-space:pre-line;font-weight:400">—</div>
-                    </div>
+        <div class="tw-preview-panel" id="previewPanel" role="region"
+             aria-label="Ticket preview" aria-hidden="true">
+            <p class="tw-preview-panel__title">
+                <i class="bx bx-file-blank" aria-hidden="true"
+                   style="color:var(--tw-primary);margin-right:6px;vertical-align:middle"></i>
+                Ticket Preview
+            </p>
+            <div class="tw-preview-grid">
+                <div>
+                    <div class="tw-preview-label">Subject</div>
+                    <div class="tw-preview-value tw-preview-value--empty" id="previewSubject">—</div>
+                </div>
+                <div>
+                    <div class="tw-preview-label">Category</div>
+                    <div class="tw-preview-value tw-preview-value--empty" id="previewCategory">—</div>
+                </div>
+                <div>
+                    <div class="tw-preview-label">Priority</div>
+                    <div class="tw-preview-value" id="previewPriority">Medium</div>
+                </div>
+                <div>
+                    <div class="tw-preview-label">Contact</div>
+                    <div class="tw-preview-value" id="previewContact">Primary Contact</div>
+                </div>
+                <div class="tw-preview-desc-item">
+                    <div class="tw-preview-label">Description</div>
+                    <div class="tw-preview-value tw-preview-value--empty" id="previewDesc"
+                         style="white-space:pre-line;font-weight:400">—</div>
                 </div>
             </div>
         </div>
+    </div>
 
-    </div><!-- end page content wrapper -->
-    </main>
-
-</section>
+{% endblock %}
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-
-<!-- ==============================================================
-     SHELL JS — sidebar, notifications, profile (same as dashboard)
-     Django: {% block page_js %}
-     ============================================================== -->
+{% block page_js %}
 <script>
-    /* Django: CLIENT_USER populated from {{ request.user }} context at deploy time */
-    var CLIENT_USER = {
-        name:     'Sarah Johnson',
-        initials: 'SJ',
-        email:    'sarah.johnson@globaltech.com',
-        company:  'GlobalTech Solutions',
-        role:     'Primary Contact'
-    };
+/* Multi-file store */
+var selectedFiles = [];
+var MAX_FILES = 3;
+var MAX_BYTES = 10 * 1024 * 1024;
 
-    document.addEventListener('DOMContentLoaded', function () {
-        var els = {
-            clientUserInitials:  CLIENT_USER.initials,
-            clientUserInitials2: CLIENT_USER.initials,
-            clientUserName:      CLIENT_USER.name,
-            clientUserEmail:     CLIENT_USER.email,
-            clientUserCompany:   CLIENT_USER.company
-        };
-        Object.keys(els).forEach(function (id) {
-            var el = document.getElementById(id);
-            if (el) el.textContent = els[id];
-        });
+function validateForm() {
+    var subject  = (document.getElementById('subjectInput').value || '').trim();
+    var category = document.getElementById('categorySelect').value;
+    var desc     = (document.getElementById('descTextarea').value || '').trim();
+    var btn      = document.getElementById('submitBtn');
+    btn.disabled = !(subject.length > 0 && category !== '' && desc.length >= 20);
+}
+
+function updateCharCount() {
+    var desc  = document.getElementById('descTextarea').value || '';
+    var count = desc.length;
+    var el    = document.getElementById('descCharCount');
+    if (count < 20) {
+        el.textContent = count + ' characters (minimum 20)';
+        el.classList.add('warn');
+    } else {
+        el.textContent = count + ' characters';
+        el.classList.remove('warn');
+    }
+}
+
+function showFieldError(inputEl, errorEl, message) {
+    inputEl.classList.add('tw-input--error');
+    if (errorEl) { errorEl.textContent = message; errorEl.style.display = 'block'; }
+}
+
+function clearFieldError(inputEl, errorEl) {
+    inputEl.classList.remove('tw-input--error');
+    if (errorEl) { errorEl.textContent = ''; errorEl.style.display = 'none'; }
+}
+
+
+/* === FILE UPLOAD === */
+function addSelectedFiles(input) {
+    var newFiles = input.files ? Array.prototype.slice.call(input.files) : [];
+    newFiles.forEach(function (file) {
+        if (selectedFiles.length >= MAX_FILES) {
+            showClientToast('Maximum ' + MAX_FILES + ' files allowed.', 'error');
+            return;
+        }
+        if (file.size > MAX_BYTES) {
+            showClientToast('"' + file.name + '" exceeds 10 MB limit.', 'error');
+            return;
+        }
+        selectedFiles.push(file);
     });
+    input.value = '';
+    renderFileChips();
+    updateUploadAreaState();
+}
 
-    /* === SIDEBAR TOGGLE === */
-    var sidebar   = document.getElementById('sidebar');
-    var hamburger = document.getElementById('hamburger-btn');
-
-    function isMobile() { return window.innerWidth <= 768; }
-
-    hamburger.addEventListener('click', function () {
-        if (isMobile()) {
-            sidebar.classList.toggle('mobile-open');
-        } else {
-            sidebar.classList.toggle('hide');
-            document.body.classList.toggle('sidebar-hidden');
-        }
+function renderFileChips() {
+    var list = document.getElementById('fileChipsList');
+    list.innerHTML = '';
+    selectedFiles.forEach(function (file, i) {
+        var chip = document.createElement('div');
+        chip.className = 'tw-file-chip-multi';
+        var ext = (file.name.split('.').pop() || '').toLowerCase();
+        var iconClass = 'bx-file';
+        if (ext === 'pdf') iconClass = 'bxs-file-pdf';
+        else if (ext === 'png' || ext === 'jpg' || ext === 'jpeg') iconClass = 'bxs-image';
+        else if (ext === 'doc' || ext === 'docx') iconClass = 'bxs-file-doc';
+        chip.innerHTML =
+            '<i class="bx ' + iconClass + '" aria-hidden="true"></i>' +
+            '<span class="tw-file-chip-multi-name">' + escapeHtml(file.name) + '</span>' +
+            '<button class="tw-file-chip-multi__remove" type="button" ' +
+                'aria-label="Remove ' + escapeHtml(file.name) + '" ' +
+                'onclick="removeFileAt(' + i + ')">' +
+                '<i class="bx bx-x" aria-hidden="true"></i>' +
+            '</button>';
+        list.appendChild(chip);
     });
+}
 
-    window.addEventListener('resize', function () {
-        if (isMobile()) {
-            sidebar.classList.remove('hide');
-            document.body.classList.remove('sidebar-hidden');
-        }
-    });
+function removeFileAt(index) {
+    selectedFiles.splice(index, 1);
+    renderFileChips();
+    updateUploadAreaState();
+}
 
-    /* === NOTIFICATION BELL === */
-    var notifBellBtn = document.getElementById('notifBellBtn');
-    var notifPanel   = document.getElementById('notifPanel');
-
-    notifBellBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var isOpen = notifPanel.classList.toggle('open');
-        notifBellBtn.setAttribute('aria-expanded', isOpen);
-    });
-
-    document.getElementById('markAllReadBtn').addEventListener('click', function () {
-        document.querySelectorAll('.tw-notif-item.unread').forEach(function (item) {
-            item.classList.remove('unread');
-        });
-        var badge = document.getElementById('notifCount');
-        if (badge) badge.remove();
-    });
-
-    /* === PROFILE DROPDOWN === */
-    var profilePanelOpen = false;
-
-    function toggleProfileDropdown(e) {
-        e.stopPropagation();
-        var panel = document.getElementById('profilePanel');
-        if (notifPanel && notifPanel.classList.contains('open')) {
-            notifPanel.classList.remove('open');
-            notifBellBtn.setAttribute('aria-expanded', 'false');
-        }
-        profilePanelOpen = !profilePanelOpen;
-        panel.classList.toggle('open', profilePanelOpen);
-        panel.setAttribute('aria-hidden', profilePanelOpen ? 'false' : 'true');
+function updateUploadAreaState() {
+    var hint = document.getElementById('uploadHint');
+    var area = document.getElementById('uploadArea');
+    var remaining = MAX_FILES - selectedFiles.length;
+    if (remaining <= 0) {
+        area.style.opacity = '0.5';
+        area.style.pointerEvents = 'none';
+        hint.textContent = 'Maximum files reached (3/3)';
+    } else {
+        area.style.opacity = '';
+        area.style.pointerEvents = '';
+        hint.textContent = remaining + ' of ' + MAX_FILES + ' files remaining';
     }
+}
 
-    function closeProfileDropdown() {
-        var panel = document.getElementById('profilePanel');
-        if (panel) {
-            panel.classList.remove('open');
-            profilePanelOpen = false;
-            panel.setAttribute('aria-hidden', 'true');
-        }
+function handleDragOver(e) {
+    e.preventDefault();
+    document.getElementById('uploadArea').classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+    document.getElementById('uploadArea').classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('uploadArea').classList.remove('drag-over');
+    var droppedFiles = e.dataTransfer && e.dataTransfer.files;
+    if (!droppedFiles || droppedFiles.length === 0) return;
+    addSelectedFiles({ files: droppedFiles, value: '' });
+}
+
+
+/* === PRIORITY SLA HINT === */
+var priorityHints = {
+    high:   { cls: 'tw-priority-hint--high',   text: 'High priority tickets are reviewed within 4 hours.' },
+    medium: { cls: 'tw-priority-hint--medium', text: 'Medium priority tickets are reviewed within 24 hours.' },
+    low:    { cls: 'tw-priority-hint--low',    text: 'Low priority tickets are reviewed within 72 hours.' }
+};
+
+function updatePriorityHint() {
+    var val  = document.getElementById('prioritySelect').value;
+    var hint = document.getElementById('priorityHint');
+    var text = document.getElementById('priorityHintText');
+    var info = priorityHints[val] || priorityHints['medium'];
+    hint.className = 'tw-priority-hint ' + info.cls;
+    text.textContent = info.text;
+}
+
+
+/* === LIVE PREVIEW === */
+function updatePreview() {
+    var subject    = (document.getElementById('subjectInput').value || '').trim();
+    var catSel     = document.getElementById('categorySelect');
+    var priSel     = document.getElementById('prioritySelect');
+    var desc       = (document.getElementById('descTextarea').value || '').trim();
+    var contactSel = document.getElementById('contactSelect');
+
+    var catText = catSel.value ? catSel.options[catSel.selectedIndex].text : '';
+    var priText = priSel.value ? priSel.options[priSel.selectedIndex].text : '';
+    var conText = contactSel.options[contactSel.selectedIndex].text || '';
+
+    setPreviewField('previewSubject',  subject,  !subject);
+    setPreviewField('previewCategory', catText,  !catText);
+    setPreviewField('previewPriority', priText,  false);
+    setPreviewField('previewContact',  conText,  false);
+
+    var descPreview = desc ? (desc.length > 100 ? desc.slice(0, 100) + '…' : desc) : '';
+    setPreviewField('previewDesc', descPreview, !desc);
+}
+
+function updatePreviewIfOpen() {
+    var panel = document.getElementById('previewPanel');
+    if (panel && panel.classList.contains('open')) updatePreview();
+}
+
+function setPreviewField(id, value, isEmpty) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = isEmpty ? '—' : value;
+    if (isEmpty) { el.classList.add('tw-preview-value--empty'); }
+    else         { el.classList.remove('tw-preview-value--empty'); }
+}
+
+function togglePreview() {
+    var panel   = document.getElementById('previewPanel');
+    var chevron = document.getElementById('previewChevron');
+    var btn     = document.getElementById('previewToggleBtn');
+    var isOpen  = panel.classList.toggle('open');
+    panel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+    btn.setAttribute('aria-expanded', isOpen);
+    chevron.style.transform = isOpen ? 'rotate(180deg)' : '';
+    if (isOpen) {
+        updatePreview();
+        setTimeout(function () { panel.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 150);
     }
-
-    document.addEventListener('click', function (e) {
-        if (!notifBellBtn.contains(e.target) && !notifPanel.contains(e.target)) {
-            notifPanel.classList.remove('open');
-            notifBellBtn.setAttribute('aria-expanded', 'false');
-        }
-        var profilePanel = document.getElementById('profilePanel');
-        if (profilePanel && profilePanel.classList.contains('open')) {
-            if (!document.getElementById('profileWrap').contains(e.target)) {
-                closeProfileDropdown();
-            }
-        }
-    });
-
-    document.addEventListener('keydown', function (e) {
-        if (e.key !== 'Escape') return;
-        closeProfileDropdown();
-        notifPanel.classList.remove('open');
-        notifBellBtn.setAttribute('aria-expanded', 'false');
-    });
+}
 
 
-    /* ============================================================
-     * PAGE JS — Submit Ticket form
-     * ============================================================ */
-
-    /* Multi-file store — up to 3 files */
-    var selectedFiles = [];
-    var MAX_FILES = 3;
-    var MAX_BYTES = 10 * 1024 * 1024;
-
-    /*
-     * validateForm()
-     * Enables/disables submit button: Subject + Category + Description (≥20).
-     */
-    function validateForm() {
-        var subject  = (document.getElementById('subjectInput').value || '').trim();
-        var category = document.getElementById('categorySelect').value;
-        var desc     = (document.getElementById('descTextarea').value || '').trim();
-        var btn      = document.getElementById('submitBtn');
-        btn.disabled = !(subject.length > 0 && category !== '' && desc.length >= 20);
-    }
-
-    /*
-     * updateCharCount()
-     * Updates char count label. Warn class when below 20.
-     */
-    function updateCharCount() {
-        var desc  = document.getElementById('descTextarea').value || '';
-        var count = desc.length;
-        var el    = document.getElementById('descCharCount');
-        if (count < 20) {
-            el.textContent = count + ' characters (minimum 20)';
-            el.classList.add('warn');
-        } else {
-            el.textContent = count + ' characters';
-            el.classList.remove('warn');
-        }
-    }
-
-    function showFieldError(inputEl, errorEl, message) {
-        inputEl.classList.add('tw-input--error');
-        if (errorEl) { errorEl.textContent = message; errorEl.style.display = 'block'; }
-    }
-
-    function clearFieldError(inputEl, errorEl) {
-        inputEl.classList.remove('tw-input--error');
-        if (errorEl) { errorEl.textContent = ''; errorEl.style.display = 'none'; }
-    }
-
-
-    /* === FILE UPLOAD (Enhancement B — multi-file, up to 3) === */
-
-    /*
-     * addSelectedFiles(input)
-     * Merges newly selected files into selectedFiles[], up to MAX_FILES.
-     * Replaces the old single-file handleFileSelect().
-     */
-    function addSelectedFiles(input) {
-        var newFiles = input.files ? Array.prototype.slice.call(input.files) : [];
-        var added = 0;
-
-        newFiles.forEach(function (file) {
-            if (selectedFiles.length >= MAX_FILES) {
-                showClientToast('Maximum ' + MAX_FILES + ' files allowed.', 'error');
-                return;
-            }
-            if (file.size > MAX_BYTES) {
-                showClientToast('"' + file.name + '" exceeds 10 MB limit.', 'error');
-                return;
-            }
-            selectedFiles.push(file);
-            added++;
-        });
-
-        /* Reset input so same file can be re-added if removed */
-        input.value = '';
-        renderFileChips();
-        updateUploadAreaState();
-    }
-
-    /*
-     * renderFileChips()
-     * Re-renders the file chips list from selectedFiles[].
-     */
-    function renderFileChips() {
-        var list = document.getElementById('fileChipsList');
-        list.innerHTML = '';
-
-        selectedFiles.forEach(function (file, i) {
-            var chip = document.createElement('div');
-            chip.className = 'tw-file-chip-multi';
-
-            /* Choose icon by extension */
-            var ext = (file.name.split('.').pop() || '').toLowerCase();
-            var iconClass = 'bx-file';
-            if (ext === 'pdf') iconClass = 'bxs-file-pdf';
-            else if (ext === 'png' || ext === 'jpg' || ext === 'jpeg') iconClass = 'bxs-image';
-            else if (ext === 'doc' || ext === 'docx') iconClass = 'bxs-file-doc';
-
-            chip.innerHTML =
-                '<i class="bx ' + iconClass + '" aria-hidden="true"></i>' +
-                '<span class="tw-file-chip-multi-name">' + escapeHtml(file.name) + '</span>' +
-                '<button class="tw-file-chip-multi__remove" type="button" ' +
-                    'aria-label="Remove ' + escapeHtml(file.name) + '" ' +
-                    'onclick="removeFileAt(' + i + ')">' +
-                    '<i class="bx bx-x" aria-hidden="true"></i>' +
-                '</button>';
-
-            list.appendChild(chip);
-        });
-    }
-
-    /*
-     * removeFileAt(index)
-     * Removes the file at the given index from selectedFiles[].
-     */
-    function removeFileAt(index) {
-        selectedFiles.splice(index, 1);
-        renderFileChips();
-        updateUploadAreaState();
-    }
-
-    /*
-     * updateUploadAreaState()
-     * Shows/hides upload area and hint based on file count.
-     */
-    function updateUploadAreaState() {
-        var hint = document.getElementById('uploadHint');
-        var area = document.getElementById('uploadArea');
-        var remaining = MAX_FILES - selectedFiles.length;
-
-        if (remaining <= 0) {
-            area.style.opacity = '0.5';
-            area.style.pointerEvents = 'none';
-            hint.textContent = 'Maximum files reached (3/3)';
-        } else {
-            area.style.opacity = '';
-            area.style.pointerEvents = '';
-            hint.textContent = remaining + ' of ' + MAX_FILES + ' files remaining';
-        }
-    }
-
-    /* Legacy alias — kept so any remaining references don't break */
-    function handleFileSelect(input) { addSelectedFiles(input); }
-    function removeFile() { removeFileAt(0); }
-
-    function handleDragOver(e) {
-        e.preventDefault();
-        document.getElementById('uploadArea').classList.add('drag-over');
-    }
-
-    function handleDragLeave(e) {
-        document.getElementById('uploadArea').classList.remove('drag-over');
-    }
-
-    function handleDrop(e) {
-        e.preventDefault();
-        document.getElementById('uploadArea').classList.remove('drag-over');
-        var droppedFiles = e.dataTransfer && e.dataTransfer.files;
-        if (!droppedFiles || droppedFiles.length === 0) return;
-
-        var fakeInput = { files: droppedFiles, value: '' };
-        addSelectedFiles(fakeInput);
-    }
-
-
-    /* === PRIORITY SLA HINT (Enhancement A) === */
-
-    var priorityHints = {
-        high:   { cls: 'tw-priority-hint--high',   text: 'High priority tickets are reviewed within 4 hours.' },
-        medium: { cls: 'tw-priority-hint--medium', text: 'Medium priority tickets are reviewed within 24 hours.' },
-        low:    { cls: 'tw-priority-hint--low',    text: 'Low priority tickets are reviewed within 72 hours.' }
-    };
-
-    /*
-     * updatePriorityHint()
-     * Swaps hint box color class and text based on selected priority.
-     */
-    function updatePriorityHint() {
-        var val   = document.getElementById('prioritySelect').value;
-        var hint  = document.getElementById('priorityHint');
-        var text  = document.getElementById('priorityHintText');
-        var info  = priorityHints[val] || priorityHints['medium'];
-
-        hint.className = 'tw-priority-hint ' + info.cls;
-        text.textContent = info.text;
-    }
-
-    /* Run on load to match default "medium" selection */
+/* Run on load to sync initial state */
+document.addEventListener('DOMContentLoaded', function () {
+    validateForm();
+    updateCharCount();
     updatePriorityHint();
-
-
-    /* === LIVE PREVIEW (Enhancement D) === */
-
-    /*
-     * updatePreview()
-     * Reads all form fields and updates the preview card values.
-     * Called on input/change events on every field.
-     */
-    function updatePreview() {
-        var subject   = (document.getElementById('subjectInput').value || '').trim();
-        var catSel    = document.getElementById('categorySelect');
-        var priSel    = document.getElementById('prioritySelect');
-        var desc      = (document.getElementById('descTextarea').value || '').trim();
-        var contactSel = document.getElementById('contactSelect');
-
-        var catText  = catSel.value   ? catSel.options[catSel.selectedIndex].text   : '';
-        var priText  = priSel.value   ? priSel.options[priSel.selectedIndex].text   : '';
-        var conText  = contactSel.options[contactSel.selectedIndex].text || '';
-
-        setPreviewField('previewSubject',  subject,  !subject);
-        setPreviewField('previewCategory', catText,  !catText);
-        setPreviewField('previewPriority', priText,  false);
-        setPreviewField('previewContact',  conText,  false);
-
-        var descPreview = desc ? (desc.length > 100 ? desc.slice(0, 100) + '…' : desc) : '';
-        setPreviewField('previewDesc', descPreview, !desc);
-    }
-
-    function updatePreviewIfOpen() {
-        var panel = document.getElementById('previewPanel');
-        if (panel && panel.classList.contains('open')) {
-            updatePreview();
-        }
-    }
-
-    function setPreviewField(id, value, isEmpty) {
-        var el = document.getElementById(id);
-        if (!el) return;
-        el.textContent = isEmpty ? '—' : value;
-        if (isEmpty) {
-            el.classList.add('tw-preview-value--empty');
-        } else {
-            el.classList.remove('tw-preview-value--empty');
-        }
-    }
-
-    /*
-     * togglePreview()
-     * Shows/hides the preview panel and rotates the chevron.
-     */
-    function togglePreview() {
-        var panel   = document.getElementById('previewPanel');
-        var chevron = document.getElementById('previewChevron');
-        var btn     = document.getElementById('previewToggleBtn');
-        var isOpen  = panel.classList.toggle('open');
-
-        panel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
-        btn.setAttribute('aria-expanded', isOpen);
-        chevron.style.transform = isOpen ? 'rotate(180deg)' : '';
-
-        if (isOpen) {
-            updatePreview();
-            setTimeout(function () {
-                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 150);
-        }
-    }
-
-
-    /* === SUBMIT === */
-
-    /*
-     * submitTicket()
-     * Validates form, shows loading, fires stub, redirects.
-     * Django: replace console.log with fetch({% url "client_submit_ticket" %}, POST)
-     */
-    function submitTicket() {
-        var subject  = (document.getElementById('subjectInput').value || '').trim();
-        var category = document.getElementById('categorySelect').value;
-        var priority = document.getElementById('prioritySelect').value;
-        var desc     = (document.getElementById('descTextarea').value || '').trim();
-        var notif    = document.getElementById('notifEmailCheck').checked;
-        var contact  = document.getElementById('contactSelect').value;
-        var valid    = true;
-
-        if (!subject) {
-            showFieldError(document.getElementById('subjectInput'), document.getElementById('subjectError'), 'Subject is required.');
-            valid = false;
-        }
-        if (!category) {
-            showFieldError(document.getElementById('categorySelect'), document.getElementById('categoryError'), 'Please select a category.');
-            valid = false;
-        }
-        if (desc.length < 20) {
-            showFieldError(document.getElementById('descTextarea'), document.getElementById('descError'), 'Description must be at least 20 characters.');
-            valid = false;
-        }
-        if (!valid) return;
-
-        var btn = document.getElementById('submitBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Submitting…';
-
-        /* Django: replace with fetch POST */
-        console.log('[Client Portal] Submit ticket stub:', {
-            subject: subject,
-            category: category,
-            priority: priority,
-            description: desc,
-            notify_email: notif,
-            contact_person: contact,
-            attachment_count: selectedFiles.length
-        });
-
-        setTimeout(function () {
-            showClientToast('Ticket submitted successfully! You will receive a confirmation by email.', 'success');
-            setTimeout(function () { window.location.href = 'dashboard.html'; }, 1500);
-        }, 800);
-    }
-
-
-    /* === UTILITIES === */
-
-    function escapeHtml(str) {
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-    }
-
-    function showClientToast(message, type) {
-        var t = document.createElement('div');
-        t.className = 'tw-client-toast tw-client-toast--' + (type || 'info');
-        t.textContent = message;
-        document.body.appendChild(t);
-        setTimeout(function () { t.classList.add('show'); }, 10);
-        setTimeout(function () {
-            t.classList.remove('show');
-            setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 300);
-        }, 3500);
-    }
+});
 </script>
-
-</body>
-</html>
-
-<!-- Django: {% endblock %} -->
+{% endblock %}

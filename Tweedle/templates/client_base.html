@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,43 +6,329 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Tweedle — Client Portal{% endblock %}</title>
 
-    <!-- Django: {% load static %} -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
 
-    <!-- 5-file CSS load order for client portal -->
-    <link rel="stylesheet" href="{% block tokens_css %}{% static 'css/tweedle-tokens.css' %}{% endblock %}">
-    <link rel="stylesheet" href="{% block theme_css %}{% static 'css/themes/theme-user.css' %}{% endblock %}">
-    <link rel="stylesheet" href="{% block base_css %}{% static 'css/tweedle-base.css' %}{% endblock %}">
-    <link rel="stylesheet" href="{% block components_css %}{% static 'css/tweedle-components.css' %}{% endblock %}">
-    <!-- notification.css loaded globally — required for bell dropdown on all client pages -->
-    <link rel="stylesheet" href="{% static 'css/pages/notification.css' %}">
-    {% block page_css %}{% endblock %}
-
-    <!-- Vendors -->
+    <!-- Vendors — load before Tweedle CSS so Tweedle rules override Bootstrap at equal specificity -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- CSS load order: 1 tokens → 2 theme-user → 3 base → 4 components → 5 notification → 6 page -->
+    <link rel="stylesheet" href="{% static 'css/tweedle-tokens.css' %}">
+    <link rel="stylesheet" href="{% static 'css/themes/theme-user.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tweedle-base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tweedle-components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/pages/notification.css' %}">
+    {% block page_css %}{% endblock %}
 </head>
 <body class="role-user">
 
-    <!-- Django: sidebar and topbar will be injected here at wiring time -->
-    <!-- Django: For now, each client portal page is standalone (full html/head/body) -->
-    <!-- Django: When wiring: {% include 'client_portal/_sidebar.html' %} -->
-    <!-- Django: When wiring: {% include 'client_portal/_topbar.html' %} -->
+<!-- ==============================================================
+     SIDEBAR
+     ============================================================== -->
+<nav class="sidebar" id="sidebar">
 
-    <!-- Django wiring note: at Django deploy time, replace this wrapper with the full
-         sidebar + topbar + <section id="content"> structure from the standalone pages.
-         Each standalone client_portal page already has the complete sidebar/topbar HTML
-         and uses <section id="content"> as the main wrapper. -->
-    <div id="clientMainContent">
-        {% block content %}{% endblock %}
+    <div class="sidebar-brand">
+        <img src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" alt="Tweedle" class="sidebar-logo-img">
+        <span class="brand-text">Tweedle</span>
     </div>
 
-    <!-- Django: {% block extra_js %}{% endblock %} -->
-    <!-- Django: {% csrf_token %} — include in every POST-capable page -->
+    <ul class="sidebar-nav">
+        <li class="nav-item {% if active_nav == 'dashboard' %}active-item{% endif %}">
+            <a href="{% url 'client_dashboard' %}" class="nav-link {% if active_nav == 'dashboard' %}active{% endif %}" title="My Tickets">
+                <i class="bx bx-receipt"></i>
+                <span class="nav-label">My Tickets</span>
+            </a>
+        </li>
+        <li class="nav-item {% if active_nav == 'submit' %}active-item{% endif %}">
+            <a href="{% url 'client_submit_ticket' %}" class="nav-link {% if active_nav == 'submit' %}active{% endif %}" title="Submit Ticket">
+                <i class="bx bx-plus-circle"></i>
+                <span class="nav-label">Submit Ticket</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="#" class="nav-link" title="Reports">
+                <i class="bx bx-bar-chart-alt-2"></i>
+                <span class="nav-label">Reports</span>
+            </a>
+        </li>
+    </ul>
 
-    <!-- Vendors -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</nav>
+<!-- END SIDEBAR -->
 
-    {% block page_js %}{% endblock %}
+
+<!-- ==============================================================
+     MAIN CONTENT WRAPPER
+     ============================================================== -->
+<section id="content">
+
+    <!-- ==========================================================
+         TOPBAR
+         ========================================================== -->
+    <nav class="topbar">
+
+        <i class="bx bx-menu" id="hamburger-btn" role="button" aria-label="Toggle sidebar"></i>
+
+        <div class="topbar-brand-mobile" style="display:none">
+            <img src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" alt="Tweedle" style="height:28px;">
+        </div>
+
+        <!-- NOTIFICATION BELL -->
+        <div class="tw-notif-bell-wrap" id="notifBellWrap">
+            <button class="tw-notif-bell-btn" id="notifBellBtn"
+                    aria-label="Notifications" aria-expanded="false" aria-controls="notifPanel">
+                <i class="bx bxs-bell" aria-hidden="true"></i>
+            </button>
+            <div class="tw-notif-panel" id="notifPanel" role="dialog" aria-label="Notifications">
+                <div class="tw-notif-panel-header">
+                    <span class="tw-notif-panel-title">Notifications</span>
+                    <button class="tw-btn tw-btn-outline tw-btn--sm" id="markAllReadBtn"
+                            aria-label="Mark all as read">Mark all read</button>
+                </div>
+                <div class="tw-notif-list" id="notifList">
+                    <div style="padding:20px;text-align:center;color:var(--tw-text-muted);font-size:var(--tw-text-sm)">
+                        No notifications yet.
+                    </div>
+                </div>
+                <div class="tw-notif-panel-footer" style="display:none">
+                    <a href="#" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
+                </div>
+            </div>
+        </div>
+        <!-- END NOTIFICATION BELL -->
+
+        <!-- PROFILE DROPDOWN -->
+        <div class="tw-profile-wrap" id="profileWrap">
+            <div class="tw-avatar tw-avatar--user"
+                 role="button" aria-label="Profile"
+                 style="width:36px;height:36px;font-size:14px;cursor:pointer"
+                 onclick="toggleProfileDropdown(event)" id="clientUserInitials">
+                {{ request.user.get_full_name|default:request.user.username|slice:":2"|upper }}
+            </div>
+
+            <div class="tw-profile-panel" id="profilePanel" role="menu" aria-hidden="true">
+                <div class="tw-profile-header">
+                    <div class="tw-avatar tw-avatar--user" style="width:40px;height:40px;font-size:15px;flex-shrink:0">
+                        {{ request.user.get_full_name|default:request.user.username|slice:":2"|upper }}
+                    </div>
+                    <div>
+                        <div style="font-size:var(--tw-text-base);font-weight:600;color:var(--tw-text-primary);line-height:1.3">
+                            {{ request.user.get_full_name|default:request.user.username }}
+                        </div>
+                        <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px">
+                            {{ request.user.email }}
+                        </div>
+                        <span class="tw-role-pill tw-role-pill--user" style="margin-top:4px;display:inline-block">Client</span>
+                    </div>
+                </div>
+
+                <div class="tw-profile-divider"></div>
+
+                <div class="tw-profile-menu-item" role="menuitem"
+                     onclick="closeProfileDropdown(); showClientToast('Profile settings coming soon.', 'info')">
+                    <i class="bx bx-user" aria-hidden="true"></i><span>View Profile</span>
+                </div>
+                <div class="tw-profile-menu-item" role="menuitem"
+                     onclick="closeProfileDropdown(); showClientToast('Password settings coming soon.', 'info')">
+                    <i class="bx bx-lock-alt" aria-hidden="true"></i><span>Change Password</span>
+                </div>
+
+                <div class="tw-profile-divider"></div>
+
+                <form method="post" action="{% url 'account_logout' %}" id="logoutForm" style="display:none">
+                    {% csrf_token %}
+                </form>
+                <div class="tw-profile-menu-item tw-profile-menu-item--danger" role="menuitem"
+                     onclick="document.getElementById('logoutForm').submit()">
+                    <i class="bx bx-log-out" aria-hidden="true"></i><span>Sign Out</span>
+                </div>
+            </div>
+        </div>
+        <!-- END PROFILE DROPDOWN -->
+
+    </nav>
+    <!-- END TOPBAR -->
+
+
+    <main id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+</section>
+<!-- END CONTENT WRAPPER -->
+
+
+<!-- Vendor JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<!-- ==============================================================
+     SHELL JS — sidebar, notification bell, profile dropdown,
+     showClientToast, panel close stubs (overridden per-page).
+     ============================================================== -->
+<script>
+var sidebar   = document.getElementById('sidebar');
+var hamburger = document.getElementById('hamburger-btn');
+var notifBellBtn = document.getElementById('notifBellBtn');
+var notifPanel   = document.getElementById('notifPanel');
+
+/* === SIDEBAR TOGGLE === */
+function isMobile() { return window.innerWidth <= 768; }
+
+hamburger.addEventListener('click', function () {
+    if (isMobile()) {
+        sidebar.classList.toggle('mobile-open');
+    } else {
+        sidebar.classList.toggle('hide');
+        document.body.classList.toggle('sidebar-hidden');
+    }
+});
+
+window.addEventListener('resize', function () {
+    if (isMobile()) {
+        sidebar.classList.remove('hide');
+        document.body.classList.remove('sidebar-hidden');
+    }
+});
+
+
+/* === NOTIFICATION BELL === */
+notifBellBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var isOpen = notifPanel.classList.toggle('open');
+    notifBellBtn.setAttribute('aria-expanded', isOpen);
+});
+
+document.getElementById('markAllReadBtn').addEventListener('click', function () {
+    document.querySelectorAll('.tw-notif-item.unread').forEach(function (item) {
+        item.classList.remove('unread');
+    });
+    var badge = document.getElementById('notifCount');
+    if (badge) badge.remove();
+});
+
+
+/* === PROFILE DROPDOWN === */
+var profilePanelOpen = false;
+
+function toggleProfileDropdown(e) {
+    e.stopPropagation();
+    var panel = document.getElementById('profilePanel');
+    if (notifPanel && notifPanel.classList.contains('open')) {
+        notifPanel.classList.remove('open');
+        notifBellBtn.setAttribute('aria-expanded', 'false');
+    }
+    profilePanelOpen = !profilePanelOpen;
+    panel.classList.toggle('open', profilePanelOpen);
+    panel.setAttribute('aria-hidden', profilePanelOpen ? 'false' : 'true');
+}
+
+function closeProfileDropdown() {
+    var panel = document.getElementById('profilePanel');
+    if (panel) {
+        panel.classList.remove('open');
+        profilePanelOpen = false;
+        panel.setAttribute('aria-hidden', 'true');
+    }
+}
+
+/* Click-outside handler */
+document.addEventListener('click', function (e) {
+    if (!notifBellBtn.contains(e.target) && !notifPanel.contains(e.target)) {
+        notifPanel.classList.remove('open');
+        notifBellBtn.setAttribute('aria-expanded', 'false');
+    }
+    var profilePanel = document.getElementById('profilePanel');
+    if (profilePanel && profilePanel.classList.contains('open')) {
+        if (!document.getElementById('profileWrap').contains(e.target)) {
+            closeProfileDropdown();
+        }
+    }
+});
+
+
+/* === PANEL STUBS (overridden per-page when those panels exist) === */
+function closeClientChatPanel() {
+    var p = document.getElementById('clientChatPanel');
+    if (p) p.classList.remove('open');
+}
+function closeClientTimelinePanel() {
+    var p = document.getElementById('clientTimelinePanel');
+    if (p) p.classList.remove('open');
+}
+
+
+/* Escape key — closes all open panels and dropdowns */
+document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    closeProfileDropdown();
+    notifPanel.classList.remove('open');
+    notifBellBtn.setAttribute('aria-expanded', 'false');
+    closeClientChatPanel();
+    closeClientTimelinePanel();
+    var pd = document.getElementById('clientPriorityDropdown');
+    if (pd) {
+        pd.classList.remove('open');
+        var pb = document.getElementById('clientPriorityBtn');
+        if (pb) pb.setAttribute('aria-expanded', 'false');
+    }
+    var dd = document.getElementById('clientDateDropdown');
+    if (dd) {
+        dd.classList.remove('open');
+        var db = document.getElementById('clientDateBtn');
+        if (db) db.setAttribute('aria-expanded', 'false');
+    }
+});
+
+
+/* === TOAST === */
+function showClientToast(message, type) {
+    var t = document.createElement('div');
+    t.className = 'tw-client-toast tw-client-toast--' + (type || 'info');
+    t.textContent = message;
+    document.body.appendChild(t);
+    setTimeout(function () { t.classList.add('show'); }, 10);
+    setTimeout(function () {
+        t.classList.remove('show');
+        setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 300);
+    }, 3000);
+}
+
+
+/* === XSS-safe html escape utility (used by page JS) === */
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function formatNow() {
+    var d = new Date();
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) +
+           ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+}
+</script>
+
+
+{% if messages %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var _msgs = [{% for m in messages %}{"text": "{{ m|escapejs }}", "type": "{{ m.tags }}"}{% if not forloop.last %},{% endif %}{% endfor %}];
+    _msgs.forEach(function (m) {
+        var type = m.type.indexOf('error') !== -1 ? 'error'
+                 : m.type.indexOf('success') !== -1 ? 'success'
+                 : 'info';
+        showClientToast(m.text, type);
+    });
+});
+</script>
+{% endif %}
+
+
+{% block page_js %}{% endblock %}
+
 </body>
 </html>

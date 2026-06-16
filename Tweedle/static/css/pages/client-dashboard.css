@@ -662,17 +662,17 @@ body > main {
     gap: 0;
 }
 
-.tw-client-timeline-item {
+.tw-client-tl-entry {
     display: flex;
     gap: var(--tw-space-3);
     position: relative;
     padding-bottom: var(--tw-space-4);
 }
 
-.tw-client-timeline-item:last-child { padding-bottom: 0; }
+.tw-client-tl-entry:last-child { padding-bottom: 0; }
 
 /* Connecting vertical line between events */
-.tw-client-timeline-item:not(:last-child)::before {
+.tw-client-tl-entry:not(:last-child)::before {
     content: '';
     position: absolute;
     left: 15px;
@@ -682,7 +682,7 @@ body > main {
     background: var(--tw-border);
 }
 
-.tw-client-tl-icon {
+.tw-client-tl-dot {
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -696,13 +696,13 @@ body > main {
 }
 
 /* Icon color variants — semantic, matches status colors */
-.tw-client-tl-icon--created  { background: var(--tw-status-inbox-bg);       color: var(--tw-status-inbox-text); }
-.tw-client-tl-icon--assigned { background: var(--tw-status-progress-bg);    color: var(--tw-status-progress-text); }
-.tw-client-tl-icon--work     { background: var(--tw-status-development-bg); color: var(--tw-status-development-text); }
-.tw-client-tl-icon--info     { background: var(--tw-status-forwarded-bg);   color: var(--tw-status-forwarded-text); }
-.tw-client-tl-icon--uat      { background: var(--tw-status-uat-bg);         color: var(--tw-status-uat-text); }
-.tw-client-tl-icon--resolved { background: var(--tw-status-closed-bg);      color: var(--tw-status-closed-text); }
-.tw-client-tl-icon--closed   { background: var(--tw-status-closed-bg);      color: var(--tw-status-closed-text); }
+.tw-client-tl-dot--created  { background: var(--tw-status-inbox-bg);       color: var(--tw-status-inbox-text); }
+.tw-client-tl-dot--assigned { background: var(--tw-status-progress-bg);    color: var(--tw-status-progress-text); }
+.tw-client-tl-dot--work     { background: var(--tw-status-development-bg); color: var(--tw-status-development-text); }
+.tw-client-tl-dot--info     { background: var(--tw-status-forwarded-bg);   color: var(--tw-status-forwarded-text); }
+.tw-client-tl-dot--uat      { background: var(--tw-status-uat-bg);         color: var(--tw-status-uat-text); }
+.tw-client-tl-dot--resolved { background: var(--tw-status-closed-bg);      color: var(--tw-status-closed-text); }
+.tw-client-tl-dot--closed   { background: var(--tw-status-closed-bg);      color: var(--tw-status-closed-text); }
 
 .tw-client-tl-content {
     flex: 1;
@@ -1288,7 +1288,7 @@ body > main {
 
 .tw-ticket-header-card[data-status="new"]       { border-left: 4px solid var(--tw-status-inbox-text); }
 .tw-ticket-header-card[data-status="in_progress"]  { border-left: 4px solid var(--tw-status-progress-text); }
-.tw-ticket-header-card[data-status="forwarded"] { border-left: 4px solid var(--tw-primary); }
+.tw-ticket-header-card[data-status="awaiting_client"] { border-left: 4px solid var(--tw-primary); }
 .tw-ticket-header-card[data-status="uat"]       { border-left: 4px solid var(--tw-status-uat-text); }
 .tw-ticket-header-card[data-status="resolved"]  { border-left: 4px solid var(--tw-status-forwarded-text); }
 .tw-ticket-header-card[data-status="closed"]    { border-left: 4px solid var(--tw-status-closed-text); }
@@ -1430,7 +1430,7 @@ body > main {
 
 /* === TIMELINE PENDING / REJECTED STATES === */
 /* Pending (future) timeline items — grey and muted */
-.tw-client-tl-icon--pending {
+.tw-client-tl-dot--pending {
     background: var(--tw-border);
     color: var(--tw-text-muted);
 }
@@ -1446,7 +1446,7 @@ body > main {
 }
 
 /* Rejected timeline dot — red X */
-.tw-client-tl-icon--rejected {
+.tw-client-tl-dot--rejected {
     background: var(--tw-priority-high-bg);
     color: var(--tw-danger);
 }

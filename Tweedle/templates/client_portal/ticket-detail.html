@@ -1,1576 +1,547 @@
-<!--
-  File: templates/client_portal/ticket-detail.html
-  Django template: extends 'client_base.html'
-  Django view:     client_portal.views.ticket_detail
-  Django url:      client_ticket_detail
-  Role:            User / Client — body class="role-user" (orange theme)
+{% extends 'client_base.html' %}
+{% load static client_extras %}
 
-  TICKET_STATUS drives all page content.
-  Change var TICKET_STATUS at the top of the script to preview
-  any of the 7 states: 'new'|'in_progress'|'forwarded'|'uat'|'resolved'|'closed'|'rejected'
--->
-<!-- Django: {% extends 'client_base.html' %} -->
-<!-- Django: {% block body_role %}user{% endblock %} -->
-<!-- Django: {% block page_css %}
+{% block title %}{{ ticket.reference }} — Tweedle{% endblock %}
+
+{% block page_css %}
 <link rel="stylesheet" href="{% static 'css/pages/client-dashboard.css' %}">
-{% endblock %} -->
-<!-- Django: {% block content %} -->
+<link rel="stylesheet" href="{% static 'css/pages/dashboard.css' %}">
+{% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Django: {% block title %}{{ ticket.ticket_id }} — Tweedle{% endblock %} -->
-    <title>TKT-GMEC-002 — Tweedle</title>
+{% block content %}
 
-    <!-- Django: {% load static %} -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
-    <!-- Django: href="{% static 'images/favicon.svg' %}" -->
-    <link rel="icon" type="image/svg+xml" href="../../static/images/favicon.svg">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- Back link -->
+    <a href="{% url 'client_dashboard' %}" class="tw-client-back-link">
+        <i class="bx bx-arrow-back" aria-hidden="true"></i>
+        Back to My Tickets
+    </a>
 
-    <!-- CSS load order: 1 tokens → 2 theme-user → 3 base → 4 components → 5 notification → 6 page -->
-    <!-- Django: href="{% static 'css/tweedle-tokens.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-tokens.css">
-    <!-- Django: href="{% static 'css/themes/theme-user.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/themes/theme-user.css">
-    <!-- Django: href="{% static 'css/tweedle-base.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-base.css">
-    <!-- Django: href="{% static 'css/tweedle-components.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-components.css">
-    <!-- Django: href="{% static 'css/pages/notification.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/notification.css">
-    <!-- Django: href="{% static 'css/pages/client-dashboard.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/client-dashboard.css">
-    <!-- Django: href="{% static 'css/pages/dashboard.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/dashboard.css">
-</head>
-
-<body class="role-user">
-
-
-<!-- SIDEBAR -->
-<nav class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-        <!-- Django: src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" -->
-        <img src="../../static/images/tweedle-logo/tweedle-mark-blue.svg" alt="Tweedle" class="sidebar-logo-img">
-        <span class="brand-text">Tweedle</span>
+    <!-- Page header -->
+    <div class="tw-client-page-header">
+        <div class="tw-client-header-left">
+            <h1>{{ ticket.subject }}</h1>
+            <p class="tw-client-header-subtitle">{{ ticket.reference }}</p>
+        </div>
     </div>
-    <ul class="sidebar-nav">
-        <!-- Django: href="{% url 'client_dashboard' %}" -->
-        <li class="nav-item active-item">
-            <a href="dashboard.html" class="nav-link active" title="My Tickets">
-                <i class='bx bx-receipt'></i>
-                <span class="nav-label">My Tickets</span>
-            </a>
-        </li>
-        <!-- Django: href="{% url 'client_submit_ticket' %}" -->
-        <li class="nav-item">
-            <a href="submit-ticket.html" class="nav-link" title="Submit Ticket">
-                <i class='bx bx-plus-circle'></i>
-                <span class="nav-label">Submit Ticket</span>
-            </a>
-        </li>
-
-        <!-- Reports -->
-        <!-- Django: href="{% url 'client_reports' %}" -->
-        <li class="nav-item">
-            <a href="reports.html" class="nav-link" title="Reports">
-                <i class='bx bx-bar-chart-alt-2'></i>
-                <span class="nav-label">Reports</span>
-            </a>
-        </li>
-    </ul>
-</nav>
 
 
-<section id="content">
-
-    <!-- TOPBAR -->
-    <nav class="topbar">
-        <i class="bx bx-menu" id="hamburger-btn" role="button" aria-label="Toggle sidebar"></i>
-
-        <!-- Tweedle logo — mobile only -->
-        <div class="topbar-brand-mobile" style="display:none">
-            <!-- Django: src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" -->
-            <img src="../../static/images/tweedle-logo/tweedle-mark-blue.svg" alt="Tweedle" style="height:28px;">
-        </div>
-
-        <!-- Notification Bell -->
-        <div class="tw-notif-bell-wrap" id="notifBellWrap">
-            <button class="tw-notif-bell-btn" id="notifBellBtn" aria-label="Notifications" aria-expanded="false" aria-controls="notifPanel">
-                <i class="bx bxs-bell" aria-hidden="true"></i>
-                <!-- Django: {% if unread_notification_count %} -->
-                <span class="tw-notif-count-badge" id="notifCount">2</span>
-                <!-- Django: {% endif %} -->
-            </button>
-            <div class="tw-notif-panel" id="notifPanel" role="dialog" aria-label="Notifications">
-                <div class="tw-notif-panel-header">
-                    <span class="tw-notif-panel-title">Notifications</span>
-                    <button class="tw-btn tw-btn-outline tw-btn--sm" id="markAllReadBtn">Mark all read</button>
-                </div>
-                <div class="tw-notif-list">
-                    <!-- Django: {% for notification in notifications %} -->
-                    <div class="tw-notif-item unread" role="button" style="cursor:pointer">
-                        <div class="tw-notif-item-body">
-                            <div class="tw-notif-type-icon tw-notif-type-icon--warning"><i class="bx bx-check-shield"></i></div>
-                            <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">Ready for your review — TKT-GMEC-002</div>
-                                <div class="tw-notif-item-msg">Bulk export CSV fix is ready for UAT.</div>
-                                <div class="tw-notif-item-time">2 hours ago</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tw-notif-item unread" role="button" style="cursor:pointer">
-                        <div class="tw-notif-item-body">
-                            <div class="tw-notif-type-icon tw-notif-type-icon--info"><i class="bx bx-info-circle"></i></div>
-                            <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">Response needed — TKT-GMEC-003</div>
-                                <div class="tw-notif-item-msg">Support team has requested additional information.</div>
-                                <div class="tw-notif-item-time">Yesterday</div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Django: {% endfor %} -->
-                </div>
-                <!-- Footer link hidden: no client notifications page exists yet (href="#"). -->
-                <div class="tw-notif-panel-footer" style="display: none;">
-                    <!-- Django: href="{% url 'client_notifications' %}" -->
-                    <a href="#" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
-                </div>
+    <!-- TICKET HEADER CARD -->
+    <div class="tw-ticket-header-card" data-status="{{ ticket.status }}">
+        <div>
+            <div class="tw-ticket-header-id">{{ ticket.reference }}</div>
+            <div class="tw-ticket-header-card__meta">
+                {% client_ticket_badge ticket %}
+                <span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">
+                    {{ ticket.get_priority_display }}
+                </span>
+                {% if ticket.category %}
+                <span style="font-size:var(--tw-text-sm);color:var(--tw-text-muted)">{{ ticket.category }}</span>
+                {% endif %}
             </div>
         </div>
-
-        <!-- Profile Dropdown -->
-        <div class="tw-profile-wrap" id="profileWrap">
-            <div class="tw-avatar tw-avatar--user" role="button" aria-label="Profile"
-                 style="width:36px;height:36px;font-size:14px;cursor:pointer"
-                 onclick="toggleProfileDropdown(event)" id="clientUserInitials">SJ</div>
-            <div class="tw-profile-panel" id="profilePanel" role="menu" aria-hidden="true">
-                <div class="tw-profile-header">
-                    <div class="tw-avatar tw-avatar--user" style="width:40px;height:40px;font-size:15px;flex-shrink:0" id="clientUserInitials2">SJ</div>
-                    <div>
-                        <!-- Django: {{ request.user.get_full_name }} -->
-                        <div style="font-size:var(--tw-text-base);font-weight:600;color:var(--tw-text-primary);line-height:1.3" id="clientUserName">Sarah Johnson</div>
-                        <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px" id="clientUserEmail">sarah.johnson@globaltech.com</div>
-                        <span class="tw-role-pill tw-role-pill--user" style="margin-top:4px;display:inline-block">Client</span>
-                    </div>
-                </div>
-                <div class="tw-profile-divider"></div>
-                <div class="tw-profile-menu-item" role="menuitem" onclick="closeProfileDropdown(); showClientToast('Profile settings coming soon.', 'info')">
-                    <i class="bx bx-user"></i><span>View Profile</span>
-                </div>
-                <div class="tw-profile-menu-item" role="menuitem" onclick="closeProfileDropdown(); showClientToast('Password settings coming soon.', 'info')">
-                    <i class="bx bx-lock-alt"></i><span>Change Password</span>
-                </div>
-                <div class="tw-profile-divider"></div>
-                <!-- Django: window.location.href="{% url 'logout' %}" -->
-                <div class="tw-profile-menu-item tw-profile-menu-item--danger" role="menuitem" onclick="window.location.href = '../login.html'">
-                    <i class="bx bx-log-out"></i><span>Sign Out</span>
-                </div>
+        <div class="tw-ticket-header-dates">
+            <div class="tw-ticket-header-date-item">
+                <span class="tw-ticket-header-date-label">Submitted</span>
+                <span class="tw-ticket-header-date-val">{{ ticket.created_at|date:"d M Y" }}</span>
+            </div>
+            <div class="tw-ticket-header-date-item">
+                <span class="tw-ticket-header-date-label">Last Updated</span>
+                <span class="tw-ticket-header-date-val">{{ ticket.updated_at|date:"d M Y" }}</span>
             </div>
         </div>
-
-    </nav>
-    <!-- END TOPBAR -->
+    </div>
 
 
-    <main id="main-content">
+    <!-- 2-COLUMN LAYOUT -->
+    <div class="tw-detail-layout">
 
-        <!-- PAGE HEADER -->
-        <!-- Django: href="{% url 'client_dashboard' %}" -->
-        <a href="dashboard.html" class="tw-client-back-link">
-            <i class="bx bx-arrow-back" aria-hidden="true"></i>
-            Back to My Tickets
-        </a>
+        <!-- =====================================================
+             LEFT COLUMN
+             ===================================================== -->
+        <div class="tw-detail-left">
 
-        <div class="tw-client-page-header">
-            <div class="tw-client-header-left">
-                <!-- Django: {{ ticket.subject }} -->
-                <h1>Bulk export CSV missing columns</h1>
-                <!-- Django: {{ ticket.ticket_id }} -->
-                <p class="tw-client-header-subtitle">TKT-GMEC-002</p>
-            </div>
-        </div>
+            <!-- STATUS ACTION CARDS (one rendered per status) -->
 
-
-        <!-- =========================================================
-             TICKET HEADER CARD
-             data-status set by JS initPage() for border color (FIX 3).
-             Inner badges (#headerStatusMeta) rendered by JS.
-             ========================================================= -->
-        <div class="tw-ticket-header-card">
-            <div>
-                <div class="tw-ticket-header-id">TKT-GMEC-002</div>
-                <!-- Django: driven by ticket.status, ticket.priority, ticket.category -->
-                <div class="tw-ticket-header-card__meta" id="headerStatusMeta">
-                    <!-- Populated by renderHeaderMeta() on load -->
+            {% if ticket.status == 'new' %}
+            <div class="tw-action-card tw-action-card--info-new">
+                <div class="tw-action-card__inner">
+                    <div class="tw-action-card__header">
+                        <i class="bx bx-envelope tw-action-card__icon" aria-hidden="true"></i>
+                        <h2 class="tw-action-card__title">Ticket Received</h2>
+                    </div>
+                    <p class="tw-action-card__message">
+                        Your ticket has been received and is currently being reviewed by our support team.
+                        We'll assign it to the right developer shortly. No action is required from you at this time.
+                    </p>
+                    <form method="post" action="{% url 'client_ticket_transition' ticket.pk %}" style="margin-top:12px">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="cancel">
+                        <button type="submit" class="tw-btn tw-btn-outline tw-btn--sm"
+                                onclick="return confirm('Cancel this ticket?')">
+                            <i class="bx bx-x" aria-hidden="true"></i>
+                            Cancel Ticket
+                        </button>
+                    </form>
                 </div>
             </div>
-            <div class="tw-ticket-header-dates">
-                <div class="tw-ticket-header-date-item">
-                    <span class="tw-ticket-header-date-label">Submitted</span>
-                    <!-- Django: {{ ticket.created_at|date:"d M Y" }} -->
-                    <span class="tw-ticket-header-date-val">15 Apr 2025</span>
-                </div>
-                <div class="tw-ticket-header-date-item">
-                    <span class="tw-ticket-header-date-label">Last Updated</span>
-                    <!-- Django: {{ ticket.updated_at|date:"d M Y" }} -->
-                    <span class="tw-ticket-header-date-val">20 Apr 2025</span>
+            {% endif %}
+
+            {% if ticket.status == 'in_progress' %}
+            <div class="tw-action-card tw-action-card--info-progress">
+                <div class="tw-action-card__inner">
+                    <div class="tw-action-card__header">
+                        <i class="bx bx-code-alt tw-action-card__icon" aria-hidden="true"></i>
+                        <h2 class="tw-action-card__title">Work in Progress</h2>
+                    </div>
+                    <p class="tw-action-card__message" style="margin-bottom:0">
+                        Our development team is actively working on your ticket. You'll be notified
+                        when we need your input or when the work is ready for your review.
+                    </p>
                 </div>
             </div>
-        </div>
+            {% endif %}
 
-
-        <!-- 2-COLUMN LAYOUT -->
-        <div class="tw-detail-layout">
-
-            <!-- =====================================================
-                 LEFT COLUMN
-                 ===================================================== -->
-            <div class="tw-detail-left">
-
-                <!-- ================================================
-                     STATUS-SPECIFIC ACTION CARDS
-                     All 7 cards pre-rendered; initPage() shows one.
-                     Django: {% if ticket.status == 'xxx' %} per card.
-                     ================================================ -->
-
-                <!-- STATUS: new — information only, no action buttons -->
-                <!-- Django: {% if ticket.status == 'new' %} -->
-                <div class="tw-action-card tw-action-card--info-new" id="actionCardNew" style="display:none">
-                    <div class="tw-action-card__inner">
-                        <div class="tw-action-card__header">
-                            <i class="bx bx-envelope tw-action-card__icon" aria-hidden="true"></i>
-                            <h2 class="tw-action-card__title">Ticket Received</h2>
-                        </div>
-                        <p class="tw-action-card__message" style="margin-bottom:0">
-                            Your ticket has been received and is currently being reviewed by our support team.
-                            We'll assign it to the right developer shortly. No action is required from you at this time.
-                        </p>
+            {% if ticket.status == 'awaiting_client' %}
+            <div class="tw-action-card tw-action-card--awaiting">
+                <div class="tw-action-card__inner">
+                    <div class="tw-action-card__header">
+                        <i class="bx bx-comment-dots tw-action-card__icon" aria-hidden="true"></i>
+                        <h2 class="tw-action-card__title">Your Input Needed</h2>
                     </div>
-                </div>
-                <!-- Django: {% endif %} -->
-
-                <!-- STATUS: progress — work in progress, information only -->
-                <!-- Django: {% if ticket.status == 'in_progress' %} -->
-                <div class="tw-action-card tw-action-card--info-progress" id="actionCardProgress" style="display:none">
-                    <div class="tw-action-card__inner">
-                        <div class="tw-action-card__header">
-                            <i class="bx bx-code-alt tw-action-card__icon" aria-hidden="true"></i>
-                            <h2 class="tw-action-card__title">Work in Progress</h2>
-                        </div>
-                        <p class="tw-action-card__message" style="margin-bottom:0">
-                            Our development team is actively working on your ticket. You'll be notified
-                            when we need your input or when the work is ready for your review.
-                        </p>
+                    <p class="tw-action-card__message">
+                        Our support team has requested additional information. Please respond using
+                        the Activity &amp; Messages section below so we can continue working on your ticket.
+                    </p>
+                    <div class="tw-action-card__buttons">
+                        <button type="button" class="tw-btn tw-btn-primary" disabled>
+                            <i class="bx bx-send" aria-hidden="true"></i>
+                            Respond
+                        </button>
                     </div>
+                    <p style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:8px;margin-bottom:0">
+                        Chat reply coming soon — use the Activity &amp; Messages section below to respond.
+                    </p>
                 </div>
-                <!-- Django: {% endif %} -->
+            </div>
+            {% endif %}
 
-                <!-- STATUS: forwarded — info request, response required -->
-                <!-- Django: {% if ticket.status == 'forwarded' %} -->
-                <div class="tw-action-card tw-action-card--awaiting" id="awaitingActionCard" style="display:none">
-                    <div class="tw-action-card__inner">
-                        <div class="tw-action-card__header">
-                            <i class="bx bx-comment-dots tw-action-card__icon" aria-hidden="true"></i>
-                            <h2 class="tw-action-card__title">Your Input Needed</h2>
-                        </div>
-                        <p class="tw-action-card__message">
-                            Our support team has requested additional information. Please respond below
-                            so we can continue working on your ticket.
-                        </p>
-                        <textarea
-                            id="awaitingResponse"
-                            class="tw-action-card__response"
-                            rows="3"
-                            placeholder="Type your response here…"
-                            aria-label="Response to support team"></textarea>
-                        <div class="tw-action-card__buttons">
-                            <button type="button" class="tw-btn tw-btn-primary" onclick="sendAwaitingResponse()">
-                                <i class="bx bx-send" aria-hidden="true"></i>
-                                Send Response
-                            </button>
-                        </div>
+            {% if ticket.status == 'uat' %}
+            <div class="tw-action-card tw-action-card--uat">
+                <div class="tw-action-card__inner">
+                    <div class="tw-action-card__header">
+                        <i class="bx bx-check-shield tw-action-card__icon" aria-hidden="true"></i>
+                        <h2 class="tw-action-card__title">Ready for Your Review</h2>
                     </div>
-                </div>
-                <!-- Django: {% endif %} -->
-
-                <!-- STATUS: uat — approve or request changes -->
-                <!-- Django: {% if ticket.status == 'uat' %} -->
-                <div class="tw-action-card tw-action-card--uat" id="uatActionCard" style="display:none">
-                    <div class="tw-action-card__inner">
-                        <div class="tw-action-card__header">
-                            <i class="bx bx-check-shield tw-action-card__icon" aria-hidden="true"></i>
-                            <h2 class="tw-action-card__title">Ready for Your Review</h2>
-                        </div>
-                        <p class="tw-action-card__message">
-                            Our team has completed work on this ticket. Please test the changes
-                            and let us know your decision.
-                        </p>
-                        <div class="tw-action-card__buttons" id="uatButtons">
-                            <button type="button" class="tw-btn tw-btn-success" onclick="openApproveConfirm()">
-                                <i class="bx bx-check-circle" aria-hidden="true"></i>
-                                Approve &amp; Close
-                            </button>
-                            <button type="button" class="tw-btn tw-btn-danger" id="requestChangesBtn" onclick="showChangesForm()">
-                                <i class="bx bx-revision" aria-hidden="true"></i>
-                                Request Changes
-                            </button>
-                        </div>
-                        <textarea
-                            id="changesTextarea"
-                            class="tw-changes-textarea"
-                            rows="3"
-                            placeholder="Describe what needs to be fixed or changed…"
-                            aria-label="Changes required explanation"></textarea>
-                        <button type="button" id="submitChangesBtn" class="tw-btn tw-btn-outline tw-submit-changes-btn" onclick="submitChanges()">
+                    <p class="tw-action-card__message">
+                        Our team has completed work on this ticket. Please test the changes
+                        and let us know your decision.
+                    </p>
+                    <div class="tw-action-card__buttons" id="uatButtons">
+                        <button type="button" class="tw-btn tw-btn-success" onclick="openApproveConfirm()">
+                            <i class="bx bx-check-circle" aria-hidden="true"></i>
+                            Approve &amp; Close
+                        </button>
+                        <button type="button" class="tw-btn tw-btn-danger" onclick="showChangesForm()">
+                            <i class="bx bx-revision" aria-hidden="true"></i>
+                            Request Changes
+                        </button>
+                    </div>
+                    <form id="changesForm" method="post"
+                          action="{% url 'client_ticket_transition' ticket.pk %}"
+                          style="display:none;margin-top:12px">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="request_changes">
+                        <textarea name="feedback" id="changesTextarea"
+                                  class="tw-changes-textarea" rows="3"
+                                  placeholder="Describe what needs to be fixed or changed…"
+                                  aria-label="Changes required explanation"></textarea>
+                        <button type="submit" class="tw-btn tw-btn-outline tw-submit-changes-btn"
+                                style="margin-top:8px">
                             <i class="bx bx-send" aria-hidden="true"></i>
                             Submit Request
                         </button>
-                    </div>
+                    </form>
                 </div>
-                <!-- Django: {% endif %} -->
+            </div>
+            {% endif %}
 
-                <!-- STATUS: resolved — read-only completion notice -->
-                <!-- Django: {% if ticket.status == 'resolved' %} -->
-                <div class="tw-action-card tw-action-card--info-resolved" id="actionCardResolved" style="display:none">
-                    <div class="tw-action-card__inner">
-                        <div class="tw-action-card__header">
-                            <i class="bx bx-check-double tw-action-card__icon" aria-hidden="true"></i>
-                            <h2 class="tw-action-card__title">Work Complete</h2>
-                        </div>
-                        <p class="tw-action-card__message" style="margin-bottom:0">
-                            Our team has resolved your ticket. The support admin will officially close it shortly.
-                            If you experience any further issues, please submit a new ticket.
-                        </p>
+            {% if ticket.status == 'resolved' %}
+            <div class="tw-action-card tw-action-card--info-resolved">
+                <div class="tw-action-card__inner">
+                    <div class="tw-action-card__header">
+                        <i class="bx bx-check-double tw-action-card__icon" aria-hidden="true"></i>
+                        <h2 class="tw-action-card__title">Work Complete</h2>
                     </div>
+                    <p class="tw-action-card__message">
+                        Our team has resolved your ticket. The support admin will officially close it shortly.
+                        If the issue persists, you can reopen this ticket.
+                    </p>
+                    <form method="post" action="{% url 'client_ticket_transition' ticket.pk %}"
+                          style="margin-top:12px">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="reopen">
+                        <textarea name="reason" class="tw-action-card__response" rows="2"
+                                  placeholder="Reason for reopening…"
+                                  aria-label="Reason for reopening"></textarea>
+                        <div class="tw-action-card__buttons" style="margin-top:8px">
+                            <button type="submit" class="tw-btn tw-btn-outline">
+                                <i class="bx bx-refresh" aria-hidden="true"></i>
+                                Reopen
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <!-- Django: {% endif %} -->
+            </div>
+            {% endif %}
 
-                <!-- STATUS: closed — green success banner -->
-                <!-- Django: {% if ticket.status == 'closed' %} -->
-                <div id="closedBanner" style="display:none">
-                    <div class="tw-status-banner tw-status-banner--closed">
-                        <i class="bx bx-check-circle" aria-hidden="true"></i>
-                        <div class="tw-status-banner__text">
-                            <span class="tw-status-banner__title">Ticket Closed Successfully</span>
-                            This ticket has been closed. Thank you for using our support service.
-                            If you encounter the same issue again, please submit a new ticket.
-                        </div>
+            {% if ticket.status == 'closed' %}
+            {% if reopen_available %}
+            <div class="tw-action-card tw-action-card--info-resolved">
+                <div class="tw-action-card__inner">
+                    <div class="tw-action-card__header">
+                        <i class="bx bx-lock tw-action-card__icon" aria-hidden="true"></i>
+                        <h2 class="tw-action-card__title">Ticket Closed</h2>
                     </div>
+                    <p class="tw-action-card__message">
+                        This ticket has been closed. If the issue has recurred, you can reopen it
+                        within 14 days of closure.
+                    </p>
+                    <form method="post" action="{% url 'client_ticket_transition' ticket.pk %}"
+                          style="margin-top:12px">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="reopen">
+                        <textarea name="reason" class="tw-action-card__response" rows="2"
+                                  placeholder="Reason for reopening…"
+                                  aria-label="Reason for reopening"></textarea>
+                        <div class="tw-action-card__buttons" style="margin-top:8px">
+                            <button type="submit" class="tw-btn tw-btn-outline">
+                                <i class="bx bx-refresh" aria-hidden="true"></i>
+                                Reopen Ticket
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <!-- Django: {% endif %} -->
-
-                <!-- STATUS: rejected — red banner + rejection reason card + suggestion -->
-                <!-- Django: {% if ticket.status == 'rejected' %} -->
-                <div id="rejectedBanner" style="display:none">
-                    <div class="tw-status-banner tw-status-banner--rejected">
-                        <i class="bx bx-x-circle" aria-hidden="true"></i>
-                        <div class="tw-status-banner__text">
-                            <span class="tw-status-banner__title">Ticket Not Accepted</span>
-                            This ticket was not accepted by our support team.
-                        </div>
-                    </div>
-
-                    <!-- Rejection details -->
-                    <div class="tw-rejection-details">
-                        <div class="tw-rejection-details__header">
-                            <i class="bx bx-info-circle" style="font-size:18px;color:var(--tw-danger)" aria-hidden="true"></i>
-                            <h3 class="tw-rejection-details__title">Rejection Details</h3>
-                        </div>
-                        <div class="tw-rejection-details__body">
-                            <div class="tw-rejection-meta-row">
-                                <span class="tw-rejection-meta-row__label">Rejected By</span>
-                                <span class="tw-rejection-meta-row__value">Support Admin</span>
-                            </div>
-                            <div class="tw-rejection-meta-row">
-                                <span class="tw-rejection-meta-row__label">Rejected On</span>
-                                <!-- Django: {{ ticket.rejected_at|date:"d M Y" }} -->
-                                <span class="tw-rejection-meta-row__value">25 Mar 2025</span>
-                            </div>
-                            <span class="tw-rejection-reason-label">Reason</span>
-                            <!-- Django: {{ ticket.rejection_reason }} -->
-                            <div class="tw-description-box">
-                                This issue is outside the scope of your current support plan. Please contact
-                                your account manager to upgrade your plan and resubmit if needed.
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Suggestion note -->
-                    <div class="tw-suggestion-note">
-                        <i class="bx bx-bulb" aria-hidden="true"></i>
-                        Need help? Contact your account manager or submit a new ticket if you believe
-                        this was rejected in error.
-                    </div>
+            </div>
+            {% else %}
+            <div class="tw-status-banner tw-status-banner--closed">
+                <i class="bx bx-check-circle" aria-hidden="true"></i>
+                <div class="tw-status-banner__text">
+                    <span class="tw-status-banner__title">Ticket Closed Successfully</span>
+                    This ticket has been closed. Thank you for using our support service.
+                    The 14-day reopen window has passed.
+                    <a href="{% url 'client_submit_ticket' %}" style="color:inherit;text-decoration:underline">
+                        Submit a related ticket
+                    </a> if you need further assistance.
                 </div>
-                <!-- Django: {% endif %} -->
+            </div>
+            {% endif %}
+            {% endif %}
 
-                <!-- END STATUS ACTION CARDS -->
-
-
-                <!-- ---- DESCRIPTION ---- -->
-                <div class="tw-detail-card">
-                    <div class="tw-detail-card__header">
-                        <i class="bx bx-detail" aria-hidden="true"></i>
-                        <h3 class="tw-detail-card__title">Description</h3>
-                    </div>
-                    <div class="tw-detail-card__body">
-                        <!-- Django: {{ ticket.description|linebreaksbr }} -->
-                        <p class="tw-description-text">When exporting reports to CSV, multiple columns are missing from the output. Specifically, the "Assigned Date" and "Resolved Date" columns do not appear in the downloaded file even though they are visible in the report table on screen.
-
-This affects all report exports generated after 14 Apr 2025. Earlier exports (before this date) appear to be fine.
-
-Steps to reproduce:
-1. Navigate to Reports → Generate Report with any date range.
-2. Click "Download CSV".
-3. Open the downloaded file — "Assigned Date" and "Resolved Date" columns are absent.
-
-Expected: all visible columns should export to CSV.
-Actual: only Ticket ID, Client, Subject, Priority, Status, and Issue Date columns are present.</p>
+            {% if ticket.status == 'rejected' %}
+            <div class="tw-status-banner tw-status-banner--rejected">
+                    <i class="bx bx-x-circle" aria-hidden="true"></i>
+                    <div class="tw-status-banner__text">
+                        <span class="tw-status-banner__title">Ticket Not Accepted</span>
+                        This ticket was not accepted by our support team.
                     </div>
                 </div>
 
+                {% if reject_event %}
+                <div class="tw-rejection-details">
+                    <div class="tw-rejection-details__header">
+                        <i class="bx bx-info-circle" style="font-size:18px;color:var(--tw-danger)" aria-hidden="true"></i>
+                        <h3 class="tw-rejection-details__title">Rejection Details</h3>
+                    </div>
+                    <div class="tw-rejection-details__body">
+                        {% if reject_event.actor %}
+                        <div class="tw-rejection-meta-row">
+                            <span class="tw-rejection-meta-row__label">Rejected By</span>
+                            <span class="tw-rejection-meta-row__value">
+                                {{ reject_event.actor.get_full_name|default:reject_event.actor.username }}
+                            </span>
+                        </div>
+                        {% endif %}
+                        <div class="tw-rejection-meta-row">
+                            <span class="tw-rejection-meta-row__label">Rejected On</span>
+                            <span class="tw-rejection-meta-row__value">{{ reject_event.created_at|date:"d M Y" }}</span>
+                        </div>
+                        {% if reject_event.note %}
+                        <span class="tw-rejection-reason-label">Reason</span>
+                        <div class="tw-description-box">{{ reject_event.note }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
 
-                <!-- ---- ATTACHMENTS (FIX 2) ---- -->
-                <!-- Django: attachment list driven by sharedAttachments / ticket.attachments.all -->
-                <div class="tw-detail-card">
-                    <div class="tw-detail-card__header">
-                        <i class="bx bx-paperclip" aria-hidden="true"></i>
-                        <h3 class="tw-detail-card__title">Attachments</h3>
+                <div class="tw-suggestion-note">
+                    <i class="bx bx-bulb" aria-hidden="true"></i>
+                    Need help? Contact your account manager or
+                    <a href="{% url 'client_submit_ticket' %}" style="color:inherit;text-decoration:underline">
+                        submit a new ticket
+                    </a> if you believe this was rejected in error.
+                </div>
+            {% endif %}
+
+            {% if ticket.status == 'cancelled' %}
+            <div class="tw-status-banner tw-status-banner--rejected">
+                <i class="bx bx-x-circle" aria-hidden="true"></i>
+                <div class="tw-status-banner__text">
+                    <span class="tw-status-banner__title">Ticket Cancelled</span>
+                    This ticket has been cancelled.
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- END STATUS ACTION CARDS -->
+
+
+            <!-- DESCRIPTION -->
+            <div class="tw-detail-card">
+                <div class="tw-detail-card__header">
+                    <i class="bx bx-detail" aria-hidden="true"></i>
+                    <h3 class="tw-detail-card__title">Description</h3>
+                </div>
+                <div class="tw-detail-card__body">
+                    <p class="tw-description-text">{{ ticket.description|linebreaksbr|default:"No description provided." }}</p>
+                </div>
+            </div>
+
+
+            <!-- ACTIVITY & MESSAGES -->
+            <div class="tw-detail-card">
+                <div class="tw-detail-card__header">
+                    <i class="bx bx-chat" aria-hidden="true"></i>
+                    <h3 class="tw-detail-card__title">Activity &amp; Messages</h3>
+                </div>
+
+                <div class="tw-client-chat-thread" id="chatThread">
+                    <div class="tw-status-msg-client">Ticket submitted — {{ ticket.created_at|date:"d M Y" }}</div>
+
+                    {% for message in chat_messages %}
+                    <div class="tw-client-message tw-client-message--{% if message.author.role == 'client' or message.author.role == 'subuser' %}client{% else %}admin{% endif %}">
+                        <span class="tw-client-message__sender">
+                            {% if message.author == request.user %}You{% else %}Support Team{% endif %}
+                        </span>
+                        <div class="tw-client-message__bubble">
+                            {{ message.body|linebreaksbr }}
+                        </div>
+                        <span class="tw-client-message__time">{{ message.created_at|date:"d M Y, g:i A" }}</span>
                     </div>
-                    <!-- Rendered by renderAttachmentList() on load and after each upload -->
-                    <div id="attachmentList"
-                         style="padding-top: var(--tw-space-3); padding-bottom: var(--tw-space-3);">
-                        <!-- populated by JS -->
-                    </div>
-                    <!-- FIX 2A: Add Attachment button -->
-                    <div class="tw-attachment-card-footer">
-                        <!-- Hidden file input for the attachment section upload -->
-                        <!-- Django: action="{% url 'client_upload_attachment' ticket.id %}" -->
-                        <input type="file"
-                               id="attachmentFileInput"
-                               style="display:none"
-                               accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-                               aria-hidden="true">
-                        <button type="button"
-                                class="tw-btn tw-btn-outline tw-btn--sm"
-                                onclick="triggerAttachmentUpload()">
-                            <i class="bx bx-paperclip" aria-hidden="true"></i>
-                            Add Attachment
+                    {% endfor %}
+                </div>
+
+                {% if ticket.status == 'closed' or ticket.status == 'rejected' or ticket.status == 'cancelled' %}
+                <div class="tw-chat-notice" aria-live="polite">
+                    <i class="bx bx-lock" aria-hidden="true"></i>
+                    This ticket is {{ ticket.get_status_display|lower }}. Chat history is read-only.
+                </div>
+                {% else %}
+                <div class="tw-chat-input-area" id="chatInputArea">
+                    <div class="tw-chat-input-row-client">
+                        <textarea id="chatInput" class="tw-chat-textarea-client"
+                                  placeholder="Type a message… (chat reply coming soon)"
+                                  rows="2" aria-label="Message input"
+                                  oninput="autoResizeChatInput(this)"
+                                  disabled style="opacity:0.6;cursor:not-allowed"></textarea>
+                        <button type="button" class="tw-btn tw-btn-primary tw-chat-send-btn"
+                                id="chatSendBtn" disabled aria-label="Send message">
+                            <i class="bx bx-send" aria-hidden="true"></i>
                         </button>
                     </div>
+                    <p style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:6px;margin-bottom:0">
+                        Chat messaging coming soon.
+                    </p>
                 </div>
-                <!-- END ATTACHMENTS -->
-
-
-                <!-- ---- CHAT / ACTIVITY THREAD ---- -->
-                <div class="tw-detail-card">
-                    <div class="tw-detail-card__header">
-                        <i class="bx bx-chat" aria-hidden="true"></i>
-                        <h3 class="tw-detail-card__title">Activity &amp; Messages</h3>
-                    </div>
-
-                    <!-- Chat thread — always visible (read-only for closed/rejected) -->
-                    <div class="tw-client-chat-thread" id="chatThread">
-                        <!-- Django: {% for message in ticket.messages.all %} -->
-
-                        <div class="tw-status-msg-client">Ticket submitted — 15 Apr 2025</div>
-
-                        <div class="tw-client-message tw-client-message--admin">
-                            <span class="tw-client-message__sender">Support Team</span>
-                            <div class="tw-client-message__bubble">
-                                <!-- Django: {{ message.content }} -->
-                                Hi Alex, we have received your ticket regarding the CSV export issue.
-                                We have assigned this to our reports developer and will begin investigation shortly.
-                            </div>
-                            <span class="tw-client-message__time">16 Apr 2025, 10:23 AM</span>
-                        </div>
-
-                        <div class="tw-client-message tw-client-message--client">
-                            <span class="tw-client-message__sender">You</span>
-                            <div class="tw-client-message__bubble">
-                                Thank you for the quick response. Please let me know if you need any additional
-                                screenshots or log files from our side.
-                            </div>
-                            <span class="tw-client-message__time">16 Apr 2025, 11:05 AM</span>
-                        </div>
-
-                        <div class="tw-client-message tw-client-message--admin">
-                            <span class="tw-client-message__sender">Support Team</span>
-                            <div class="tw-client-message__bubble">
-                                We have identified the root cause — a recent query change missed two column
-                                mappings in the CSV serialiser. The fix has been applied and deployed to staging.
-                                Please review and test at your earliest convenience.
-                            </div>
-                            <span class="tw-client-message__time">20 Apr 2025, 3:48 PM</span>
-                        </div>
-
-                        <div class="tw-status-msg-client">Status changed to UAT Approval — 20 Apr 2025</div>
-
-                        <!-- Django: {% endfor %} -->
-                    </div>
-                    <!-- END CHAT THREAD -->
-
-                    <!-- Closed notice (shown by initPage for 'closed' status) -->
-                    <div class="tw-chat-notice" id="chatNotice" style="display:none" aria-live="polite">
-                        <i class="bx bx-lock" aria-hidden="true"></i>
-                        This ticket is closed. Chat history is read-only.
-                    </div>
-
-                    <!-- Chat input area (hidden entirely for 'rejected') -->
-                    <div class="tw-chat-input-area" id="chatInputArea">
-
-                        <div class="tw-chat-input-row-client">
-                            <textarea
-                                id="chatInput"
-                                class="tw-chat-textarea-client"
-                                placeholder="Type a message…"
-                                rows="2"
-                                aria-label="Message input"
-                                oninput="autoResizeChatInput(this)"></textarea>
-
-                            <!-- FIX 2B: Attach file icon in chat -->
-                            <!-- Django: action="{% url 'client_upload_attachment' ticket.id %}" -->
-                            <input type="file"
-                                   id="chatFileInput"
-                                   style="display:none"
-                                   accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-                                   aria-hidden="true">
-                            <button type="button"
-                                    class="tw-btn-icon"
-                                    onclick="document.getElementById('chatFileInput').click()"
-                                    aria-label="Attach a file"
-                                    title="Attach file">
-                                <i class="bx bx-paperclip" aria-hidden="true"></i>
-                            </button>
-
-                            <button type="button"
-                                    class="tw-btn tw-btn-primary tw-chat-send-btn"
-                                    id="chatSendBtn"
-                                    onclick="sendChatMessage()"
-                                    aria-label="Send message">
-                                <i class="bx bx-send" aria-hidden="true"></i>
-                            </button>
-                        </div>
-
-                        <label class="tw-chat-email-check">
-                            <input type="checkbox" id="emailCopyCheck">
-                            Send me an email copy of this message
-                        </label>
-
-                    </div>
-                    <!-- END CHAT INPUT -->
-
-                </div>
-                <!-- END CHAT CARD -->
+                {% endif %}
 
             </div>
-            <!-- END LEFT COLUMN -->
+            <!-- END ACTIVITY CARD -->
+
+        </div>
+        <!-- END LEFT COLUMN -->
 
 
-            <!-- =====================================================
-                 RIGHT COLUMN — info panel + timeline
-                 Both rendered by JS via renderInfoPanel() and
-                 renderTimeline() based on TICKET_STATUS.
-                 ===================================================== -->
-            <div class="tw-detail-right">
+        <!-- =====================================================
+             RIGHT COLUMN — info panel + timeline
+             ===================================================== -->
+        <div class="tw-detail-right">
 
-                <!-- TICKET INFO PANEL — rows rendered by JS -->
-                <div class="tw-info-panel">
-                    <div class="tw-info-panel__header">
-                        <i class="bx bx-info-circle" aria-hidden="true"></i>
-                        <h3 class="tw-info-panel__title">Ticket Info</h3>
-                    </div>
-                    <!-- Django: driven by ticket context variables -->
-                    <div class="tw-info-panel__body" id="infoPanelBody">
-                        <!-- Populated by renderInfoPanel() on load -->
-                    </div>
+            <!-- TICKET INFO PANEL -->
+            <div class="tw-info-panel">
+                <div class="tw-info-panel__header">
+                    <i class="bx bx-info-circle" aria-hidden="true"></i>
+                    <h3 class="tw-info-panel__title">Ticket Info</h3>
                 </div>
+                <div class="tw-info-panel__body">
 
-                <!-- TIMELINE PANEL — entries rendered by JS -->
-                <div class="tw-info-panel">
-                    <div class="tw-info-panel__header">
-                        <i class="bx bx-history" aria-hidden="true"></i>
-                        <h3 class="tw-info-panel__title">Timeline</h3>
+                    <div class="tw-info-row">
+                        <span class="tw-info-row__label">Status</span>
+                        <span class="tw-info-row__value">{% client_ticket_badge ticket %}</span>
                     </div>
-                    <!-- Django: {% for event in ticket.events.all %} -->
-                    <div class="tw-client-timeline" id="timelineBody">
-                        <!-- Populated by renderTimeline() on load -->
+
+                    <div class="tw-info-row">
+                        <span class="tw-info-row__label">Priority</span>
+                        <span class="tw-info-row__value">
+                            <span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">
+                                {{ ticket.get_priority_display }}
+                            </span>
+                        </span>
                     </div>
-                    <!-- Django: {% endfor %} -->
+
+                    {% if ticket.category %}
+                    <div class="tw-info-row">
+                        <span class="tw-info-row__label">Category</span>
+                        <span class="tw-info-row__value">{{ ticket.category }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="tw-info-row">
+                        <span class="tw-info-row__label">Submitted</span>
+                        <span class="tw-info-row__value">{{ ticket.created_at|date:"d M Y" }}</span>
+                    </div>
+
+                    {% if ticket.assigned_developer %}
+                    <div class="tw-info-row">
+                        <span class="tw-info-row__label">Developer</span>
+                        <span class="tw-info-row__value">
+                            {{ ticket.assigned_developer.get_full_name|default:ticket.assigned_developer.username }}
+                        </span>
+                    </div>
+                    {% else %}
+                    <div class="tw-info-row">
+                        <span class="tw-info-row__label">Assigned To</span>
+                        <span class="tw-info-row__value" style="color:var(--tw-text-muted);font-style:italic">
+                            Pending assignment
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    {% if ticket.assigned_tester %}
+                    <div class="tw-info-row">
+                        <span class="tw-info-row__label">Tester</span>
+                        <span class="tw-info-row__value">
+                            {{ ticket.assigned_tester.get_full_name|default:ticket.assigned_tester.username }}
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    {% if ticket.status == 'closed' and ticket.closed_at %}
+                    <div class="tw-info-row">
+                        <span class="tw-info-row__label">Closed On</span>
+                        <span class="tw-info-row__value">{{ ticket.closed_at|date:"d M Y" }}</span>
+                    </div>
+                    {% endif %}
+
                 </div>
-
             </div>
-            <!-- END RIGHT COLUMN -->
+            <!-- END INFO PANEL -->
+
+
+            <!-- TIMELINE -->
+            <div class="tw-info-panel">
+                <div class="tw-info-panel__header">
+                    <i class="bx bx-history" aria-hidden="true"></i>
+                    <h3 class="tw-info-panel__title">Timeline</h3>
+                </div>
+                <div class="tw-client-timeline">
+
+                    <div class="tw-client-tl-entry">
+                        <div class="tw-client-tl-dot tw-client-tl-dot--created">
+                            <i class="bx bx-plus" aria-hidden="true"></i>
+                        </div>
+                        <div class="tw-client-tl-content">
+                            <div class="tw-client-tl-label">Ticket Submitted</div>
+                            <div class="tw-client-tl-date">{{ ticket.created_at|date:"d M Y" }}</div>
+                        </div>
+                    </div>
+
+                    {% for event in events %}
+                    <div class="tw-client-tl-entry">
+                        <div class="tw-client-tl-dot tw-client-tl-dot--{{ event.action|event_dot_cls }}">
+                            <i class="bx {{ event.action|event_icon }}" aria-hidden="true"></i>
+                        </div>
+                        <div class="tw-client-tl-content">
+                            <div class="tw-client-tl-label">{{ event.action|event_label }}</div>
+                            <div class="tw-client-tl-date">{{ event.created_at|date:"d M Y" }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+            <!-- END TIMELINE -->
 
         </div>
-        <!-- END 2-COLUMN LAYOUT -->
+        <!-- END RIGHT COLUMN -->
 
-    </main>
-
-</section>
-<!-- END CONTENT WRAPPER -->
+    </div>
+    <!-- END 2-COLUMN LAYOUT -->
 
 
-<!-- UAT APPROVE CONFIRM MODAL -->
-<div class="tw-client-confirm-overlay" id="approveConfirmOverlay"
-     role="dialog" aria-modal="true" aria-labelledby="approveConfirmTitle">
-    <div class="tw-client-confirm-box">
-        <div class="tw-client-confirm-icon tw-client-confirm-icon--success" aria-hidden="true">
-            <i class="bx bx-check-circle"></i>
-        </div>
-        <div class="tw-client-confirm-title" id="approveConfirmTitle">Approve this ticket?</div>
-        <div class="tw-client-confirm-message">
-            This will mark the ticket as <strong>Resolved</strong>. Our team will confirm
-            closure shortly. This action cannot be undone.
-        </div>
-        <div class="tw-client-confirm-buttons">
-            <button type="button" class="tw-btn tw-btn-outline" onclick="closeApproveConfirm()">Cancel</button>
-            <button type="button" class="tw-btn tw-btn-success" onclick="confirmApprove()">
-                <i class="bx bx-check" aria-hidden="true"></i> Yes, Approve
-            </button>
+    {% if ticket.status == 'uat' %}
+    <!-- UAT APPROVE CONFIRM OVERLAY -->
+    <div class="tw-client-confirm-overlay" id="approveConfirmOverlay"
+         role="dialog" aria-modal="true" aria-labelledby="approveConfirmTitle">
+        <div class="tw-client-confirm-box">
+            <div class="tw-client-confirm-icon tw-client-confirm-icon--success" aria-hidden="true">
+                <i class="bx bx-check-circle"></i>
+            </div>
+            <div class="tw-client-confirm-title" id="approveConfirmTitle">Approve this ticket?</div>
+            <div class="tw-client-confirm-message">
+                This will mark the ticket as <strong>Resolved</strong>. Our team will confirm
+                closure shortly. This action cannot be undone.
+            </div>
+            <div class="tw-client-confirm-buttons">
+                <button type="button" class="tw-btn tw-btn-outline" onclick="closeApproveConfirm()">Cancel</button>
+                <form method="post" action="{% url 'client_ticket_transition' ticket.pk %}" style="display:inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="approve">
+                    <button type="submit" class="tw-btn tw-btn-success">
+                        <i class="bx bx-check" aria-hidden="true"></i> Yes, Approve
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+    {% endif %}
+
+{% endblock %}
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- ==============================================================
-     PAGE SCRIPT
-     Django: {% block page_js %}
-     ============================================================== -->
+{% block page_js %}
 <script>
-    /* Django: CLIENT_USER populated from {{ request.user }} context at deploy time */
-    var CLIENT_USER = {
-        name:     'Sarah Johnson',
-        initials: 'SJ',
-        email:    'sarah.johnson@globaltech.com',
-        company:  'GlobalTech Solutions',
-        role:     'Primary Contact'
-    };
-
-    document.addEventListener('DOMContentLoaded', function () {
-        var els = {
-            clientUserInitials:  CLIENT_USER.initials,
-            clientUserInitials2: CLIENT_USER.initials,
-            clientUserName:      CLIENT_USER.name,
-            clientUserEmail:     CLIENT_USER.email,
-            clientUserCompany:   CLIENT_USER.company
-        };
-        Object.keys(els).forEach(function (id) {
-            var el = document.getElementById(id);
-            if (el) el.textContent = els[id];
-        });
-    });
-
-    /* ============================================================
-     * TICKET STATUS & ID — read from URL query parameters.
-     * Django: var TICKET_STATUS = "{{ ticket.status }}";
-     *         var TICKET_ID     = "{{ ticket.ticket_id }}";
-     * ============================================================ */
-    var urlParams     = new URLSearchParams(window.location.search);
-    var TICKET_STATUS = urlParams.get('status') || 'new';
-    var TICKET_ID     = urlParams.get('id')     || 'TKT-GMEC-001';
-    var currentTicket; /* set by initPage; used by confirmApprove */
-
-
-    /* ============================================================
-     * TICKET DATA — maps ticket ID → full ticket content.
-     * Django: replaces this entire object with {{ ticket }} context.
-     * ============================================================ */
-    var TICKET_DATA = {
-        'TKT-GMEC-001': {
-            subject:      'Payment gateway timeout',
-            category:     'Billing',
-            priority:     'HIGH',
-            priorityClass:'tw-priority-badge--high',
-            submitted:    '10 Apr 2025',
-            lastUpdated:  '22 Apr 2025',
-            assignedTo:   'Arjun Mehta',
-            estResolution:'30 May 2025',
-            description:  'The payment gateway is timing out during checkout. Customers are unable to complete purchases. The issue started on 8 Apr 2025 and affects approximately 30% of transactions. Error code: GATEWAY_TIMEOUT_503.',
-            attachments: [
-                { name: 'requirements_v2.pdf', type: 'pdf', size: '180 KB', date: '10 Apr 2025' }
-            ]
-        },
-        'TKT-GMEC-002': {
-            subject:      'Bulk export CSV missing columns',
-            category:     'Reports',
-            priority:     'MEDIUM',
-            priorityClass:'tw-priority-badge--medium',
-            submitted:    '15 Apr 2025',
-            lastUpdated:  '20 Apr 2025',
-            assignedTo:   'Priya Menon',
-            estResolution:'25 Apr 2025',
-            description:  'When exporting reports to CSV, multiple columns are missing from the output. Specifically, the Assigned Date and Resolved Date columns do not appear in the downloaded file even though they are visible in the report table on screen. This affects all report exports generated after 14 Apr 2025.',
-            actionMessage:'Priya Menon has completed work on the CSV export issue. Please test the export functionality and confirm whether the Assigned Date and Resolved Date columns now appear correctly in your downloaded files.',
-            attachments: [
-                { name: 'csv-export-screenshot.png', type: 'img', size: '214 KB', date: '15 Apr 2025' }
-            ]
-        },
-        'TKT-GMEC-003': {
-            subject:      'User role permissions not saving',
-            category:     'Access Control',
-            priority:     'HIGH',
-            priorityClass:'tw-priority-badge--high',
-            submitted:    '18 Apr 2025',
-            lastUpdated:  '21 Apr 2025',
-            assignedTo:   'Kiran Das',
-            estResolution:'28 Apr 2025',
-            description:  'When updating user role permissions in the admin panel, changes are not being saved. The UI shows success but on page refresh, the old permissions are restored. This affects all admin users trying to update team member access levels.',
-            actionMessage:'Kiran Das from our support team has requested additional information about your Access Control issue. Please provide details about which specific roles are affected and when the issue first occurred.',
-            attachments: [
-                { name: 'access_issue_log.pdf', type: 'pdf', size: '92 KB', date: '18 Apr 2025' }
-            ]
-        },
-        'TKT-GMEC-004': {
-            subject:      'Invoice generation wrong totals',
-            category:     'Billing',
-            priority:     'MEDIUM',
-            priorityClass:'tw-priority-badge--medium',
-            submitted:    '02 May 2025',
-            lastUpdated:  '05 May 2025',
-            assignedTo:   'Pending assignment',
-            estResolution:'To be confirmed',
-            description:  'The invoice generation module is calculating incorrect totals when multiple discount codes are applied. The final amount shows a higher value than expected. This affects invoices generated after the latest billing module update on 1 May 2025.',
-            attachments: []
-        },
-        'TKT-GMEC-005': {
-            subject:          'Dashboard not loading on mobile',
-            category:         'UI/UX',
-            priority:         'MEDIUM',
-            priorityClass:    'tw-priority-badge--medium',
-            submitted:        '28 Mar 2025',
-            lastUpdated:      '15 Apr 2025',
-            assignedTo:       'Rithik S',
-            closedOn:         '15 Apr 2025',
-            resolutionTime:   '18 days',
-            tatStatus:        'Met',
-            closedBy:         'Support Admin',
-            resolutionSummary:'Fixed responsive CSS breakpoint issue causing layout collapse on screens below 768px. Deployed hotfix v2.1.4.',
-            description:      'The main dashboard does not load correctly on mobile devices. The layout breaks and key widgets are not visible. Reproducible on iOS Safari and Android Chrome.',
-            attachments: []
-        },
-        'TKT-GMEC-006': {
-            subject:         'API rate limit errors on sync',
-            category:        'Integration',
-            priority:        'HIGH',
-            priorityClass:   'tw-priority-badge--high',
-            submitted:       '20 Mar 2025',
-            lastUpdated:     '25 Mar 2025',
-            assignedTo:      'N/A',
-            rejectedBy:      'Support Admin',
-            rejectedOn:      '25 Mar 2025',
-            rejectionReason: 'This issue is outside the scope of your current support plan. The API rate limiting is a third-party provider limitation. Please contact your account manager to discuss upgrading your plan for dedicated API support.',
-            description:     'We are experiencing frequent API rate limit errors when syncing data with the external payment provider. The sync fails every 2-3 hours requiring manual intervention.',
-            attachments: []
-        }
-    };
-
-
-    /* ============================================================
-     * UTILITY FUNCTIONS (defined first — used by everything below)
-     * ============================================================ */
-
-    function escapeHtml(str) {
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-    }
-
-    function formatNow() {
-        var d = new Date();
-        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) +
-               ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-    }
-
-    function formatDateShort(d) {
-        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    }
-
-    function showClientToast(message, type) {
-        var t = document.createElement('div');
-        t.className = 'tw-client-toast tw-client-toast--' + (type || 'info');
-        t.textContent = message;
-        document.body.appendChild(t);
-        setTimeout(function () { t.classList.add('show'); }, 10);
-        setTimeout(function () {
-            t.classList.remove('show');
-            setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 300);
-        }, 3000);
-    }
-
-
-    /* ============================================================
-     * STATUS DATA — defines all per-status content.
-     * Each key maps to a full page state definition.
-     * Django: this data comes from ticket context variables at
-     * deploy time; the STATUS_DATA object is frontend-only.
-     * ============================================================ */
-    var STATUS_DATA = {
-
-        'new': {
-            headerBadge: '<span class="tw-status-badge tw-status-badge--new">New</span>',
-            showActionDot: false,
-            infoRows: [
-                { label: 'Status',          value: '<span class="tw-status-badge tw-status-badge--new">New</span>' },
-                { label: 'Priority',        value: '<span class="tw-priority-badge tw-priority-badge--medium">Medium</span>' },
-                { label: 'Category',        value: 'Reports' },
-                { label: 'Submitted',       value: '15 Apr 2025' },
-                { label: 'Assigned To',     value: '<span style="color:var(--tw-text-muted);font-style:italic">Pending assignment</span>' },
-                { label: 'Est. Resolution', value: '<span style="color:var(--tw-text-muted)">To be confirmed</span>' }
-            ],
-            timeline: [
-                { icon: 'bx-plus',        cls: 'created', label: 'Ticket Submitted', date: '15 Apr 2025', done: true },
-                { icon: 'bx-search',      cls: 'pending', label: 'Under Review',     date: 'Pending',     done: false },
-                { icon: 'bx-time-five',   cls: 'pending', label: 'In Progress',      date: 'Pending',     done: false },
-                { icon: 'bx-check-circle',cls: 'pending', label: 'Resolved',         date: 'Pending',     done: false }
-            ],
-            chatDisabled: false,
-            chatHidden:   false
-        },
-
-        'in_progress': {
-            headerBadge: '<span class="tw-status-badge tw-status-badge--progress">In Progress</span>',
-            showActionDot: false,
-            infoRows: [
-                { label: 'Status',        value: '<span class="tw-status-badge tw-status-badge--progress">In Progress</span>' },
-                { label: 'Sub-status',    value: '<span class="tw-status-badge tw-status-badge--development">Development</span>' },
-                { label: 'Priority',      value: '<span class="tw-priority-badge tw-priority-badge--medium">Medium</span>' },
-                { label: 'Assigned Dev',  value: 'Arjun Mehta' },
-                { label: 'Est. Resolution', value: '30 May 2025' },
-                { label: 'TAT Status',    value: '<span class="tw-tat-badge tw-tat-badge--pending">On Track</span>' }
-            ],
-            timeline: [
-                { icon: 'bx-plus',         cls: 'created',  label: 'Ticket Submitted',             date: '15 Apr 2025', done: true },
-                { icon: 'bx-user-check',   cls: 'assigned', label: 'Assigned to Arjun Mehta',      date: '16 Apr 2025', done: true },
-                { icon: 'bx-code-alt',     cls: 'work',     label: 'Work Started — Development',   date: '17 Apr 2025', done: true },
-                { icon: 'bx-test-tube',    cls: 'pending',  label: 'Testing',                      date: 'Pending',     done: false },
-                { icon: 'bx-check-shield', cls: 'pending',  label: 'UAT Review',                   date: 'Pending',     done: false },
-                { icon: 'bx-check-circle', cls: 'pending',  label: 'Resolved',                     date: 'Pending',     done: false }
-            ],
-            chatDisabled: false,
-            chatHidden:   false
-        },
-
-        'forwarded': {
-            headerBadge: '<span class="tw-status-badge tw-status-badge--forwarded">Your Input Needed</span>',
-            showActionDot: true,
-            infoRows: [
-                { label: 'Status',          value: '<span class="tw-status-badge tw-status-badge--forwarded">Your Input Needed</span>' },
-                { label: 'Priority',        value: '<span class="tw-priority-badge tw-priority-badge--medium">Medium</span>' },
-                { label: 'Category',        value: 'Reports' },
-                { label: 'Submitted',       value: '15 Apr 2025' },
-                { label: 'Assigned To',     value: 'Priya Menon' },
-                { label: 'Info Requested',  value: '21 Apr 2025' }
-            ],
-            timeline: [
-                { icon: 'bx-plus',          cls: 'created', label: 'Ticket Submitted',              date: '15 Apr 2025',  done: true },
-                { icon: 'bx-user-check',    cls: 'assigned',label: 'Assigned to Developer',          date: '16 Apr 2025',  done: true },
-                { icon: 'bx-code-alt',      cls: 'work',    label: 'Work Started',                   date: '17 Apr 2025',  done: true },
-                { icon: 'bx-info-circle',   cls: 'info',    label: 'Info Requested by Support Team', date: '21 Apr 2025',  done: true },
-                { icon: 'bx-comment-dots',  cls: 'pending', label: 'Your Input Needed',               date: 'Action needed',done: false, current: true },
-                { icon: 'bx-play',          cls: 'pending', label: 'Work Resumes',                   date: 'Pending',      done: false }
-            ],
-            chatDisabled: false,
-            chatHidden:   false
-        },
-
-        'uat': {
-            headerBadge: '<span class="tw-status-badge tw-status-badge--uat">UAT Approval</span>',
-            showActionDot: true,
-            infoRows: [
-                { label: 'Status',          value: '<span class="tw-status-badge tw-status-badge--uat">UAT Approval</span>' },
-                { label: 'Priority',        value: '<span class="tw-priority-badge tw-priority-badge--medium">Medium</span>' },
-                { label: 'Category',        value: 'Reports' },
-                { label: 'Submitted',       value: '15 Apr 2025' },
-                { label: 'Assigned To',     value: 'Priya Menon' },
-                { label: 'Est. Resolution', value: '25 Apr 2025' }
-            ],
-            timeline: [
-                { icon: 'bx-plus',         cls: 'created',  label: 'Ticket Submitted',        date: '15 Apr 2025',  done: true },
-                { icon: 'bx-user-check',   cls: 'assigned', label: 'Assigned to Developer',   date: '16 Apr 2025',  done: true },
-                { icon: 'bx-code-alt',     cls: 'work',     label: 'Work Completed',          date: '19 Apr 2025',  done: true },
-                { icon: 'bx-check-shield', cls: 'uat',      label: 'Sent for UAT Review',     date: '20 Apr 2025',  done: true },
-                { icon: 'bx-time-five',    cls: 'pending',  label: 'Awaiting Your Approval',  date: 'Action needed',done: false, current: true }
-            ],
-            chatDisabled: false,
-            chatHidden:   false
-        },
-
-        'resolved': {
-            headerBadge: '<span class="tw-status-badge tw-status-badge--resolved">Resolved</span>',
-            showActionDot: false,
-            infoRows: [
-                { label: 'Status',           value: '<span class="tw-status-badge tw-status-badge--resolved">Resolved</span>' },
-                { label: 'Developer',        value: 'Arjun Mehta' },
-                { label: 'Resolved On',      value: '20 May 2025' },
-                { label: 'Resolution Time',  value: '12 days' },
-                { label: 'TAT Status',       value: '<span class="tw-tat-badge tw-tat-badge--met">Met</span>' }
-            ],
-            timeline: [
-                { icon: 'bx-plus',         cls: 'created',  label: 'Ticket Submitted',            date: '15 Apr 2025',              done: true },
-                { icon: 'bx-user-check',   cls: 'assigned', label: 'Assigned to Arjun Mehta',     date: '16 Apr 2025',              done: true },
-                { icon: 'bx-code-alt',     cls: 'work',     label: 'Work Completed',              date: '19 Apr 2025',              done: true },
-                { icon: 'bx-check-shield', cls: 'uat',      label: 'UAT Approved by You',         date: '20 Apr 2025',              done: true },
-                { icon: 'bx-check-circle', cls: 'resolved', label: 'Resolved',                    date: '20 May 2025',              done: true },
-                { icon: 'bx-lock',         cls: 'pending',  label: 'Officially Closed',           date: 'Pending admin confirmation',done: false }
-            ],
-            chatDisabled: false,
-            chatHidden:   false
-        },
-
-        'closed': {
-            headerBadge: '<span class="tw-status-badge tw-status-badge--closed">Closed</span>',
-            showActionDot: false,
-            infoRows: [
-                { label: 'Status',          value: '<span class="tw-status-badge tw-status-badge--closed">Closed</span>' },
-                { label: 'Closed On',       value: '15 Apr 2025' },
-                { label: 'Resolution Time', value: '18 days' },
-                { label: 'TAT Status',      value: '<span class="tw-tat-badge tw-tat-badge--met">Met</span>' },
-                { label: 'Closed By',       value: 'Support Admin' }
-            ],
-            timeline: [
-                { icon: 'bx-plus',         cls: 'created',  label: 'Ticket Submitted',       date: '15 Apr 2025', done: true },
-                { icon: 'bx-user-check',   cls: 'assigned', label: 'Assigned to Developer',  date: '16 Apr 2025', done: true },
-                { icon: 'bx-code-alt',     cls: 'work',     label: 'Work Completed',         date: '19 Apr 2025', done: true },
-                { icon: 'bx-check-shield', cls: 'uat',      label: 'UAT Approved by You',    date: '20 Apr 2025', done: true },
-                { icon: 'bx-check-circle', cls: 'resolved', label: 'Resolved',               date: '20 Apr 2025', done: true },
-                { icon: 'bx-lock',         cls: 'closed',   label: 'Closed',                 date: '15 Apr 2025', done: true }
-            ],
-            chatDisabled: true,   /* show notice, disable inputs */
-            chatHidden:   false
-        },
-
-        'rejected': {
-            headerBadge: '<span class="tw-status-badge tw-status-badge--rejected">Rejected</span>',
-            showActionDot: false,
-            infoRows: [
-                { label: 'Status',      value: '<span class="tw-status-badge tw-status-badge--rejected">Rejected</span>' },
-                { label: 'Rejected On', value: '25 Mar 2025' },
-                { label: 'Rejected By', value: 'Support Admin' }
-            ],
-            timeline: [
-                { icon: 'bx-plus',     cls: 'created',  label: 'Ticket Submitted', date: '15 Apr 2025', done: true },
-                { icon: 'bx-x-circle', cls: 'rejected', label: 'Rejected',         date: '25 Mar 2025', done: true }
-            ],
-            chatDisabled: false,
-            chatHidden:   true    /* hide input entirely */
-        }
-    };
-
-
-    /* ============================================================
-     * SHARED ATTACHMENTS (FIX 2)
-     * Single source of truth for all attachments on this ticket.
-     * Shown in both the Attachments section and reflected in chat.
-     * Django: pre-populated from ticket.attachments.all context.
-     * ============================================================ */
-    var sharedAttachments = [];
-
-
-    /* ============================================================
-     * RENDER FUNCTIONS
-     * ============================================================ */
-
-    /*
-     * renderInfoPanel(rows)
-     * Rebuilds the right-column info panel from a rows array.
-     * row.value may contain HTML (badge markup) — not escaped.
-     * row.label is always plain text — escaped.
-     */
-    function renderInfoPanel(rows) {
-        var body = document.getElementById('infoPanelBody');
-        if (!body) return;
-        var html = '';
-        rows.forEach(function (row) {
-            html += '<div class="tw-info-row">' +
-                '<span class="tw-info-row__label">' + escapeHtml(row.label) + '</span>' +
-                '<span class="tw-info-row__value">' + row.value + '</span>' +
-                '</div>';
-        });
-        body.innerHTML = html;
-    }
-
-    /*
-     * renderTimeline(entries)
-     * Rebuilds the condensed right-column timeline.
-     * entry.done: colored icon. entry.current: pulsing dot.
-     * entry.done = false, current = false: pending (grey, italic).
-     */
-    function renderTimeline(entries) {
-        var container = document.getElementById('timelineBody');
-        if (!container) return;
-        var html = '';
-        entries.forEach(function (entry) {
-            var iconCls = entry.done
-                ? 'tw-client-tl-icon--' + entry.cls
-                : 'tw-client-tl-icon--pending';
-
-            var labelExtra = entry.current
-                ? ' <span class="tw-action-dot" aria-label="Current step"></span>'
-                : '';
-
-            var labelCls = (!entry.done && !entry.current)
-                ? ' tw-client-tl-label--pending'
-                : '';
-
-            var dateCls = (!entry.done && !entry.current)
-                ? ' tw-client-tl-date--pending'
-                : '';
-
-            html +=
-                '<div class="tw-client-timeline-item">' +
-                '<div class="tw-client-tl-icon ' + iconCls + '" aria-hidden="true">' +
-                '<i class="bx ' + entry.icon + '"></i>' +
-                '</div>' +
-                '<div class="tw-client-tl-content">' +
-                '<div class="tw-client-tl-label' + labelCls + '">' +
-                escapeHtml(entry.label) + labelExtra +
-                '</div>' +
-                '<div class="tw-client-tl-date' + dateCls + '">' + escapeHtml(entry.date) + '</div>' +
-                '</div></div>';
-        });
-        container.innerHTML = html;
-    }
-
-    /*
-     * renderHeaderMeta(data)
-     * Updates the status badge cluster in the ticket header card.
-     * Also appends the priority and category badges.
-     */
-    function renderHeaderMeta(data, ticket) {
-        var meta = document.getElementById('headerStatusMeta');
-        if (!meta) return;
-        var html = data.headerBadge;
-        if (data.showActionDot) html += ' <span class="tw-action-dot" aria-label="Action needed"></span>';
-        html += ' <span class="tw-priority-badge ' + ticket.priorityClass + '">' + escapeHtml(ticket.priority) + '</span>';
-        html += ' <span class="tw-ticket-label">' + escapeHtml(ticket.category) + '</span>';
-        meta.innerHTML = html;
-    }
-
-    /*
-     * renderAttachmentList()
-     * FIX 2F: Re-renders the attachment list from sharedAttachments array.
-     * Called on load and after every addSharedAttachment().
-     * Django: replaces {% for attachment in ticket.attachments.all %}.
-     */
-    function renderAttachmentList() {
-        var container = document.getElementById('attachmentList');
-        if (!container) return;
-
-        if (sharedAttachments.length === 0) {
-            container.innerHTML =
-                '<p style="padding:var(--tw-space-4) var(--tw-space-5);color:var(--tw-text-muted);' +
-                'font-size:var(--tw-text-sm)">No attachments yet.</p>';
-            return;
-        }
-
-        var html = '';
-        sharedAttachments.forEach(function (att) {
-            var iconCls, iconName;
-            if (att.type === 'pdf') {
-                iconCls = 'tw-file-icon--pdf'; iconName = 'bx-file-pdf';
-            } else if (att.type === 'doc') {
-                iconCls = 'tw-file-icon--doc'; iconName = 'bx-file';
-            } else {
-                iconCls = 'tw-file-icon--img'; iconName = 'bx-image';
-            }
-            html +=
-                '<div class="tw-attachment-item">' +
-                '<div class="tw-file-icon ' + iconCls + '" aria-hidden="true"><i class="bx ' + iconName + '"></i></div>' +
-                '<div class="tw-attachment-info">' +
-                '<span class="tw-attachment-name">' + escapeHtml(att.name) + '</span>' +
-                '<span class="tw-attachment-meta">' + escapeHtml(att.size + ' · ' + att.date) + '</span>' +
-                '</div>' +
-                '<div class="tw-attachment-actions">' +
-                '<button class="tw-btn-icon" aria-label="Download ' + escapeHtml(att.name) + '" ' +
-                'onclick="showClientToast(\'Download started.\', \'success\')">' +
-                '<i class="bx bx-download"></i></button>' +
-                '</div></div>';
-        });
-        container.innerHTML = html;
-    }
-
-
-    /*
-     * buildInfoRows(s, ticket)
-     * Returns per-status info panel rows using live ticket data.
-     * Supersedes STATUS_DATA[s].infoRows for initPage() rendering.
-     */
-    function buildInfoRows(s, ticket) {
-        var pri = '<span class="tw-priority-badge ' + ticket.priorityClass + '">' + escapeHtml(ticket.priority) + '</span>';
-        switch (s) {
-            case 'new':
-                return [
-                    { label: 'Status',          value: '<span class="tw-status-badge tw-status-badge--new">New</span>' },
-                    { label: 'Priority',        value: pri },
-                    { label: 'Category',        value: escapeHtml(ticket.category) },
-                    { label: 'Submitted',       value: escapeHtml(ticket.submitted) },
-                    { label: 'Assigned To',     value: '<span style="color:var(--tw-text-muted);font-style:italic">Pending assignment</span>' },
-                    { label: 'Est. Resolution', value: '<span style="color:var(--tw-text-muted)">To be confirmed</span>' }
-                ];
-            case 'in_progress':
-                return [
-                    { label: 'Status',          value: '<span class="tw-status-badge tw-status-badge--progress">In Progress</span>' },
-                    { label: 'Sub-status',      value: '<span class="tw-status-badge tw-status-badge--development">Development</span>' },
-                    { label: 'Priority',        value: pri },
-                    { label: 'Assigned Dev',    value: escapeHtml(ticket.assignedTo) },
-                    { label: 'Est. Resolution', value: escapeHtml(ticket.estResolution) },
-                    { label: 'TAT Status',      value: '<span class="tw-tat-badge tw-tat-badge--pending">On Track</span>' }
-                ];
-            case 'forwarded':
-                return [
-                    { label: 'Status',         value: '<span class="tw-status-badge tw-status-badge--forwarded">Your Input Needed</span>' },
-                    { label: 'Priority',       value: pri },
-                    { label: 'Category',       value: escapeHtml(ticket.category) },
-                    { label: 'Submitted',      value: escapeHtml(ticket.submitted) },
-                    { label: 'Assigned To',    value: escapeHtml(ticket.assignedTo) },
-                    { label: 'Info Requested', value: escapeHtml(ticket.lastUpdated) }
-                ];
-            case 'uat':
-                return [
-                    { label: 'Status',          value: '<span class="tw-status-badge tw-status-badge--uat">UAT Approval</span>' },
-                    { label: 'Priority',        value: pri },
-                    { label: 'Category',        value: escapeHtml(ticket.category) },
-                    { label: 'Submitted',       value: escapeHtml(ticket.submitted) },
-                    { label: 'Assigned To',     value: escapeHtml(ticket.assignedTo) },
-                    { label: 'Est. Resolution', value: escapeHtml(ticket.estResolution) }
-                ];
-            case 'resolved':
-                return [
-                    { label: 'Status',          value: '<span class="tw-status-badge tw-status-badge--resolved">Resolved</span>' },
-                    { label: 'Developer',       value: escapeHtml(ticket.assignedTo) },
-                    { label: 'Resolved On',     value: escapeHtml(ticket.lastUpdated) },
-                    { label: 'Resolution Time', value: escapeHtml(ticket.resolutionTime || 'N/A') },
-                    { label: 'TAT Status',      value: '<span class="tw-tat-badge tw-tat-badge--met">Met</span>' }
-                ];
-            case 'closed':
-                return [
-                    { label: 'Status',          value: '<span class="tw-status-badge tw-status-badge--closed">Closed</span>' },
-                    { label: 'Closed On',       value: escapeHtml(ticket.closedOn) },
-                    { label: 'Resolution Time', value: escapeHtml(ticket.resolutionTime) },
-                    { label: 'TAT Status',      value: '<span class="tw-tat-badge tw-tat-badge--met">Met</span>' },
-                    { label: 'Closed By',       value: escapeHtml(ticket.closedBy) }
-                ];
-            case 'rejected':
-                return [
-                    { label: 'Status',      value: '<span class="tw-status-badge tw-status-badge--rejected">Rejected</span>' },
-                    { label: 'Rejected On', value: escapeHtml(ticket.rejectedOn) },
-                    { label: 'Rejected By', value: escapeHtml(ticket.rejectedBy) }
-                ];
-            default:
-                return STATUS_DATA['new'].infoRows;
-        }
-    }
-
-
-    /* ============================================================
-     * INIT PAGE (runs last, after all declarations)
-     * Reads TICKET_STATUS and sets up the entire page state.
-     * Django: at deploy time, TICKET_STATUS is set from context
-     * and this IIFE becomes irrelevant (Django renders per-status).
-     * ============================================================ */
-    function initPage() {
-        var s      = TICKET_STATUS;
-        var data   = STATUS_DATA[s] || STATUS_DATA['new'];
-        var ticket = TICKET_DATA[TICKET_ID] || TICKET_DATA['TKT-GMEC-001'];
-        currentTicket = ticket;
-
-        /* Page title and header text */
-        document.title = ticket.subject + ' — Tweedle';
-        var h1El = document.querySelector('.tw-client-header-left h1');
-        if (h1El) h1El.textContent = ticket.subject;
-        var subtitleEl = document.querySelector('.tw-client-header-subtitle');
-        if (subtitleEl) subtitleEl.textContent = TICKET_ID;
-        var headerIdEl = document.querySelector('.tw-ticket-header-id');
-        if (headerIdEl) headerIdEl.textContent = TICKET_ID;
-
-        /* Dates in header card */
-        var dateVals = document.querySelectorAll('.tw-ticket-header-date-val');
-        if (dateVals[0]) dateVals[0].textContent = ticket.submitted;
-        if (dateVals[1]) dateVals[1].textContent = ticket.lastUpdated;
-
-        /* FIX 3: Set data-status on header card for CSS border color */
-        var headerCard = document.querySelector('.tw-ticket-header-card');
-        if (headerCard) headerCard.dataset.status = s;
-
-        /* Render header meta badges */
-        renderHeaderMeta(data, ticket);
-
-        /* Show correct action card, hide all others */
-        var cardMap = {
-            'new':      'actionCardNew',
-            'in_progress': 'actionCardProgress',
-            'forwarded':'awaitingActionCard',
-            'uat':      'uatActionCard',
-            'resolved': 'actionCardResolved',
-            'closed':   'closedBanner',
-            'rejected': 'rejectedBanner'
-        };
-        Object.keys(cardMap).forEach(function (status) {
-            var el = document.getElementById(cardMap[status]);
-            if (el) el.style.display = (s === status) ? '' : 'none';
-        });
-
-        /* Status-specific action card message */
-        if ((s === 'forwarded' || s === 'uat') && ticket.actionMessage) {
-            var cardId = s === 'forwarded' ? 'awaitingActionCard' : 'uatActionCard';
-            var msgEl = document.querySelector('#' + cardId + ' .tw-action-card__message');
-            if (msgEl) msgEl.textContent = ticket.actionMessage;
-        }
-
-        /* Description — updated before closed injection to avoid querySelector ambiguity */
-        var descEl = document.querySelector('.tw-description-text');
-        if (descEl) descEl.textContent = ticket.description;
-
-        /* Closed: inject resolution summary card after the status banner */
-        if (s === 'closed' && ticket.resolutionSummary) {
-            var closedEl = document.getElementById('closedBanner');
-            if (closedEl) {
-                closedEl.insertAdjacentHTML('beforeend',
-                    '<div class="tw-detail-card" style="margin-top:var(--tw-space-4)">' +
-                    '<div class="tw-detail-card__header">' +
-                    '<i class="bx bx-check-double" aria-hidden="true"></i>' +
-                    '<h3 class="tw-detail-card__title">Resolution Summary</h3>' +
-                    '</div>' +
-                    '<div class="tw-detail-card__body">' +
-                    '<p style="margin:0;color:var(--tw-text-secondary);font-size:var(--tw-text-sm)">' +
-                    escapeHtml(ticket.resolutionSummary) + '</p>' +
-                    '</div></div>'
-                );
-            }
-        }
-
-        /* Rejected: populate rejection details panel */
-        if (s === 'rejected') {
-            var metaVals = document.querySelectorAll('.tw-rejection-meta-row__value');
-            if (metaVals[0]) metaVals[0].textContent = ticket.rejectedBy;
-            if (metaVals[1]) metaVals[1].textContent = ticket.rejectedOn;
-            var reasonBox = document.querySelector('.tw-rejection-details .tw-description-box');
-            if (reasonBox) reasonBox.textContent = ticket.rejectionReason;
-        }
-
-        /* Attachments — seed array; always show card so "Add Attachment" is accessible */
-        sharedAttachments = ticket.attachments.slice();
-        var attachListEl = document.getElementById('attachmentList');
-        if (attachListEl) {
-            var attachCard = attachListEl.closest('.tw-detail-card');
-            if (attachCard) attachCard.style.display = '';
-        }
-
-        /* Render right column */
-        renderInfoPanel(buildInfoRows(s, ticket));
-        renderTimeline(data.timeline);
-
-        /* Handle chat state */
-        var chatInputArea = document.getElementById('chatInputArea');
-        var chatNotice    = document.getElementById('chatNotice');
-        var chatInput     = document.getElementById('chatInput');
-        var chatSendBtn   = document.getElementById('chatSendBtn');
-
-        if (data.chatHidden) {
-            /* rejected: hide input entirely — read history only */
-            if (chatInputArea) chatInputArea.style.display = 'none';
-        } else if (data.chatDisabled) {
-            /* closed: show notice, disable textarea and send button */
-            if (chatNotice)  chatNotice.style.display = '';
-            if (chatInput)   { chatInput.disabled = true; chatInput.placeholder = 'Chat is closed.'; }
-            if (chatSendBtn) chatSendBtn.disabled = true;
-        }
-
-        /* Render attachment list */
-        renderAttachmentList();
-
-        /* Scroll chat to bottom */
-        var thread = document.getElementById('chatThread');
-        if (thread) thread.scrollTop = thread.scrollHeight;
-    }
-    initPage();
-
-
-    /* ============================================================
-     * FIX 2: ATTACHMENT FUNCTIONS
-     * ============================================================ */
-
-    /* Trigger the hidden file input for the attachment section */
-    function triggerAttachmentUpload() {
-        document.getElementById('attachmentFileInput').click();
-    }
-
-    /*
-     * addSharedAttachment(file)
-     * FIX 2D: Adds a file to the sharedAttachments array,
-     * re-renders the attachment section, and adds a bubble to chat.
-     * Django: POSTs file to {% url 'client_upload_attachment' ticket.id %}
-     */
-    function addSharedAttachment(file) {
-        var maxBytes = 10 * 1024 * 1024;
-        if (file.size > maxBytes) {
-            showClientToast('File too large. Maximum size is 10 MB.', 'error');
-            return;
-        }
-
-        var ext  = (file.name.split('.').pop() || '').toLowerCase();
-        var type = ['jpg', 'jpeg', 'png', 'gif', 'webp'].indexOf(ext) !== -1 ? 'img'
-                 : ext === 'pdf' ? 'pdf' : 'doc';
-        var sizeKb  = Math.round(file.size / 1024);
-        var sizeStr = sizeKb > 1024 ? (Math.round(sizeKb / 102.4) / 10) + ' MB' : sizeKb + ' KB';
-
-        /* Add to shared array */
-        sharedAttachments.push({
-            name: file.name,
-            type: type,
-            size: sizeStr,
-            date: formatDateShort(new Date())
-        });
-
-        /* Re-render attachment list */
-        renderAttachmentList();
-
-        /* FIX 2E: Add file chip bubble to chat thread */
-        var thread = document.getElementById('chatThread');
-        if (thread) {
-            var el = document.createElement('div');
-            el.className = 'tw-client-message tw-client-message--client';
-            el.innerHTML =
-                '<span class="tw-client-message__sender">You — Attachment</span>' +
-                '<div class="tw-client-message__bubble" style="display:flex;align-items:center;gap:8px;padding:10px 14px">' +
-                '<i class="bx bx-paperclip" style="font-size:16px;flex-shrink:0" aria-hidden="true"></i>' +
-                '<span>' + escapeHtml(file.name) + '</span>' +
-                '</div>' +
-                '<span class="tw-client-message__time">' + formatNow() + '</span>';
-            thread.appendChild(el);
-            thread.scrollTop = thread.scrollHeight;
-        }
-
-        /* Django: fetch stub */
-        console.log('[Client Portal] Upload attachment stub:', { name: file.name, size: sizeStr });
-
-        showClientToast('Attachment added and shared with support team.', 'success');
-    }
-
-    /* Wire attachment section file input */
-    document.getElementById('attachmentFileInput').addEventListener('change', function () {
-        if (this.files && this.files[0]) {
-            addSharedAttachment(this.files[0]);
-            this.value = ''; /* reset so same file can be re-selected */
-        }
-    });
-
-    /* FIX 2E: Wire chat attach file input */
-    document.getElementById('chatFileInput').addEventListener('change', function () {
-        if (this.files && this.files[0]) {
-            addSharedAttachment(this.files[0]);
-            this.value = '';
-        }
-    });
-
-
-    /* ============================================================
-     * CHAT INTERACTION
-     * ============================================================ */
-
-    function autoResizeChatInput(el) {
-        el.style.height = 'auto';
-        el.style.height = Math.min(el.scrollHeight, 160) + 'px';
-    }
-
-    /*
-     * sendChatMessage()
-     * Appends typed text as an orange client bubble.
-     * Django: fetch('{% url "client_ticket_message" ticket.id %}', {method:'POST', ...})
-     */
-    function sendChatMessage() {
-        var input     = document.getElementById('chatInput');
-        var emailCopy = document.getElementById('emailCopyCheck').checked;
-        var text      = (input.value || '').trim();
-        if (!text) { input.focus(); return; }
-
-        var el = document.createElement('div');
-        el.className = 'tw-client-message tw-client-message--client';
-        el.innerHTML =
-            '<span class="tw-client-message__sender">You</span>' +
-            '<div class="tw-client-message__bubble">' + escapeHtml(text) + '</div>' +
-            '<span class="tw-client-message__time">' + formatNow() + '</span>';
-
-        var thread = document.getElementById('chatThread');
-        thread.appendChild(el);
-        thread.scrollTop = thread.scrollHeight;
-
-        /* Django: fetch stub */
-        console.log('[Client Portal] Send message stub:', { content: text, email_copy: emailCopy });
-
-        input.value = '';
-        input.style.height = 'auto';
-        showClientToast(emailCopy ? 'Message sent. A copy has been emailed to you.' : 'Message sent.', 'success');
-    }
-
-    /*
-     * sendAwaitingResponse()
-     * Sends client reply to a forwarded/Awaiting info request.
-     * Django: fetch('{% url "client_ticket_response" ticket.id %}', {method:'POST', ...})
-     */
-    function sendAwaitingResponse() {
-        var textarea = document.getElementById('awaitingResponse');
-        var text     = (textarea.value || '').trim();
-        if (!text) { textarea.focus(); showClientToast('Please type your response before sending.', 'error'); return; }
-
-        /* Django: fetch stub */
-        console.log('[Client Portal] Send awaiting response stub:', { response: text });
-
-        showClientToast('Response sent — your ticket will resume shortly.', 'success');
-        textarea.value = '';
-        var card = document.getElementById('awaitingActionCard');
-        if (card) card.style.display = 'none';
-    }
-
-
-    /* ============================================================
-     * UAT APPROVE / REJECT FLOWS
-     * ============================================================ */
-
-    function openApproveConfirm() {
-        var overlay = document.getElementById('approveConfirmOverlay');
-        if (overlay) overlay.classList.add('active');
-    }
-
-    function closeApproveConfirm() {
-        var overlay = document.getElementById('approveConfirmOverlay');
-        if (overlay) overlay.classList.remove('active');
-    }
-
-    /*
-     * confirmApprove()
-     * Django: fetch('{% url "client_uat_approve" ticket.id %}', {method:'POST'})
-     */
-    function confirmApprove() {
-        closeApproveConfirm();
-        console.log('[Client Portal] UAT approve stub:', TICKET_ID);
-
-        showClientToast('Thank you! Ticket marked as resolved. Our team will confirm closure shortly.', 'success');
-
-        TICKET_STATUS = 'resolved';
-        if (typeof currentTicket !== 'undefined') {
-            currentTicket.status = 'resolved';
-        }
-        setTimeout(function() {
-            initPage();
-        }, 800);
-    }
-
-    function showChangesForm() {
-        document.getElementById('changesTextarea').classList.add('show');
-        document.getElementById('submitChangesBtn').classList.add('show');
-        document.getElementById('requestChangesBtn').style.display = 'none';
-        document.getElementById('changesTextarea').focus();
-    }
-
-    /*
-     * submitChanges()
-     * Django: fetch('{% url "client_uat_reject" ticket.id %}', {method:'POST', ...})
-     */
-    function submitChanges() {
-        var textarea = document.getElementById('changesTextarea');
-        var text     = (textarea.value || '').trim();
-        if (!text) { textarea.focus(); showClientToast('Please describe the changes needed before submitting.', 'error'); return; }
-
-        console.log('[Client Portal] UAT reject stub:', { reason: text });
-        var card = document.getElementById('uatActionCard');
-        if (card) card.style.display = 'none';
-        showClientToast('Feedback sent — ticket has been returned to development.', 'info');
-    }
-
-
-    /* ============================================================
-     * SHELL JS — sidebar, notifications, profile
-     * ============================================================ */
-
-    var sidebar   = document.getElementById('sidebar');
-    var hamburger = document.getElementById('hamburger-btn');
-
-    function isMobile() { return window.innerWidth <= 768; }
-
-    hamburger.addEventListener('click', function () {
-        if (isMobile()) {
-            sidebar.classList.toggle('mobile-open');
-        } else {
-            sidebar.classList.toggle('hide');
-            document.body.classList.toggle('sidebar-hidden');
-        }
-    });
-
-    window.addEventListener('resize', function () {
-        if (isMobile()) {
-            sidebar.classList.remove('hide');
-            document.body.classList.remove('sidebar-hidden');
-        }
-    });
-
-    var notifBellBtn = document.getElementById('notifBellBtn');
-    var notifPanel   = document.getElementById('notifPanel');
-
-    notifBellBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var isOpen = notifPanel.classList.toggle('open');
-        notifBellBtn.setAttribute('aria-expanded', isOpen);
-    });
-
-    document.getElementById('markAllReadBtn').addEventListener('click', function () {
-        document.querySelectorAll('.tw-notif-item.unread').forEach(function (item) { item.classList.remove('unread'); });
-        var badge = document.getElementById('notifCount');
-        if (badge) badge.remove();
-    });
-
-    var profilePanelOpen = false;
-
-    function toggleProfileDropdown(e) {
-        e.stopPropagation();
-        var panel = document.getElementById('profilePanel');
-        if (notifPanel && notifPanel.classList.contains('open')) {
-            notifPanel.classList.remove('open');
-            notifBellBtn.setAttribute('aria-expanded', 'false');
-        }
-        profilePanelOpen = !profilePanelOpen;
-        panel.classList.toggle('open', profilePanelOpen);
-        panel.setAttribute('aria-hidden', profilePanelOpen ? 'false' : 'true');
-    }
-
-    function closeProfileDropdown() {
-        var panel = document.getElementById('profilePanel');
-        if (panel) { panel.classList.remove('open'); profilePanelOpen = false; panel.setAttribute('aria-hidden', 'true'); }
-    }
-
-    document.addEventListener('click', function (e) {
-        if (!notifBellBtn.contains(e.target) && !notifPanel.contains(e.target)) {
-            notifPanel.classList.remove('open');
-            notifBellBtn.setAttribute('aria-expanded', 'false');
-        }
-        var profilePanel = document.getElementById('profilePanel');
-        if (profilePanel && profilePanel.classList.contains('open')) {
-            if (!document.getElementById('profileWrap').contains(e.target)) closeProfileDropdown();
-        }
-        var overlay = document.getElementById('approveConfirmOverlay');
-        if (overlay && overlay.classList.contains('active') && e.target === overlay) closeApproveConfirm();
-    });
-
-    document.addEventListener('keydown', function (e) {
-        if (e.key !== 'Escape') return;
-        closeProfileDropdown();
-        notifPanel.classList.remove('open');
-        notifBellBtn.setAttribute('aria-expanded', 'false');
-        closeApproveConfirm();
-    });
+function autoResizeChatInput(el) {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+}
+
+{% if ticket.status == 'uat' %}
+function openApproveConfirm() {
+    var overlay = document.getElementById('approveConfirmOverlay');
+    if (overlay) overlay.classList.add('active');
+}
+
+function closeApproveConfirm() {
+    var overlay = document.getElementById('approveConfirmOverlay');
+    if (overlay) overlay.classList.remove('active');
+}
+
+function showChangesForm() {
+    var form    = document.getElementById('changesForm');
+    var buttons = document.getElementById('uatButtons');
+    if (form)    form.style.display = 'block';
+    if (buttons) buttons.style.display = 'none';
+    var ta = document.getElementById('changesTextarea');
+    if (ta) ta.focus();
+}
+
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeApproveConfirm();
+});
+
+document.getElementById('approveConfirmOverlay').addEventListener('click', function (e) {
+    if (e.target === this) closeApproveConfirm();
+});
+{% endif %}
 </script>
-
-</body>
-</html>
-
-<!-- Django: {% endblock %} -->
+{% endblock %}

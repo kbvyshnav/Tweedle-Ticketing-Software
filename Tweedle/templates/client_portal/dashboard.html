@@ -1,1796 +1,594 @@
-<!--
-  File: templates/client_portal/dashboard.html
-  Django template: extends 'client_base.html'
-  Django view:     client_portal.views.dashboard
-  Django url:      client_dashboard
-  Role:            User / Client — body class="role-user" (orange theme)
--->
-<!-- Django: {% extends 'client_base.html' %} -->
-<!-- Django: {% block body_role %}user{% endblock %} -->
-<!-- Django: {% block page_css %}
+{% extends 'client_base.html' %}
+{% load static client_extras %}
+
+{% block title %}My Tickets — Tweedle{% endblock %}
+
+{% block page_css %}
 <link rel="stylesheet" href="{% static 'css/pages/client-dashboard.css' %}">
-{% endblock %} -->
-<!-- Django: {% block content %} -->
+<link rel="stylesheet" href="{% static 'css/pages/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/chat.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/ticket-timeline.css' %}">
+{% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Django: {% block title %}My Tickets — Tweedle{% endblock %} -->
-    <title>My Tickets — Tweedle</title>
+{% block content %}
 
-    <!-- Django: {% load static %} -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
-    <!-- Django: href="{% static 'images/favicon.svg' %}" -->
-    <link rel="icon" type="image/svg+xml" href="../../static/images/favicon.svg">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-
-    <!-- CSS load order: 1 tokens → 2 theme-user → 3 base → 4 components → 5 notification → 6 page -->
-    <!-- Django: href="{% static 'css/tweedle-tokens.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-tokens.css">
-    <!-- Django: href="{% static 'css/themes/theme-user.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/themes/theme-user.css">
-    <!-- Django: href="{% static 'css/tweedle-base.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-base.css">
-    <!-- Django: href="{% static 'css/tweedle-components.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-components.css">
-    <!-- Django: href="{% static 'css/pages/notification.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/notification.css">
-    <!-- Django: href="{% static 'css/pages/client-dashboard.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/client-dashboard.css">
-    <!-- dashboard.css: .tw-stat-card, .tw-toolbar-btn, .tw-toolbar-icon-btn, .tw-priority-option -->
-    <!-- Django: href="{% static 'css/pages/dashboard.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/dashboard.css">
-    <!-- chat.css + ticket-timeline.css: panel markup classes for slide-in panels (FIX 2) -->
-    <!-- Django: href="{% static 'css/pages/chat.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/chat.css">
-    <!-- Django: href="{% static 'css/pages/ticket-timeline.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/ticket-timeline.css">
-</head>
-
-<!--
-    BODY CLASS: role-user activates orange theme from theme-user.css.
-    Django: class="role-{% block body_role %}user{% endblock %}"
--->
-<body class="role-user">
+<!-- PAGE HEADER -->
+<div class="tw-client-page-header">
+    <div class="tw-client-header-left">
+        <h1>My Tickets</h1>
+        <p class="tw-client-header-subtitle">Track and manage your support requests</p>
+    </div>
+    <a href="{% url 'client_submit_ticket' %}" class="tw-btn tw-btn-primary">
+        <i class="bx bx-plus" aria-hidden="true"></i>
+        Submit New Ticket
+    </a>
+</div>
 
 
-<!-- ==============================================================
-     SIDEBAR — client portal: My Tickets + Submit Ticket only
-     ============================================================== -->
-<nav class="sidebar" id="sidebar">
+<!-- STAT STRIP -->
+<div class="tw-client-stat-strip" aria-label="Ticket status summary">
 
-    <!-- Brand -->
-    <!-- Django: href="{% url 'client_dashboard' %}" -->
-    <div class="sidebar-brand">
-        <!-- Django: src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" -->
-        <img src="../../static/images/tweedle-logo/tweedle-mark-blue.svg"
-             alt="Tweedle"
-             class="sidebar-logo-img">
-        <span class="brand-text">Tweedle</span>
+    <div class="tw-stat-card tw-stat-card--client-open"
+         data-filter="open" role="button" tabindex="0"
+         onclick="filterByStatCard('open', this)">
+        <div class="tw-stat-card__left">
+            <div class="tw-stat-card__icon" aria-hidden="true"><i class="bx bx-folder-open"></i></div>
+        </div>
+        <div class="tw-stat-card__body">
+            <div class="tw-stat-card__count">{{ open_count }}</div>
+            <div class="tw-stat-card__label">Active tickets</div>
+        </div>
     </div>
 
-    <ul class="sidebar-nav">
-
-        <!-- My Tickets — active on this page -->
-        <!-- Django: href="{% url 'client_dashboard' %}" -->
-        <li class="nav-item active-item">
-            <a href="dashboard.html" class="nav-link active" title="My Tickets">
-                <i class='bx bx-receipt'></i>
-                <span class="nav-label">My Tickets</span>
-            </a>
-        </li>
-
-        <!-- Submit Ticket -->
-        <!-- Django: href="{% url 'client_submit_ticket' %}" -->
-        <li class="nav-item">
-            <a href="submit-ticket.html" class="nav-link" title="Submit Ticket">
-                <i class='bx bx-plus-circle'></i>
-                <span class="nav-label">Submit Ticket</span>
-            </a>
-        </li>
-
-        <!-- Reports -->
-        <!-- Django: href="{% url 'client_reports' %}" -->
-        <li class="nav-item">
-            <a href="reports.html" class="nav-link" title="Reports">
-                <i class='bx bx-bar-chart-alt-2'></i>
-                <span class="nav-label">Reports</span>
-            </a>
-        </li>
-
-    </ul>
-
-</nav>
-<!-- END SIDEBAR -->
-
-
-<!-- ==============================================================
-     MAIN CONTENT WRAPPER
-     ============================================================== -->
-<section id="content">
-
-    <!-- ==========================================================
-         TOPBAR
-         ========================================================== -->
-    <nav class="topbar">
-
-        <i class="bx bx-menu" id="hamburger-btn" role="button" aria-label="Toggle sidebar"></i>
-
-        <!-- Tweedle logo — mobile only -->
-        <div class="topbar-brand-mobile" style="display:none">
-            <!-- Django: src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" -->
-            <img src="../../static/images/tweedle-logo/tweedle-mark-blue.svg" alt="Tweedle" style="height:28px;">
+    <div class="tw-stat-card tw-stat-card--client-needs-action {% if needs_action_count %}has-items{% endif %}"
+         data-filter="needs-action" role="button" tabindex="0"
+         onclick="filterByStatCard('needs-action', this)">
+        <div class="tw-stat-card__left">
+            <div class="tw-stat-card__icon" aria-hidden="true"><i class="bx bx-bell"></i></div>
         </div>
-
-        <!-- NOTIFICATION BELL -->
-        <div class="tw-notif-bell-wrap" id="notifBellWrap">
-            <button
-                class="tw-notif-bell-btn"
-                id="notifBellBtn"
-                aria-label="Notifications"
-                aria-expanded="false"
-                aria-controls="notifPanel">
-                <i class="bx bxs-bell" aria-hidden="true"></i>
-                <!-- Django: {% if unread_notification_count %} -->
-                <span class="tw-notif-count-badge" id="notifCount">2</span>
-                <!-- Django: {% endif %} -->
-            </button>
-
-            <div class="tw-notif-panel" id="notifPanel" role="dialog" aria-label="Notifications">
-                <div class="tw-notif-panel-header">
-                    <span class="tw-notif-panel-title">Notifications</span>
-                    <button
-                        class="tw-btn tw-btn-outline tw-btn--sm"
-                        id="markAllReadBtn"
-                        aria-label="Mark all as read">
-                        Mark all read
-                    </button>
-                </div>
-
-                <div class="tw-notif-list">
-                    <!-- Django: {% for notification in notifications %} -->
-
-                    <div class="tw-notif-item unread" role="button" style="cursor:pointer">
-                        <div class="tw-notif-item-body">
-                            <div class="tw-notif-type-icon tw-notif-type-icon--warning">
-                                <i class="bx bx-check-shield" aria-hidden="true"></i>
-                            </div>
-                            <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">Ready for your review — TKT-GMEC-002</div>
-                                <div class="tw-notif-item-msg">Bulk export CSV fix is ready for UAT. Please review and approve.</div>
-                                <div class="tw-notif-item-time">2 hours ago</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tw-notif-item unread" role="button" style="cursor:pointer">
-                        <div class="tw-notif-item-body">
-                            <div class="tw-notif-type-icon tw-notif-type-icon--info">
-                                <i class="bx bx-info-circle" aria-hidden="true"></i>
-                            </div>
-                            <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">Response needed — TKT-GMEC-003</div>
-                                <div class="tw-notif-item-msg">Support team has requested additional information about your ticket.</div>
-                                <div class="tw-notif-item-time">Yesterday</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Django: {% endfor %} -->
-                </div>
-
-                <!-- Footer link hidden: no client notifications page exists yet (href="#"). -->
-                <div class="tw-notif-panel-footer" style="display: none;">
-                    <!-- Django: href="{% url 'client_notifications' %}" -->
-                    <!-- Django: href="{% url 'client_notifications' %}" -->
-                    <a href="#" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
-                </div>
-            </div>
+        <div class="tw-stat-card__body">
+            <div class="tw-stat-card__count">{{ needs_action_count }}</div>
+            <div class="tw-stat-card__label">Needs Action</div>
         </div>
-        <!-- END NOTIFICATION BELL -->
-
-        <!-- PROFILE DROPDOWN -->
-        <div class="tw-profile-wrap" id="profileWrap">
-
-            <!-- Django: initials {{ request.user.get_full_name|slice:":2"|upper }} -->
-            <div class="tw-avatar tw-avatar--user"
-                 role="button"
-                 aria-label="Profile"
-                 style="width:36px;height:36px;font-size:14px;cursor:pointer"
-                 onclick="toggleProfileDropdown(event)" id="clientUserInitials">SJ</div>
-
-            <div class="tw-profile-panel" id="profilePanel" role="menu" aria-hidden="true">
-                <div class="tw-profile-header">
-                    <!-- Django: {{ request.user.get_full_name }}, {{ request.user.email }} -->
-                    <div class="tw-avatar tw-avatar--user" style="width:40px;height:40px;font-size:15px;flex-shrink:0" id="clientUserInitials2">SJ</div>
-                    <div>
-                        <div style="font-size:var(--tw-text-base);font-weight:600;color:var(--tw-text-primary);line-height:1.3" id="clientUserName">Sarah Johnson</div>
-                        <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px" id="clientUserEmail">sarah.johnson@globaltech.com</div>
-                        <span class="tw-role-pill tw-role-pill--user" style="margin-top:4px;display:inline-block">Client</span>
-                    </div>
-                </div>
-
-                <div class="tw-profile-divider"></div>
-
-                <div class="tw-profile-menu-item" role="menuitem"
-                     onclick="closeProfileDropdown(); showClientToast('Profile settings coming soon.', 'info')">
-                    <i class="bx bx-user" aria-hidden="true"></i>
-                    <span>View Profile</span>
-                </div>
-                <div class="tw-profile-menu-item" role="menuitem"
-                     onclick="closeProfileDropdown(); showClientToast('Password settings coming soon.', 'info')">
-                    <i class="bx bx-lock-alt" aria-hidden="true"></i>
-                    <span>Change Password</span>
-                </div>
-
-                <div class="tw-profile-divider"></div>
-
-                <!-- Django: window.location.href="{% url 'logout' %}" -->
-                <div class="tw-profile-menu-item tw-profile-menu-item--danger" role="menuitem"
-                     onclick="window.location.href = '../login.html'">
-                    <i class="bx bx-log-out" aria-hidden="true"></i>
-                    <span>Sign Out</span>
-                </div>
-            </div>
-
-        </div>
-        <!-- END PROFILE DROPDOWN -->
-
-    </nav>
-    <!-- END TOPBAR -->
-
-
-    <!-- ==========================================================
-         MAIN PAGE CONTENT
-         ========================================================== -->
-    <main id="main-content">
-
-        <!-- =========================================================
-             PAGE HEADER
-             ========================================================= -->
-        <div class="tw-client-page-header">
-            <div class="tw-client-header-left">
-                <h1>My Tickets</h1>
-                <p class="tw-client-header-subtitle">Track and manage your support requests</p>
-            </div>
-            <!-- Django: href="{% url 'client_submit_ticket' %}" -->
-            <a href="submit-ticket.html" class="tw-btn tw-btn-primary">
-                <i class='bx bx-plus' aria-hidden="true"></i>
-                Submit New Ticket
-            </a>
-        </div>
-        <!-- END PAGE HEADER -->
-
-
-        <!-- =========================================================
-             STAT STRIP — 4 cards
-             Django: {{ open_count }}, {{ needs_action_count }},
-                     {{ closed_count }}, {{ rejected_count }}
-             ========================================================= -->
-        <div class="tw-client-stat-strip" aria-label="Ticket status summary">
-
-            <!-- Card 1: Open — blue tint -->
-            <div class="tw-stat-card tw-stat-card--client-open"
-                 data-filter="open"
-                 role="button" tabindex="0"
-                 aria-label="Open tickets: 8"
-                 onclick="filterByStatCard('open', this)">
-                <div class="tw-stat-card__left">
-                    <div class="tw-stat-card__icon" aria-hidden="true">
-                        <i class='bx bx-folder-open'></i>
-                    </div>
-                </div>
-                <div class="tw-stat-card__body">
-                    <!-- Django: {{ open_count }} -->
-                    <div class="tw-stat-card__count">8</div>
-                    <div class="tw-stat-card__label">Active tickets</div>
-                </div>
-            </div>
-
-            <!-- Card 2: Needs Action — orange tint, pulsing border when count > 0 -->
-            <div class="tw-stat-card tw-stat-card--client-needs-action has-items"
-                 data-filter="needs-action"
-                 role="button" tabindex="0"
-                 aria-label="Needs action: 2"
-                 onclick="filterByStatCard('needs-action', this)">
-                <div class="tw-stat-card__left">
-                    <div class="tw-stat-card__icon" aria-hidden="true">
-                        <i class='bx bx-bell'></i>
-                    </div>
-                </div>
-                <div class="tw-stat-card__body">
-                    <!-- Django: {{ needs_action_count }} -->
-                    <div class="tw-stat-card__count">2</div>
-                    <div class="tw-stat-card__label">Needs Action</div>
-                </div>
-            </div>
-
-            <!-- Card 3: Awaiting Closure — blue tint -->
-            <!-- Django: {{ resolved_count }} -->
-            <div class="tw-stat-card tw-stat-card--client-resolved"
-                 data-filter="resolved"
-                 role="button" tabindex="0"
-                 aria-label="Awaiting closure: 2"
-                 onclick="filterByStatCard('resolved', this)">
-                <div class="tw-stat-card__left">
-                    <div class="tw-stat-card__icon" aria-hidden="true">
-                        <i class='bx bx-time-five'></i>
-                    </div>
-                </div>
-                <div class="tw-stat-card__body">
-                    <!-- Django: {{ resolved_count }} -->
-                    <div class="tw-stat-card__count">2</div>
-                    <div class="tw-stat-card__label">Awaiting Closure</div>
-                    <span style="display:block;font-size:10px;color:var(--tw-text-muted);font-weight:500;margin-top:1px;">Work done — pending admin</span>
-                </div>
-            </div>
-
-            <!-- Card 4: Closed — green tint -->
-            <div class="tw-stat-card tw-stat-card--client-closed"
-                 data-filter="closed"
-                 role="button" tabindex="0"
-                 aria-label="Closed tickets: 12"
-                 onclick="filterByStatCard('closed', this)">
-                <div class="tw-stat-card__left">
-                    <div class="tw-stat-card__icon" aria-hidden="true">
-                        <i class='bx bx-check-circle'></i>
-                    </div>
-                </div>
-                <div class="tw-stat-card__body">
-                    <!-- Django: {{ closed_count }} -->
-                    <div class="tw-stat-card__count">12</div>
-                    <div class="tw-stat-card__label">Completed</div>
-                </div>
-            </div>
-
-            <!-- Card 4: Rejected — danger red tint -->
-            <div class="tw-stat-card tw-stat-card--client-rejected"
-                 data-filter="rejected"
-                 role="button" tabindex="0"
-                 aria-label="Rejected tickets: 1"
-                 onclick="filterByStatCard('rejected', this)">
-                <div class="tw-stat-card__left">
-                    <div class="tw-stat-card__icon" aria-hidden="true">
-                        <i class='bx bx-x-circle'></i>
-                    </div>
-                </div>
-                <div class="tw-stat-card__body">
-                    <!-- Django: {{ rejected_count }} -->
-                    <div class="tw-stat-card__count">1</div>
-                    <div class="tw-stat-card__label">Rejected</div>
-                </div>
-            </div>
-
-        </div>
-        <!-- END STAT STRIP -->
-
-
-        <!-- =========================================================
-             TABLE CARD — ticket list with filter bar
-             ========================================================= -->
-        <div class="tw-table-card">
-
-            <!-- =====================================================
-                 FILTER BAR (FIX 3 + FIX 4)
-                 Left: status pills (+ Rejected)
-                 Right: Priority dropdown | Date Range dropdown |
-                        Sort toggle | Search input
-                 ===================================================== -->
-            <div class="tw-client-filter-bar" style="padding: var(--tw-space-4) var(--tw-space-5); border-bottom: 1px solid var(--tw-border);">
-
-                <!-- Status filter pills -->
-                <div class="tw-client-filter-btns" role="group" aria-label="Filter by status">
-                    <button class="tw-client-filter-btn active" data-status-filter="all"          onclick="filterTickets('all', this)">All</button>
-                    <button class="tw-client-filter-btn"        data-status-filter="open"         onclick="filterTickets('open', this)">Open</button>
-                    <button class="tw-client-filter-btn"        data-status-filter="needs-action" onclick="filterTickets('needs-action', this)">Needs Action</button>
-                    <button class="tw-client-filter-btn"        data-status-filter="resolved"     onclick="filterTickets('resolved', this)">Awaiting Closure</button>
-                    <button class="tw-client-filter-btn"        data-status-filter="closed"       onclick="filterTickets('closed', this)">Closed</button>
-                    <button class="tw-client-filter-btn"        data-status-filter="rejected"     onclick="filterTickets('rejected', this)">Rejected</button>
-                </div>
-
-                <!-- Right cluster: Priority | Date Range | Sort | Search -->
-                <div class="tw-client-toolbar-right">
-
-                    <!-- Priority dropdown (FIX 3A) -->
-                    <div class="tw-client-dropdown-wrap" id="clientPriorityWrap">
-                        <button
-                            class="tw-toolbar-btn"
-                            id="clientPriorityBtn"
-                            onclick="toggleClientPriorityDropdown(event)"
-                            aria-haspopup="listbox"
-                            aria-expanded="false">
-                            <span id="priorityBtnLabel">Priority</span>
-                            <i class="bx bx-chevron-down tw-dropdown-arrow" aria-hidden="true"></i>
-                        </button>
-                        <div class="tw-client-priority-dropdown" id="clientPriorityDropdown" role="listbox" aria-label="Priority filter options">
-                            <!-- Django: {% for priority in priority_choices %} -->
-                            <div class="tw-priority-option" role="option" onclick="applyClientPriority('all', this)">
-                                All Priorities
-                            </div>
-                            <div class="tw-priority-option" role="option" onclick="applyClientPriority('high', this)">
-                                <span class="tw-priority-dot" style="background:var(--tw-priority-high-text)"></span>
-                                High
-                            </div>
-                            <div class="tw-priority-option" role="option" onclick="applyClientPriority('medium', this)">
-                                <span class="tw-priority-dot" style="background:var(--tw-priority-medium-text)"></span>
-                                Medium
-                            </div>
-                            <div class="tw-priority-option" role="option" onclick="applyClientPriority('low', this)">
-                                <span class="tw-priority-dot" style="background:var(--tw-priority-low-text)"></span>
-                                Low
-                            </div>
-                            <!-- Django: {% endfor %} -->
-                        </div>
-                    </div>
-
-                    <!-- Date Range dropdown (FIX 3B) -->
-                    <div class="tw-client-dropdown-wrap" id="clientDateWrap">
-                        <button
-                            class="tw-toolbar-btn"
-                            id="clientDateBtn"
-                            onclick="toggleClientDateDropdown(event)"
-                            aria-haspopup="true"
-                            aria-expanded="false">
-                            <span id="dateBtnLabel">Date Range</span>
-                            <i class="bx bx-chevron-down tw-dropdown-arrow" aria-hidden="true"></i>
-                        </button>
-                        <div class="tw-client-date-dropdown" id="clientDateDropdown">
-                            <!-- Quick filters -->
-                            <div class="tw-client-quick-filters">
-                                <button class="tw-client-quick-filter" onclick="applyClientQuickDate('today', this)">Today</button>
-                                <button class="tw-client-quick-filter" onclick="applyClientQuickDate('week', this)">This Week</button>
-                                <button class="tw-client-quick-filter" onclick="applyClientQuickDate('month', this)">This Month</button>
-                            </div>
-                            <!-- Custom range -->
-                            <div class="tw-client-date-input-group">
-                                <div>
-                                    <label for="clientDateFrom">From</label>
-                                    <input type="date" id="clientDateFrom" class="tw-input" oninput="applyClientDateRange()">
-                                </div>
-                                <div>
-                                    <label for="clientDateTo">To</label>
-                                    <input type="date" id="clientDateTo" class="tw-input" oninput="applyClientDateRange()">
-                                </div>
-                            </div>
-                            <button
-                                class="tw-btn tw-btn-outline tw-btn--sm"
-                                style="width:100%;margin-top:var(--tw-space-2)"
-                                onclick="clearClientDateFilter()">
-                                Clear Date Filter
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Sort toggle (FIX 3C) -->
-                    <button
-                        class="tw-toolbar-icon-btn"
-                        id="sortBtn"
-                        onclick="cycleSortOrder()"
-                        title="Sort by submitted date"
-                        aria-label="Sort tickets by submitted date">
-                        <i class="bx bx-sort-alt-2" id="sortIcon"></i>
-                    </button>
-
-                    <!-- Search input -->
-                    <div class="tw-client-search">
-                        <i class="bx bx-search tw-search-icon" aria-hidden="true"></i>
-                        <input
-                            type="text"
-                            id="ticketSearchInput"
-                            placeholder="Search by ID or subject..."
-                            aria-label="Search tickets"
-                            oninput="clientFilters.search = this.value.toLowerCase().trim(); applyClientFilters()">
-                    </div>
-
-                </div>
-                <!-- END TOOLBAR RIGHT -->
-
-            </div>
-            <!-- END FILTER BAR -->
-
-
-            <!-- =====================================================
-                 TICKET TABLE — 6 rows with star, attachments, actions
-                 Django: {{ ticket.ticket_id }}, {{ ticket.subject }},
-                         {{ ticket.category }}, {{ ticket.created_at }},
-                         {{ ticket.updated_at }}, {{ ticket.status }}
-                 ===================================================== -->
-            <div class="table-scroll-wrapper">
-                <table class="tw-table" aria-label="My tickets">
-                    <thead>
-                        <tr>
-                            <th>Ticket ID</th>
-                            <th>Subject</th>
-                            <th>Category</th>
-                            <th>Submitted On</th>
-                            <th>Last Updated</th>
-                            <th>Status</th>
-                            <th>Quick Access</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ticketTableBody">
-
-                        <!-- Django: {% for ticket in tickets %} -->
-
-                        <!-- Row 1: In Progress | Medium | 10 Apr 2025 -->
-                        <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
-                        <tr data-status="in_progress"
-                            data-ticket-id="TKT-GMEC-001"
-                            data-subject="Payment gateway timeout"
-                            data-priority="medium"
-                            data-submitted-date="2025-04-10"
-                            style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-001&amp;status=in_progress'"
-                            aria-label="View ticket TKT-GMEC-001">
-                            <td>
-                                <!-- FIX 1: Star icon + ticket ID in flex wrapper -->
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <!-- Django: {{ ticket.ticket_id }} -->
-                                    <span class="tw-ticket-id">TKT-GMEC-001</span>
-                                </div>
-                            </td>
-                            <td>
-                                <!-- FIX 5: Subject + attachment chip stacked -->
-                                <div title="Payment gateway timeout">Payment gateway timeout</div>
-                                <div class="tw-row-attachment">
-                                    <!-- Django: {{ ticket.attachment.filename }} -->
-                                    <i class="bx bxs-file-pdf attach-icon pdf" aria-hidden="true"></i>
-                                    <span class="attach-name">requirements_v2.pdf</span>
-                                </div>
-                            </td>
-                            <td>
-                                <!-- Django: {{ ticket.category }} -->
-                                Billing
-                            </td>
-                            <td>10 Apr 2025</td>
-                            <td>22 Apr 2025</td>
-                            <td>
-                                <span class="tw-status-badge tw-status-badge--progress">In Progress</span>
-                            </td>
-                            <td>
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openClientTimelinePanel('TKT-GMEC-001', 'Payment gateway timeout')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openClientChatPanel('TKT-GMEC-001', 'Payment gateway timeout')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Row 2: UAT Approval | Medium | 15 Apr 2025 — "Your Review Needed" -->
-                        <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
-                        <tr data-status="uat"
-                            data-ticket-id="TKT-GMEC-002"
-                            data-subject="Bulk export CSV missing columns"
-                            data-priority="medium"
-                            data-submitted-date="2025-04-15"
-                            style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-002&amp;status=uat'"
-                            aria-label="View ticket TKT-GMEC-002">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <span class="tw-ticket-id">TKT-GMEC-002</span>
-                                </div>
-                            </td>
-                            <td>
-                                <!-- FIX 5: Screenshot attachment -->
-                                <div title="Bulk export CSV missing columns">Bulk export CSV missing columns</div>
-                                <div class="tw-row-attachment">
-                                    <i class="bx bxs-image attach-icon img" aria-hidden="true"></i>
-                                    <span class="attach-name">csv-export-screenshot.png</span>
-                                </div>
-                            </td>
-                            <td>Reports</td>
-                            <td>15 Apr 2025</td>
-                            <td>20 Apr 2025</td>
-                            <td>
-                                <span class="tw-status-badge tw-status-badge--uat">UAT Approval</span>
-                                <span class="tw-action-dot" title="Your review is needed" aria-label="Your review is needed"></span>
-                            </td>
-                            <td>
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openClientTimelinePanel('TKT-GMEC-002', 'Bulk export CSV missing columns')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openClientChatPanel('TKT-GMEC-002', 'Bulk export CSV missing columns')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Row 3: Forwarded / Your Input Needed | High | 18 Apr 2025 — "Action Required" -->
-                        <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
-                        <tr data-status="forwarded"
-                            data-ticket-id="TKT-GMEC-003"
-                            data-subject="User role permissions not saving"
-                            data-priority="high"
-                            data-submitted-date="2025-04-18"
-                            style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-003&amp;status=forwarded'"
-                            aria-label="View ticket TKT-GMEC-003">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <span class="tw-ticket-id">TKT-GMEC-003</span>
-                                </div>
-                            </td>
-                            <td>
-                                <!-- FIX 5: Log attachment -->
-                                <div title="User role permissions not saving">User role permissions not saving</div>
-                                <div class="tw-row-attachment">
-                                    <i class="bx bxs-file-pdf attach-icon pdf" aria-hidden="true"></i>
-                                    <span class="attach-name">access_issue_log.pdf</span>
-                                </div>
-                            </td>
-                            <td>Access Control</td>
-                            <td>18 Apr 2025</td>
-                            <td>21 Apr 2025</td>
-                            <td>
-                                <span class="tw-status-badge tw-status-badge--forwarded">Your Input Needed</span>
-                                <span class="tw-action-dot" title="Your input is needed" aria-label="Your input is needed"></span>
-                            </td>
-                            <td>
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openClientTimelinePanel('TKT-GMEC-003', 'User role permissions not saving')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openClientChatPanel('TKT-GMEC-003', 'User role permissions not saving')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Row 4: New | Low | 02 May 2025 — no attachment -->
-                        <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
-                        <tr data-status="new"
-                            data-ticket-id="TKT-GMEC-004"
-                            data-subject="Invoice generation wrong totals"
-                            data-priority="low"
-                            data-submitted-date="2025-05-02"
-                            style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-004&amp;status=new'"
-                            aria-label="View ticket TKT-GMEC-004">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <span class="tw-ticket-id">TKT-GMEC-004</span>
-                                </div>
-                            </td>
-                            <td>Invoice generation wrong totals</td>
-                            <td>Billing</td>
-                            <td>02 May 2025</td>
-                            <td>05 May 2025</td>
-                            <td>
-                                <span class="tw-status-badge tw-status-badge--new">New</span>
-                            </td>
-                            <td>
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openClientTimelinePanel('TKT-GMEC-004', 'Invoice generation wrong totals')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openClientChatPanel('TKT-GMEC-004', 'Invoice generation wrong totals')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Row 5: Closed | Low | 28 Mar 2025 — no attachment -->
-                        <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
-                        <tr data-status="closed"
-                            data-ticket-id="TKT-GMEC-005"
-                            data-subject="Dashboard not loading on mobile"
-                            data-priority="low"
-                            data-submitted-date="2025-03-28"
-                            style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-005&amp;status=closed'"
-                            aria-label="View ticket TKT-GMEC-005">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <span class="tw-ticket-id">TKT-GMEC-005</span>
-                                </div>
-                            </td>
-                            <td>Dashboard not loading on mobile</td>
-                            <td>UI/UX</td>
-                            <td>28 Mar 2025</td>
-                            <td>15 Apr 2025</td>
-                            <td>
-                                <span class="tw-status-badge tw-status-badge--closed">Closed</span>
-                            </td>
-                            <td>
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openClientTimelinePanel('TKT-GMEC-005', 'Dashboard not loading on mobile')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openClientChatPanel('TKT-GMEC-005', 'Dashboard not loading on mobile')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Row 6: Rejected | High | 20 Mar 2025 — no attachment -->
-                        <!-- Django: onclick="window.location.href='{% url 'client_ticket_detail' ticket.id %}'" -->
-                        <tr data-status="rejected"
-                            data-ticket-id="TKT-GMEC-006"
-                            data-subject="API rate limit errors on sync"
-                            data-priority="high"
-                            data-submitted-date="2025-03-20"
-                            style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-006&amp;status=rejected'"
-                            aria-label="View ticket TKT-GMEC-006">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <span class="tw-ticket-id">TKT-GMEC-006</span>
-                                </div>
-                            </td>
-                            <td>API rate limit errors on sync</td>
-                            <td>Integration</td>
-                            <td>20 Mar 2025</td>
-                            <td>10 Apr 2025</td>
-                            <td>
-                                <span class="tw-status-badge tw-status-badge--rejected">Rejected</span>
-                            </td>
-                            <td>
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openClientTimelinePanel('TKT-GMEC-006', 'API rate limit errors on sync')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openClientChatPanel('TKT-GMEC-006', 'API rate limit errors on sync')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Row 7: Resolved | High | 10 Apr 2025 — "Awaiting Closure" -->
-                        <!-- Django: {% if ticket.status == 'resolved' %} -->
-                        <tr data-status="resolved"
-                            data-ticket-id="TKT-GMEC-007"
-                            data-subject="Payment gateway timeout on checkout"
-                            data-priority="high"
-                            data-submitted-date="2025-04-10"
-                            style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html?id=TKT-GMEC-001&amp;status=resolved'"
-                            aria-label="View ticket TKT-GMEC-007">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <!-- Django: {{ ticket.ticket_id }} -->
-                                    <span class="tw-ticket-id">TKT-GMEC-007</span>
-                                </div>
-                            </td>
-                            <td>Payment gateway timeout on checkout</td>
-                            <td>Billing</td>
-                            <td>10 Apr 2025</td>
-                            <td>02 May 2025</td>
-                            <td>
-                                <span class="tw-status-badge tw-status-badge--resolved">Resolved</span>
-                            </td>
-                            <td>
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openClientTimelinePanel('TKT-GMEC-007', 'Payment gateway timeout on checkout')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openClientChatPanel('TKT-GMEC-007', 'Payment gateway timeout on checkout')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Empty state — shown by JS when no rows match the active filter -->
-                        <!-- Django: {% empty %} -->
-                        <tr id="clientEmptyState" style="display:none;">
-                            <td colspan="7">
-                                <div class="tw-client-empty-state">
-                                    <i class='bx bx-folder-open' aria-hidden="true"></i>
-                                    <p id="clientEmptyMsg">No tickets found.</p>
-                                    <button class="tw-btn tw-btn-outline tw-btn--sm"
-                                            onclick="resetClientFilters()">
-                                        Clear Filters
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Django: {% endfor %} -->
-
-                    </tbody>
-                </table>
-            </div>
-            <!-- END TABLE -->
-
-        </div>
-        <!-- END TABLE CARD -->
-
-    </main>
-    <!-- END MAIN -->
-
-
-    <!-- ==============================================================
-         FIX 2: CLIENT CHAT PANEL
-         Single shared instance — header updated by openClientChatPanel().
-         Reuses .tw-chat-panel CSS from chat.css.
-         Django: {{ ticket.messages.all }} populates messages area.
-         ============================================================== -->
-    <div class="tw-chat-panel" id="clientChatPanel"
-         role="dialog" aria-modal="false" aria-label="Ticket chat">
-
-        <div class="tw-chat-header">
-            <div class="chat-header-info">
-                <!-- Updated by openClientChatPanel(ticketId, subject) -->
-                <div class="chat-ticket-id" id="clientChatTicketId">Ticket ID: —</div>
-                <div class="chat-ticket-subject" id="clientChatSubject">—</div>
-            </div>
-            <button class="chat-close-btn" onclick="closeClientChatPanel()" aria-label="Close chat">
-                <i class="bx bx-x" aria-hidden="true"></i>
-            </button>
-        </div>
-
-        <div class="tw-messages-area" id="clientMessagesArea">
-
-            <!-- System event -->
-            <div class="tw-chat-status-msg">
-                Ticket created
-                <span class="tw-chat-status-time">• 15 Apr 2025</span>
-            </div>
-
-            <!-- Admin message (received = left-aligned, grey bubble) -->
-            <div class="tw-message received">
-                <div class="tw-avatar tw-avatar--sm tw-avatar--admin" aria-hidden="true">S</div>
-                <div>
-                    <div class="tw-message-sender">
-                        Support Team
-                        <span class="tw-role-pill tw-role-pill--admin">Admin</span>
-                    </div>
-                    <div class="tw-message-bubble">
-                        <div class="tw-message-text">Hi, we have received your ticket and our team will begin investigation shortly.</div>
-                        <div class="tw-message-time">16 Apr 2025 at 10:23 AM</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Client message (sent = right-aligned, orange bubble via --tw-primary) -->
-            <div class="tw-message sent">
-                <div class="tw-avatar tw-avatar--sm tw-avatar--user" aria-hidden="true">AJ</div>
-                <div>
-                    <div class="tw-message-sender">
-                        You
-                        <span class="tw-role-pill tw-role-pill--user">Client</span>
-                    </div>
-                    <div class="tw-message-bubble">
-                        <div class="tw-message-text">Thank you for the update. Please let me know if you need any additional information from our side.</div>
-                        <div class="tw-message-time">16 Apr 2025 at 11:05 AM</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tw-chat-status-msg">
-                Fix deployed to staging — 20 Apr 2025
-            </div>
-
-        </div>
-
-        <div class="tw-chat-footer">
-
-            <div class="tw-attach-preview-strip" id="clientPanelAttachStrip" aria-live="polite">
-                <i class="bx bx-file" aria-hidden="true"></i>
-                <span id="clientPanelAttachFileName"></span>
-                <button class="tw-file-chip-remove" onclick="removeClientPanelAttachment()" aria-label="Remove attachment">
-                    <i class="bx bx-x" aria-hidden="true"></i>
-                </button>
-            </div>
-
-            <div class="tw-chat-input-row">
-                <input type="file" id="clientPanelChatFile" style="display:none;" accept="*/*">
-                <button class="tw-chat-attach-btn" onclick="document.getElementById('clientPanelChatFile').click()" title="Attach file" aria-label="Attach file">
-                    <i class="bx bx-paperclip" aria-hidden="true"></i>
-                </button>
-                <textarea
-                    class="tw-chat-textarea"
-                    id="clientChatTextarea"
-                    placeholder="Type your message…"
-                    rows="1"
-                    aria-label="Message input"></textarea>
-                <button class="tw-chat-send-btn" onclick="sendClientMessage()" aria-label="Send message">
-                    <i class="bx bx-send" aria-hidden="true"></i>
-                </button>
-            </div>
-            <div class="tw-chat-email-row">
-                <input type="checkbox" id="clientEmailNotif" aria-label="Send email copy to me">
-                <label for="clientEmailNotif">Send me an email copy</label>
-            </div>
-        </div>
-
     </div>
-    <!-- END CLIENT CHAT PANEL -->
 
-
-    <!-- ==============================================================
-         FIX 2: CLIENT TIMELINE PANEL
-         Single shared instance — header updated by openClientTimelinePanel().
-         Reuses .tw-timeline-panel CSS from ticket-timeline.css.
-         Django: {{ ticket.events.all }} populates entries.
-         ============================================================== -->
-    <div class="tw-timeline-panel" id="clientTimelinePanel"
-         role="dialog" aria-modal="false" aria-label="Ticket timeline">
-
-        <div class="tw-timeline-panel-header">
-            <div>
-                <!-- Updated by openClientTimelinePanel(ticketId, subject) -->
-                <div class="tw-timeline-panel-ticket-id" id="clientTimelineTicketId">Ticket ID: —</div>
-                <div class="tw-timeline-panel-subject" id="clientTimelineSubject">—</div>
-            </div>
-            <button class="tw-timeline-panel-close" onclick="closeClientTimelinePanel()" aria-label="Close timeline">
-                <i class="bx bx-x" aria-hidden="true"></i>
-            </button>
+    <div class="tw-stat-card tw-stat-card--client-resolved"
+         data-filter="resolved" role="button" tabindex="0"
+         onclick="filterByStatCard('resolved', this)">
+        <div class="tw-stat-card__left">
+            <div class="tw-stat-card__icon" aria-hidden="true"><i class="bx bx-time-five"></i></div>
         </div>
-
-        <div class="tw-timeline-panel-body">
-
-            <!-- Django: {% for event in ticket.events.all %} -->
-
-            <div class="tw-tl-panel-entry">
-                <div class="tw-tl-panel-dot tw-tl-panel-dot--created">
-                    <i class="bx bx-plus" aria-hidden="true"></i>
-                </div>
-                <div class="tw-tl-panel-content">
-                    <div class="tw-tl-panel-event">Ticket Submitted</div>
-                    <div class="tw-tl-panel-meta">15 Apr 2025 at 9:30 AM</div>
-                </div>
-            </div>
-
-            <div class="tw-tl-panel-entry">
-                <div class="tw-tl-panel-dot tw-tl-panel-dot--accepted">
-                    <i class="bx bx-check" aria-hidden="true"></i>
-                </div>
-                <div class="tw-tl-panel-content">
-                    <div class="tw-tl-panel-event">Reviewed by Admin</div>
-                    <div class="tw-tl-panel-meta">16 Apr 2025 at 10:15 AM</div>
-                </div>
-            </div>
-
-            <div class="tw-tl-panel-entry">
-                <div class="tw-tl-panel-dot tw-tl-panel-dot--assigned">
-                    <i class="bx bx-user" aria-hidden="true"></i>
-                </div>
-                <div class="tw-tl-panel-content">
-                    <div class="tw-tl-panel-event">Assigned to Developer</div>
-                    <div class="tw-tl-panel-meta">16 Apr 2025 at 11:30 AM</div>
-                </div>
-            </div>
-
-            <div class="tw-tl-panel-entry">
-                <div class="tw-tl-panel-dot tw-tl-panel-dot--current">
-                    <i class="bx bx-code-alt" aria-hidden="true"></i>
-                </div>
-                <div class="tw-tl-panel-content">
-                    <div class="tw-tl-panel-event">Work Started</div>
-                    <div class="tw-tl-panel-meta">17 Apr 2025 at 9:00 AM</div>
-                </div>
-            </div>
-
-            <!-- Django: {% endfor %} -->
-
+        <div class="tw-stat-card__body">
+            <div class="tw-stat-card__count">{{ resolved_count }}</div>
+            <div class="tw-stat-card__label">Awaiting Closure</div>
+            <span style="display:block;font-size:10px;color:var(--tw-text-muted);font-weight:500;margin-top:1px">Work done — pending admin</span>
         </div>
-
     </div>
-    <!-- END CLIENT TIMELINE PANEL -->
 
-</section>
-<!-- END CONTENT WRAPPER -->
+    <div class="tw-stat-card tw-stat-card--client-closed"
+         data-filter="closed" role="button" tabindex="0"
+         onclick="filterByStatCard('closed', this)">
+        <div class="tw-stat-card__left">
+            <div class="tw-stat-card__icon" aria-hidden="true"><i class="bx bx-check-circle"></i></div>
+        </div>
+        <div class="tw-stat-card__body">
+            <div class="tw-stat-card__count">{{ closed_count }}</div>
+            <div class="tw-stat-card__label">Completed</div>
+        </div>
+    </div>
+
+    <div class="tw-stat-card tw-stat-card--client-rejected"
+         data-filter="rejected" role="button" tabindex="0"
+         onclick="filterByStatCard('rejected', this)">
+        <div class="tw-stat-card__left">
+            <div class="tw-stat-card__icon" aria-hidden="true"><i class="bx bx-x-circle"></i></div>
+        </div>
+        <div class="tw-stat-card__body">
+            <div class="tw-stat-card__count">{{ rejected_count }}</div>
+            <div class="tw-stat-card__label">Rejected</div>
+        </div>
+    </div>
+
+</div>
+<!-- END STAT STRIP -->
 
 
-<!-- ==============================================================
-     VENDOR SCRIPTS
-     ============================================================== -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- TABLE CARD -->
+<div class="tw-table-card">
+
+    <!-- FILTER BAR -->
+    <div class="tw-client-filter-bar" style="padding:var(--tw-space-4) var(--tw-space-5);border-bottom:1px solid var(--tw-border)">
+
+        <div class="tw-client-filter-btns" role="group" aria-label="Filter by status">
+            <button class="tw-client-filter-btn active" data-status-filter="all"          onclick="filterTickets('all', this)">All</button>
+            <button class="tw-client-filter-btn"        data-status-filter="open"         onclick="filterTickets('open', this)">Open</button>
+            <button class="tw-client-filter-btn"        data-status-filter="needs-action" onclick="filterTickets('needs-action', this)">Needs Action</button>
+            <button class="tw-client-filter-btn"        data-status-filter="resolved"     onclick="filterTickets('resolved', this)">Awaiting Closure</button>
+            <button class="tw-client-filter-btn"        data-status-filter="closed"       onclick="filterTickets('closed', this)">Closed</button>
+            <button class="tw-client-filter-btn"        data-status-filter="rejected"     onclick="filterTickets('rejected', this)">Rejected</button>
+        </div>
+
+        <div class="tw-client-toolbar-right">
+
+            <!-- Priority dropdown -->
+            <div class="tw-client-dropdown-wrap" id="clientPriorityWrap">
+                <button class="tw-toolbar-btn" id="clientPriorityBtn"
+                        onclick="toggleClientPriorityDropdown(event)"
+                        aria-haspopup="listbox" aria-expanded="false">
+                    <span id="priorityBtnLabel">Priority</span>
+                    <i class="bx bx-chevron-down tw-dropdown-arrow" aria-hidden="true"></i>
+                </button>
+                <div class="tw-client-priority-dropdown" id="clientPriorityDropdown" role="listbox" aria-label="Priority filter options">
+                    <div class="tw-priority-option" role="option" onclick="applyClientPriority('all', this)">All Priorities</div>
+                    <div class="tw-priority-option" role="option" onclick="applyClientPriority('high', this)">
+                        <span class="tw-priority-dot" style="background:var(--tw-priority-high-text)"></span>High
+                    </div>
+                    <div class="tw-priority-option" role="option" onclick="applyClientPriority('medium', this)">
+                        <span class="tw-priority-dot" style="background:var(--tw-priority-medium-text)"></span>Medium
+                    </div>
+                    <div class="tw-priority-option" role="option" onclick="applyClientPriority('low', this)">
+                        <span class="tw-priority-dot" style="background:var(--tw-priority-low-text)"></span>Low
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date Range dropdown -->
+            <div class="tw-client-dropdown-wrap" id="clientDateWrap">
+                <button class="tw-toolbar-btn" id="clientDateBtn"
+                        onclick="toggleClientDateDropdown(event)"
+                        aria-haspopup="true" aria-expanded="false">
+                    <span id="dateBtnLabel">Date Range</span>
+                    <i class="bx bx-chevron-down tw-dropdown-arrow" aria-hidden="true"></i>
+                </button>
+                <div class="tw-client-date-dropdown" id="clientDateDropdown">
+                    <div class="tw-client-quick-filters">
+                        <button class="tw-client-quick-filter" onclick="applyClientQuickDate('today', this)">Today</button>
+                        <button class="tw-client-quick-filter" onclick="applyClientQuickDate('week', this)">This Week</button>
+                        <button class="tw-client-quick-filter" onclick="applyClientQuickDate('month', this)">This Month</button>
+                    </div>
+                    <div class="tw-client-date-input-group">
+                        <div>
+                            <label for="clientDateFrom">From</label>
+                            <input type="date" id="clientDateFrom" class="tw-input" oninput="applyClientDateRange()">
+                        </div>
+                        <div>
+                            <label for="clientDateTo">To</label>
+                            <input type="date" id="clientDateTo" class="tw-input" oninput="applyClientDateRange()">
+                        </div>
+                    </div>
+                    <button class="tw-btn tw-btn-outline tw-btn--sm" style="width:100%;margin-top:var(--tw-space-2)"
+                            onclick="clearClientDateFilter()">Clear Date Filter</button>
+                </div>
+            </div>
+
+            <!-- Sort toggle -->
+            <button class="tw-toolbar-icon-btn" id="sortBtn" onclick="cycleSortOrder()"
+                    title="Sort by submitted date" aria-label="Sort tickets by submitted date">
+                <i class="bx bx-sort-alt-2" id="sortIcon"></i>
+            </button>
+
+            <!-- Search -->
+            <div class="tw-client-search">
+                <i class="bx bx-search tw-search-icon" aria-hidden="true"></i>
+                <input type="text" id="ticketSearchInput"
+                       placeholder="Search by ID or subject…"
+                       aria-label="Search tickets"
+                       oninput="clientFilters.search = this.value.toLowerCase().trim(); applyClientFilters()">
+            </div>
+
+        </div>
+    </div>
+    <!-- END FILTER BAR -->
 
 
-<!-- ==============================================================
-     SHELL JS — sidebar toggle, profile dropdown, notification bell.
-     Django: {% block page_js %} — only page-specific code here.
-     ============================================================== -->
+    <!-- TICKET TABLE -->
+    <div class="table-scroll-wrapper">
+        <table class="tw-table" aria-label="My tickets">
+            <thead>
+                <tr>
+                    <th>Ticket ID</th>
+                    <th>Subject</th>
+                    <th>Category</th>
+                    <th>Submitted On</th>
+                    <th>Last Updated</th>
+                    <th>Status</th>
+                    <th>Quick Access</th>
+                </tr>
+            </thead>
+            <tbody id="ticketTableBody">
+
+                {% for ticket in tickets %}
+                <tr data-status="{{ ticket.status }}"
+                    data-ticket-id="{{ ticket.reference }}"
+                    data-subject="{{ ticket.subject|lower }}"
+                    data-priority="{{ ticket.priority }}"
+                    data-submitted-date="{{ ticket.created_at|date:'Y-m-d' }}"
+                    style="cursor:pointer"
+                    onclick="window.location.href='{% url 'client_ticket_detail' ticket.pk %}'"
+                    aria-label="View ticket {{ ticket.reference }}">
+                    <td>
+                        <div class="ticket-id-cell">
+                            <i class="bx bxs-star tw-star-icon"
+                               onclick="event.stopPropagation(); this.classList.toggle('active')"
+                               role="button" tabindex="0"
+                               aria-label="Star this ticket"></i>
+                            <span class="tw-ticket-id">{{ ticket.reference }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div title="{{ ticket.subject }}">{{ ticket.subject }}</div>
+                    </td>
+                    <td>{{ ticket.category|default:"—" }}</td>
+                    <td>{{ ticket.created_at|date:"d M Y" }}</td>
+                    <td>{{ ticket.updated_at|date:"d M Y" }}</td>
+                    <td>
+                        {% client_ticket_badge ticket %}
+                        {% if ticket.status == 'uat' or ticket.status == 'awaiting_client' %}
+                        <span class="tw-action-dot" title="Your action is needed" aria-label="Your action is needed"></span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
+                               onclick="event.stopPropagation(); window.location.href='{% url 'client_ticket_detail' ticket.pk %}'"
+                               role="button" tabindex="0"
+                               aria-label="View ticket details"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
+                               onclick="event.stopPropagation(); window.location.href='{% url 'client_ticket_detail' ticket.pk %}'"
+                               role="button" tabindex="0"
+                               aria-label="View ticket details"></i>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr id="clientEmptyStateNoTickets">
+                    <td colspan="7">
+                        <div class="tw-client-empty-state">
+                            <i class="bx bx-folder-open" aria-hidden="true"></i>
+                            <p>You haven't submitted any tickets yet.</p>
+                            <a href="{% url 'client_submit_ticket' %}" class="tw-btn tw-btn-primary tw-btn--sm">
+                                Submit your first ticket
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+
+                <!-- JS-driven empty state for active filters (hidden by default) -->
+                <tr id="clientEmptyState" style="display:none">
+                    <td colspan="7">
+                        <div class="tw-client-empty-state">
+                            <i class="bx bx-folder-open" aria-hidden="true"></i>
+                            <p id="clientEmptyMsg">No tickets found.</p>
+                            <button class="tw-btn tw-btn-outline tw-btn--sm"
+                                    onclick="resetClientFilters()">Clear Filters</button>
+                        </div>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+    <!-- END TABLE -->
+
+</div>
+<!-- END TABLE CARD -->
+
+{% endblock %}
+
+
+{% block page_js %}
 <script>
-    /* Django: CLIENT_USER populated from {{ request.user }} context at deploy time */
-    var CLIENT_USER = {
-        name:     'Sarah Johnson',
-        initials: 'SJ',
-        email:    'sarah.johnson@globaltech.com',
-        company:  'GlobalTech Solutions',
-        role:     'Primary Contact'
-    };
+/* ============================================================
+ * Composable filter state
+ * ============================================================ */
+var clientFilters = {
+    status:   'all',
+    priority: 'all',
+    dateFrom: null,
+    dateTo:   null,
+    search:   ''
+};
 
-    document.addEventListener('DOMContentLoaded', function () {
-        var els = {
-            clientUserInitials:  CLIENT_USER.initials,
-            clientUserInitials2: CLIENT_USER.initials,
-            clientUserName:      CLIENT_USER.name,
-            clientUserEmail:     CLIENT_USER.email,
-            clientUserCompany:   CLIENT_USER.company
-        };
-        Object.keys(els).forEach(function (id) {
-            var el = document.getElementById(id);
-            if (el) el.textContent = els[id];
-        });
-    });
+var clientSortOrder = 'default';
 
-    /* === SIDEBAR TOGGLE === */
-    var sidebar   = document.getElementById('sidebar');
-    var hamburger = document.getElementById('hamburger-btn');
+(function storeOriginalOrder() {
+    var rows = document.querySelectorAll('#ticketTableBody tr[data-status]');
+    rows.forEach(function (row, i) { row.dataset.originalOrder = i; });
+})();
 
-    function isMobile() { return window.innerWidth <= 768; }
 
-    hamburger.addEventListener('click', function () {
-        if (isMobile()) {
-            sidebar.classList.toggle('mobile-open');
+function applyClientFilters() {
+    var rows = document.querySelectorAll('#ticketTableBody tr[data-status]');
+    rows.forEach(function (row) {
+        if (checkRowMatch(row)) {
+            row.classList.remove('row-hidden');
         } else {
-            sidebar.classList.toggle('hide');
-            document.body.classList.toggle('sidebar-hidden');
+            row.classList.add('row-hidden');
         }
     });
+    applySortOrder();
+    updateClientEmptyState();
+}
 
-    window.addEventListener('resize', function () {
-        if (isMobile()) {
-            sidebar.classList.remove('hide');
-            document.body.classList.remove('sidebar-hidden');
-        }
-    });
+function checkRowMatch(row) {
+    var rowStatus   = row.dataset.status || '';
+    var rowId       = (row.dataset.ticketId  || '').toLowerCase();
+    var rowSubject  = (row.dataset.subject   || '').toLowerCase();
+    var rowPriority = (row.dataset.priority  || '').toLowerCase();
+    var rowDateStr  = row.dataset.submittedDate || '';
 
-
-    /* === NOTIFICATION BELL === */
-    var notifBellBtn = document.getElementById('notifBellBtn');
-    var notifPanel   = document.getElementById('notifPanel');
-
-    notifBellBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var isOpen = notifPanel.classList.toggle('open');
-        notifBellBtn.setAttribute('aria-expanded', isOpen);
-    });
-
-    document.getElementById('markAllReadBtn').addEventListener('click', function () {
-        document.querySelectorAll('.tw-notif-item.unread').forEach(function (item) {
-            item.classList.remove('unread');
-        });
-        var badge = document.getElementById('notifCount');
-        if (badge) badge.remove();
-    });
-
-
-    /* === PROFILE DROPDOWN === */
-    var profilePanelOpen = false;
-
-    function toggleProfileDropdown(e) {
-        e.stopPropagation();
-        var panel = document.getElementById('profilePanel');
-        if (notifPanel && notifPanel.classList.contains('open')) {
-            notifPanel.classList.remove('open');
-            notifBellBtn.setAttribute('aria-expanded', 'false');
-        }
-        profilePanelOpen = !profilePanelOpen;
-        panel.classList.toggle('open', profilePanelOpen);
-        panel.setAttribute('aria-hidden', profilePanelOpen ? 'false' : 'true');
+    var s = clientFilters.status;
+    var statusMatch;
+    if (s === 'all') {
+        statusMatch = true;
+    } else if (s === 'open') {
+        statusMatch = ['new', 'in_progress', 'awaiting_client', 'uat'].indexOf(rowStatus) !== -1;
+    } else if (s === 'needs-action') {
+        statusMatch = rowStatus === 'awaiting_client' || rowStatus === 'uat';
+    } else if (s === 'resolved') {
+        statusMatch = rowStatus === 'resolved';
+    } else if (s === 'closed') {
+        statusMatch = rowStatus === 'closed';
+    } else if (s === 'rejected') {
+        statusMatch = rowStatus === 'rejected';
+    } else {
+        statusMatch = false;
     }
 
-    function closeProfileDropdown() {
-        var panel = document.getElementById('profilePanel');
-        if (panel) {
-            panel.classList.remove('open');
-            profilePanelOpen = false;
-            panel.setAttribute('aria-hidden', 'true');
-        }
-    }
+    var priorityMatch = clientFilters.priority === 'all' || rowPriority === clientFilters.priority;
 
-    /* Click-outside handler — closes all dropdowns and panels */
-    document.addEventListener('click', function (e) {
-        /* Notification bell */
-        if (!notifBellBtn.contains(e.target) && !notifPanel.contains(e.target)) {
-            notifPanel.classList.remove('open');
-            notifBellBtn.setAttribute('aria-expanded', 'false');
-        }
-        /* Profile panel */
-        var profilePanel = document.getElementById('profilePanel');
-        if (profilePanel && profilePanel.classList.contains('open')) {
-            if (!document.getElementById('profileWrap').contains(e.target)) {
-                closeProfileDropdown();
-            }
-        }
-        /* Priority dropdown */
-        var priorityWrap = document.getElementById('clientPriorityWrap');
-        var priorityDD   = document.getElementById('clientPriorityDropdown');
-        if (priorityDD && priorityDD.classList.contains('open') &&
-            priorityWrap && !priorityWrap.contains(e.target)) {
-            priorityDD.classList.remove('open');
-            document.getElementById('clientPriorityBtn').setAttribute('aria-expanded', 'false');
-        }
-        /* Date dropdown */
-        var dateWrap = document.getElementById('clientDateWrap');
-        var dateDD   = document.getElementById('clientDateDropdown');
-        if (dateDD && dateDD.classList.contains('open') &&
-            dateWrap && !dateWrap.contains(e.target)) {
-            dateDD.classList.remove('open');
-            document.getElementById('clientDateBtn').setAttribute('aria-expanded', 'false');
-        }
-    });
-
-    /* Escape key — closes all open panels and dropdowns */
-    document.addEventListener('keydown', function (e) {
-        if (e.key !== 'Escape') return;
-        closeProfileDropdown();
-        notifPanel.classList.remove('open');
-        notifBellBtn.setAttribute('aria-expanded', 'false');
-        closeClientChatPanel();
-        closeClientTimelinePanel();
-        var pd = document.getElementById('clientPriorityDropdown');
-        if (pd) { pd.classList.remove('open'); document.getElementById('clientPriorityBtn').setAttribute('aria-expanded', 'false'); }
-        var dd = document.getElementById('clientDateDropdown');
-        if (dd) { dd.classList.remove('open'); document.getElementById('clientDateBtn').setAttribute('aria-expanded', 'false'); }
-    });
-
-
-    /* ============================================================
-     * PAGE JS — composable filter state + all filter functions
-     *
-     * clientFilters: single state object — all filters AND together.
-     * Same pattern as admin portal's activeFilters + applyAllFilters().
-     *
-     * Django: filter values come from request.GET / context vars.
-     * ============================================================ */
-
-    /* --- Composable filter state --------------------------------- */
-    var clientFilters = {
-        status:   'all',   /* 'all'|'open'|'needs-action'|'closed'|'rejected' */
-        priority: 'all',   /* 'all'|'high'|'medium'|'low' */
-        dateFrom: null,    /* Date object | null */
-        dateTo:   null,    /* Date object | null */
-        search:   ''       /* lowercased string */
-    };
-
-    /* Sort state: 'default' | 'oldest' | 'newest' */
-    var clientSortOrder = 'default';
-
-    /* Store original DOM order so sort can be fully reset */
-    (function storeOriginalOrder() {
-        var rows = document.querySelectorAll('#ticketTableBody tr[data-status]');
-        rows.forEach(function (row, i) { row.dataset.originalOrder = i; });
-    })();
-
-
-    /* ============================================================
-     * applyClientFilters()
-     * Master filter: ANDs status + priority + date + search.
-     * Runs after every state change, then applies sort.
-     * ============================================================ */
-    function applyClientFilters() {
-        var rows = document.querySelectorAll('#ticketTableBody tr[data-status]');
-
-        rows.forEach(function (row) {
-            if (checkRowMatch(row)) {
-                row.classList.remove('row-hidden');
-            } else {
-                row.classList.add('row-hidden');
-            }
-        });
-
-        /* Re-sort after filtering */
-        applySortOrder();
-
-        updateClientEmptyState();
-    }
-
-    /*
-     * checkRowMatch(row)
-     * Returns true if the row satisfies ALL active filters.
-     */
-    function checkRowMatch(row) {
-        var rowStatus   = row.dataset.status || '';
-        var rowId       = (row.dataset.ticketId    || '').toLowerCase();
-        var rowSubject  = (row.dataset.subject      || '').toLowerCase();
-        var rowPriority = (row.dataset.priority     || '').toLowerCase();
-        var rowDateStr  = row.dataset.submittedDate || '';
-
-        /* --- Status filter --- */
-        var s = clientFilters.status;
-        var statusMatch;
-        if (s === 'all') {
-            statusMatch = true;
-        } else if (s === 'open') {
-            /* Open = any active ticket: new, in progress, forwarded, or awaiting UAT */
-            statusMatch = ['new', 'in_progress', 'forwarded', 'uat'].indexOf(rowStatus) !== -1;
-        } else if (s === 'needs-action') {
-            /* Needs Action = tickets requiring client response or approval */
-            statusMatch = rowStatus === 'forwarded' || rowStatus === 'uat';
-        } else if (s === 'resolved') {
-            statusMatch = rowStatus === 'resolved';
-        } else if (s === 'closed') {
-            statusMatch = rowStatus === 'closed';
-        } else if (s === 'rejected') {
-            statusMatch = rowStatus === 'rejected';
+    var dateMatch = true;
+    if (clientFilters.dateFrom || clientFilters.dateTo) {
+        if (!rowDateStr) {
+            dateMatch = false;
         } else {
-            statusMatch = false;
+            var d = new Date(rowDateStr + 'T00:00:00');
+            if (clientFilters.dateFrom && d < clientFilters.dateFrom) dateMatch = false;
+            if (clientFilters.dateTo   && d > clientFilters.dateTo)   dateMatch = false;
         }
+    }
 
-        /* --- Priority filter --- */
-        var priorityMatch = clientFilters.priority === 'all' || rowPriority === clientFilters.priority;
+    var q = clientFilters.search;
+    var searchMatch = !q || rowId.indexOf(q) !== -1 || rowSubject.indexOf(q) !== -1;
 
-        /* --- Date range filter --- */
-        var dateMatch = true;
-        if (clientFilters.dateFrom || clientFilters.dateTo) {
-            if (!rowDateStr) {
-                dateMatch = false;
-            } else {
-                var d = new Date(rowDateStr + 'T00:00:00');
-                if (clientFilters.dateFrom && d < clientFilters.dateFrom) dateMatch = false;
-                if (clientFilters.dateTo   && d > clientFilters.dateTo)   dateMatch = false;
-            }
+    return statusMatch && priorityMatch && dateMatch && searchMatch;
+}
+
+
+/* ============================================================
+ * SORT
+ * ============================================================ */
+function applySortOrder() {
+    var tbody = document.getElementById('ticketTableBody');
+    var rows  = Array.prototype.slice.call(tbody.querySelectorAll('tr[data-status]'));
+
+    rows.sort(function (a, b) {
+        if (clientSortOrder === 'oldest') {
+            return new Date(a.dataset.submittedDate) - new Date(b.dataset.submittedDate);
         }
-
-        /* --- Search filter --- */
-        var q = clientFilters.search;
-        var searchMatch = !q || rowId.indexOf(q) !== -1 || rowSubject.indexOf(q) !== -1;
-
-        return statusMatch && priorityMatch && dateMatch && searchMatch;
-    }
-
-
-    /* ============================================================
-     * SORT (FIX 3C)
-     * ============================================================ */
-
-    /*
-     * applySortOrder()
-     * Re-orders all rows in tbody by date (or restores original order).
-     * Called inside applyClientFilters() after every filter pass.
-     */
-    function applySortOrder() {
-        var tbody = document.getElementById('ticketTableBody');
-        var rows  = Array.prototype.slice.call(
-            tbody.querySelectorAll('tr[data-status]')
-        );
-
-        rows.sort(function (a, b) {
-            if (clientSortOrder === 'oldest') {
-                return new Date(a.dataset.submittedDate) - new Date(b.dataset.submittedDate);
-            }
-            if (clientSortOrder === 'newest') {
-                return new Date(b.dataset.submittedDate) - new Date(a.dataset.submittedDate);
-            }
-            /* default: restore original DOM insertion order */
-            return parseInt(a.dataset.originalOrder, 10) - parseInt(b.dataset.originalOrder, 10);
-        });
-
-        rows.forEach(function (row) { tbody.appendChild(row); });
-    }
-
-    /*
-     * cycleSortOrder()
-     * Cycles: default → oldest first → newest first → default
-     * Updates icon and tooltip on sortBtn.
-     */
-    function cycleSortOrder() {
-        var icon = document.getElementById('sortIcon');
-        var btn  = document.getElementById('sortBtn');
-
-        if (clientSortOrder === 'default') {
-            clientSortOrder = 'oldest';
-            icon.className  = 'bx bx-sort-up';
-            btn.title       = 'Sorting: Oldest first — click for Newest first';
-        } else if (clientSortOrder === 'oldest') {
-            clientSortOrder = 'newest';
-            icon.className  = 'bx bx-sort-down';
-            btn.title       = 'Sorting: Newest first — click to reset';
-        } else {
-            clientSortOrder = 'default';
-            icon.className  = 'bx bx-sort-alt-2';
-            btn.title       = 'Sort by submitted date';
+        if (clientSortOrder === 'newest') {
+            return new Date(b.dataset.submittedDate) - new Date(a.dataset.submittedDate);
         }
-
-        applyClientFilters();
-    }
-
-
-    /* ============================================================
-     * STATUS FILTER PILLS
-     * ============================================================ */
-
-    /*
-     * filterTickets(status, btn)
-     * Status pill click — updates clientFilters.status, sets active pill.
-     */
-    function filterTickets(status, btn) {
-        clientFilters.status = status;
-        document.querySelectorAll('.tw-client-filter-btn').forEach(function (b) {
-            b.classList.remove('active');
-        });
-        if (btn) btn.classList.add('active');
-        /* Deactivate stat cards when a pill is clicked directly */
-        document.querySelectorAll('.tw-stat-card').forEach(function (c) {
-            c.classList.remove('active');
-        });
-        applyClientFilters();
-    }
-
-    /*
-     * filterByStatCard(filter, card)
-     * Stat card click — syncs status filter and the matching pill button.
-     */
-    function filterByStatCard(filter, card) {
-        document.querySelectorAll('.tw-stat-card').forEach(function (c) {
-            c.classList.remove('active');
-        });
-        if (card) card.classList.add('active');
-
-        clientFilters.status = filter;
-
-        document.querySelectorAll('.tw-client-filter-btn').forEach(function (b) {
-            b.classList.remove('active');
-            if (b.dataset.statusFilter === filter) b.classList.add('active');
-        });
-
-        applyClientFilters();
-    }
-
-
-    /* ============================================================
-     * PRIORITY FILTER (FIX 3A)
-     * ============================================================ */
-
-    /*
-     * toggleClientPriorityDropdown(e)
-     * Opens/closes the priority dropdown. Closes date dropdown if open.
-     */
-    function toggleClientPriorityDropdown(e) {
-        e.stopPropagation();
-        var dd   = document.getElementById('clientPriorityDropdown');
-        var btn  = document.getElementById('clientPriorityBtn');
-        var dateDD = document.getElementById('clientDateDropdown');
-
-        if (dateDD && dateDD.classList.contains('open')) {
-            dateDD.classList.remove('open');
-            document.getElementById('clientDateBtn').setAttribute('aria-expanded', 'false');
-        }
-
-        var isOpen = dd.classList.toggle('open');
-        btn.setAttribute('aria-expanded', isOpen);
-    }
-
-    /*
-     * applyClientPriority(priority, optionEl)
-     * Sets priority filter, updates button label, closes dropdown.
-     */
-    function applyClientPriority(priority, optionEl) {
-        clientFilters.priority = priority;
-
-        /* Update button label */
-        var label = document.getElementById('priorityBtnLabel');
-        if (label) {
-            label.textContent = priority === 'all'
-                ? 'Priority'
-                : priority.charAt(0).toUpperCase() + priority.slice(1);
-        }
-
-        /* Highlight selected option */
-        document.querySelectorAll('#clientPriorityDropdown .tw-priority-option').forEach(function (o) {
-            o.classList.remove('selected');
-        });
-        if (optionEl) optionEl.classList.add('selected');
-
-        /* Close dropdown */
-        document.getElementById('clientPriorityDropdown').classList.remove('open');
-        document.getElementById('clientPriorityBtn').setAttribute('aria-expanded', 'false');
-
-        applyClientFilters();
-    }
-
-
-    /* ============================================================
-     * DATE RANGE FILTER (FIX 3B)
-     * ============================================================ */
-
-    /*
-     * toggleClientDateDropdown(e)
-     * Opens/closes the date dropdown. Closes priority dropdown if open.
-     */
-    function toggleClientDateDropdown(e) {
-        e.stopPropagation();
-        var dd   = document.getElementById('clientDateDropdown');
-        var btn  = document.getElementById('clientDateBtn');
-        var priorityDD = document.getElementById('clientPriorityDropdown');
-
-        if (priorityDD && priorityDD.classList.contains('open')) {
-            priorityDD.classList.remove('open');
-            document.getElementById('clientPriorityBtn').setAttribute('aria-expanded', 'false');
-        }
-
-        var isOpen = dd.classList.toggle('open');
-        btn.setAttribute('aria-expanded', isOpen);
-    }
-
-    /*
-     * applyClientQuickDate(period, btn)
-     * Quick filter: 'today' | 'week' | 'month'.
-     * Sets clientFilters.dateFrom and dateTo, highlights btn.
-     */
-    function applyClientQuickDate(period, btn) {
-        var now  = new Date();
-        var from, to;
-
-        if (period === 'today') {
-            from = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-            to   = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-        } else if (period === 'week') {
-            var day = now.getDay(); /* 0=Sunday */
-            from = new Date(now);
-            from.setDate(now.getDate() - day);
-            from.setHours(0, 0, 0, 0);
-            to = new Date(from);
-            to.setDate(from.getDate() + 6);
-            to.setHours(23, 59, 59, 999);
-        } else if (period === 'month') {
-            from = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
-            to   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-        }
-
-        clientFilters.dateFrom = from;
-        clientFilters.dateTo   = to;
-
-        /* Highlight quick filter button */
-        document.querySelectorAll('.tw-client-quick-filter').forEach(function (b) {
-            b.classList.remove('active');
-        });
-        if (btn) btn.classList.add('active');
-
-        /* Update dropdown trigger label */
-        var labels = { today: 'Today', week: 'This Week', month: 'This Month' };
-        var span = document.getElementById('dateBtnLabel');
-        if (span) span.textContent = labels[period] || 'Date Range';
-
-        applyClientFilters();
-    }
-
-    /*
-     * applyClientDateRange()
-     * Custom From/To date inputs. Clears quick-filter highlights.
-     * Django: date values come from request.GET['from'] / request.GET['to']
-     */
-    function applyClientDateRange() {
-        var fromVal = document.getElementById('clientDateFrom').value;
-        var toVal   = document.getElementById('clientDateTo').value;
-
-        clientFilters.dateFrom = fromVal ? new Date(fromVal + 'T00:00:00') : null;
-        clientFilters.dateTo   = toVal   ? new Date(toVal   + 'T23:59:59') : null;
-
-        /* Deactivate quick filter buttons */
-        document.querySelectorAll('.tw-client-quick-filter').forEach(function (b) {
-            b.classList.remove('active');
-        });
-
-        var span = document.getElementById('dateBtnLabel');
-        if (span) span.textContent = (fromVal || toVal) ? 'Custom Range' : 'Date Range';
-
-        applyClientFilters();
-    }
-
-    /*
-     * clearClientDateFilter()
-     * Resets date filter, clears inputs and quick filter highlights.
-     */
-    function clearClientDateFilter() {
-        clientFilters.dateFrom = null;
-        clientFilters.dateTo   = null;
-
-        document.getElementById('clientDateFrom').value = '';
-        document.getElementById('clientDateTo').value   = '';
-
-        document.querySelectorAll('.tw-client-quick-filter').forEach(function (b) {
-            b.classList.remove('active');
-        });
-
-        var span = document.getElementById('dateBtnLabel');
-        if (span) span.textContent = 'Date Range';
-
-        document.getElementById('clientDateDropdown').classList.remove('open');
-        document.getElementById('clientDateBtn').setAttribute('aria-expanded', 'false');
-
-        applyClientFilters();
-    }
-
-
-    /* ============================================================
-     * CHAT PANEL (FIX 2)
-     * ============================================================ */
-
-    /*
-     * openClientChatPanel(ticketId, subject)
-     * Updates panel header, closes timeline panel (mutual exclusion),
-     * opens chat panel, scrolls messages to bottom.
-     * Django: also fetches {{ ticket.messages.all }} via AJAX.
-     */
-    function openClientChatPanel(ticketId, subject) {
-        /* Mutual exclusion with timeline panel */
-        var tp = document.getElementById('clientTimelinePanel');
-        if (tp && tp.classList.contains('open')) tp.classList.remove('open');
-
-        /* Update header */
-        var idEl  = document.getElementById('clientChatTicketId');
-        var subEl = document.getElementById('clientChatSubject');
-        if (idEl)  idEl.textContent  = 'Ticket ID: ' + ticketId;
-        if (subEl) subEl.textContent = subject || '—';
-
-        /* Open */
-        document.getElementById('clientChatPanel').classList.add('open');
-
-        /* Scroll to bottom */
-        var area = document.getElementById('clientMessagesArea');
-        if (area) area.scrollTop = area.scrollHeight;
-    }
-
-    /* closeClientChatPanel() — removes .open, panel slides out */
-    function closeClientChatPanel() {
-        var panel = document.getElementById('clientChatPanel');
-        if (panel) panel.classList.remove('open');
-    }
-
-    /* Client chat panel — file select shows inline preview card (admin pattern) */
-    document.addEventListener('DOMContentLoaded', function () {
-        var panelChatFile = document.getElementById('clientPanelChatFile');
-        if (panelChatFile) {
-            panelChatFile.addEventListener('change', function () {
-                if (!this.files || !this.files[0]) return;
-                var file     = this.files[0];
-                var strip    = document.getElementById('clientPanelAttachStrip');
-                var nameSpan = document.getElementById('clientPanelAttachFileName');
-                if (nameSpan) nameSpan.textContent = file.name;
-                if (strip) strip.classList.add('show');
-            });
-        }
+        return parseInt(a.dataset.originalOrder, 10) - parseInt(b.dataset.originalOrder, 10);
     });
 
-    function removeClientPanelAttachment() {
-        var input = document.getElementById('clientPanelChatFile');
-        if (input) input.value = '';
-        var strip = document.getElementById('clientPanelAttachStrip');
-        if (strip) strip.classList.remove('show');
-    }
+    rows.forEach(function (row) { tbody.appendChild(row); });
+}
 
-    /*
-     * sendClientMessage()
-     * Appends the typed message as a client (sent) bubble.
-     * Orange bubble via var(--tw-primary) in role-user theme.
-     * Supports text + optional file attachment (inline preview strip pattern).
-     * Django: fetch('{% url "client_ticket_message" ticket.id %}', {method:'POST',...})
-     * Django: POST file to {% url 'client:chat_attach' ticket_id %} with X-CSRFToken
-     */
-    function sendClientMessage() {
-        var textarea  = document.getElementById('clientChatTextarea');
-        var panelFile = document.getElementById('clientPanelChatFile');
-        var strip     = document.getElementById('clientPanelAttachStrip');
-        var emailCopy = document.getElementById('clientEmailNotif').checked;
-        var text      = (textarea ? textarea.value : '').trim();
+function cycleSortOrder() {
+    var icon = document.getElementById('sortIcon');
+    var btn  = document.getElementById('sortBtn');
 
-        if (!text && !(strip && strip.classList.contains('show'))) {
-            if (textarea) textarea.focus();
-            return;
-        }
-
-        var attachHTML = '';
-        if (panelFile && panelFile.files && panelFile.files.length > 0) {
-            var file = panelFile.files[0];
-            if (file.type.startsWith('image/')) {
-                var url = URL.createObjectURL(file);
-                attachHTML = '<img src="' + url + '" alt="' + escapeHtml(file.name) + '" class="tw-chat-img-attachment">';
-            } else {
-                attachHTML =
-                    '<div class="tw-file-chip">' +
-                    '<i class="bx bx-paperclip" aria-hidden="true"></i>' +
-                    '<span class="tw-file-chip-name">' + escapeHtml(file.name) + '</span>' +
-                    '</div>';
-            }
-        }
-
-        var area  = document.getElementById('clientMessagesArea');
-        var msgEl = document.createElement('div');
-        msgEl.className = 'tw-message sent';
-        msgEl.innerHTML =
-            '<div class="tw-avatar tw-avatar--sm tw-avatar--user" aria-hidden="true">' + escapeHtml(CLIENT_USER.initials) + '</div>' +
-            '<div>' +
-            '<div class="tw-message-sender">You <span class="tw-role-pill tw-role-pill--user">Client</span></div>' +
-            '<div class="tw-message-bubble">' +
-            (text ? '<div class="tw-message-text">' + escapeHtml(text).replace(/\n/g, '<br>') + '</div>' : '') +
-            attachHTML +
-            '<div class="tw-message-time">' + formatNow() + '</div>' +
-            '</div></div>';
-
-        area.appendChild(msgEl);
-        area.scrollTop = area.scrollHeight;
-
-        if (textarea)  { textarea.value = ''; textarea.style.height = 'auto'; }
-        if (panelFile) panelFile.value = '';
-        if (strip)     strip.classList.remove('show');
-
-        /* Django: fetch stub */
-        console.log('[Client Portal] Send message stub:', { content: text, email_copy: emailCopy });
-
-        showClientToast('Message sent.', 'success');
-    }
-
-
-    /* ============================================================
-     * TIMELINE PANEL (FIX 2)
-     * ============================================================ */
-
-    /*
-     * openClientTimelinePanel(ticketId, subject)
-     * Updates panel header, closes chat panel (mutual exclusion), opens panel.
-     * Django: also fetches {{ ticket.events.all }} via AJAX.
-     */
-    function openClientTimelinePanel(ticketId, subject) {
-        /* Mutual exclusion with chat panel */
-        var cp = document.getElementById('clientChatPanel');
-        if (cp && cp.classList.contains('open')) cp.classList.remove('open');
-
-        /* Update header */
-        var idEl  = document.getElementById('clientTimelineTicketId');
-        var subEl = document.getElementById('clientTimelineSubject');
-        if (idEl)  idEl.textContent  = 'Ticket ID: ' + ticketId;
-        if (subEl) subEl.textContent = subject || '—';
-
-        /* Open */
-        document.getElementById('clientTimelinePanel').classList.add('open');
-    }
-
-    /* closeClientTimelinePanel() — removes .open, panel slides out */
-    function closeClientTimelinePanel() {
-        var panel = document.getElementById('clientTimelinePanel');
-        if (panel) panel.classList.remove('open');
-    }
-
-
-    /* ============================================================
-     * UTILITIES
-     * ============================================================ */
-
-    /* XSS-safe string for injecting into innerHTML */
-    function escapeHtml(str) {
-        return str
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-    }
-
-    /* Format current time as "d Mon YYYY, HH:MM" */
-    function formatNow() {
-        var d = new Date();
-        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) +
-               ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-    }
-
-    function updateClientEmptyState() {
-        var visibleRows = document.querySelectorAll(
-            '#ticketTableBody tr[data-status]:not(.row-hidden)'
-        ).length;
-        var emptyState = document.getElementById('clientEmptyState');
-        var emptyMsg   = document.getElementById('clientEmptyMsg');
-        if (!emptyState) return;
-        if (visibleRows === 0) {
-            emptyState.style.display = '';
-            var msgs = {
-                'all':          "You haven't submitted any tickets yet.",
-                'open':         'No active tickets. Submit a new ticket if you need support.',
-                'needs-action': 'No tickets require your attention right now. Great job!',
-                'resolved':     'No tickets awaiting closure.',
-                'closed':       'No closed tickets yet.',
-                'rejected':     'No rejected tickets.'
-            };
-            if (emptyMsg) emptyMsg.textContent = msgs[clientFilters.status] || 'No tickets match your filters.';
-        } else {
-            emptyState.style.display = 'none';
-        }
-    }
-
-    function resetClientFilters() {
-        clientFilters.status   = 'all';
-        clientFilters.priority = 'all';
-        clientFilters.dateFrom = null;
-        clientFilters.dateTo   = null;
-        clientFilters.search   = '';
-        document.querySelectorAll('.tw-client-filter-btn').forEach(function (b) {
-            b.classList.remove('active');
-            if (b.dataset.statusFilter === 'all') b.classList.add('active');
-        });
-        document.querySelectorAll('.tw-stat-card').forEach(function (c) {
-            c.classList.remove('active');
-        });
-        var priorityLabel = document.getElementById('priorityBtnLabel');
-        if (priorityLabel) priorityLabel.textContent = 'Priority';
-        document.querySelectorAll('#clientPriorityDropdown .tw-priority-option').forEach(function (o) {
-            o.classList.remove('selected');
-        });
-        var fromIn = document.getElementById('clientDateFrom');
-        var toIn   = document.getElementById('clientDateTo');
-        if (fromIn) fromIn.value = '';
-        if (toIn)   toIn.value   = '';
-        var dateLabel = document.getElementById('dateBtnLabel');
-        if (dateLabel) dateLabel.textContent = 'Date Range';
-        document.querySelectorAll('.tw-client-quick-filter').forEach(function (b) {
-            b.classList.remove('active');
-        });
-        var searchInput = document.getElementById('ticketSearchInput');
-        if (searchInput) searchInput.value = '';
+    if (clientSortOrder === 'default') {
+        clientSortOrder = 'oldest';
+        icon.className  = 'bx bx-sort-up';
+        btn.title       = 'Sorting: Oldest first — click for Newest first';
+    } else if (clientSortOrder === 'oldest') {
+        clientSortOrder = 'newest';
+        icon.className  = 'bx bx-sort-down';
+        btn.title       = 'Sorting: Newest first — click to reset';
+    } else {
         clientSortOrder = 'default';
-        var sortIcon = document.getElementById('sortIcon');
-        if (sortIcon) sortIcon.className = 'bx bx-sort-alt-2';
-        var sortBtn = document.getElementById('sortBtn');
-        if (sortBtn) sortBtn.title = 'Sort by submitted date';
-        applyClientFilters();
+        icon.className  = 'bx bx-sort-alt-2';
+        btn.title       = 'Sort by submitted date';
     }
 
-    /*
-     * showClientToast(message, type)
-     * Bottom-right transient notification.
-     * type: 'success' | 'error' | 'info'
-     */
-    function showClientToast(message, type) {
-        var t = document.createElement('div');
-        t.className = 'tw-client-toast tw-client-toast--' + (type || 'info');
-        t.textContent = message;
-        document.body.appendChild(t);
-        setTimeout(function () { t.classList.add('show'); }, 10);
-        setTimeout(function () {
-            t.classList.remove('show');
-            setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 300);
-        }, 3000);
+    applyClientFilters();
+}
+
+
+/* ============================================================
+ * STATUS FILTER PILLS
+ * ============================================================ */
+function filterTickets(status, btn) {
+    clientFilters.status = status;
+    document.querySelectorAll('.tw-client-filter-btn').forEach(function (b) { b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    document.querySelectorAll('.tw-stat-card').forEach(function (c) { c.classList.remove('active'); });
+    applyClientFilters();
+}
+
+function filterByStatCard(filter, card) {
+    document.querySelectorAll('.tw-stat-card').forEach(function (c) { c.classList.remove('active'); });
+    if (card) card.classList.add('active');
+    clientFilters.status = filter;
+    document.querySelectorAll('.tw-client-filter-btn').forEach(function (b) {
+        b.classList.remove('active');
+        if (b.dataset.statusFilter === filter) b.classList.add('active');
+    });
+    applyClientFilters();
+}
+
+
+/* ============================================================
+ * PRIORITY FILTER
+ * ============================================================ */
+function toggleClientPriorityDropdown(e) {
+    e.stopPropagation();
+    var dd  = document.getElementById('clientPriorityDropdown');
+    var btn = document.getElementById('clientPriorityBtn');
+    var dateDD = document.getElementById('clientDateDropdown');
+    if (dateDD && dateDD.classList.contains('open')) {
+        dateDD.classList.remove('open');
+        document.getElementById('clientDateBtn').setAttribute('aria-expanded', 'false');
     }
+    var isOpen = dd.classList.toggle('open');
+    btn.setAttribute('aria-expanded', isOpen);
+}
+
+function applyClientPriority(priority, optionEl) {
+    clientFilters.priority = priority;
+    var label = document.getElementById('priorityBtnLabel');
+    if (label) {
+        label.textContent = priority === 'all' ? 'Priority'
+            : priority.charAt(0).toUpperCase() + priority.slice(1);
+    }
+    document.querySelectorAll('#clientPriorityDropdown .tw-priority-option').forEach(function (o) {
+        o.classList.remove('selected');
+    });
+    if (optionEl) optionEl.classList.add('selected');
+    document.getElementById('clientPriorityDropdown').classList.remove('open');
+    document.getElementById('clientPriorityBtn').setAttribute('aria-expanded', 'false');
+    applyClientFilters();
+}
+
+
+/* ============================================================
+ * DATE RANGE FILTER
+ * ============================================================ */
+function toggleClientDateDropdown(e) {
+    e.stopPropagation();
+    var dd  = document.getElementById('clientDateDropdown');
+    var btn = document.getElementById('clientDateBtn');
+    var priorityDD = document.getElementById('clientPriorityDropdown');
+    if (priorityDD && priorityDD.classList.contains('open')) {
+        priorityDD.classList.remove('open');
+        document.getElementById('clientPriorityBtn').setAttribute('aria-expanded', 'false');
+    }
+    var isOpen = dd.classList.toggle('open');
+    btn.setAttribute('aria-expanded', isOpen);
+}
+
+function applyClientQuickDate(period, btn) {
+    var now = new Date();
+    var from, to;
+    if (period === 'today') {
+        from = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        to   = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+    } else if (period === 'week') {
+        var day = now.getDay();
+        from = new Date(now); from.setDate(now.getDate() - day); from.setHours(0, 0, 0, 0);
+        to   = new Date(from); to.setDate(from.getDate() + 6); to.setHours(23, 59, 59, 999);
+    } else if (period === 'month') {
+        from = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
+        to   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    }
+    clientFilters.dateFrom = from;
+    clientFilters.dateTo   = to;
+    document.querySelectorAll('.tw-client-quick-filter').forEach(function (b) { b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    var span = document.getElementById('dateBtnLabel');
+    if (span) span.textContent = { today: 'Today', week: 'This Week', month: 'This Month' }[period] || 'Date Range';
+    applyClientFilters();
+}
+
+function applyClientDateRange() {
+    var fromVal = document.getElementById('clientDateFrom').value;
+    var toVal   = document.getElementById('clientDateTo').value;
+    clientFilters.dateFrom = fromVal ? new Date(fromVal + 'T00:00:00') : null;
+    clientFilters.dateTo   = toVal   ? new Date(toVal   + 'T23:59:59') : null;
+    document.querySelectorAll('.tw-client-quick-filter').forEach(function (b) { b.classList.remove('active'); });
+    var span = document.getElementById('dateBtnLabel');
+    if (span) span.textContent = (fromVal || toVal) ? 'Custom Range' : 'Date Range';
+    applyClientFilters();
+}
+
+function clearClientDateFilter() {
+    clientFilters.dateFrom = null;
+    clientFilters.dateTo   = null;
+    document.getElementById('clientDateFrom').value = '';
+    document.getElementById('clientDateTo').value   = '';
+    document.querySelectorAll('.tw-client-quick-filter').forEach(function (b) { b.classList.remove('active'); });
+    var span = document.getElementById('dateBtnLabel');
+    if (span) span.textContent = 'Date Range';
+    document.getElementById('clientDateDropdown').classList.remove('open');
+    document.getElementById('clientDateBtn').setAttribute('aria-expanded', 'false');
+    applyClientFilters();
+}
+
+
+/* ============================================================
+ * EMPTY STATE + RESET
+ * ============================================================ */
+function updateClientEmptyState() {
+    var visibleRows = document.querySelectorAll('#ticketTableBody tr[data-status]:not(.row-hidden)').length;
+    var emptyState  = document.getElementById('clientEmptyState');
+    var emptyMsg    = document.getElementById('clientEmptyMsg');
+    if (!emptyState) return;
+    if (visibleRows === 0) {
+        emptyState.style.display = '';
+        var msgs = {
+            'all':          "You haven't submitted any tickets yet.",
+            'open':         'No active tickets.',
+            'needs-action': 'No tickets require your attention right now.',
+            'resolved':     'No tickets awaiting closure.',
+            'closed':       'No closed tickets yet.',
+            'rejected':     'No rejected tickets.'
+        };
+        if (emptyMsg) emptyMsg.textContent = msgs[clientFilters.status] || 'No tickets match your filters.';
+    } else {
+        emptyState.style.display = 'none';
+    }
+}
+
+function resetClientFilters() {
+    clientFilters.status   = 'all';
+    clientFilters.priority = 'all';
+    clientFilters.dateFrom = null;
+    clientFilters.dateTo   = null;
+    clientFilters.search   = '';
+    document.querySelectorAll('.tw-client-filter-btn').forEach(function (b) {
+        b.classList.remove('active');
+        if (b.dataset.statusFilter === 'all') b.classList.add('active');
+    });
+    document.querySelectorAll('.tw-stat-card').forEach(function (c) { c.classList.remove('active'); });
+    var pLabel = document.getElementById('priorityBtnLabel');
+    if (pLabel) pLabel.textContent = 'Priority';
+    document.querySelectorAll('#clientPriorityDropdown .tw-priority-option').forEach(function (o) { o.classList.remove('selected'); });
+    var fromIn = document.getElementById('clientDateFrom');
+    var toIn   = document.getElementById('clientDateTo');
+    if (fromIn) fromIn.value = '';
+    if (toIn)   toIn.value   = '';
+    var dLabel = document.getElementById('dateBtnLabel');
+    if (dLabel) dLabel.textContent = 'Date Range';
+    document.querySelectorAll('.tw-client-quick-filter').forEach(function (b) { b.classList.remove('active'); });
+    var searchInput = document.getElementById('ticketSearchInput');
+    if (searchInput) searchInput.value = '';
+    clientSortOrder = 'default';
+    var sortIcon = document.getElementById('sortIcon');
+    if (sortIcon) sortIcon.className = 'bx bx-sort-alt-2';
+    var sortBtn = document.getElementById('sortBtn');
+    if (sortBtn) sortBtn.title = 'Sort by submitted date';
+    applyClientFilters();
+}
+
+/* Also close click-outside for filter dropdowns */
+document.addEventListener('click', function (e) {
+    var priorityWrap = document.getElementById('clientPriorityWrap');
+    var priorityDD   = document.getElementById('clientPriorityDropdown');
+    if (priorityDD && priorityDD.classList.contains('open') &&
+        priorityWrap && !priorityWrap.contains(e.target)) {
+        priorityDD.classList.remove('open');
+        document.getElementById('clientPriorityBtn').setAttribute('aria-expanded', 'false');
+    }
+    var dateWrap = document.getElementById('clientDateWrap');
+    var dateDD   = document.getElementById('clientDateDropdown');
+    if (dateDD && dateDD.classList.contains('open') &&
+        dateWrap && !dateWrap.contains(e.target)) {
+        dateDD.classList.remove('open');
+        document.getElementById('clientDateBtn').setAttribute('aria-expanded', 'false');
+    }
+});
 </script>
-
-</body>
-</html>
-
-<!-- Django: {% endblock %} -->
+{% endblock %}
