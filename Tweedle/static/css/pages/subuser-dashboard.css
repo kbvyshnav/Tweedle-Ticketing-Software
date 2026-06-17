@@ -23,6 +23,43 @@ body > main {
 }
 
 
+/* === SIDEBAR USER FOOTER ==================================== */
+.sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-3);
+    padding: var(--tw-space-3) var(--tw-space-4);
+    border-top: 1px solid var(--tw-border-light);
+    margin-top: auto;
+    overflow: hidden;
+}
+
+.sidebar-user-info {
+    overflow: hidden;
+}
+
+.sidebar-user-name {
+    font-size: var(--tw-text-base);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: var(--tw-font-secondary);
+    line-height: 1.3;
+}
+
+.sidebar-user-role {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    font-family: var(--tw-font-secondary);
+}
+
+.sidebar.hide .sidebar-user-info {
+    display: none;
+}
+
+
 /* ============================================================
  * SECTION 1: PAGE HEADER (shared pattern — all sub-user pages)
  * ============================================================ */
@@ -1015,6 +1052,7 @@ body > main {
 
 .tw-client-toast--success { background: var(--tw-success); }
 .tw-client-toast--error   { background: var(--tw-danger); }
+.tw-client-toast--warning { background: var(--tw-warning); }
 .tw-client-toast--info    { background: var(--tw-primary-text); } /* dark brown on amber — readable */
 
 
