@@ -30,7 +30,7 @@ so users instantly recognise their workspace.
 ## Features
 
 ### Ticket Management
-- Ticket flow: Inbox → In Progress → Forwarded → Closed
+- Ticket flow: New → In Progress → Awaiting Client → UAT → Resolved → Closed (or Rejected / Cancelled)
 - Sub-status tracking: New → Development → Testing → UAT
 - Priority levels: High / Medium / Low
 - TAT (Turn Around Time) tracking per ticket
@@ -82,12 +82,12 @@ so users instantly recognise their workspace.
 - Boxicons — icon library
 - Google Fonts — Poppins (primary) + Lato (secondary)
 
-### Backend (Planned)
-- Python Django — web framework
-- PostgreSQL — primary database
-- Django REST Framework — API layer
-- django-allauth — authentication
-- django-otp — two-factor authentication (Phase 2)
+### Backend (Built — through Phase 4.7)
+- Python Django 5.2 LTS — web framework (server-rendered; DRF not used)
+- PostgreSQL — primary database (SQLite fallback for local dev)
+- django-allauth — authentication (signup closed; admin-provisioned)
+- Django REST Framework — not built (deferred; server-rendered form-POST is the target)
+- django-otp — two-factor authentication (Phase 3b — deferred)
 
 ---
 
