@@ -1,1553 +1,497 @@
-<!--
-  File: templates/tester_portal/ticket-detail.html
-  Django template: extends 'tester_base.html'
-  Django view:     tester_portal.views.ticket_detail
-  Django url:      tester:ticket_detail
-  Role:            Tester — body class="role-tester" (teal theme)
+{% extends 'tester_base.html' %}
+{% load static tester_extras %}
 
-  URL params drive all content:
-    ?id=GMEC25010001&status=testing
--->
-<!-- Django: {% extends 'tester_base.html' %} -->
-<!-- Django: {% block body_role %}tester{% endblock %} -->
-<!-- Django: {% block page_css %}
+{% block title %}{{ ticket.subject }} — Tweedle{% endblock %}
+
+{% block page_css %}
 <link rel="stylesheet" href="{% static 'css/pages/tester-dashboard.css' %}">
-{% endblock %} -->
-<!-- Django: {% block content %} -->
+<link rel="stylesheet" href="{% static 'css/pages/developer-dashboard.css' %}">
+{% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Django: {% block title %}Ticket Detail — Tweedle{% endblock %} -->
-    <title>Ticket Detail — Tweedle</title>
+{% block content %}
 
-    <!-- Django: {% load static %} -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
-    <!-- Django: href="{% static 'images/favicon.svg' %}" -->
-    <link rel="icon" type="image/svg+xml" href="../../static/images/favicon.svg">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<!-- Back link -->
+<a href="{% url 'tester:dashboard' %}" class="dev-back-link">
+    <i class="bx bx-arrow-back" aria-hidden="true"></i>
+    Back to My Tests
+</a>
 
-    <!-- CSS load order: 1 tokens → 2 theme-tester → 3 base → 4 components → 5 notification → 6 page -->
-    <!-- Django: href="{% static 'css/tweedle-tokens.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-tokens.css">
-    <!-- Django: href="{% static 'css/themes/theme-tester.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/themes/theme-tester.css">
-    <!-- Django: href="{% static 'css/tweedle-base.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-base.css">
-    <!-- Django: href="{% static 'css/tweedle-components.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-components.css">
-    <!-- Django: href="{% static 'css/pages/notification.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/notification.css">
-    <!-- Django: href="{% static 'css/pages/tester-dashboard.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/tester-dashboard.css">
-</head>
-
-<!--
-    BODY CLASS: role-tester activates teal theme from theme-tester.css.
-    Django: class="role-{% block body_role %}tester{% endblock %}"
--->
-<body class="role-tester">
+<!-- Page title -->
+<div class="dev-page-title-area">
+    <h1>{{ ticket.subject }}</h1>
+    <p class="dev-ticket-id-sub">{{ ticket.reference }}</p>
+</div>
 
 
-<!-- ==============================================================
-     SIDEBAR
-     ============================================================== -->
-<nav class="sidebar" id="sidebar">
-    <!-- Django: href="{% url 'tester:dashboard' %}" -->
-    <div class="sidebar-brand">
-        <!-- Django: src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" -->
-        <img src="../../static/images/tweedle-logo/tweedle-mark-blue.svg" alt="Tweedle" class="sidebar-logo-img">
-        <span class="brand-text">Tweedle</span>
-    </div>
-    <ul class="sidebar-nav">
-        <!-- Django: href="{% url 'tester:dashboard' %}" -->
-        <li class="nav-item active-item">
-            <a href="dashboard.html" class="nav-link active" title="My Tests">
-                <i class='bx bx-test-tube'></i>
-                <span class="nav-label">My Tests</span>
-            </a>
-        </li>
-        <!-- Django: href="{% url 'tester:chat' %}" -->
-        <li class="nav-item">
-            <a href="chat.html" class="nav-link" title="Chat">
-                <i class='bx bx-chat'></i>
-                <span class="nav-label">Chat</span>
-            </a>
-        </li>
-    </ul>
-    <div class="sidebar-user">
-        <!-- Django: {{ tester_user.initials }} -->
-        <div class="tw-avatar tw-avatar--tester" id="testerAvatarSidebar"
-             style="width:36px;height:36px;font-size:13px;flex-shrink:0;">PS</div>
-        <div class="sidebar-user-info">
-            <!-- Django: {{ tester_user.name }} -->
-            <div class="sidebar-user-name" id="testerNameSidebar">Priya Sharma</div>
-            <div class="sidebar-user-role">Tester</div>
+<!-- =========================================================
+     TICKET HEADER CARD
+     ========================================================= -->
+<div class="dev-ticket-header-card"
+     data-sub-status="{{ ticket.sub_status }}">
+
+    <div>
+        <div style="font-size:var(--tw-text-sm);font-weight:600;
+                    color:var(--tw-text-muted);font-family:'Courier New',monospace;
+                    letter-spacing:0.5px;margin-bottom:var(--tw-space-2)">
+            {{ ticket.reference }}
+        </div>
+        <div class="dev-ticket-header-badges">
+            {% tester_ticket_badge ticket %}
+            <span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">
+                {{ ticket.get_priority_display }}
+            </span>
+            {% if ticket.category %}
+            <span class="tw-ticket-label">{{ ticket.category }}</span>
+            {% endif %}
         </div>
     </div>
-</nav>
 
-
-<!-- ==============================================================
-     MAIN CONTENT WRAPPER
-     ============================================================== -->
-<section id="content">
-
-    <!-- TOPBAR -->
-    <nav class="topbar">
-        <i class="bx bx-menu" id="hamburger-btn" role="button" aria-label="Toggle sidebar"></i>
-        <div class="topbar-brand-mobile" style="display:none">
-            <img src="../../static/images/tweedle-logo/tweedle-mark-blue.svg" alt="Tweedle" style="height:28px;">
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:var(--tw-space-3)">
+        <div class="dev-ticket-client-tag">
+            <i class="bx bx-buildings" aria-hidden="true"></i>
+            <span>{{ ticket.client.name|default:"—" }}</span>
         </div>
+        <div class="dev-ticket-header-dates">
+            <div class="dev-ticket-header-date-item">
+                <span class="dev-ticket-header-date-label">Issue Date</span>
+                <span class="dev-ticket-header-date-val">{{ ticket.created_at|date:"d M Y" }}</span>
+            </div>
+        </div>
+    </div>
 
-        <!-- NOTIFICATION BELL -->
-        <div class="tw-notif-bell-wrap" id="notifBellWrap">
-            <button class="tw-notif-bell-btn" id="notifBellBtn" aria-label="Notifications" aria-expanded="false" aria-controls="notifPanel">
-                <i class="bx bxs-bell" aria-hidden="true"></i>
-                <!-- Django: {% if unread_notification_count %} -->
-                <span class="tw-notif-count-badge" id="notifCount">3</span>
-                <!-- Django: {% endif %} -->
-            </button>
-            <div class="tw-notif-panel" id="notifPanel" role="dialog" aria-label="Notifications">
-                <div class="tw-notif-panel-header">
-                    <span class="tw-notif-panel-title">Notifications</span>
-                    <button class="tw-btn tw-btn-outline tw-btn--sm" id="markAllReadBtn">Mark all read</button>
+</div>
+<!-- END TICKET HEADER CARD -->
+
+
+<!-- =========================================================
+     TWO-COLUMN LAYOUT — 65% / 35%
+     ========================================================= -->
+<div class="dev-detail-layout">
+
+    <!-- =======================================================
+         LEFT COLUMN
+         ======================================================= -->
+    <div class="dev-detail-left">
+
+        <!-- ================================================
+             1. QA ACTION CARD
+             ================================================ -->
+        <div class="dev-detail-card" id="testerActionCard">
+            <div class="dev-detail-card__header">
+                <i class="bx bx-test-tube" aria-hidden="true"></i>
+                <h3 class="dev-detail-card__title">Testing Decision</h3>
+            </div>
+            <div class="dev-detail-card__body">
+
+                {% if ticket.sub_status == 'testing' %}
+                <!-- ── ACTIVE TESTING STATE: Pass + Fail actions ── -->
+
+                <p style="margin:0 0 var(--tw-space-4);color:var(--tw-text-secondary);
+                           font-size:var(--tw-text-sm);line-height:1.6">
+                    Review the ticket and verify that the developer's fix meets requirements.
+                    If it passes QA, click <strong>Pass</strong>. If it needs more work,
+                    add your failure notes and click <strong>Fail</strong>.
+                </p>
+
+                <!-- PASS FORM -->
+                <form method="post" action="{% url 'tester:ticket_transition' ticket.pk %}"
+                      id="testerPassForm"
+                      onsubmit="return openTesterConfirmModal(event, 'pass')">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="pass">
+                    <button type="submit" class="tw-btn tw-btn-success">
+                        <i class="bx bx-check-circle" aria-hidden="true"></i>
+                        Pass — Mark Ready for UAT
+                    </button>
+                </form>
+
+                <div style="margin:var(--tw-space-5) 0 var(--tw-space-3);
+                            border-top:1px solid var(--tw-border);padding-top:var(--tw-space-4)">
+                    <label for="testerFailNotes"
+                           style="display:block;font-size:var(--tw-text-sm);font-weight:600;
+                                  color:var(--tw-text-primary);margin-bottom:var(--tw-space-2)">
+                        Failure Notes <span style="color:var(--tw-danger)">*</span>
+                    </label>
+                    <p style="margin:0 0 var(--tw-space-2);font-size:var(--tw-text-xs);color:var(--tw-text-muted)">
+                        Required if failing. Describe what failed and what the developer needs to fix.
+                    </p>
                 </div>
-                <div class="tw-notif-list">
-                    <!-- Django: {% for notification in notifications %} -->
-                    <div class="tw-notif-item unread" role="button" style="cursor:pointer">
-                        <div class="tw-notif-item-body">
-                            <div class="tw-notif-type-icon tw-notif-type-icon--info"><i class="bx bx-test-tube"></i></div>
-                            <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">Ticket assigned — GMEC25010001</div>
-                                <div class="tw-notif-item-time">1 hour ago</div>
-                            </div>
+
+                <!-- FAIL FORM -->
+                <form method="post" action="{% url 'tester:ticket_transition' ticket.pk %}"
+                      id="testerFailForm"
+                      onsubmit="return openTesterConfirmModal(event, 'fail')">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="fail">
+                    <textarea id="testerFailNotes"
+                              name="failure_notes"
+                              required
+                              rows="4"
+                              placeholder="Describe what failed and what needs to be fixed…"
+                              style="width:100%;padding:var(--tw-space-3);
+                                     border:1px solid var(--tw-border);border-radius:var(--tw-radius);
+                                     font-size:var(--tw-text-sm);color:var(--tw-text-primary);
+                                     background:var(--tw-surface);resize:vertical;
+                                     font-family:inherit;line-height:1.5;
+                                     margin-bottom:var(--tw-space-3)"></textarea>
+                    <button type="submit" class="tw-btn tw-btn-danger">
+                        <i class="bx bx-x-circle" aria-hidden="true"></i>
+                        Fail — Return to Developer
+                    </button>
+                </form>
+
+                {% elif ticket.sub_status == 'returned' %}
+                <!-- ── RETURNED STATE (read-only) ── -->
+                <div class="dev-closed-banner">
+                    <i class="bx bx-x-circle" aria-hidden="true"></i>
+                    <div>
+                        <div class="dev-closed-banner__title">Testing Failed — Returned to Developer</div>
+                        <div class="dev-closed-banner__body">
+                            You returned this ticket with failure notes. The developer is working on a fix.
+                            You will be notified when it is resubmitted for testing.
                         </div>
                     </div>
-                    <!-- Django: {% endfor %} -->
                 </div>
-                <div class="tw-notif-panel-footer">
-                    <a href="notifications.html" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
-                </div>
-            </div>
-        </div>
 
-        <!-- PROFILE DROPDOWN -->
-        <div class="tw-profile-wrap" id="profileWrap">
-            <!-- Django: {{ tester_user.initials }} -->
-            <div class="tw-avatar tw-avatar--tester" id="testerAvatarTopbar"
-                 role="button" aria-label="Profile"
-                 style="width:36px;height:36px;font-size:14px;cursor:pointer"
-                 onclick="toggleProfileDropdown(event)">PS</div>
-            <div class="tw-profile-panel" id="profilePanel" role="menu" aria-hidden="true">
-                <div class="tw-profile-header">
-                    <!-- Django: {{ tester_user.initials }}, {{ tester_user.name }}, {{ tester_user.email }} -->
-                    <div class="tw-avatar tw-avatar--tester" style="width:40px;height:40px;font-size:15px;flex-shrink:0" id="testerAvatarPanel">PS</div>
+                {% elif ticket.sub_status == 'ready_for_uat' %}
+                <!-- ── PASSED STATE (read-only) ── -->
+                <div class="dev-uat-approval-banner">
+                    <i class="bx bx-check-circle" aria-hidden="true"></i>
                     <div>
-                        <div style="font-size:var(--tw-text-base);font-weight:600;color:var(--tw-text-primary);line-height:1.3" id="testerNamePanel">Priya Sharma</div>
-                        <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px" id="testerEmailPanel">priya.sharma@tweedle.io</div>
-                        <span class="tw-role-pill tw-role-pill--tester" style="margin-top:4px;display:inline-block">Tester</span>
+                        <div class="dev-uat-approval-banner__title">Testing Passed — Ready for UAT</div>
+                        <div class="dev-uat-approval-banner__body">
+                            You passed this ticket. The admin will send it to the client for UAT review when ready.
+                            No further action is needed from you.
+                        </div>
                     </div>
                 </div>
-                <div class="tw-profile-divider"></div>
-                <!-- Django: href="{% url 'tester:profile' %}" -->
-                <div class="tw-profile-menu-item" role="menuitem" onclick="closeProfileDropdown(); window.location.href='profile.html'">
-                    <i class="bx bx-user"></i><span>View Profile</span>
+
+                {% else %}
+                <div style="color:var(--tw-text-muted);font-size:var(--tw-text-sm);padding:var(--tw-space-2) 0">
+                    No actions available for this ticket's current state.
                 </div>
-                <div class="tw-profile-menu-item" role="menuitem" onclick="closeProfileDropdown(); showTesterToast('Password settings coming soon.', 'info')">
-                    <i class="bx bx-lock-alt"></i><span>Change Password</span>
-                </div>
-                <div class="tw-profile-divider"></div>
-                <!-- Django: window.location.href="{% url 'logout' %}" -->
-                <div class="tw-profile-menu-item tw-profile-menu-item--danger" role="menuitem" onclick="window.location.href = '../login.html'">
-                    <i class="bx bx-log-out"></i><span>Sign Out</span>
-                </div>
+                {% endif %}
+
+            </div>
+        </div>
+        <!-- END QA ACTION CARD -->
+
+
+        <!-- ================================================
+             2. DESCRIPTION
+             ================================================ -->
+        <div class="dev-detail-card">
+            <div class="dev-detail-card__header">
+                <i class="bx bx-detail" aria-hidden="true"></i>
+                <h3 class="dev-detail-card__title">Description</h3>
+            </div>
+            <div class="dev-detail-card__body">
+                <p style="margin:0;color:var(--tw-text-secondary);
+                          font-size:var(--tw-text-base);line-height:1.7;
+                          white-space:pre-wrap">{{ ticket.description|default:"No description provided." }}</p>
             </div>
         </div>
 
-    </nav>
-    <!-- END TOPBAR -->
 
-
-    <!-- MAIN PAGE CONTENT -->
-    <main id="main-content">
-
-        <!-- Back link -->
-        <!-- Django: href="{% url 'tester:dashboard' %}" -->
-        <a id="testerBackLink" href="dashboard.html" class="tester-back-link">
-            <i class="bx bx-arrow-back" aria-hidden="true"></i>
-            Back to My Testing Queue
-        </a>
-
-        <div class="tester-page-title-area">
-            <!-- Django: {{ ticket.subject }} -->
-            <h1 id="testerTicketH1">Wallet Option Agents</h1>
-            <!-- Django: {{ ticket.id }} -->
-            <p class="tester-ticket-id-sub" id="testerTicketIdSub">GMEC25010001</p>
-        </div>
-
-
-        <!-- =========================================================
-             TICKET HEADER CARD
-             ========================================================= -->
-        <div class="tester-ticket-header-card" id="testerHeaderCard" data-status="testing">
-
-            <div>
-                <div style="font-size:var(--tw-text-sm);font-weight:600;color:var(--tw-text-muted);
-                            font-family:'Courier New',monospace;letter-spacing:0.5px;margin-bottom:var(--tw-space-2)"
-                     id="testerHeaderId">GMEC25010001</div>
-                <div class="tester-ticket-header-badges" id="testerHeaderBadges">
-                    <!-- populated by initPage() -->
-                </div>
+        <!-- ================================================
+             3. ATTACHMENTS
+             ================================================ -->
+        <div class="dev-detail-card">
+            <div class="dev-detail-card__header">
+                <i class="bx bx-paperclip" aria-hidden="true"></i>
+                <h3 class="dev-detail-card__title">Attachments</h3>
             </div>
-
-            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:var(--tw-space-3)">
-                <div class="tester-ticket-header-dates">
-                    <div class="tester-ticket-header-date-item">
-                        <span class="tester-ticket-header-date-label">Issue Date</span>
-                        <!-- Django: {{ ticket.created_at|date:"d M Y" }} -->
-                        <span class="tester-ticket-header-date-val" id="testerHeaderIssueDate">11 Sep 2021</span>
+            <div style="padding-top:var(--tw-space-3);padding-bottom:var(--tw-space-3)">
+                {% for att in ticket.attachments.all %}
+                <div class="tw-attachment-item">
+                    <div class="tw-file-icon tw-file-icon--doc" aria-hidden="true">
+                        <i class="bx bx-file"></i>
                     </div>
-                    <div class="tester-ticket-header-date-item">
-                        <span class="tester-ticket-header-date-label">Est. Resolution</span>
-                        <!-- Django: {{ ticket.est_resolution|date:"d M Y" }} -->
-                        <span class="tester-ticket-header-date-val" id="testerHeaderEstDate">15 May 2025</span>
+                    <div class="tw-attachment-info">
+                        <span class="tw-attachment-name">{{ att.file.name|cut:"ticket_attachments/" }}</span>
+                        <span class="tw-attachment-meta">{{ att.created_at|date:"d M Y" }}</span>
                     </div>
                 </div>
+                {% empty %}
+                <p style="padding:var(--tw-space-4) var(--tw-space-5);color:var(--tw-text-muted);
+                          font-size:var(--tw-text-sm);margin:0">No attachments.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+
+        <!-- ================================================
+             4. CHAT WITH ADMIN
+             ================================================ -->
+        <div class="dev-detail-card">
+            <div class="dev-detail-card__header">
+                <i class="bx bx-chat" aria-hidden="true"></i>
+                <h3 class="dev-detail-card__title">Chat with Admin</h3>
             </div>
 
+            <div style="padding:var(--tw-space-3) var(--tw-space-5) 0">
+                <p style="margin:0;font-size:var(--tw-text-xs);color:var(--tw-text-muted);
+                          font-style:italic;line-height:1.5">
+                    This chat is between you and the support admin. Clients and developers cannot see these messages.
+                </p>
+            </div>
+
+            <div class="dev-chat-thread" id="testerChatThread">
+                {% for msg in chat_messages %}
+                {% if msg.author == request.user %}
+                <div class="dev-msg dev-msg--tester">
+                    <div class="tw-avatar tw-avatar--sm tw-avatar--tester" aria-hidden="true">
+                        {{ msg.author.get_full_name|default:msg.author.username|slice:":2"|upper }}
+                    </div>
+                    <div class="dev-msg-body">
+                        <div class="dev-msg-sender">
+                            You
+                            <span class="tw-role-pill tw-role-pill--tester">Tester</span>
+                        </div>
+                        <div class="dev-msg-bubble">{{ msg.body }}</div>
+                        <div class="dev-msg-time">{{ msg.created_at|date:"d M Y" }} at {{ msg.created_at|time:"H:i" }}</div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="dev-msg dev-msg--admin">
+                    <div class="tw-avatar tw-avatar--sm tw-avatar--admin" aria-hidden="true">
+                        {{ msg.author.get_full_name|default:msg.author.username|slice:":2"|upper }}
+                    </div>
+                    <div class="dev-msg-body">
+                        <div class="dev-msg-sender">
+                            {{ msg.author.get_full_name|default:msg.author.username }}
+                            <span class="tw-role-pill tw-role-pill--admin">Admin</span>
+                        </div>
+                        <div class="dev-msg-bubble">{{ msg.body }}</div>
+                        <div class="dev-msg-time">{{ msg.created_at|date:"d M Y" }} at {{ msg.created_at|time:"H:i" }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                {% empty %}
+                <div style="padding:var(--tw-space-5);text-align:center;color:var(--tw-text-muted);font-size:var(--tw-text-sm)">
+                    No messages yet.
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if ticket.sub_status == 'testing' %}
+            <div class="dev-chat-footer">
+                <div class="dev-chat-input-row">
+                    <textarea class="dev-chat-textarea" id="testerChatInput"
+                              placeholder="Type a message to admin…" rows="1"
+                              aria-label="Chat message input"
+                              oninput="this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+                    <button type="button" class="tw-btn tw-btn-primary tw-btn--sm"
+                            style="flex-shrink:0" onclick="sendTesterDetailMessage()"
+                            aria-label="Send message">
+                        <i class="bx bx-send" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+            {% else %}
+            <div style="padding:var(--tw-space-3) var(--tw-space-5);font-size:var(--tw-text-xs);color:var(--tw-text-muted);font-style:italic">
+                Chat is read-only for this ticket's current state.
+            </div>
+            {% endif %}
+
         </div>
+        <!-- END CHAT CARD -->
 
-        <!-- Overdue banner -->
-        <div class="tester-overdue-banner" id="testerOverdueBanner" style="display:none;">
-            <i class="bx bx-time-five" aria-hidden="true"></i>
-            <span id="testerOverdueMsg">This ticket is overdue. The estimated resolution date has passed.</span>
-        </div>
+    </div>
+    <!-- END LEFT COLUMN -->
 
 
-        <!-- =========================================================
-             TWO-COLUMN LAYOUT — 65% / 35%
-             ========================================================= -->
-        <div class="tester-detail-layout">
+    <!-- =======================================================
+         RIGHT COLUMN
+         ======================================================= -->
+    <div class="dev-detail-right">
 
-            <!-- =======================================================
-                 LEFT COLUMN
-                 ======================================================= -->
-            <div class="tester-detail-left">
+        <!-- TICKET INFO PANEL -->
+        <div class="dev-info-panel">
+            <div class="dev-info-panel__header">
+                <i class="bx bx-info-circle" aria-hidden="true"></i>
+                <h3 class="dev-info-panel__title">Ticket Info</h3>
+            </div>
 
-
-                <!-- 1. ADMIN NOTES (conditional) -->
-                <div class="tester-admin-note" id="testerAdminNoteCard" style="display:none">
-                    <span class="tester-admin-note-icon" aria-hidden="true">
-                        <i class="bx bx-info-circle"></i>
+            <div class="dev-info-row">
+                <span class="dev-info-row__label">Status</span>
+                <span class="dev-info-row__value">{% tester_ticket_badge ticket %}</span>
+            </div>
+            <div class="dev-info-row">
+                <span class="dev-info-row__label">Priority</span>
+                <span class="dev-info-row__value">
+                    <span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">
+                        {{ ticket.get_priority_display }}
                     </span>
-                    <div>
-                        <div class="tester-admin-note-title">Note from Admin</div>
-                        <!-- Django: {{ ticket.admin_notes }} -->
-                        <div class="tester-admin-note-body" id="testerAdminNoteBody">
-                            <!-- populated by initPage() -->
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- 2. TEST EXECUTION PANEL -->
-                <div class="tester-detail-card" id="testerTestPanel">
-                    <div class="tester-detail-card__header">
-                        <i class="bx bx-clipboard" aria-hidden="true"></i>
-                        <h3 class="tester-detail-card__title">Test Execution</h3>
-                    </div>
-                    <div id="testerTestPanelBody">
-                        <!-- populated by renderTestPanel() -->
-                    </div>
-                </div>
-
-
-                <!-- 3. DESCRIPTION -->
-                <div class="tester-detail-card">
-                    <div class="tester-detail-card__header">
-                        <i class="bx bx-detail" aria-hidden="true"></i>
-                        <h3 class="tester-detail-card__title">Description</h3>
-                    </div>
-                    <div class="tester-detail-card__body">
-                        <!-- Django: {{ ticket.description|linebreaksbr }} -->
-                        <p id="testerTicketDesc"
-                           style="margin:0;color:var(--tw-text-secondary);font-size:var(--tw-text-base);line-height:1.7;white-space:pre-wrap">
-                            <!-- populated by initPage() -->
-                        </p>
-                    </div>
-                </div>
-
-
-                <!-- 4. ATTACHMENTS -->
-                <div class="tester-detail-card">
-                    <div class="tester-detail-card__header">
-                        <i class="bx bx-paperclip" aria-hidden="true"></i>
-                        <h3 class="tester-detail-card__title">Attachments &amp; Evidence</h3>
-                    </div>
-                    <!-- Django: {% for att in ticket.attachments.all %} -->
-                    <div id="testerAttachList"
-                         style="padding-top:var(--tw-space-3);padding-bottom:var(--tw-space-3)">
-                        <!-- populated by renderTesterAttachments() -->
-                    </div>
-                    <!-- Django: {% endfor %} -->
-                    <div class="tester-attachment-card-footer">
-                        <!-- Django: action="{% url 'tester:upload_attachment' ticket.id %}" -->
-                        <input type="file" id="testerAttachInput" style="display:none"
-                               accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.xlsx,.csv"
-                               aria-hidden="true">
-                        <button type="button"
-                                id="testerAddAttachBtn"
-                                class="tw-btn tw-btn-outline tw-btn--sm"
-                                onclick="document.getElementById('testerAttachInput').click()">
-                            <i class="bx bx-paperclip" aria-hidden="true"></i>
-                            Add Test Evidence
-                        </button>
-                    </div>
-                </div>
-
-
-                <!-- 5. CHAT WITH ADMIN -->
-                <div class="tester-detail-card">
-                    <div class="tester-detail-card__header">
-                        <i class="bx bx-chat" aria-hidden="true"></i>
-                        <h3 class="tester-detail-card__title">Chat with Admin</h3>
-                    </div>
-
-                    <div style="padding:var(--tw-space-3) var(--tw-space-5) 0">
-                        <p style="margin:0;font-size:var(--tw-text-xs);color:var(--tw-text-muted);font-style:italic;line-height:1.5">
-                            This chat is between you and the support admin. Clients and developers cannot see these messages.
-                        </p>
-                    </div>
-
-                    <!-- Django: {% for message in ticket.messages.all %} -->
-                    <div class="tester-chat-thread" id="testerChatThread">
-
-                        <!-- Admin message -->
-                        <div class="tester-msg tester-msg--admin">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--admin" aria-hidden="true">S</div>
-                            <div class="tester-msg-body">
-                                <div class="tester-msg-sender">
-                                    Support Admin
-                                    <span class="tw-role-pill tw-role-pill--admin">Admin</span>
-                                </div>
-                                <!-- Django: {{ message.content }} -->
-                                <div class="tester-msg-bubble">Hi Priya, please test this ticket thoroughly and log your findings. Client is waiting.</div>
-                                <div class="tester-msg-time">16 Apr 2025 at 11:30 AM</div>
-                            </div>
-                        </div>
-
-                        <!-- Tester message -->
-                        <div class="tester-msg tester-msg--tester">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--tester" aria-hidden="true">PS</div>
-                            <div class="tester-msg-body">
-                                <div class="tester-msg-sender">
-                                    You
-                                    <span class="tw-role-pill tw-role-pill--tester">Tester</span>
-                                </div>
-                                <div class="tester-msg-bubble">Understood. I'll start executing the test cases and update you shortly.</div>
-                                <div class="tester-msg-time">16 Apr 2025 at 11:50 AM</div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <!-- Django: {% endfor %} -->
-
-                    <!-- Chat input -->
-                    <div class="tester-chat-footer">
-                        <div class="tw-attach-preview-strip" id="testerChatAttachStrip" aria-live="polite">
-                            <i class="bx bx-file" aria-hidden="true"></i>
-                            <span id="testerChatAttachFileName"></span>
-                            <button class="tw-file-chip-remove" onclick="removeTesterChatAttachment()" aria-label="Remove attachment">
-                                <i class="bx bx-x" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                        <div class="tester-chat-input-row">
-                            <!-- Django: action="{% url 'tester:send_message' ticket.id %}" -->
-                            <input type="file" id="testerChatFileInput" style="display:none"
-                                   accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" aria-hidden="true">
-                            <button type="button" class="tw-btn-icon"
-                                    onclick="document.getElementById('testerChatFileInput').click()"
-                                    title="Attach file" aria-label="Attach file">
-                                <i class="bx bx-paperclip" aria-hidden="true"></i>
-                            </button>
-                            <textarea
-                                class="tester-chat-textarea"
-                                id="testerChatDetailInput"
-                                placeholder="Type a message to admin…"
-                                rows="1"
-                                aria-label="Chat message input"
-                                oninput="this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
-                            <button type="button"
-                                    class="tw-btn tw-btn-primary tw-btn--sm"
-                                    style="flex-shrink:0"
-                                    onclick="sendTesterDetailMessage()"
-                                    aria-label="Send message">
-                                <i class="bx bx-send" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-                <!-- END CHAT CARD -->
-
-
+                </span>
             </div>
-            <!-- END LEFT COLUMN -->
-
-
-            <!-- =======================================================
-                 RIGHT COLUMN — Ticket Info + Test Progress Timeline
-                 ======================================================= -->
-            <div class="tester-detail-right">
-
-                <!-- TICKET INFO PANEL -->
-                <div class="tester-info-panel">
-                    <div class="tester-info-panel__header">
-                        <i class="bx bx-info-circle" aria-hidden="true"></i>
-                        <h3 class="tester-info-panel__title">Ticket Info</h3>
-                    </div>
-                    <!-- Django: rows from ticket context -->
-                    <div id="testerInfoPanelBody">
-                        <!-- populated by renderTesterInfoPanel() -->
-                    </div>
-                </div>
-
-                <!-- TEST PROGRESS TIMELINE -->
-                <div class="tester-info-panel">
-                    <div class="tester-info-panel__header">
-                        <i class="bx bx-history" aria-hidden="true"></i>
-                        <h3 class="tester-info-panel__title">Test Progress Timeline</h3>
-                    </div>
-                    <!-- Django: {% for event in ticket.events.all %} -->
-                    <div class="tester-timeline" id="testerProgressTimeline">
-                        <!-- populated by renderTesterTimeline() -->
-                    </div>
-                    <!-- Django: {% endfor %} -->
-                </div>
-
+            <div class="dev-info-row">
+                <span class="dev-info-row__label">Client</span>
+                <span class="dev-info-row__value">{{ ticket.client.name|default:"—" }}</span>
             </div>
-            <!-- END RIGHT COLUMN -->
-
+            <div class="dev-info-row">
+                <span class="dev-info-row__label">Category</span>
+                <span class="dev-info-row__value">{{ ticket.category|default:"—" }}</span>
+            </div>
+            <div class="dev-info-row">
+                <span class="dev-info-row__label">Issue Date</span>
+                <span class="dev-info-row__value">{{ ticket.created_at|date:"d M Y" }}</span>
+            </div>
+            <div class="dev-info-row">
+                <span class="dev-info-row__label">Developer</span>
+                <span class="dev-info-row__value">
+                    {{ ticket.assigned_developer.get_full_name|default:ticket.assigned_developer.username|default:"—" }}
+                </span>
+            </div>
+            <div class="dev-info-row">
+                <span class="dev-info-row__label">Assigned To</span>
+                <span class="dev-info-row__value">
+                    {{ ticket.assigned_tester.get_full_name|default:ticket.assigned_tester.username }}
+                    <span style="font-size:var(--tw-text-xs);color:var(--tw-text-muted)">(you)</span>
+                </span>
+            </div>
         </div>
-        <!-- END TWO-COLUMN LAYOUT -->
 
-    </main>
-    <!-- END MAIN -->
+        <!-- PROGRESS TIMELINE -->
+        <div class="dev-info-panel">
+            <div class="dev-info-panel__header">
+                <i class="bx bx-history" aria-hidden="true"></i>
+                <h3 class="dev-info-panel__title">Progress Timeline</h3>
+            </div>
 
-</section>
-<!-- END CONTENT WRAPPER -->
+            <div class="dev-progress-timeline">
+                {% for event in events %}
+                <div class="dev-progress-tl-item done">
+                    <div class="dev-progress-tl-dot">
+                        <i class="bx {{ event.action|event_icon }}" aria-hidden="true"></i>
+                    </div>
+                    <div class="dev-progress-tl-content">
+                        <div class="dev-progress-tl-label">{{ event.action|event_label }}</div>
+                        {% if event.note %}
+                        <div class="dev-progress-tl-note" style="font-size:var(--tw-text-xs);
+                             color:var(--tw-text-muted);margin-top:2px;font-style:italic">
+                            {{ event.note }}
+                        </div>
+                        {% endif %}
+                        <div class="dev-progress-tl-date">{{ event.created_at|date:"d M Y" }} at {{ event.created_at|time:"H:i" }}</div>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="padding:var(--tw-space-4);color:var(--tw-text-muted);font-size:var(--tw-text-sm);margin:0">
+                    No timeline events yet.
+                </p>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+    <!-- END RIGHT COLUMN -->
+
+</div>
+<!-- END TWO-COLUMN LAYOUT -->
 
 
 <!-- ==============================================================
      CONFIRM MODAL
+     Uses .active class toggle (CSS opacity transition).
+     Phase 4.5 fix applied: form captured in local var BEFORE
+     closeModal nulls the global reference.
      ============================================================== -->
-<div class="tester-confirm-overlay" id="testerConfirmOverlay"
+<div class="dev-confirm-overlay" id="testerConfirmOverlay"
      role="dialog" aria-modal="true" aria-labelledby="testerConfirmTitle">
-    <div class="tester-confirm-box">
-        <div class="tester-confirm-icon tester-confirm-icon--pass" id="testerConfirmIcon" aria-hidden="true">
-            <i class="bx bx-check-circle"></i>
+    <div class="dev-confirm-box">
+        <div class="dev-confirm-icon dev-confirm-icon--primary" aria-hidden="true">
+            <i class="bx bx-test-tube"></i>
         </div>
-        <div class="tester-confirm-title" id="testerConfirmTitle">Confirm Result</div>
-        <div class="tester-confirm-message" id="testerConfirmMessage">
-            <!-- set by openTesterConfirmModal() -->
-        </div>
-        <div class="tester-confirm-buttons">
-            <button type="button" class="tw-btn tw-btn-outline" onclick="closeTesterConfirmModal()">Cancel</button>
-            <button type="button" class="tw-btn tw-btn-primary" id="testerConfirmOkBtn">Confirm</button>
-        </div>
-    </div>
-</div>
-
-
-<!-- ==============================================================
-     FILE PREVIEW MODAL — shown before adding test evidence.
-     ============================================================== -->
-<div id="testerFilePreviewModal" class="tw-file-preview-modal">
-    <div class="tw-file-preview-modal__box">
-        <h3 class="tw-file-preview-modal__title">Add Test Evidence</h3>
-        <p class="tw-file-preview-modal__subtitle">Review before attaching</p>
-        <div class="tw-file-preview-modal__file-card">
-            <i id="testerPreviewFileIcon" class="bx bx-file"
-               style="font-size:32px;color:var(--tw-primary);flex-shrink:0;"></i>
-            <div>
-                <div id="testerPreviewFileName"
-                     style="font-weight:600;color:var(--tw-text-primary);font-size:var(--tw-text-base);"></div>
-                <div id="testerPreviewFileSize"
-                     style="font-size:var(--tw-text-sm);color:var(--tw-text-muted);margin-top:2px;"></div>
-                <div id="testerPreviewFileType"
-                     style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:1px;"></div>
-            </div>
-        </div>
-        <div class="tw-file-preview-modal__actions">
-            <button onclick="cancelTesterFilePreview()" class="tw-btn tw-btn-outline">Cancel</button>
-            <button onclick="confirmTesterFileAttach()" class="tw-btn tw-btn-primary">Add Evidence</button>
+        <div class="dev-confirm-title" id="testerConfirmTitle">Confirm Action</div>
+        <div class="dev-confirm-message" id="testerConfirmMessage"></div>
+        <div class="dev-confirm-buttons">
+            <button type="button" class="tw-btn tw-btn-outline"
+                    onclick="closeTesterConfirmModal()">Cancel</button>
+            <button type="button" class="tw-btn tw-btn-primary"
+                    id="testerConfirmOkBtn">Confirm</button>
         </div>
     </div>
 </div>
 
-
-<!-- ==============================================================
-     VENDOR SCRIPTS
-     ============================================================== -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
 
 
-<!-- ==============================================================
-     PAGE SCRIPT
-     Django: {% block page_js %}
-     ============================================================== -->
+{% block page_js %}
 <script>
 
-    /* ============================================================
-     * TESTER IDENTITY
-     * Django: var TESTER_USER = {{ tester_user|safe }};
-     * ============================================================ */
-    var TESTER_USER = {
-        name:     'Priya Sharma',
-        initials: 'PS',
-        email:    'priya.sharma@tweedle.io',
-        role:     'Tester'
+    var testerPendingForm = null;
+
+    var TESTER_ACTION_LABELS = {
+        'pass': {
+            title: 'Pass this Ticket?',
+            msg:   'This will mark testing complete and move the ticket to Ready for UAT. The admin will be notified.',
+            ok:    'Pass — Mark Ready for UAT'
+        },
+        'fail': {
+            title: 'Fail this Ticket?',
+            msg:   'This will return the ticket to the developer with your failure notes. The developer will be notified.',
+            ok:    'Fail — Return to Developer'
+        }
     };
-    /* Django: var TESTER_USER = {{ tester_user|safe }}; */
 
+    function openTesterConfirmModal(e, action) {
+        e.preventDefault();
+        var info = TESTER_ACTION_LABELS[action] || { title: 'Confirm Action', msg: 'Proceed?', ok: 'Confirm' };
 
-    /* ============================================================
-     * URL PARAMS
-     * Django: var TICKET_ID = "{{ ticket.id }}";
-     *         var TICKET_STATUS = "{{ ticket.current_status }}";
-     * ============================================================ */
-    var _urlParams    = new URLSearchParams(window.location.search);
-    var TICKET_ID     = _urlParams.get('id')     || 'GMEC25010001';
-    var TICKET_STATUS = _urlParams.get('status') || 'testing';
-    /* Django: var TICKET_ID = "{{ ticket.id }}"; */
-    /* Django: var TICKET_STATUS = "{{ ticket.current_status }}"; */
+        document.getElementById('testerConfirmTitle').textContent   = info.title;
+        document.getElementById('testerConfirmMessage').textContent = info.msg;
+        document.getElementById('testerConfirmOkBtn').textContent   = info.ok;
 
+        testerPendingForm = e.target.closest ? e.target.closest('form') : null;
 
-    /* ============================================================
-     * TESTER_TICKET_DATA
-     * Django: var TESTER_TICKET_DATA = {{ tickets_json|safe }};
-     * ============================================================ */
-    var TESTER_TICKET_DATA = {
-
-        'GMEC25010001': {
-            subject:       'Wallet Option Agents',
-            client:        'Global Money Exchange CO.LLC',
-            clientId:      'GMEC',
-            developer:     'Rithik Sunil',
-            priority:      'HIGH',
-            priorityClass: 'tw-priority-badge--high',
-            issueDate:     '11 Sep 2021',
-            estResolution: '15 May 2025',
-            isOverdue:     true,
-            category:      'Payments',
-            description:   'Wallet option agents are not being displayed correctly on the payment selection screen. Users cannot select wallet as a payment method. Affects all wallet-type transactions.',
-            attachments:   [{ name: 'test_plan_v1.pdf', type: 'pdf', size: '210 KB', date: '12 Apr 2025' }],
-            adminNotes:    'Client is premium — test thoroughly across all wallet types.',
-            currentStatus: 'testing',
-            testRemarks:   '',
-            testResult:    null
-        },
-
-        'GMEC25010004': {
-            subject:       'Kumari API Integration',
-            client:        'Global Money Exchange CO.LLC',
-            clientId:      'GMEC',
-            developer:     'Arjun Mehta',
-            priority:      'MEDIUM',
-            priorityClass: 'tw-priority-badge--medium',
-            issueDate:     '08 Jan 2022',
-            estResolution: '20 May 2025',
-            isOverdue:     true,
-            category:      'Integration',
-            description:   'Kumari API integration failing on authentication handshake. API returns 401 on valid credentials. Fix needs to be verified across all API endpoints.',
-            attachments:   [],
-            adminNotes:    '',
-            currentStatus: 'failed',
-            testRemarks:   'Auth still failing on /api/v2/transactions endpoint. Returning 401 despite valid token. Developer needs to check token expiry logic.',
-            testResult:    'fail'
-        },
-
-        'BGEX25010013': {
-            subject:       'User role permissions not saving',
-            client:        'Belhasa Global Exchange Co.LLC',
-            clientId:      'BGEX',
-            developer:     'Rithik Sunil',
-            priority:      'MEDIUM',
-            priorityClass: 'tw-priority-badge--medium',
-            issueDate:     '05 May 2025',
-            estResolution: '30 May 2025',
-            isOverdue:     false,
-            category:      'Access Control',
-            description:   'Role permission changes are not persisting after page refresh. UI shows success but old permissions are restored on reload.',
-            attachments:   [{ name: 'permissions_test_evidence.pdf', type: 'pdf', size: '145 KB', date: '18 May 2025' }],
-            adminNotes:    'Test with all 3 role types: Admin, Manager, Staff.',
-            currentStatus: 'testing',
-            testRemarks:   '',
-            testResult:    null
-        },
-
-        'GMEC25010010': {
-            subject:       'Payment gateway timeout on checkout',
-            client:        'Global Money Exchange CO.LLC',
-            clientId:      'GMEC',
-            developer:     'Arjun Mehta',
-            priority:      'HIGH',
-            priorityClass: 'tw-priority-badge--high',
-            issueDate:     '14 Apr 2025',
-            estResolution: '25 May 2025',
-            isOverdue:     false,
-            category:      'Billing',
-            description:   'Payment gateway timing out during checkout. Error code: GATEWAY_TIMEOUT_503. Affects approximately 30% of transactions.',
-            attachments:   [],
-            adminNotes:    'Test under high load conditions — simulate concurrent transactions.',
-            currentStatus: 'testing',
-            testRemarks:   '',
-            testResult:    null
-        },
-
-        'BGEX25020003': {
-            subject:       'Mobile App Crash on Login',
-            client:        'Belhasa Global Exchange Co.LLC',
-            clientId:      'BGEX',
-            developer:     'Rithik Sunil',
-            priority:      'LOW',
-            priorityClass: 'tw-priority-badge--low',
-            issueDate:     '21 Feb 2025',
-            estResolution: '28 May 2025',
-            isOverdue:     false,
-            category:      'Mobile',
-            description:   'App crashes on login screen on Android devices below API level 28. Stack trace points to null pointer in auth module.',
-            attachments:   [],
-            adminNotes:    '',
-            currentStatus: 'passed',
-            testRemarks:   'Fix verified on Android API 26, 27, 28. No crashes observed. Login successful across all test devices.',
-            testResult:    'pass'
-        },
-
-        'GMEC25010012': {
-            subject:       'Invoice generation incorrect totals',
-            client:        'Global Money Exchange CO.LLC',
-            clientId:      'GMEC',
-            developer:     'Arjun Mehta',
-            priority:      'HIGH',
-            priorityClass: 'tw-priority-badge--high',
-            issueDate:     '02 May 2025',
-            estResolution: '10 Jun 2025',
-            isOverdue:     false,
-            category:      'Billing',
-            description:   'Invoice totals incorrect when multiple discount codes applied. Final amount higher than expected.',
-            attachments:   [],
-            adminNotes:    'Test with 2, 3, and 4 stacked discount codes.',
-            currentStatus: 'testing',
-            testRemarks:   '',
-            testResult:    null
-        },
-
-        'BGEX25010008': {
-            subject:       'Two-factor authentication not triggering',
-            client:        'Belhasa Global Exchange Co.LLC',
-            clientId:      'BGEX',
-            developer:     'Rithik Sunil',
-            priority:      'HIGH',
-            priorityClass: 'tw-priority-badge--high',
-            issueDate:     '12 Apr 2025',
-            estResolution: '28 Apr 2025',
-            isOverdue:     false,
-            category:      'Security',
-            description:   '2FA SMS codes not being sent on login. Affects all users with 2FA enabled.',
-            attachments:   [],
-            adminNotes:    'Test with SMS and email 2FA methods both.',
-            currentStatus: 'passed',
-            testRemarks:   'Both SMS and email 2FA verified working. Codes delivered within 30 seconds. Test passed on 5 different accounts.',
-            testResult:    'pass'
-        },
-
-        'GMEC25010007': {
-            subject:       'Email notification delay on ticket updates',
-            client:        'Global Money Exchange CO.LLC',
-            clientId:      'GMEC',
-            developer:     'Arjun Mehta',
-            priority:      'MEDIUM',
-            priorityClass: 'tw-priority-badge--medium',
-            issueDate:     '05 May 2025',
-            estResolution: '22 May 2025',
-            isOverdue:     true,
-            category:      'Notifications',
-            description:   'Email notifications delayed by 2-4 hours. Clients not receiving real-time updates.',
-            attachments:   [],
-            adminNotes:    '',
-            currentStatus: 'failed',
-            testRemarks:   'Notifications still delayed — averaging 3.2 hours in test environment. Issue not resolved.',
-            testResult:    'fail'
-        }
-
-    };
-    /* Django: var TESTER_TICKET_DATA = {{ tickets_json|safe }}; */
-
-
-    /* ============================================================
-     * PAGE STATE
-     * ============================================================ */
-    var testerWorkAttachments = [];
-    var testerPendingFile     = null;
-    var testerSelectedResult  = null;  /* 'pass' | 'fail' | null */
-    var testerConfirmCallback = null;
-
-
-    /* ============================================================
-     * initPage()
-     * Master render — hydrates every element from TESTER_TICKET_DATA.
-     * Django: at deploy time this is replaced by server-rendered context.
-     * ============================================================ */
-    function initPage() {
-        var ticket = TESTER_TICKET_DATA[TICKET_ID] || TESTER_TICKET_DATA['GMEC25010001'];
-
-        /* Use stored status */
-        TICKET_STATUS = ticket.currentStatus || TICKET_STATUS;
-
-        /* Restore persisted result from localStorage if present */
-        var savedResult = null;
-        try {
-            var savedStr = localStorage.getItem('tester_result_' + TICKET_ID);
-            if (savedStr) {
-                savedResult = JSON.parse(savedStr);
-                if (savedResult && savedResult.result) {
-                    TESTER_TICKET_DATA[TICKET_ID].testResult    = savedResult.result;
-                    TESTER_TICKET_DATA[TICKET_ID].testRemarks   = savedResult.remarks;
-                    TESTER_TICKET_DATA[TICKET_ID].currentStatus = savedResult.status;
-                    TICKET_STATUS = savedResult.status;
-                    ticket = TESTER_TICKET_DATA[TICKET_ID];
-                }
-            }
-        } catch(e) { /* ignore storage errors */ }
-
-        /* Back link */
-        var backLink = document.getElementById('testerBackLink');
-        if (backLink) backLink.href = 'dashboard.html?filter=' + (TICKET_STATUS === 'testing' ? 'active' : TICKET_STATUS);
-
-        /* Page title */
-        document.title = ticket.subject + ' — Tweedle';
-
-        /* Header */
-        var h1El   = document.getElementById('testerTicketH1');
-        var subEl  = document.getElementById('testerTicketIdSub');
-        var hid    = document.getElementById('testerHeaderId');
-        if (h1El)  h1El.textContent  = ticket.subject;
-        if (subEl) subEl.textContent = TICKET_ID;
-        if (hid)   hid.textContent   = TICKET_ID;
-
-        /* Header card border */
-        var hc = document.getElementById('testerHeaderCard');
-        if (hc) hc.dataset.status = TICKET_STATUS;
-
-        /* Header badges */
-        var badgesEl = document.getElementById('testerHeaderBadges');
-        if (badgesEl) {
-            var statusBadgeClass = {
-                testing: 'tester-status-badge--testing',
-                passed:  'tester-status-badge--passed',
-                failed:  'tester-status-badge--failed'
-            }[TICKET_STATUS] || 'tester-status-badge--testing';
-            var statusLabel = { testing: 'Testing', passed: 'Passed', failed: 'Failed' }[TICKET_STATUS] || 'Testing';
-
-            badgesEl.innerHTML =
-                '<span class="tester-status-badge ' + statusBadgeClass + '">' + escapeHtml(statusLabel) + '</span>' +
-                ' <span class="tw-priority-badge ' + escapeHtml(ticket.priorityClass) + '">' + escapeHtml(ticket.priority) + '</span>' +
-                ' <span class="tw-ticket-label">' + escapeHtml(ticket.category) + '</span>' +
-                ' <span class="tester-developer-tag"><i class="bx bx-code-alt"></i>' + escapeHtml(ticket.developer) + '</span>' +
-                ' <span class="tester-client-tag"><i class="bx bx-buildings"></i>' + escapeHtml(ticket.clientId) + '</span>';
-        }
-
-        /* Dates */
-        var issueEl = document.getElementById('testerHeaderIssueDate');
-        var estEl   = document.getElementById('testerHeaderEstDate');
-        if (issueEl) issueEl.textContent = ticket.issueDate;
-        if (estEl) {
-            estEl.textContent = ticket.estResolution;
-            if (ticket.isOverdue) {
-                estEl.style.color      = 'var(--tw-danger)';
-                estEl.style.fontWeight = '600';
-            }
-        }
-
-        /* Overdue banner */
-        var overdueBanner = document.getElementById('testerOverdueBanner');
-        if (overdueBanner) {
-            overdueBanner.style.display = ticket.isOverdue ? '' : 'none';
-            var overdueMsg = document.getElementById('testerOverdueMsg');
-            if (overdueMsg && ticket.isOverdue) {
-                overdueMsg.textContent =
-                    'This ticket is overdue. The estimated resolution date (' +
-                    ticket.estResolution + ') has passed.';
-            }
-        }
-
-        /* Admin note */
-        var adminCard = document.getElementById('testerAdminNoteCard');
-        var adminBody = document.getElementById('testerAdminNoteBody');
-        if (adminCard) {
-            if (ticket.adminNotes) {
-                adminCard.style.display = '';
-                if (adminBody) adminBody.textContent = ticket.adminNotes;
-            } else {
-                adminCard.style.display = 'none';
-            }
-        }
-
-        /* Description */
-        var descEl = document.getElementById('testerTicketDesc');
-        if (descEl) descEl.textContent = ticket.description;
-
-        /* Attachments */
-        testerWorkAttachments = ticket.attachments.slice();
-        renderTesterAttachments();
-
-        /* Test panel */
-        renderTestPanel();
-
-        /* Info panel */
-        renderTesterInfoPanel(ticket);
-
-        /* Progress timeline */
-        renderTesterTimeline();
-
-        /* Sidebar/topbar identity */
-        var ids = {
-            testerAvatarTopbar:  TESTER_USER.initials,
-            testerAvatarSidebar: TESTER_USER.initials,
-            testerAvatarPanel:   TESTER_USER.initials,
-            testerNameSidebar:   TESTER_USER.name,
-            testerNamePanel:     TESTER_USER.name,
-            testerEmailPanel:    TESTER_USER.email
-        };
-        Object.keys(ids).forEach(function (id) {
-            var el = document.getElementById(id);
-            if (el) el.textContent = ids[id];
-        });
-
-        /* Scroll chat to bottom */
-        var thread = document.getElementById('testerChatThread');
-        if (thread) thread.scrollTop = thread.scrollHeight;
-    }
-
-
-    /* ============================================================
-     * renderTestPanel()
-     * Renders the test execution panel based on TICKET_STATUS.
-     * ============================================================ */
-    function renderTestPanel() {
-        var body   = document.getElementById('testerTestPanelBody');
-        var ticket = TESTER_TICKET_DATA[TICKET_ID];
-        if (!body || !ticket) return;
-
-        /* PASSED state: green read-only banner */
-        if (TICKET_STATUS === 'passed') {
-            body.innerHTML =
-                '<div class="tester-passed-banner">' +
-                '<i class="bx bx-check-circle tester-passed-banner__icon" aria-hidden="true"></i>' +
-                '<div>' +
-                '<div class="tester-passed-banner__title">✓ Test Passed</div>' +
-                '<div class="tester-remarks-quote">' + escapeHtml(ticket.testRemarks || '—') + '</div>' +
-                '<p class="tester-banner-note">Admin and developer have been notified. Ticket will proceed to UAT review.</p>' +
-                '</div></div>';
-            return;
-        }
-
-        /* FAILED state: red read-only banner */
-        if (TICKET_STATUS === 'failed') {
-            body.innerHTML =
-                '<div class="tester-failed-banner">' +
-                '<i class="bx bx-x-circle tester-failed-banner__icon" aria-hidden="true"></i>' +
-                '<div>' +
-                '<div class="tester-failed-banner__title">✗ Test Failed — Returned to Developer</div>' +
-                '<div class="tester-remarks-quote">' + escapeHtml(ticket.testRemarks || '—') + '</div>' +
-                '<p class="tester-banner-note">The developer has been notified. This ticket is back in development.</p>' +
-                '</div></div>';
-            return;
-        }
-
-        /* TESTING state: active form */
-        testerSelectedResult = null;
-
-        body.innerHTML =
-            '<div class="tester-result-form">' +
-
-            '<label>Test Result <span style="color:var(--tw-danger)">*</span></label>' +
-            '<div class="tester-result-buttons" id="testerResultButtons">' +
-            '<button type="button" class="tester-result-btn tester-result-btn--pass" id="testerPassBtn"' +
-            '        onclick="selectTestResult(\'pass\')">' +
-            '<i class="bx bx-check-circle"></i> Pass' +
-            '</button>' +
-            '<button type="button" class="tester-result-btn tester-result-btn--fail" id="testerFailBtn"' +
-            '        onclick="selectTestResult(\'fail\')">' +
-            '<i class="bx bx-x-circle"></i> Fail' +
-            '</button>' +
-            '</div>' +
-
-            '<label for="testerRemarksInput">Test Remarks <span style="color:var(--tw-danger)">*</span></label>' +
-            '<textarea id="testerRemarksInput"' +
-            '          class="tw-input tester-textarea"' +
-            '          placeholder="Describe what you tested, what passed or failed, and any observations…"' +
-            '          oninput="updateSubmitBtn()"></textarea>' +
-
-            '<div style="margin-top:var(--tw-space-4);">' +
-            '<label>Test Evidence <span style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);font-weight:400;">(optional)</span></label>' +
-            '<div class="tester-evidence-upload" id="testerEvidenceArea" onclick="document.getElementById(\'testerEvidenceFileInput\').click()">' +
-            '<i class="bx bx-cloud-upload" aria-hidden="true"></i>' +
-            '<p>Click to upload screenshot or test report<br><span style="font-size:var(--tw-text-xs);">PDF, PNG, JPG, XLSX accepted</span></p>' +
-            '</div>' +
-            '<div class="tester-evidence-selected" id="testerEvidenceSelected" style="display:none;">' +
-            '<i class="bx bx-file-pdf" id="testerEvidenceIcon"></i>' +
-            '<span id="testerEvidenceFileName"></span>' +
-            '<button class="tester-evidence-remove" onclick="clearTesterEvidence()" aria-label="Remove evidence">' +
-            '<i class="bx bx-x"></i>' +
-            '</button>' +
-            '</div>' +
-            '<input type="file" id="testerEvidenceFileInput" style="display:none;" accept=".pdf,.png,.jpg,.jpeg,.xlsx">' +
-            '</div>' +
-
-            '</div>' +
-
-            '<div class="tester-submit-btn-row">' +
-            '<button type="button" class="tw-btn tw-btn-primary" id="testerSubmitBtn"' +
-            '        onclick="confirmSubmitTestResult()" disabled>' +
-            '<i class="bx bx-clipboard-check" aria-hidden="true"></i>' +
-            'Submit Test Result' +
-            '</button>' +
-            '</div>';
-
-        /* Wire evidence file input */
-        var evidenceInput = document.getElementById('testerEvidenceFileInput');
-        if (evidenceInput) {
-            evidenceInput.addEventListener('change', function () {
-                if (!this.files || !this.files[0]) return;
-                var file = this.files[0];
-                var area = document.getElementById('testerEvidenceArea');
-                var sel  = document.getElementById('testerEvidenceSelected');
-                var name = document.getElementById('testerEvidenceFileName');
-                if (area) area.style.display = 'none';
-                if (sel)  sel.style.display  = '';
-                if (name) name.textContent   = file.name;
-            });
-        }
-    }
-
-
-    /* selectTestResult(result) — 'pass' or 'fail' */
-    function selectTestResult(result) {
-        testerSelectedResult = result;
-        var passBtn = document.getElementById('testerPassBtn');
-        var failBtn = document.getElementById('testerFailBtn');
-        if (passBtn) passBtn.classList.toggle('selected', result === 'pass');
-        if (failBtn) failBtn.classList.toggle('selected', result === 'fail');
-        updateSubmitBtn();
-    }
-
-    /* updateSubmitBtn() — enables submit only when result + remarks filled */
-    function updateSubmitBtn() {
-        var btn     = document.getElementById('testerSubmitBtn');
-        var remarks = document.getElementById('testerRemarksInput');
-        if (!btn) return;
-        var hasResult  = !!testerSelectedResult;
-        var hasRemarks = !!(remarks && remarks.value.trim().length >= 5);
-        btn.disabled = !(hasResult && hasRemarks);
-    }
-
-    /* clearTesterEvidence() */
-    function clearTesterEvidence() {
-        var input = document.getElementById('testerEvidenceFileInput');
-        var area  = document.getElementById('testerEvidenceArea');
-        var sel   = document.getElementById('testerEvidenceSelected');
-        if (input) input.value = '';
-        if (area)  area.style.display = '';
-        if (sel)   sel.style.display  = 'none';
-    }
-
-
-    /* ============================================================
-     * confirmSubmitTestResult()
-     * Opens confirm modal before submitting result.
-     * Django: fetch('{% url "tester:submit_result" ticket.id %}', { ... })
-     * ============================================================ */
-    function confirmSubmitTestResult() {
-        var remarks = document.getElementById('testerRemarksInput');
-        var text    = remarks ? remarks.value.trim() : '';
-
-        if (!testerSelectedResult || !text) {
-            showTesterToast('Please select a result and add test remarks.', 'error');
-            return;
-        }
-
-        var isPass = testerSelectedResult === 'pass';
-
-        openTesterConfirmModal({
-            iconClass: isPass ? 'tester-confirm-icon--pass' : 'tester-confirm-icon--fail',
-            iconHtml:  isPass ? '<i class="bx bx-check-circle"></i>' : '<i class="bx bx-x-circle"></i>',
-            title:     isPass ? 'Mark as Passed?' : 'Mark as Failed?',
-            message:   isPass
-                ? 'This will mark the test as passed. The admin will be notified to proceed with UAT preparation.'
-                : 'This will mark the test as failed. The developer has been notified and the ticket has been returned to development.',
-            okLabel:  isPass ? 'Yes, Mark as Passed' : 'Yes, Mark as Failed',
-            okCls:    isPass ? 'tw-btn-success' : 'tw-btn-danger',
-            onConfirm: function () {
-                var ticket = TESTER_TICKET_DATA[TICKET_ID];
-                if (!ticket) return;
-
-                var evidenceInput = document.getElementById('testerEvidenceFileInput');
-                var evidenceFile  = evidenceInput && evidenceInput.files && evidenceInput.files[0] ? evidenceInput.files[0] : null;
-
-                /* Update ticket data */
-                ticket.testResult    = testerSelectedResult;
-                ticket.testRemarks   = text;
-                ticket.currentStatus = isPass ? 'passed' : 'failed';
-                TICKET_STATUS        = ticket.currentStatus;
-
-                /* Persist result across navigation */
-                localStorage.setItem('tester_result_' + TICKET_ID, JSON.stringify({
-                    result:  testerSelectedResult,
-                    remarks: text,
-                    status:  testerSelectedResult === 'pass' ? 'passed' : 'failed'
-                }));
-                /* Django: at wiring time, result state comes from server — remove localStorage */
-                /* Django: tester:submit_result with { result: 'pass' }
-                   automatically sets sub_status='testing_passed',
-                   sends notification to admin,
-                   creates TicketTimeline event: 'testing_passed' */
-                /* Django: tester:submit_result with { result: 'fail' }
-                   automatically sets sub_status='development' (returned),
-                   sends notification to assigned_developer and admin,
-                   creates TicketTimeline event: 'testing_failed' */
-
-                /* If evidence file attached, add to attachments */
-                if (evidenceFile) {
-                    var ext  = (evidenceFile.name.split('.').pop() || '').toLowerCase();
-                    var type = ['jpg','jpeg','png','gif'].indexOf(ext) !== -1 ? 'img' : ext === 'pdf' ? 'pdf' : 'doc';
-                    var sizeKb = Math.round(evidenceFile.size / 1024);
-                    testerWorkAttachments.push({
-                        name: evidenceFile.name,
-                        type: type,
-                        size: sizeKb + ' KB',
-                        date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-                    });
-                    renderTesterAttachments();
-                }
-
-                /* Re-render panels */
-                renderTestPanel();
-                renderTesterInfoPanel(ticket);
-                renderTesterTimeline();
-
-                /* Django: fetch('{% url "tester:submit_result" ticket.id %}', {
-                   method: 'POST',
-                   headers: {
-                       'Content-Type': 'application/json',
-                       'X-CSRFToken': getCookie('csrftoken')
-                   },
-                   body: JSON.stringify({ result: testerSelectedResult, remarks: text })
-                }) */
-                console.log('[Tester Portal] submitTestResult stub:', {
-                    id:     TICKET_ID,
-                    result: testerSelectedResult,
-                    remarks: text
-                });
-
-                showTesterToast(
-                    isPass
-                        ? 'Test marked as passed. Admin has been notified to proceed with UAT preparation.'
-                        : 'Test failed — the developer has been notified and the ticket has been returned to development. You will be reassigned if further testing is needed.',
-                    isPass ? 'success' : 'info'
-                );
-
-                testerSelectedResult = null;
-            }
-        });
-    }
-
-
-    /* ============================================================
-     * renderTesterInfoPanel(ticket)
-     * Builds the right-column Ticket Info rows.
-     * ============================================================ */
-    function renderTesterInfoPanel(ticket) {
-        var body = document.getElementById('testerInfoPanelBody');
-        if (!body) return;
-
-        var statusBadgeClass = {
-            testing: 'tester-status-badge--testing',
-            passed:  'tester-status-badge--passed',
-            failed:  'tester-status-badge--failed'
-        }[TICKET_STATUS] || 'tester-status-badge--testing';
-        var statusLabel = { testing: 'Testing', passed: 'Passed', failed: 'Failed' }[TICKET_STATUS] || 'Testing';
-
-        var resultVal;
-        if (ticket.testResult === 'pass') {
-            resultVal = '<span style="color:var(--tw-status-closed-text);font-weight:600">✓ Passed</span>';
-        } else if (ticket.testResult === 'fail') {
-            resultVal = '<span style="color:var(--tw-priority-high-text);font-weight:600">✗ Failed</span>';
-        } else {
-            resultVal = '<span style="color:var(--tw-text-muted);font-style:italic">Pending</span>';
-        }
-
-        var estVal = ticket.isOverdue
-            ? '<span style="color:var(--tw-danger);font-weight:600">' + escapeHtml(ticket.estResolution) + '</span>'
-            : escapeHtml(ticket.estResolution);
-
-        var rows = [
-            { label: 'Status',          value: '<span class="tester-status-badge ' + statusBadgeClass + '">' + statusLabel + '</span>' },
-            { label: 'Test Result',     value: resultVal },
-            { label: 'Priority',        value: '<span class="tw-priority-badge ' + escapeHtml(ticket.priorityClass) + '">' + escapeHtml(ticket.priority) + '</span>' },
-            { label: 'Client',          value: escapeHtml(ticket.client) },
-            { label: 'Developer',       value: escapeHtml(ticket.developer) },
-            { label: 'Category',        value: escapeHtml(ticket.category) },
-            { label: 'Issue Date',      value: escapeHtml(ticket.issueDate) },
-            { label: 'Est. Resolution', value: estVal },
-            { label: 'Assigned To',     value: escapeHtml(TESTER_USER.name) + ' <span style="font-size:var(--tw-text-xs);color:var(--tw-text-muted)">(you)</span>' }
-        ];
-
-        var html = '';
-        rows.forEach(function (row) {
-            html +=
-                '<div class="tester-info-row">' +
-                '<span class="tester-info-row__label">' + escapeHtml(row.label) + '</span>' +
-                '<span class="tester-info-row__value">' + row.value + '</span>' +
-                '</div>';
-        });
-        body.innerHTML = html;
-    }
-
-
-    /* ============================================================
-     * renderTesterTimeline()
-     * Builds the right-column vertical progress timeline.
-     * ============================================================ */
-    function renderTesterTimeline() {
-        var container = document.getElementById('testerProgressTimeline');
-        if (!container) return;
-
-        var stages = [
-            { label: 'Ticket Assigned',  icon: 'bx-user-check',  date: 'Completed' },
-            { label: 'Development',       icon: 'bx-code-alt',    date: 'Completed' },
-            { label: 'Testing',           icon: 'bx-test-tube',   date: null },
-            { label: 'UAT Review',        icon: 'bx-user-check',  date: null },
-            { label: 'Resolved',          icon: 'bx-check-circle', date: null }
-        ];
-
-        var html = '';
-        stages.forEach(function (stage, i) {
-            var cls, dotHtml, dateText;
-
-            if (i < 2) {
-                /* Done stages */
-                cls     = 'done';
-                dotHtml = '<i class="bx bx-check" aria-hidden="true"></i>';
-                dateText = stage.date || 'Completed';
-            } else if (i === 2) {
-                /* Current: Testing */
-                if (TICKET_STATUS === 'passed') {
-                    cls      = 'done';
-                    dotHtml  = '<i class="bx bx-check" aria-hidden="true"></i>';
-                    dateText = 'Passed';
-                } else if (TICKET_STATUS === 'failed') {
-                    cls      = 'failed-step';
-                    dotHtml  = '<i class="bx bx-x" aria-hidden="true"></i>';
-                    dateText = 'Failed — back to dev';
-                } else {
-                    cls      = 'active';
-                    dotHtml  = '<i class="bx bx-test-tube" aria-hidden="true"></i>';
-                    dateText = 'In progress';
-                }
-            } else {
-                /* Future stages */
-                cls      = 'future';
-                dotHtml  = '<i class="bx ' + stage.icon + '" aria-hidden="true"></i>';
-                dateText = 'Pending';
-            }
-
-            html += '<div class="tester-timeline-item ' + cls + '">';
-            html += '<div class="tester-timeline-dot">' + dotHtml + '</div>';
-            html += '<div class="tester-timeline-content">';
-            html += '<div class="tester-timeline-label">' + escapeHtml(stage.label) + '</div>';
-            html += '<div class="tester-timeline-date">' + escapeHtml(dateText) + '</div>';
-            html += '</div></div>';
-        });
-
-        container.innerHTML = html;
-    }
-
-
-    /* ============================================================
-     * renderTesterAttachments()
-     * ============================================================ */
-    function renderTesterAttachments() {
-        var container = document.getElementById('testerAttachList');
-        if (!container) return;
-
-        if (testerWorkAttachments.length === 0) {
-            container.innerHTML =
-                '<p style="padding:var(--tw-space-4) var(--tw-space-5);color:var(--tw-text-muted);' +
-                'font-size:var(--tw-text-sm);margin:0">No attachments yet.</p>';
-            return;
-        }
-
-        var html = '';
-        testerWorkAttachments.forEach(function (att) {
-            var iconCls, iconName;
-            if (att.type === 'pdf') {
-                iconCls = 'tw-file-icon--pdf'; iconName = 'bx-file-pdf';
-            } else if (att.type === 'doc') {
-                iconCls = 'tw-file-icon--doc'; iconName = 'bx-file';
-            } else {
-                iconCls = 'tw-file-icon--img'; iconName = 'bx-image';
-            }
-            html +=
-                '<div class="tw-attachment-item">' +
-                '<div class="tw-file-icon ' + iconCls + '" aria-hidden="true"><i class="bx ' + iconName + '"></i></div>' +
-                '<div class="tw-attachment-info">' +
-                '<span class="tw-attachment-name">' + escapeHtml(att.name) + '</span>' +
-                '<span class="tw-attachment-meta">' + escapeHtml(att.size + ' · ' + att.date) + '</span>' +
-                '</div>' +
-                '<div class="tw-attachment-actions">' +
-                '<button class="tw-btn-icon" aria-label="Download ' + escapeHtml(att.name) + '"' +
-                ' onclick="showTesterToast(\'Download started.\', \'success\')">' +
-                '<i class="bx bx-download"></i></button>' +
-                '</div></div>';
-        });
-        container.innerHTML = html;
-    }
-
-    /* Wire "Add Test Evidence" button */
-    document.addEventListener('DOMContentLoaded', function () {
-        var attachInput = document.getElementById('testerAttachInput');
-        if (attachInput) {
-            attachInput.addEventListener('change', function () {
-                if (!this.files || !this.files[0]) return;
-                showTesterFilePreview(this.files[0]);
-            });
-        }
-    });
-
-    function showTesterFilePreview(file) {
-        testerPendingFile = file;
-        var modal = document.getElementById('testerFilePreviewModal');
-        document.getElementById('testerPreviewFileName').textContent = file.name;
-        document.getElementById('testerPreviewFileSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
-        document.getElementById('testerPreviewFileType').textContent = file.type || 'Unknown type';
-        var ext = (file.name.split('.').pop() || '').toLowerCase();
-        var iconClass = 'bx-file';
-        if (ext === 'pdf') iconClass = 'bx-file-pdf';
-        else if (['jpg','jpeg','png','gif'].indexOf(ext) !== -1) iconClass = 'bx-image';
-        document.getElementById('testerPreviewFileIcon').className = 'bx ' + iconClass;
-        modal.classList.add('show');
-    }
-
-    function cancelTesterFilePreview() {
-        testerPendingFile = null;
-        document.getElementById('testerFilePreviewModal').classList.remove('show');
-        var attachInput = document.getElementById('testerAttachInput');
-        if (attachInput) attachInput.value = '';
-    }
-
-    function confirmTesterFileAttach() {
-        if (!testerPendingFile) return;
-        var file = testerPendingFile;
-        document.getElementById('testerFilePreviewModal').classList.remove('show');
-        testerPendingFile = null;
-
-        var ext  = (file.name.split('.').pop() || '').toLowerCase();
-        var type = ['jpg','jpeg','png','gif'].indexOf(ext) !== -1 ? 'img' : ext === 'pdf' ? 'pdf' : 'doc';
-        var kb   = Math.round(file.size / 1024);
-        var size = kb > 1024 ? (Math.round(kb / 102.4) / 10) + ' MB' : kb + ' KB';
-        testerWorkAttachments.push({
-            name: file.name, type: type, size: size,
-            date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-        });
-        renderTesterAttachments();
-        /* Django: fetch('{% url "tester:upload_attachment" ticket.id %}', {method:'POST', body: formData}) */
-        console.log('[Tester Portal] uploadAttachment stub:', { name: file.name });
-        showTesterToast('Evidence uploaded.', 'success');
-    }
-
-
-    /* ============================================================
-     * CHAT — inline ticket-detail chat with admin
-     * ============================================================ */
-    function sendTesterDetailMessage() {
-        var textarea      = document.getElementById('testerChatDetailInput');
-        var chatFileInput = document.getElementById('testerChatFileInput');
-        var strip         = document.getElementById('testerChatAttachStrip');
-        var text          = (textarea ? textarea.value : '').trim();
-        var hasFile       = !!(strip && strip.classList.contains('show') &&
-                               chatFileInput && chatFileInput.files && chatFileInput.files[0]);
-
-        if (!text && !hasFile) { if (textarea) textarea.focus(); return; }
-
-        var thread = document.getElementById('testerChatThread');
-
-        if (text) {
-            var el = document.createElement('div');
-            el.className = 'tester-msg tester-msg--tester';
-            el.innerHTML =
-                '<div class="tw-avatar tw-avatar--sm tw-avatar--tester" aria-hidden="true">' +
-                escapeHtml(TESTER_USER.initials) + '</div>' +
-                '<div class="tester-msg-body">' +
-                '<div class="tester-msg-sender">You <span class="tw-role-pill tw-role-pill--tester">Tester</span></div>' +
-                '<div class="tester-msg-bubble">' + escapeHtml(text) + '</div>' +
-                '<div class="tester-msg-time">' + formatNow() + '</div>' +
-                '</div>';
-            if (thread) { thread.appendChild(el); thread.scrollTop = thread.scrollHeight; }
-            if (textarea) { textarea.value = ''; textarea.style.height = 'auto'; }
-        }
-
-        if (hasFile) {
-            var file = chatFileInput.files[0];
-            var elf  = document.createElement('div');
-            elf.className = 'tester-msg tester-msg--tester';
-            elf.innerHTML =
-                '<div class="tw-avatar tw-avatar--sm tw-avatar--tester" aria-hidden="true">' +
-                escapeHtml(TESTER_USER.initials) + '</div>' +
-                '<div class="tester-msg-body">' +
-                '<div class="tester-msg-sender">You <span class="tw-role-pill tw-role-pill--tester">Tester</span></div>' +
-                '<div class="tester-msg-bubble" style="display:flex;align-items:center;gap:8px">' +
-                '<i class="bx bx-paperclip"></i><span>' + escapeHtml(file.name) + '</span>' +
-                '</div>' +
-                '<div class="tester-msg-time">' + formatNow() + '</div>' +
-                '</div>';
-            if (thread) { thread.appendChild(elf); thread.scrollTop = thread.scrollHeight; }
-            if (chatFileInput) chatFileInput.value = '';
-            if (strip) strip.classList.remove('show');
-        }
-
-        /* Django: fetch('{% url "tester:send_message" ticket.id %}', {method:'POST', body: JSON.stringify({content: text})}) */
-        console.log('[Tester Portal] sendTesterDetailMessage stub:', { id: TICKET_ID, content: text });
-        showTesterToast('Message sent.', 'success');
-    }
-
-    /* Chat file input handler */
-    document.addEventListener('DOMContentLoaded', function () {
-        var chatFileInput = document.getElementById('testerChatFileInput');
-        if (chatFileInput) {
-            chatFileInput.addEventListener('change', function () {
-                if (!this.files || !this.files[0]) return;
-                var file     = this.files[0];
-                var strip    = document.getElementById('testerChatAttachStrip');
-                var nameSpan = document.getElementById('testerChatAttachFileName');
-                if (nameSpan) nameSpan.textContent = file.name;
-                if (strip) strip.classList.add('show');
-            });
-        }
-    });
-
-    function removeTesterChatAttachment() {
-        var input = document.getElementById('testerChatFileInput');
-        if (input) input.value = '';
-        var strip = document.getElementById('testerChatAttachStrip');
-        if (strip) strip.classList.remove('show');
-    }
-
-
-    /* ============================================================
-     * GENERIC CONFIRM MODAL HELPER
-     * ============================================================ */
-    function openTesterConfirmModal(opts) {
-        var overlay = document.getElementById('testerConfirmOverlay');
-        if (!overlay) return;
-
-        var iconEl  = document.getElementById('testerConfirmIcon');
-        var titleEl = document.getElementById('testerConfirmTitle');
-        var msgEl   = document.getElementById('testerConfirmMessage');
-        var okBtn   = document.getElementById('testerConfirmOkBtn');
-
-        if (iconEl) {
-            iconEl.className = 'tester-confirm-icon ' + (opts.iconClass || 'tester-confirm-icon--pass');
-            iconEl.innerHTML = opts.iconHtml || '';
-        }
-        if (titleEl) titleEl.textContent = opts.title   || 'Confirm';
-        if (msgEl)   msgEl.textContent   = opts.message || '';
-        if (okBtn) {
-            okBtn.className   = 'tw-btn ' + (opts.okCls || 'tw-btn-primary');
-            okBtn.textContent = opts.okLabel || 'Confirm';
-        }
-
-        testerConfirmCallback = opts.onConfirm || null;
-        overlay.classList.add('active');
+        document.getElementById('testerConfirmOverlay').classList.add('active');
+        return false;
     }
 
     function closeTesterConfirmModal() {
-        var overlay = document.getElementById('testerConfirmOverlay');
-        if (overlay) overlay.classList.remove('active');
-        testerConfirmCallback = null;
+        document.getElementById('testerConfirmOverlay').classList.remove('active');
+        testerPendingForm = null;
     }
 
-    /* Wire OK button */
     document.addEventListener('DOMContentLoaded', function () {
         var okBtn = document.getElementById('testerConfirmOkBtn');
         if (okBtn) {
             okBtn.addEventListener('click', function () {
+                /* Capture form BEFORE closing modal (closing nulls testerPendingForm). */
+                var form = testerPendingForm;
                 closeTesterConfirmModal();
-                if (testerConfirmCallback) testerConfirmCallback();
+                if (form) form.submit();
             });
         }
 
-        /* Backdrop close */
+        /* Close on backdrop click */
         var overlay = document.getElementById('testerConfirmOverlay');
         if (overlay) {
             overlay.addEventListener('click', function (e) {
-                if (e.target === this) closeTesterConfirmModal();
+                if (e.target === overlay) closeTesterConfirmModal();
             });
         }
+
+        /* Scroll chat to bottom */
+        var thread = document.getElementById('testerChatThread');
+        if (thread) thread.scrollTop = thread.scrollHeight;
     });
 
-
-    /* ============================================================
-     * SIDEBAR TOGGLE
-     * ============================================================ */
-    var sidebar   = document.getElementById('sidebar');
-    var hamburger = document.getElementById('hamburger-btn');
-
-    function isMobile() { return window.innerWidth <= 768; }
-
-    hamburger.addEventListener('click', function () {
-        if (isMobile()) {
-            sidebar.classList.toggle('mobile-open');
-        } else {
-            sidebar.classList.toggle('hide');
-            document.body.classList.toggle('sidebar-hidden');
-        }
-    });
-
-    window.addEventListener('resize', function () {
-        if (isMobile()) {
-            sidebar.classList.remove('hide');
-            document.body.classList.remove('sidebar-hidden');
-        }
-    });
-
-
-    /* ============================================================
-     * NOTIFICATION BELL
-     * ============================================================ */
-    var notifBellBtn = document.getElementById('notifBellBtn');
-    var notifPanel   = document.getElementById('notifPanel');
-
-    notifBellBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var isOpen = notifPanel.classList.toggle('open');
-        notifBellBtn.setAttribute('aria-expanded', isOpen);
-    });
-
-    document.getElementById('markAllReadBtn').addEventListener('click', function () {
-        document.querySelectorAll('.tw-notif-item.unread').forEach(function (item) {
-            item.classList.remove('unread');
-        });
-        var badge = document.getElementById('notifCount');
-        if (badge) badge.remove();
-    });
-
-
-    /* ============================================================
-     * PROFILE DROPDOWN
-     * ============================================================ */
-    var profilePanelOpen = false;
-
-    function toggleProfileDropdown(e) {
-        e.stopPropagation();
-        var panel = document.getElementById('profilePanel');
-        if (notifPanel.classList.contains('open')) {
-            notifPanel.classList.remove('open');
-            notifBellBtn.setAttribute('aria-expanded', 'false');
-        }
-        profilePanelOpen = !profilePanelOpen;
-        panel.classList.toggle('open', profilePanelOpen);
-        panel.setAttribute('aria-hidden', profilePanelOpen ? 'false' : 'true');
-    }
-
-    function closeProfileDropdown() {
-        var panel = document.getElementById('profilePanel');
-        if (panel) {
-            panel.classList.remove('open');
-            profilePanelOpen = false;
-            panel.setAttribute('aria-hidden', 'true');
-        }
-    }
-
-
-    /* ============================================================
-     * CLICK-OUTSIDE
-     * ============================================================ */
-    document.addEventListener('click', function (e) {
-        if (!notifBellBtn.contains(e.target) && !notifPanel.contains(e.target)) {
-            notifPanel.classList.remove('open');
-            notifBellBtn.setAttribute('aria-expanded', 'false');
-        }
-        var pp = document.getElementById('profilePanel');
-        if (pp && pp.classList.contains('open')) {
-            if (!document.getElementById('profileWrap').contains(e.target)) {
-                closeProfileDropdown();
-            }
-        }
-    });
-
-
-    /* ============================================================
-     * ESCAPE KEY
-     * ============================================================ */
     document.addEventListener('keydown', function (e) {
-        if (e.key !== 'Escape') return;
-        closeProfileDropdown();
-        notifPanel.classList.remove('open');
-        notifBellBtn.setAttribute('aria-expanded', 'false');
-        closeTesterConfirmModal();
-        document.getElementById('testerFilePreviewModal').classList.remove('show');
+        if (e.key === 'Escape') closeTesterConfirmModal();
     });
 
 
-    /* ============================================================
-     * UTILITIES
-     * ============================================================ */
-    function escapeHtml(str) {
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
+    /* === CHAT SEND (stub — wired in Phase 5) === */
+    function sendTesterDetailMessage() {
+        var textarea = document.getElementById('testerChatInput');
+        var text     = textarea ? textarea.value.trim() : '';
+        if (!text) { if (textarea) textarea.focus(); return; }
+
+        showTesterToast('Chat sending will be wired in a later phase.', 'info');
+        if (textarea) { textarea.value = ''; textarea.style.height = 'auto'; }
     }
-
-    function formatNow() {
-        var d = new Date();
-        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) +
-               ' at ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-    }
-
-    function getCookie(name) {
-        var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
-        return v ? v[2] : null;
-    }
-
-    function showTesterToast(message, type) {
-        var t = document.createElement('div');
-        t.className = 'tester-toast tester-toast--' + (type || 'success');
-        t.textContent = message;
-        document.body.appendChild(t);
-        setTimeout(function () { t.classList.add('show'); }, 10);
-        setTimeout(function () {
-            t.classList.remove('show');
-            setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 300);
-        }, 3000);
-    }
-
-
-    /* ============================================================
-     * BOOT
-     * ============================================================ */
-    document.addEventListener('DOMContentLoaded', initPage);
 
 </script>
-
-</body>
-</html>
-
-<!-- Django: {% endblock %} -->
+{% endblock %}

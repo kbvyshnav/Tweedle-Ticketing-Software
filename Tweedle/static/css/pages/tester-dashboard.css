@@ -1137,7 +1137,24 @@
 
 .tester-toast--success { background: var(--tw-success); }
 .tester-toast--error   { background: var(--tw-danger); }
+.tester-toast--warning { background: var(--tw-warning); }
 .tester-toast--info    { background: var(--tw-primary); }
+
+
+/* ── Tester chat bubble (extends dev-msg base from developer-dashboard.css) ── */
+.dev-msg--tester {
+    flex-direction: row-reverse;
+}
+
+.dev-msg--tester .dev-msg-body {
+    align-items: flex-end;
+}
+
+.dev-msg--tester .dev-msg-bubble {
+    background: var(--tw-primary);
+    color: #ffffff;
+    border-radius: var(--tw-radius-md) 4px var(--tw-radius-md) var(--tw-radius-md);
+}
 
 
 /* ============================================================
