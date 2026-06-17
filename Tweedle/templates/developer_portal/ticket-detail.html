@@ -1,1936 +1,499 @@
-<!--
-  File: templates/developer_portal/ticket-detail.html
-  Django template: extends 'developer_base.html'
-  Django view:     developer_portal.views.ticket_detail
-  Django url:      dev:ticket_detail
-  Role:            Developer — body class="role-developer" (purple theme)
+{% extends 'developer_base.html' %}
+{% load static dev_extras %}
 
-  URL params drive all content:
-    ?id=GMEC25010001&substatus=testing
-  TICKET_SUBSTATUS drives the sub-status stepper and action buttons.
-  Change either param to preview any ticket / stage combination.
--->
-<!-- Django: {% extends 'developer_base.html' %} -->
-<!-- Django: {% block body_role %}developer{% endblock %} -->
-<!-- Django: {% block page_css %}
+{% block title %}{{ ticket.subject }} — Tweedle{% endblock %}
+
+{% block page_css %}
 <link rel="stylesheet" href="{% static 'css/pages/developer-dashboard.css' %}">
-{% endblock %} -->
-<!-- Django: {% block content %} -->
+{% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Django: {% block title %}Ticket Detail — Tweedle{% endblock %} -->
-    <title>Ticket Detail — Tweedle</title>
+{% block content %}
 
-    <!-- Django: {% load static %} -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
-    <!-- Django: href="{% static 'images/favicon.svg' %}" -->
-    <link rel="icon" type="image/svg+xml" href="../../static/images/favicon.svg">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<!-- Back link -->
+<a href="{% url 'dev:dashboard' %}" class="dev-back-link">
+    <i class="bx bx-arrow-back" aria-hidden="true"></i>
+    Back to My Tickets
+</a>
 
-    <!-- CSS load order: 1 tokens → 2 theme-developer → 3 base → 4 components → 5 notification → 6 page -->
-    <!-- Django: href="{% static 'css/tweedle-tokens.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-tokens.css">
-    <!-- Django: href="{% static 'css/themes/theme-developer.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/themes/theme-developer.css">
-    <!-- Django: href="{% static 'css/tweedle-base.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-base.css">
-    <!-- Django: href="{% static 'css/tweedle-components.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-components.css">
-    <!-- Django: href="{% static 'css/pages/notification.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/notification.css">
-    <!-- Django: href="{% static 'css/pages/developer-dashboard.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/developer-dashboard.css">
-</head>
-
-<!--
-    BODY CLASS: role-developer activates purple theme from theme-developer.css.
-    Django: class="role-{% block body_role %}developer{% endblock %}"
--->
-<body class="role-developer">
+<!-- Page title -->
+<div class="dev-page-title-area">
+    <h1>{{ ticket.subject }}</h1>
+    <p class="dev-ticket-id-sub">{{ ticket.reference }}</p>
+</div>
 
 
-<!-- ==============================================================
-     SIDEBAR — developer portal: My Tickets + Chat
-     ============================================================== -->
-<nav class="sidebar" id="sidebar">
+<!-- =========================================================
+     TICKET HEADER CARD
+     ========================================================= -->
+<div class="dev-ticket-header-card"
+     data-sub-status="{{ ticket.sub_status|default:ticket.status }}">
 
-    <!-- Brand -->
-    <!-- Django: href="{% url 'dev:dashboard' %}" -->
-    <div class="sidebar-brand">
-        <!-- Django: src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" -->
-        <img src="../../static/images/tweedle-logo/tweedle-mark-blue.svg"
-             alt="Tweedle"
-             class="sidebar-logo-img">
-        <span class="brand-text">Tweedle</span>
-    </div>
-
-    <ul class="sidebar-nav">
-
-        <!-- My Tickets — active (ticket-detail is under this section) -->
-        <!-- Django: href="{% url 'dev:dashboard' %}" -->
-        <li class="nav-item active-item">
-            <a href="dashboard.html" class="nav-link active" title="My Tickets">
-                <i class='bx bx-task'></i>
-                <span class="nav-label">My Tickets</span>
-            </a>
-        </li>
-
-        <!-- Chat -->
-        <!-- Django: href="{% url 'dev:chat' %}" -->
-        <li class="nav-item">
-            <a href="chat.html" class="nav-link" title="Chat">
-                <i class='bx bx-chat'></i>
-                <span class="nav-label">Chat</span>
-            </a>
-        </li>
-
-    </ul>
-
-    <!-- Sidebar bottom user section -->
-    <div class="sidebar-user">
-        <!-- Django: {{ dev_user.initials }} -->
-        <div class="tw-avatar tw-avatar--developer" id="devAvatarSidebar"
-             style="width:36px;height:36px;font-size:13px;flex-shrink:0;">AM</div>
-        <div class="sidebar-user-info">
-            <!-- Django: {{ dev_user.name }} -->
-            <div class="sidebar-user-name" id="devNameSidebar">Arjun Mehta</div>
-            <div class="sidebar-user-role">Developer</div>
+    <div>
+        <div style="font-size:var(--tw-text-sm);font-weight:600;
+                    color:var(--tw-text-muted);font-family:'Courier New',monospace;
+                    letter-spacing:0.5px;margin-bottom:var(--tw-space-2)">
+            {{ ticket.reference }}
+        </div>
+        <div class="dev-ticket-header-badges">
+            {% dev_ticket_badge ticket %}
+            <span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">
+                {{ ticket.get_priority_display }}
+            </span>
+            {% if ticket.category %}
+            <span class="tw-ticket-label">{{ ticket.category }}</span>
+            {% endif %}
         </div>
     </div>
 
-</nav>
-<!-- END SIDEBAR -->
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:var(--tw-space-3)">
+        <div class="dev-ticket-client-tag">
+            <i class="bx bx-buildings" aria-hidden="true"></i>
+            <span>{{ ticket.client.name|default:"—" }}</span>
+        </div>
+        <div class="dev-ticket-header-dates">
+            <div class="dev-ticket-header-date-item">
+                <span class="dev-ticket-header-date-label">Issue Date</span>
+                <span class="dev-ticket-header-date-val">{{ ticket.created_at|date:"d M Y" }}</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!-- END TICKET HEADER CARD -->
 
 
-<!-- ==============================================================
-     MAIN CONTENT WRAPPER
-     ============================================================== -->
-<section id="content">
+<!-- =========================================================
+     TWO-COLUMN LAYOUT — 65% / 35%
+     ========================================================= -->
+<div class="dev-detail-layout">
 
-    <!-- ==========================================================
-         TOPBAR
-         ========================================================== -->
-    <nav class="topbar">
+    <!-- =======================================================
+         LEFT COLUMN
+         ======================================================= -->
+    <div class="dev-detail-left">
 
-        <i class="bx bx-menu" id="hamburger-btn" role="button" aria-label="Toggle sidebar"></i>
+        <!-- ================================================
+             1. PROGRESS UPDATE (action card)
+             ================================================ -->
+        <div class="dev-detail-card" id="devSubstatusCard">
+            <div class="dev-detail-card__header">
+                <i class="bx bx-git-branch" aria-hidden="true"></i>
+                <h3 class="dev-detail-card__title">Update Progress</h3>
+            </div>
+            <div class="dev-detail-card__body">
 
-        <!-- Tweedle logo — mobile only -->
-        <div class="topbar-brand-mobile" style="display:none">
-            <!-- Django: src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" -->
-            <img src="../../static/images/tweedle-logo/tweedle-mark-blue.svg" alt="Tweedle" style="height:28px;">
+                {% if ticket.status == 'awaiting_client' %}
+                <div class="dev-awaiting-client-banner">
+                    <i class="bx bx-pause-circle" aria-hidden="true"></i>
+                    <div>
+                        <div class="dev-awaiting-client-banner__title">Ticket Paused — Awaiting Client Response</div>
+                        <div class="dev-awaiting-client-banner__body">The support admin has requested information from the client. Your work is on hold until the client responds. You will be notified when work can resume.</div>
+                    </div>
+                </div>
+
+                {% elif ticket.status == 'uat' %}
+                <div class="dev-uat-approval-banner">
+                    <i class="bx bx-user-check" aria-hidden="true"></i>
+                    <div>
+                        <div class="dev-uat-approval-banner__title">In Client UAT Testing</div>
+                        <div class="dev-uat-approval-banner__body">Your work has been submitted and the client is currently testing. No further action is needed from you. You will be notified when the client approves or requests changes.</div>
+                    </div>
+                </div>
+
+                {% elif ticket.status == 'resolved' %}
+                <div class="dev-resolved-banner">
+                    <i class="bx bx-check-circle" aria-hidden="true"></i>
+                    <div><strong>Ticket Resolved.</strong> This ticket has been approved and resolved.</div>
+                </div>
+
+                {% elif ticket.status == 'closed' %}
+                <div class="dev-closed-banner">
+                    <i class="bx bx-check-circle" aria-hidden="true"></i>
+                    <div>
+                        <div class="dev-closed-banner__title">Ticket Closed</div>
+                        <div class="dev-closed-banner__body">This ticket has been officially closed. No further action is required.</div>
+                    </div>
+                </div>
+
+                {% elif ticket.status in 'rejected,cancelled' %}
+                <div class="dev-closed-banner">
+                    <i class="bx bx-x-circle" aria-hidden="true"></i>
+                    <div>
+                        <div class="dev-closed-banner__title">Ticket {{ ticket.get_status_display }}</div>
+                        <div class="dev-closed-banner__body">No further action is required.</div>
+                    </div>
+                </div>
+
+                {% elif ticket.status == 'in_progress' and ticket.sub_status == 'testing' %}
+                <div class="dev-uat-approval-banner">
+                    <i class="bx bx-test-tube" aria-hidden="true"></i>
+                    <div>
+                        <div class="dev-uat-approval-banner__title">In Testing</div>
+                        <div class="dev-uat-approval-banner__body">This ticket is currently with the QA tester. You will be notified when testing is complete or if it is returned for further work.</div>
+                    </div>
+                </div>
+
+                {% elif ticket.status == 'in_progress' and ticket.sub_status == 'ready_for_uat' %}
+                <div class="dev-uat-approval-banner">
+                    <i class="bx bx-check-shield" aria-hidden="true"></i>
+                    <div>
+                        <div class="dev-uat-approval-banner__title">Ready for UAT</div>
+                        <div class="dev-uat-approval-banner__body">Development is complete. The admin will move this ticket to client UAT when ready.</div>
+                    </div>
+                </div>
+
+                {% elif show_submit_for_testing %}
+                <form method="post" action="{% url 'dev:ticket_transition' ticket.pk %}"
+                      id="devActionForm" onsubmit="return openDevConfirmModal(event, 'submit_for_testing')">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="submit_for_testing">
+                    <button type="submit" class="tw-btn tw-btn-primary" id="devActionBtn">
+                        <i class="bx bx-test-tube" aria-hidden="true"></i>
+                        Submit for Testing
+                    </button>
+                    <p class="dev-substatus-action-note">Development work is complete. Submit to move this ticket to the testing stage.</p>
+                </form>
+
+                {% elif show_resubmit %}
+                <form method="post" action="{% url 'dev:ticket_transition' ticket.pk %}"
+                      id="devActionForm" onsubmit="return openDevConfirmModal(event, 'resubmit_for_testing')">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="resubmit_for_testing">
+                    <button type="submit" class="tw-btn tw-btn-primary" id="devActionBtn">
+                        <i class="bx bx-refresh" aria-hidden="true"></i>
+                        Resubmit for Testing
+                    </button>
+                    <p class="dev-substatus-action-note">Issues have been addressed. Resubmit this ticket to testing for QA review.</p>
+                </form>
+
+                {% elif show_mark_ready %}
+                <form method="post" action="{% url 'dev:ticket_transition' ticket.pk %}"
+                      id="devActionForm" onsubmit="return openDevConfirmModal(event, 'mark_ready')">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="mark_ready">
+                    <button type="submit" class="tw-btn tw-btn-success" id="devActionBtn">
+                        <i class="bx bx-check-shield" aria-hidden="true"></i>
+                        Mark Ready for UAT
+                    </button>
+                    <p class="dev-substatus-action-note">All development work is complete and no tester is assigned. Mark ready for the admin to move to client UAT.</p>
+                </form>
+
+                {% else %}
+                <div style="color:var(--tw-text-muted);font-size:var(--tw-text-sm);padding:var(--tw-space-2) 0">
+                    No actions available for this ticket's current status.
+                </div>
+
+                {% endif %}
+
+            </div>
+        </div>
+        <!-- END ACTION CARD -->
+
+
+        <!-- ================================================
+             2. DESCRIPTION
+             ================================================ -->
+        <div class="dev-detail-card">
+            <div class="dev-detail-card__header">
+                <i class="bx bx-detail" aria-hidden="true"></i>
+                <h3 class="dev-detail-card__title">Description</h3>
+            </div>
+            <div class="dev-detail-card__body">
+                <p style="margin:0;color:var(--tw-text-secondary);
+                          font-size:var(--tw-text-base);line-height:1.7;
+                          white-space:pre-wrap">{{ ticket.description|default:"No description provided." }}</p>
+            </div>
         </div>
 
-        <!-- NOTIFICATION BELL -->
-        <div class="tw-notif-bell-wrap" id="notifBellWrap">
-            <button
-                class="tw-notif-bell-btn"
-                id="notifBellBtn"
-                aria-label="Notifications"
-                aria-expanded="false"
-                aria-controls="notifPanel">
-                <i class="bx bxs-bell" aria-hidden="true"></i>
-                <!-- Django: {% if unread_notification_count %} -->
-                <span class="tw-notif-count-badge" id="notifCount">3</span>
-                <!-- Django: {% endif %} -->
-            </button>
 
-            <div class="tw-notif-panel" id="notifPanel" role="dialog" aria-label="Notifications">
-                <div class="tw-notif-panel-header">
-                    <span class="tw-notif-panel-title">Notifications</span>
-                    <button
-                        class="tw-btn tw-btn-outline tw-btn--sm"
-                        id="markAllReadBtn"
-                        aria-label="Mark all as read">
-                        Mark all read
+        <!-- ================================================
+             3. ATTACHMENTS
+             ================================================ -->
+        <div class="dev-detail-card">
+            <div class="dev-detail-card__header">
+                <i class="bx bx-paperclip" aria-hidden="true"></i>
+                <h3 class="dev-detail-card__title">Attachments</h3>
+            </div>
+            <div style="padding-top:var(--tw-space-3);padding-bottom:var(--tw-space-3)">
+                {% for att in ticket.attachments.all %}
+                <div class="tw-attachment-item">
+                    <div class="tw-file-icon tw-file-icon--doc" aria-hidden="true">
+                        <i class="bx bx-file"></i>
+                    </div>
+                    <div class="tw-attachment-info">
+                        <span class="tw-attachment-name">{{ att.file.name|cut:"ticket_attachments/" }}</span>
+                        <span class="tw-attachment-meta">{{ att.created_at|date:"d M Y" }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="padding:var(--tw-space-4) var(--tw-space-5);color:var(--tw-text-muted);
+                          font-size:var(--tw-text-sm);margin:0">No attachments.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+
+        <!-- ================================================
+             4. CHAT WITH ADMIN
+             ================================================ -->
+        <div class="dev-detail-card">
+            <div class="dev-detail-card__header">
+                <i class="bx bx-chat" aria-hidden="true"></i>
+                <h3 class="dev-detail-card__title">Chat with Admin</h3>
+            </div>
+
+            <div style="padding:var(--tw-space-3) var(--tw-space-5) 0">
+                <p style="margin:0;font-size:var(--tw-text-xs);color:var(--tw-text-muted);
+                          font-style:italic;line-height:1.5">
+                    This chat is between you and the support admin. Clients cannot see these messages.
+                </p>
+            </div>
+
+            <div class="dev-chat-thread" id="devChatThread">
+                {% for msg in chat_messages %}
+                {% if msg.author == request.user %}
+                <div class="dev-msg dev-msg--dev">
+                    <div class="tw-avatar tw-avatar--sm tw-avatar--developer" aria-hidden="true">
+                        {{ msg.author.get_full_name|default:msg.author.username|slice:":2"|upper }}
+                    </div>
+                    <div class="dev-msg-body">
+                        <div class="dev-msg-sender">
+                            You
+                            <span class="tw-role-pill tw-role-pill--developer">Developer</span>
+                        </div>
+                        <div class="dev-msg-bubble">{{ msg.body }}</div>
+                        <div class="dev-msg-time">{{ msg.created_at|date:"d M Y" }} at {{ msg.created_at|time:"H:i" }}</div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="dev-msg dev-msg--admin">
+                    <div class="tw-avatar tw-avatar--sm tw-avatar--admin" aria-hidden="true">
+                        {{ msg.author.get_full_name|default:msg.author.username|slice:":2"|upper }}
+                    </div>
+                    <div class="dev-msg-body">
+                        <div class="dev-msg-sender">
+                            {{ msg.author.get_full_name|default:msg.author.username }}
+                            <span class="tw-role-pill tw-role-pill--admin">Admin</span>
+                        </div>
+                        <div class="dev-msg-bubble">{{ msg.body }}</div>
+                        <div class="dev-msg-time">{{ msg.created_at|date:"d M Y" }} at {{ msg.created_at|time:"H:i" }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                {% empty %}
+                <div style="padding:var(--tw-space-5);text-align:center;color:var(--tw-text-muted);font-size:var(--tw-text-sm)">
+                    No messages yet.
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if ticket.status not in 'closed,resolved,rejected,cancelled' %}
+            <div class="dev-chat-footer">
+                <div class="dev-chat-input-row">
+                    <textarea class="dev-chat-textarea" id="devChatInput"
+                              placeholder="Type a message to admin…" rows="1"
+                              aria-label="Chat message input"
+                              oninput="this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+                    <button type="button" class="tw-btn tw-btn-primary tw-btn--sm"
+                            style="flex-shrink:0" onclick="sendDevDetailMessage()"
+                            aria-label="Send message">
+                        <i class="bx bx-send" aria-hidden="true"></i>
                     </button>
                 </div>
-
-                <div class="tw-notif-list">
-                    <!-- Django: {% for notification in notifications %} -->
-                    <div class="tw-notif-item unread" role="button" style="cursor:pointer">
-                        <div class="tw-notif-item-body">
-                            <div class="tw-notif-type-icon tw-notif-type-icon--warning">
-                                <i class="bx bx-time-five" aria-hidden="true"></i>
-                            </div>
-                            <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">Ticket overdue — GMEC25010001</div>
-                                <div class="tw-notif-item-msg">Payment gateway timeout on checkout is past its estimated resolution date.</div>
-                                <div class="tw-notif-item-time">1 day ago</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tw-notif-item unread" role="button" style="cursor:pointer">
-                        <div class="tw-notif-item-body">
-                            <div class="tw-notif-type-icon tw-notif-type-icon--info">
-                                <i class="bx bx-info-circle" aria-hidden="true"></i>
-                            </div>
-                            <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">New ticket assigned — BGEX25010013</div>
-                                <div class="tw-notif-item-msg">User role permissions not saving has been assigned to you.</div>
-                                <div class="tw-notif-item-time">2 days ago</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tw-notif-item" role="button" style="cursor:pointer">
-                        <div class="tw-notif-item-body">
-                            <div class="tw-notif-type-icon tw-notif-type-icon--success">
-                                <i class="bx bx-check-circle" aria-hidden="true"></i>
-                            </div>
-                            <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">Admin note added — GMEC25010004</div>
-                                <div class="tw-notif-item-msg">Admin left a note on Invoice generation wrong totals.</div>
-                                <div class="tw-notif-item-time">3 days ago</div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Django: {% endfor %} -->
-                </div>
-
-                <div class="tw-notif-panel-footer">
-                    <!-- Django: href="{% url 'dev:notifications' %}" -->
-                    <!-- Django: href="{% url 'dev:notifications' %}" -->
-                    <a href="notifications.html" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
-                </div>
             </div>
+            {% else %}
+            <div style="padding:var(--tw-space-3) var(--tw-space-5);font-size:var(--tw-text-xs);color:var(--tw-text-muted);font-style:italic">
+                Chat is disabled — this ticket is {{ ticket.get_status_display|lower }}.
+            </div>
+            {% endif %}
+
         </div>
-        <!-- END NOTIFICATION BELL -->
+        <!-- END CHAT CARD -->
 
-        <!-- PROFILE DROPDOWN -->
-        <div class="tw-profile-wrap" id="profileWrap">
+    </div>
+    <!-- END LEFT COLUMN -->
 
-            <!-- Django: {{ dev_user.initials }} -->
-            <div class="tw-avatar tw-avatar--developer"
-                 id="devAvatarTopbar"
-                 role="button"
-                 aria-label="Profile"
-                 style="width:36px;height:36px;font-size:14px;cursor:pointer"
-                 onclick="toggleProfileDropdown(event)">AM</div>
 
-            <div class="tw-profile-panel" id="profilePanel" role="menu" aria-hidden="true">
-                <div class="tw-profile-header">
-                    <!-- Django: {{ dev_user.initials }}, {{ dev_user.name }}, {{ dev_user.email }} -->
-                    <div class="tw-avatar tw-avatar--developer"
-                         style="width:40px;height:40px;font-size:15px;flex-shrink:0"
-                         id="devAvatarPanel">AM</div>
-                    <div>
-                        <div style="font-size:var(--tw-text-base);font-weight:600;color:var(--tw-text-primary);line-height:1.3"
-                             id="devNamePanel">Arjun Mehta</div>
-                        <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px"
-                             id="devEmailPanel">arjun.mehta@tweedle.io</div>
-                        <span class="tw-role-pill tw-role-pill--developer" style="margin-top:4px;display:inline-block">Developer</span>
-                    </div>
-                </div>
-                <div class="tw-profile-divider"></div>
-                <!-- Django: href="{% url 'dev:profile' %}" -->
-                <div class="tw-profile-menu-item" role="menuitem"
-                     onclick="closeProfileDropdown(); window.location.href='profile.html'">
-                    <i class="bx bx-user" aria-hidden="true"></i>
-                    <span>View Profile</span>
-                </div>
-                <!-- Django: href="{% url 'dev:settings' %}" -->
-                <div class="tw-profile-menu-item" role="menuitem"
-                     onclick="closeProfileDropdown(); showDevToast('Password settings coming soon.', 'info')">
-                    <i class="bx bx-lock-alt" aria-hidden="true"></i>
-                    <span>Change Password</span>
-                </div>
-                <div class="tw-profile-divider"></div>
-                <!-- Django: window.location.href="{% url 'logout' %}" -->
-                <div class="tw-profile-menu-item tw-profile-menu-item--danger" role="menuitem"
-                     onclick="window.location.href = '../login.html'">
-                    <i class="bx bx-log-out" aria-hidden="true"></i>
-                    <span>Sign Out</span>
-                </div>
+    <!-- =======================================================
+         RIGHT COLUMN
+         ======================================================= -->
+    <div class="dev-detail-right">
+
+        <!-- TICKET INFO PANEL -->
+        <div class="dev-info-panel">
+            <div class="dev-info-panel__header">
+                <i class="bx bx-info-circle" aria-hidden="true"></i>
+                <h3 class="dev-info-panel__title">Ticket Info</h3>
             </div>
 
-        </div>
-        <!-- END PROFILE DROPDOWN -->
-
-    </nav>
-    <!-- END TOPBAR -->
-
-
-    <!-- ==========================================================
-         MAIN PAGE CONTENT
-         ========================================================== -->
-    <main id="main-content">
-
-        <!-- =========================================================
-             PAGE HEADER
-             ========================================================= -->
-        <!-- Django: href="{% url 'dev:dashboard' %}" -->
-        <a id="devBackLink" href="dashboard.html" class="dev-back-link">
-            <i class="bx bx-arrow-back" aria-hidden="true"></i>
-            Back to My Tickets
-        </a>
-
-        <div class="dev-page-title-area">
-            <!-- Django: {{ ticket.subject }} -->
-            <h1 id="devTicketH1">Payment gateway timeout on checkout</h1>
-            <!-- Django: {{ ticket.id }} -->
-            <p class="dev-ticket-id-sub" id="devTicketIdSub">GMEC25010001</p>
-        </div>
-
-
-        <!-- =========================================================
-             TICKET HEADER CARD
-             data-sub-status set by initPage() for CSS left-border color.
-             Django: data-sub-status="{{ ticket.current_substatus }}"
-             ========================================================= -->
-        <div class="dev-ticket-header-card" id="devHeaderCard" data-sub-status="testing">
-
-            <!-- Left: ticket ID + badge cluster -->
-            <div>
-                <!-- Django: {{ ticket.id }} -->
-                <div style="font-size:var(--tw-text-sm);font-weight:600;
-                            color:var(--tw-text-muted);font-family:'Courier New',monospace;
-                            letter-spacing:0.5px;margin-bottom:var(--tw-space-2)"
-                     id="devHeaderId">GMEC25010001</div>
-
-                <!-- Badges: sub-status | priority | category — rendered by initPage() -->
-                <div class="dev-ticket-header-badges" id="devHeaderBadges">
-                    <!-- populated by initPage() -->
-                </div>
+            <div class="dev-info-row">
+                <span class="dev-info-row__label">Status</span>
+                <span class="dev-info-row__value">{% dev_ticket_badge ticket %}</span>
             </div>
-
-            <!-- Right: client tag + dates -->
-            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:var(--tw-space-3)">
-                <!-- Django: {{ ticket.client.name }} -->
-                <div class="dev-ticket-client-tag" id="devHeaderClientTag">
-                    <i class="bx bx-buildings" aria-hidden="true"></i>
-                    <span>GlobalMec Industries</span>
-                </div>
-                <div class="dev-ticket-header-dates">
-                    <div class="dev-ticket-header-date-item">
-                        <span class="dev-ticket-header-date-label">Issue Date</span>
-                        <!-- Django: {{ ticket.created_at|date:"d M Y" }} -->
-                        <span class="dev-ticket-header-date-val" id="devHeaderIssueDate">10 Apr 2025</span>
-                    </div>
-                    <div class="dev-ticket-header-date-item">
-                        <span class="dev-ticket-header-date-label">Est. Resolution</span>
-                        <!-- Django: {{ ticket.est_resolution|date:"d M Y" }} -->
-                        <span class="dev-ticket-header-date-val" id="devHeaderEstDate">15 May 2025</span>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Overdue banner — shown by initPage() if ticket.isOverdue -->
-        <!-- Django: {% if ticket.is_overdue %} -->
-        <div class="dev-overdue-banner" id="devOverdueBanner" style="display:none;margin-bottom:var(--tw-space-5)">
-            <i class="bx bx-time-five" aria-hidden="true"></i>
-            <!-- Django: {{ ticket.est_resolution|date:"d M Y" }} -->
-            <span id="devOverdueMsg">This ticket is <strong>overdue</strong>. The estimated resolution date has passed. Please prioritise or contact admin to update the timeline.</span>
-        </div>
-        <!-- Django: {% endif %} -->
-
-
-        <!-- =========================================================
-             TWO-COLUMN LAYOUT — 65% / 35%
-             ========================================================= -->
-        <div class="dev-detail-layout">
-
-            <!-- =======================================================
-                 LEFT COLUMN
-                 ======================================================= -->
-            <div class="dev-detail-left">
-
-                <!-- ================================================
-                     1. ADMIN NOTE — conditional, only if adminNotes
-                     Django: {% if ticket.admin_notes %}
-                     ================================================ -->
-                <div class="dev-admin-note" id="devAdminNoteCard" style="display:none">
-                    <span class="dev-admin-note-icon" aria-hidden="true">
-                        <i class="bx bx-info-circle"></i>
+            <div class="dev-info-row">
+                <span class="dev-info-row__label">Priority</span>
+                <span class="dev-info-row__value">
+                    <span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">
+                        {{ ticket.get_priority_display }}
                     </span>
-                    <div>
-                        <div class="dev-admin-note-title">Note from Admin</div>
-                        <!-- Django: {{ ticket.admin_notes }} -->
-                        <div class="dev-admin-note-body" id="devAdminNoteBody">
-                            <!-- populated by initPage() -->
-                        </div>
-                    </div>
-                </div>
-                <!-- Django: {% endif %} -->
-
-
-                <!-- ================================================
-                     2. SUB-STATUS UPDATE PANEL
-                     Stepper + action button rendered by renderSubstatusPanel().
-                     Django: {{ ticket.current_substatus }}
-                     ================================================ -->
-                <div class="dev-detail-card" id="devSubstatusCard">
-                    <div class="dev-detail-card__header">
-                        <i class="bx bx-git-branch" aria-hidden="true"></i>
-                        <h3 class="dev-detail-card__title">Update Progress</h3>
-                    </div>
-                    <div class="dev-detail-card__body" id="devSubstatusBody">
-                        <!-- populated by renderSubstatusPanel() -->
-                    </div>
-                </div>
-
-
-                <!-- ================================================
-                     3. DESCRIPTION
-                     Django: {{ ticket.description|linebreaksbr }}
-                     ================================================ -->
-                <div class="dev-detail-card">
-                    <div class="dev-detail-card__header">
-                        <i class="bx bx-detail" aria-hidden="true"></i>
-                        <h3 class="dev-detail-card__title">Description</h3>
-                    </div>
-                    <div class="dev-detail-card__body">
-                        <!-- Django: {{ ticket.description|linebreaksbr }} -->
-                        <p id="devTicketDesc"
-                           style="margin:0;color:var(--tw-text-secondary);
-                                  font-size:var(--tw-text-base);line-height:1.7;
-                                  white-space:pre-wrap">
-                            <!-- populated by initPage() -->
-                        </p>
-                    </div>
-                </div>
-
-
-                <!-- ================================================
-                     4. ATTACHMENTS
-                     Django: {% for att in ticket.attachments.all %}
-                     ================================================ -->
-                <div class="dev-detail-card">
-                    <div class="dev-detail-card__header">
-                        <i class="bx bx-paperclip" aria-hidden="true"></i>
-                        <h3 class="dev-detail-card__title">Attachments</h3>
-                    </div>
-
-                    <!-- Django: {% for att in ticket.attachments.all %} -->
-                    <div id="devAttachList"
-                         style="padding-top:var(--tw-space-3);padding-bottom:var(--tw-space-3)">
-                        <!-- populated by renderDevAttachments() -->
-                    </div>
-                    <!-- Django: {% endfor %} -->
-
-                    <div class="dev-attachment-card-footer">
-                        <!-- Django: action="{% url 'dev:upload_attachment' ticket.id %}" -->
-                        <input type="file"
-                               id="devAttachInput"
-                               style="display:none"
-                               accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-                               aria-hidden="true">
-                        <button type="button"
-                                id="devAddAttachBtn"
-                                class="tw-btn tw-btn-outline tw-btn--sm"
-                                onclick="document.getElementById('devAttachInput').click()">
-                            <i class="bx bx-paperclip" aria-hidden="true"></i>
-                            Add Work Attachment
-                        </button>
-                    </div>
-                </div>
-                <!-- END ATTACHMENTS -->
-
-
-                <!-- ================================================
-                     5. CHAT WITH ADMIN
-                     Admin messages: grey (left). Dev messages: purple (right).
-                     Django: {% for message in ticket.messages.all %}
-                     ================================================ -->
-                <div class="dev-detail-card">
-                    <div class="dev-detail-card__header">
-                        <i class="bx bx-chat" aria-hidden="true"></i>
-                        <h3 class="dev-detail-card__title">Chat with Admin</h3>
-                    </div>
-
-                    <!-- Muted visibility note -->
-                    <div style="padding:var(--tw-space-3) var(--tw-space-5) 0">
-                        <p style="margin:0;font-size:var(--tw-text-xs);color:var(--tw-text-muted);
-                                  font-style:italic;line-height:1.5">
-                            This chat is between you and the support admin. Clients cannot see these messages.
-                        </p>
-                    </div>
-
-                    <!-- Chat thread -->
-                    <!-- Django: {% for message in ticket.messages.all %} -->
-                    <div class="dev-chat-thread" id="devChatThread">
-
-                        <!-- Admin message (grey left bubble) -->
-                        <div class="dev-msg dev-msg--admin">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--admin" aria-hidden="true">S</div>
-                            <div class="dev-msg-body">
-                                <div class="dev-msg-sender">
-                                    Support Admin
-                                    <span class="tw-role-pill tw-role-pill--admin">Admin</span>
-                                </div>
-                                <!-- Django: {{ message.content }} -->
-                                <div class="dev-msg-bubble">
-                                    Hi Arjun, this ticket has been assigned to you. Please investigate the issue and update the sub-status as you progress through development, testing, and UAT.
-                                </div>
-                                <div class="dev-msg-time">16 Apr 2025 at 11:30 AM</div>
-                            </div>
-                        </div>
-
-                        <!-- Developer reply (purple right bubble) -->
-                        <div class="dev-msg dev-msg--dev">
-                            <div class="tw-avatar tw-avatar--sm tw-avatar--developer" aria-hidden="true">AM</div>
-                            <div class="dev-msg-body">
-                                <div class="dev-msg-sender">
-                                    You
-                                    <span class="tw-role-pill tw-role-pill--developer">Developer</span>
-                                </div>
-                                <div class="dev-msg-bubble">
-                                    Understood. I've reviewed the ticket and will start investigating shortly. I'll keep the sub-status updated as I progress.
-                                </div>
-                                <div class="dev-msg-time">16 Apr 2025 at 11:48 AM</div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <!-- Django: {% endfor %} -->
-
-                    <!-- Chat input -->
-                    <div class="dev-chat-footer">
-                        <div class="tw-attach-preview-strip" id="devChatAttachStrip" aria-live="polite">
-                            <i class="bx bx-file" aria-hidden="true"></i>
-                            <span id="devChatAttachFileName"></span>
-                            <button class="tw-file-chip-remove" onclick="removeDevChatAttachment()" aria-label="Remove attachment">
-                                <i class="bx bx-x" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                        <div class="dev-chat-input-row">
-                            <textarea
-                                class="dev-chat-textarea"
-                                id="devChatInput"
-                                placeholder="Type a message to admin…"
-                                rows="1"
-                                aria-label="Chat message input"
-                                oninput="this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
-                            <!-- Django: action="{% url 'dev:send_message' ticket.id %}" -->
-                            <input type="file" id="devChatFileInput" style="display:none"
-                                   accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" aria-hidden="true">
-                            <button type="button" class="tw-btn-icon"
-                                    onclick="document.getElementById('devChatFileInput').click()"
-                                    title="Attach file" aria-label="Attach file">
-                                <i class="bx bx-paperclip" aria-hidden="true"></i>
-                            </button>
-                            <button type="button"
-                                    class="tw-btn tw-btn-primary tw-btn--sm"
-                                    style="flex-shrink:0"
-                                    onclick="sendDevDetailMessage()"
-                                    aria-label="Send message">
-                                <i class="bx bx-send" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-                <!-- END CHAT CARD -->
-
+                </span>
             </div>
-            <!-- END LEFT COLUMN -->
-
-
-            <!-- =======================================================
-                 RIGHT COLUMN — ticket info + progress timeline
-                 ======================================================= -->
-            <div class="dev-detail-right">
-
-                <!-- TICKET INFO PANEL -->
-                <div class="dev-info-panel">
-                    <div class="dev-info-panel__header">
-                        <i class="bx bx-info-circle" aria-hidden="true"></i>
-                        <h3 class="dev-info-panel__title">Ticket Info</h3>
-                    </div>
-                    <!-- Django: rows from ticket context -->
-                    <div id="devInfoPanelBody">
-                        <!-- populated by renderDevInfoPanel() -->
-                    </div>
-                </div>
-
-                <!-- PROGRESS TIMELINE -->
-                <div class="dev-info-panel">
-                    <div class="dev-info-panel__header">
-                        <i class="bx bx-history" aria-hidden="true"></i>
-                        <h3 class="dev-info-panel__title">Progress Timeline</h3>
-                    </div>
-                    <!-- Django: {% for event in ticket.events.all %} -->
-                    <div class="dev-progress-timeline" id="devProgressTimeline">
-                        <!-- populated by renderDevProgressTimeline() -->
-                    </div>
-                    <!-- Django: {% endfor %} -->
-                </div>
-
+            <div class="dev-info-row">
+                <span class="dev-info-row__label">Client</span>
+                <span class="dev-info-row__value">{{ ticket.client.name|default:"—" }}</span>
             </div>
-            <!-- END RIGHT COLUMN -->
-
+            <div class="dev-info-row">
+                <span class="dev-info-row__label">Category</span>
+                <span class="dev-info-row__value">{{ ticket.category|default:"—" }}</span>
+            </div>
+            <div class="dev-info-row">
+                <span class="dev-info-row__label">Issue Date</span>
+                <span class="dev-info-row__value">{{ ticket.created_at|date:"d M Y" }}</span>
+            </div>
+            <div class="dev-info-row">
+                <span class="dev-info-row__label">Assigned To</span>
+                <span class="dev-info-row__value">
+                    {{ ticket.assigned_developer.get_full_name|default:ticket.assigned_developer.username }}
+                    <span style="font-size:var(--tw-text-xs);color:var(--tw-text-muted)">(you)</span>
+                </span>
+            </div>
+            {% if ticket.assigned_tester %}
+            <div class="dev-info-row">
+                <span class="dev-info-row__label">QA Tester</span>
+                <span class="dev-info-row__value">
+                    {{ ticket.assigned_tester.get_full_name|default:ticket.assigned_tester.username }}
+                </span>
+            </div>
+            {% endif %}
         </div>
-        <!-- END TWO-COLUMN LAYOUT -->
 
-    </main>
-    <!-- END MAIN -->
+        <!-- PROGRESS TIMELINE -->
+        <div class="dev-info-panel">
+            <div class="dev-info-panel__header">
+                <i class="bx bx-history" aria-hidden="true"></i>
+                <h3 class="dev-info-panel__title">Progress Timeline</h3>
+            </div>
 
-</section>
-<!-- END CONTENT WRAPPER -->
+            <div class="dev-progress-timeline">
+                {% for event in events %}
+                <div class="dev-progress-tl-item done">
+                    <div class="dev-progress-tl-dot">
+                        <i class="bx {{ event.action|event_icon }}" aria-hidden="true"></i>
+                    </div>
+                    <div class="dev-progress-tl-content">
+                        <div class="dev-progress-tl-label">{{ event.action|event_label }}</div>
+                        <div class="dev-progress-tl-date">{{ event.created_at|date:"d M Y" }} at {{ event.created_at|time:"H:i" }}</div>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="padding:var(--tw-space-4);color:var(--tw-text-muted);font-size:var(--tw-text-sm);margin:0">
+                    No timeline events yet.
+                </p>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+    <!-- END RIGHT COLUMN -->
+
+</div>
+<!-- END TWO-COLUMN LAYOUT -->
 
 
 <!-- ==============================================================
-     SUB-STATUS CONFIRM MODAL
-     Used for "Move to Testing/UAT" and "Mark as Resolved" flows.
-     id="devSubstatusConfirmOverlay" — matches spec.
+     CONFIRM MODAL
+     Uses .active class toggle (CSS opacity transition), not display:none.
      ============================================================== -->
-<div class="dev-confirm-overlay" id="devSubstatusConfirmOverlay"
+<div class="dev-confirm-overlay" id="devConfirmOverlay"
      role="dialog" aria-modal="true" aria-labelledby="devConfirmTitle">
     <div class="dev-confirm-box">
-        <div class="dev-confirm-icon dev-confirm-icon--primary" id="devConfirmIcon" aria-hidden="true">
+        <div class="dev-confirm-icon dev-confirm-icon--primary" aria-hidden="true">
             <i class="bx bx-git-branch"></i>
         </div>
         <div class="dev-confirm-title" id="devConfirmTitle">Confirm Action</div>
-        <div class="dev-confirm-message" id="devConfirmMessage">
-            <!-- set by openDevConfirmModal() -->
-        </div>
+        <div class="dev-confirm-message" id="devConfirmMessage"></div>
         <div class="dev-confirm-buttons">
-            <button type="button"
-                    class="tw-btn tw-btn-outline"
+            <button type="button" class="tw-btn tw-btn-outline"
                     onclick="closeDevConfirmModal()">Cancel</button>
-            <button type="button"
-                    class="tw-btn tw-btn-primary"
+            <button type="button" class="tw-btn tw-btn-primary"
                     id="devConfirmOkBtn">Confirm</button>
         </div>
     </div>
 </div>
 
-
-<!-- ==============================================================
-     VENDOR SCRIPTS
-     ============================================================== -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
 
 
-<!-- ==============================================================
-     PAGE SCRIPT
-     All top-level vars use var (never const/let) to prevent TDZ
-     crashes when the page router re-executes this script.
-     Django: {% block page_js %}
-     ============================================================== -->
+{% block page_js %}
 <script>
 
-    /* ============================================================
-     * ARCHITECTURE DECISION: Sub-status advancement is developer-driven.
-     * Developers move tickets through:
-     *   development → testing → uat (internal UAT prep)
-     * Developer then submits for client UAT via confirmSubmitForUAT()
-     * which moves status from 'in_progress' to 'uat' (client-facing).
-     * Admin retains override ability at all stages.
-     *
-     * Django: dev:update_substatus handles all sub-status changes
-     *         (development ↔ testing ↔ uat).
-     *         dev:submit_for_uat handles the final client UAT submission
-     *         and sets ticket.status = 'uat'.
-     * ============================================================ */
+    var devPendingAction = null;
+    var devPendingForm   = null;
 
-    /* ============================================================
-     * DEVELOPER IDENTITY — single source of truth.
-     * Django: var DEV_USER = {{ dev_user|safe }};
-     * ============================================================ */
-    var DEV_USER = {
-        name:     'Arjun Mehta',
-        initials: 'AM',
-        email:    'arjun.mehta@tweedle.io',
-        role:     'Developer'
+    var ACTION_LABELS = {
+        'submit_for_testing':   { title: 'Submit for Testing?',   msg: 'This will move the ticket to Testing stage and notify the QA tester. Continue?',            ok: 'Submit for Testing' },
+        'resubmit_for_testing': { title: 'Resubmit for Testing?', msg: 'This will resubmit the ticket to Testing stage and notify the QA tester. Continue?',         ok: 'Resubmit for Testing' },
+        'mark_ready':           { title: 'Mark Ready for UAT?',   msg: 'This will mark the ticket ready for UAT review. The admin will be notified. Continue?',       ok: 'Mark Ready for UAT' }
     };
-    /* Django: var DEV_USER = {{ dev_user|safe }}; */
 
+    function openDevConfirmModal(e, action) {
+        e.preventDefault();
+        var info = ACTION_LABELS[action] || { title: 'Confirm Action', msg: 'Proceed?', ok: 'Confirm' };
 
-    /* ============================================================
-     * URL PARAMS — read ticket ID and initial sub-status.
-     * Django: var TICKET_ID = "{{ ticket.id }}";
-     *         var TICKET_SUBSTATUS = "{{ ticket.current_substatus }}";
-     * ============================================================ */
-    var _urlParams       = new URLSearchParams(window.location.search);
-    var TICKET_ID        = _urlParams.get('id')        || 'GMEC25010001';
-    var TICKET_SUBSTATUS = _urlParams.get('substatus') || 'development';
-    /* Django: var TICKET_ID = "{{ ticket.id }}"; */
-    /* Django: var TICKET_SUBSTATUS = "{{ ticket.current_substatus }}"; */
+        document.getElementById('devConfirmTitle').textContent   = info.title;
+        document.getElementById('devConfirmMessage').textContent = info.msg;
+        document.getElementById('devConfirmOkBtn').textContent   = info.ok;
 
+        devPendingAction = action;
+        devPendingForm   = e.target.closest ? e.target.closest('form') : null;
 
-    /* ============================================================
-     * DEV_TICKET_DATA — maps ticket ID → full ticket object.
-     * All 6 tickets from the developer dashboard dummy data.
-     * Django: var DEV_TICKET_DATA = {{ tickets_json|safe }};
-     * ============================================================ */
-    var DEV_TICKET_DATA = {
-
-        'GMEC25010001': {
-            subject:          'Wallet Option Agents',
-            client:           'GlobalMec Industries',
-            clientId:         'GMEC',
-            priority:         'High',
-            priorityClass:    'tw-priority-badge--high',
-            issueDate:        '11 Sep 2021',
-            estResolution:    '15 May 2025',
-            isOverdue:        true,
-            category:         'Payments',
-            description:      'The payment gateway is timing out during checkout. Customers are unable to complete purchases. The issue started on 8 Apr 2025 and affects approximately 30% of transactions.\n\nSteps to reproduce:\n1. Navigate to the checkout page.\n2. Add items to cart and proceed to payment.\n3. Select any payment method and click "Pay Now".\n4. Observe GATEWAY_TIMEOUT_503 error after 30 seconds.\n\nExpected: successful payment processing within 5 seconds.\nActual: timeout error after 30 seconds.',
-            attachments:      [
-                { name: 'wallet_specs.pdf', type: 'pdf', size: '220 KB', date: '10 Apr 2025' }
-            ],
-            adminNotes:       'Priority escalated by client — GMEC has flagged this as business-critical. Please keep sub-status updated in real time and communicate immediately if you need additional context or resources.',
-            currentSubstatus: 'testing'
-        },
-
-        'GMEC25010004': {
-            subject:          'Kumari API Integration',
-            client:           'GlobalMec Industries',
-            clientId:         'GMEC',
-            priority:         'Medium',
-            priorityClass:    'tw-priority-badge--medium',
-            issueDate:        '08 Jan 2022',
-            estResolution:    '20 May 2025',
-            isOverdue:        true,
-            category:         'Billing',
-            description:      'The invoice generation module is calculating incorrect totals when multiple discount codes are applied. The final amount shows a higher value than expected.\n\nThis affects invoices generated after the billing module update on 1 May 2025.\n\nSteps to reproduce:\n1. Go to Billing → Generate Invoice.\n2. Apply two or more discount codes simultaneously.\n3. Observe — the final total does not correctly reflect the combined discounts.',
-            attachments:      [],
-            adminNotes:       'The client confirmed this affects 100% of invoices with stacked discounts. Check the billing module changelog from 1 May 2025 — the root cause is likely in the discount stacking logic.',
-            currentSubstatus: 'development'
-        },
-
-        'BGEX25010013': {
-            subject:          'User role permissions not saving',
-            client:           'BrightGEX Corp',
-            clientId:         'BGEX',
-            priority:         'Medium',
-            priorityClass:    'tw-priority-badge--medium',
-            issueDate:        '05 May 2025',
-            estResolution:    '30 May 2025',
-            isOverdue:        false,
-            category:         'Access Control',
-            description:      'When updating user role permissions in the admin panel, changes are not being saved. The UI shows a success message but on page refresh the old permissions are restored.\n\nThis affects all admin users trying to update team member access levels.\n\nSteps to reproduce:\n1. Login as an admin.\n2. Navigate to Settings → User Roles.\n3. Modify permissions for any role and save.\n4. Refresh the page — permissions have reverted to the previous state.',
-            attachments:      [
-                { name: 'access_issue_log.pdf', type: 'pdf', size: '92 KB', date: '18 Apr 2025' }
-            ],
-            adminNotes:       null,
-            currentSubstatus: 'uat'
-        },
-
-        'GMEC25010010': {
-            subject:          'Payment gateway timeout on checkout',
-            client:           'GlobalMec Industries',
-            clientId:         'GMEC',
-            priority:         'High',
-            priorityClass:    'tw-priority-badge--high',
-            issueDate:        '14 Apr 2025',
-            estResolution:    '25 May 2025',
-            isOverdue:        false,
-            category:         'Reports',
-            description:      'When exporting reports to CSV, multiple columns are missing from the output. The "Assigned Date" and "Resolved Date" columns do not appear in the downloaded file even though they are visible in the on-screen report table.\n\nThis affects all report exports generated after 14 Apr 2025.\n\nSteps to reproduce:\n1. Navigate to Reports → Generate Report.\n2. Click "Download CSV".\n3. Open the file — "Assigned Date" and "Resolved Date" columns are absent.',
-            attachments:      [],
-            adminNotes:       null,
-            currentSubstatus: 'development'
-        },
-
-        'BGEX25020003': {
-            subject:          'Mobile App Crash on Login',
-            client:           'BrightGEX Corp',
-            clientId:         'BGEX',
-            priority:         'Low',
-            priorityClass:    'tw-priority-badge--low',
-            issueDate:        '21 Feb 2025',
-            estResolution:    '28 May 2025',
-            isOverdue:        false,
-            category:         'Integration',
-            description:      'Frequent API rate limit errors occur when syncing data with the external payment provider. The sync fails every 2–3 hours requiring manual intervention.\n\nError log shows HTTP 429 Too Many Requests from the payment gateway API endpoint.\n\nExpected: sync should complete without rate limit errors at the current request volume.',
-            attachments:      [],
-            adminNotes:       null,
-            currentSubstatus: 'testing'
-        },
-
-        'GMEC25010012': {
-            subject:          'Invoice generation incorrect totals',
-            client:           'GlobalMec Industries',
-            clientId:         'GMEC',
-            priority:         'High',
-            priorityClass:    'tw-priority-badge--high',
-            issueDate:        '02 May 2025',
-            estResolution:    '10 Jun 2025',
-            isOverdue:        false,
-            category:         'UI/UX',
-            description:      'The main dashboard does not load correctly on mobile devices. The layout breaks and key widgets are not visible.\n\nReproducible on iOS Safari and Android Chrome on all devices with viewport width below 768px.\n\nSteps to reproduce:\n1. Open the application on a mobile device or resize browser below 768px.\n2. Login and navigate to the dashboard.\n3. Observe — layout breaks and several widgets are missing or overlapping.',
-            attachments:      [],
-            adminNotes:       null,
-            currentSubstatus: 'development'
-        },
-
-        'GMEC25010007': {
-            subject:          'Email notification delay on ticket updates',
-            client:           'Global Money Exchange CO.LLC',
-            clientId:         'GMEC',
-            priority:         'Medium',
-            priorityClass:    'tw-priority-badge--medium',
-            issueDate:        '05 May 2025',
-            estResolution:    '22 May 2025',
-            isOverdue:        true,
-            category:         'Notifications',
-            description:      'Email notifications for ticket status updates are delayed by 2-4 hours. Clients are not receiving real-time updates. Issue began after the 3 May 2025 email service config change.',
-            attachments:      [],
-            adminNotes:       'Waiting for client to confirm their email server settings before we can proceed.',
-            currentSubstatus: 'development',
-            ticketStatus:     'forwarded'
-        },
-
-        'BGEX25010008': {
-            subject:          'Two-factor authentication not triggering on login',
-            client:           'Belhasa Global Exchange Co.LLC',
-            clientId:         'BGEX',
-            priority:         'High',
-            priorityClass:    'tw-priority-badge--high',
-            issueDate:        '12 Apr 2025',
-            estResolution:    '28 Apr 2025',
-            isOverdue:        true,
-            category:         'Security',
-            description:      '2FA SMS codes are not being sent on login attempts. Affects all users with 2FA enabled. Issue started after the 10 Apr 2025 SMS gateway update.',
-            attachments:      [
-                { name: '2fa_debug_log.pdf', type: 'pdf', size: '134 KB', date: '14 Apr 2025' }
-            ],
-            adminNotes:       'Fix verified internally. Submitted for client UAT testing.',
-            currentSubstatus: 'uat',
-            ticketStatus:     'uat'
-        },
-
-        'GMEC25010005': {
-            subject:          'Session timeout too aggressive on dashboard',
-            client:           'Global Money Exchange CO.LLC',
-            clientId:         'GMEC',
-            priority:         'Low',
-            priorityClass:    'tw-priority-badge--low',
-            issueDate:        '01 Mar 2025',
-            estResolution:    '20 Mar 2025',
-            isOverdue:        false,
-            category:         'UI/UX',
-            description:      'Users are being logged out after 5 minutes of inactivity on the dashboard. The expected session timeout is 30 minutes per the product spec.',
-            attachments:      [
-                { name: 'session_fix_notes.pdf', type: 'pdf', size: '48 KB', date: '10 Mar 2025' }
-            ],
-            adminNotes:       '',
-            currentSubstatus: 'uat',
-            ticketStatus:     'closed',
-            closedDate:       '28 Mar 2025'
-        },
-
-        'BGEX25010006': {
-            subject:          'Login page not redirecting after password reset',
-            client:           'Belhasa Global Exchange Co.LLC',
-            clientId:         'BGEX',
-            priority:         'Medium',
-            priorityClass:    'tw-priority-badge--medium',
-            issueDate:        '10 Feb 2025',
-            estResolution:    '25 Feb 2025',
-            isOverdue:        false,
-            category:         'Authentication',
-            description:      'After a successful password reset, users are not being redirected to the login page. They see a blank screen instead. Fixed in the Feb 2025 auth module patch.',
-            attachments:      [],
-            adminNotes:       '',
-            currentSubstatus: 'uat',
-            ticketStatus:     'closed',
-            closedDate:       '01 Mar 2025'
-        }
-    };
-    /* Django: var DEV_TICKET_DATA = {{ tickets_json|safe }}; */
-
-
-    /* ============================================================
-     * PAGE STATE
-     * ============================================================ */
-    var devTicketSubmittedForUAT = false;  /* set true after confirmSubmitForUAT() confirms */
-    var devWorkAttachments       = [];     /* seeded from ticket.attachments in initPage() */
-    var devConfirmCallback   = null;    /* set by openDevConfirmModal() */
-    var devPendingFile       = null;    /* file staged in preview modal */
-    var devPendingFileSource = null;    /* 'attachment' | 'chat' */
-
-
-    /* ============================================================
-     * UTILITY FUNCTIONS
-     * ============================================================ */
-
-    function escapeHtml(str) {
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-    }
-
-    function capitalize(str) {
-        if (!str) return '';
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-
-    function formatNow() {
-        var d = new Date();
-        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) +
-               ' at ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-    }
-
-    function showDevToast(message, type) {
-        var t = document.createElement('div');
-        t.className = 'dev-toast dev-toast--' + (type || 'success');
-        t.textContent = message;
-        document.body.appendChild(t);
-        setTimeout(function () { t.classList.add('show'); }, 10);
-        setTimeout(function () {
-            t.classList.remove('show');
-            setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 300);
-        }, 3000);
-    }
-
-
-    /* ============================================================
-     * initPage()
-     * Master render — hydrates every element from DEV_TICKET_DATA.
-     * Called once by DOMContentLoaded.
-     * Django: at deploy time this function is replaced by
-     * server-rendered template tags.
-     * ============================================================ */
-    function initPage() {
-        var ticket = DEV_TICKET_DATA[TICKET_ID] || DEV_TICKET_DATA['GMEC25010001'];
-
-        /* Use the stored substatus from the data object (authoritative) */
-        TICKET_SUBSTATUS = ticket.currentSubstatus || TICKET_SUBSTATUS;
-
-        /* Restore UAT-submitted state from localStorage (survives navigation) */
-        if (localStorage.getItem('dev_uat_submitted_' + TICKET_ID) === '1') {
-            devTicketSubmittedForUAT = true;
-        }
-
-        /* ---- Back link — preserves active filter on return (M7) ---- */
-        var backLink = document.getElementById('devBackLink');
-        if (backLink) {
-            var backSubstatus = TICKET_SUBSTATUS;
-            if (ticket.ticketStatus === 'forwarded')    backSubstatus = 'forwarded';
-            if (ticket.ticketStatus === 'uat') backSubstatus = 'uat';
-            if (ticket.ticketStatus === 'closed')       backSubstatus = 'all';
-            if (ticket.ticketStatus === 'resolved')     backSubstatus = 'resolved';
-            backLink.href = 'dashboard.html?filter=' + backSubstatus;
-        }
-
-        /* ---- Page title ---- */
-        document.title = ticket.subject + ' — Tweedle';
-
-        /* ---- Page header ---- */
-        var h1 = document.getElementById('devTicketH1');
-        if (h1) h1.textContent = ticket.subject;
-        var sub = document.getElementById('devTicketIdSub');
-        if (sub) sub.textContent = TICKET_ID;
-
-        /* ---- Header card ID ---- */
-        var hid = document.getElementById('devHeaderId');
-        if (hid) hid.textContent = TICKET_ID;
-
-        /* ---- Header card border color by substatus ---- */
-        var headerCard = document.getElementById('devHeaderCard');
-        if (headerCard) headerCard.dataset.subStatus = TICKET_SUBSTATUS;
-
-        /* ---- Header badges ---- */
-        var badgesEl = document.getElementById('devHeaderBadges');
-        if (badgesEl) {
-            badgesEl.innerHTML =
-                '<span class="tw-status-badge tw-status-badge--' + TICKET_SUBSTATUS + '">' +
-                escapeHtml(capitalize(TICKET_SUBSTATUS)) + '</span>' +
-                ' <span class="tw-priority-badge ' + escapeHtml(ticket.priorityClass) + '">' +
-                escapeHtml(ticket.priority) + '</span>' +
-                ' <span class="tw-ticket-label">' + escapeHtml(ticket.category) + '</span>';
-        }
-
-        /* ---- Client tag ---- */
-        var clientTag = document.getElementById('devHeaderClientTag');
-        if (clientTag) {
-            clientTag.innerHTML =
-                '<i class="bx bx-buildings" aria-hidden="true"></i>' +
-                '<span>' + escapeHtml(ticket.client) + '</span>';
-        }
-
-        /* ---- Dates ---- */
-        var issueEl = document.getElementById('devHeaderIssueDate');
-        if (issueEl) issueEl.textContent = ticket.issueDate;
-        var estEl = document.getElementById('devHeaderEstDate');
-        if (estEl) {
-            estEl.textContent = ticket.estResolution;
-            if (ticket.isOverdue) {
-                estEl.style.color      = 'var(--tw-danger)';
-                estEl.style.fontWeight = '600';
-            }
-        }
-
-        /* ---- Overdue banner ---- */
-        var overdueBanner = document.getElementById('devOverdueBanner');
-        if (overdueBanner) {
-            overdueBanner.style.display = ticket.isOverdue ? '' : 'none';
-            var overdueMsg = document.getElementById('devOverdueMsg');
-            if (overdueMsg && ticket.isOverdue) {
-                overdueMsg.innerHTML =
-                    'This ticket is <strong>overdue</strong>. The estimated resolution date (' +
-                    escapeHtml(ticket.estResolution) + ') has passed. Please prioritise or contact admin to update the timeline.';
-            }
-        }
-
-        /* ---- Admin note card ---- */
-        var adminCard = document.getElementById('devAdminNoteCard');
-        var adminBody = document.getElementById('devAdminNoteBody');
-        if (adminCard) {
-            if (ticket.adminNotes) {
-                adminCard.style.display = '';
-                if (adminBody) adminBody.textContent = ticket.adminNotes;
-            } else {
-                adminCard.style.display = 'none';
-            }
-        }
-
-        /* ---- Description ---- */
-        var descEl = document.getElementById('devTicketDesc');
-        if (descEl) descEl.textContent = ticket.description;
-
-        /* ---- Attachments ---- */
-        devWorkAttachments = ticket.attachments.slice();
-        renderDevAttachments();
-
-        /* ---- Sub-status panel ---- */
-        renderSubstatusPanel();
-
-        /* ---- Right column ---- */
-        renderDevInfoPanel(ticket);
-        renderDevProgressTimeline();
-
-        /* ---- Sidebar / topbar user hydration ---- */
-        var ids = {
-            devAvatarTopbar:  DEV_USER.initials,
-            devAvatarSidebar: DEV_USER.initials,
-            devAvatarPanel:   DEV_USER.initials,
-            devNameSidebar:   DEV_USER.name,
-            devNamePanel:     DEV_USER.name,
-            devEmailPanel:    DEV_USER.email
-        };
-        Object.keys(ids).forEach(function (id) {
-            var el = document.getElementById(id);
-            if (el) el.textContent = ids[id];
-        });
-
-        /* ---- Scroll chat to bottom ---- */
-        var thread = document.getElementById('devChatThread');
-        if (thread) thread.scrollTop = thread.scrollHeight;
-
-        /* ---- Apply chat disabled state (closed/forwarded) ---- */
-        applyDevChatState();
-    }
-
-
-    /* ============================================================
-     * renderSubstatusPanel()
-     * Builds the stepper + action area from TICKET_SUBSTATUS.
-     * Re-called after every substatus change.
-     * Django: renderSubstatusPanel() handles this client-side using TICKET_SUBSTATUS.
-     *         At Django wiring time: pass ticket.current_substatus into the page via
-     *         var TICKET_SUBSTATUS = '{{ ticket.current_substatus }}';
-     *         and remove the JS fallback default.
-     * ============================================================ */
-    function renderSubstatusPanel() {
-        var body = document.getElementById('devSubstatusBody');
-        if (!body) return;
-
-        /* Awaiting Client — render paused banner, disable attachment button */
-        var _ticketData = DEV_TICKET_DATA[TICKET_ID];
-        if (_ticketData && _ticketData.ticketStatus === 'forwarded') {
-            body.innerHTML =
-                '<div class="dev-awaiting-client-banner">' +
-                '<i class="bx bx-pause-circle" aria-hidden="true"></i>' +
-                '<div>' +
-                '<div class="dev-awaiting-client-banner__title">Ticket Paused — Awaiting Client Response</div>' +
-                '<div class="dev-awaiting-client-banner__body">The support admin has requested information from the client. Your work is on hold until the client responds. You will be notified when work can resume.</div>' +
-                '</div>' +
-                '</div>';
-            var addAttachBtn = document.getElementById('devAddAttachBtn');
-            if (addAttachBtn) {
-                addAttachBtn.disabled = true;
-                addAttachBtn.style.opacity = '0.5';
-                addAttachBtn.style.cursor = 'not-allowed';
-                addAttachBtn.title = 'Ticket is paused — attachments disabled';
-            }
-            return;
-        }
-
-        /* UAT Approval — in-testing banner, disable attachment button */
-        if (_ticketData && _ticketData.ticketStatus === 'uat') {
-            body.innerHTML =
-                '<div class="dev-uat-approval-banner">' +
-                '<i class="bx bx-user-check" aria-hidden="true"></i>' +
-                '<div>' +
-                '<div class="dev-uat-approval-banner__title">In Client UAT Testing</div>' +
-                '<div class="dev-uat-approval-banner__body">Your work has been submitted and the client is currently testing. No further action is needed from you. You will be notified when the client approves or requests changes.</div>' +
-                '</div>' +
-                '</div>';
-            var uatAttachBtn = document.getElementById('devAddAttachBtn');
-            if (uatAttachBtn) {
-                uatAttachBtn.disabled = true;
-                uatAttachBtn.style.opacity = '0.5';
-                uatAttachBtn.style.cursor = 'not-allowed';
-            }
-            return;
-        }
-
-        /* Closed — closed banner, disable chat and attachment */
-        if (_ticketData && _ticketData.ticketStatus === 'closed') {
-            body.innerHTML =
-                '<div class="dev-closed-banner">' +
-                '<i class="bx bx-check-circle" aria-hidden="true"></i>' +
-                '<div>' +
-                '<div class="dev-closed-banner__title">Ticket Closed</div>' +
-                '<div class="dev-closed-banner__body">This ticket has been officially closed on ' +
-                escapeHtml(_ticketData.closedDate || 'N/A') +
-                '. No further action is required. Thank you for your work on this ticket.</div>' +
-                '</div>' +
-                '</div>';
-            var closedAttachBtn = document.getElementById('devAddAttachBtn');
-            if (closedAttachBtn) {
-                closedAttachBtn.disabled = true;
-                closedAttachBtn.style.opacity = '0.5';
-                closedAttachBtn.style.cursor = 'not-allowed';
-            }
-            var chatInput = document.getElementById('devChatInput') || document.querySelector('.dev-chat-input');
-            if (chatInput) {
-                chatInput.disabled = true;
-                chatInput.placeholder = 'This ticket is closed — chat is disabled.';
-            }
-            var sendBtn = document.querySelector('.dev-chat-send-btn') || document.getElementById('devChatSendBtn');
-            if (sendBtn) { sendBtn.disabled = true; sendBtn.style.opacity = '0.5'; }
-            return;
-        }
-
-        var steps = [
-            { key: 'development', label: 'Development' },
-            { key: 'testing',     label: 'Testing' },
-            { key: 'uat',         label: 'UAT' },
-            { key: 'resolved',    label: 'Resolved' }
-        ];
-
-        /* When submitted for UAT, all sub-statuses are done and Resolved is the active step */
-        var currentIdx = devTicketSubmittedForUAT
-            ? 3
-            : steps.map(function (s) { return s.key; }).indexOf(TICKET_SUBSTATUS);
-
-        /* ---- Stepper ---- */
-        var stepperHtml = '<div class="dev-substatus-stepper" aria-label="Sub-status progress stepper">';
-
-        steps.forEach(function (step, i) {
-            var isDone   = i < currentIdx;
-            var isActive = i === currentIdx;
-            var modCls   = isDone ? 'done' : (isActive ? 'active' : '');
-
-            var circleInner = isDone
-                ? '<i class="bx bx-check" aria-hidden="true"></i>'
-                : String(i + 1);
-
-            stepperHtml +=
-                '<div class="dev-substatus-step ' + modCls + '">' +
-                '<div class="dev-substatus-step-circle">' + circleInner + '</div>' +
-                '<div class="dev-substatus-step-label">' + escapeHtml(step.label) + '</div>' +
-                '</div>';
-
-            /* Connector between steps */
-            if (i < steps.length - 1) {
-                var connDone = i < currentIdx;
-                stepperHtml += '<div class="dev-substatus-connector' + (connDone ? ' done' : '') +
-                               '" aria-hidden="true"></div>';
-            }
-        });
-        stepperHtml += '</div>';
-
-        /* ---- Action area ---- */
-        var actionHtml = '<div style="margin-top:var(--tw-space-4)">';
-
-        if (devTicketSubmittedForUAT) {
-            /* Submitted — show confirmation banner below the completed stepper */
-            actionHtml +=
-                '<div class="dev-resolved-banner">' +
-                '<i class="bx bx-check-circle" aria-hidden="true"></i>' +
-                '<div>' +
-                '<strong>Submitted for client UAT review.</strong><br>' +
-                '<span style="font-weight:normal">The client will test and approve your work.</span>' +
-                '</div>' +
-                '</div>';
-
-        } else if (TICKET_SUBSTATUS === 'development') {
-            actionHtml +=
-                '<button type="button" class="tw-btn tw-btn-primary" id="devActionBtn"' +
-                ' onclick="confirmSubstatusChange(\'testing\')">' +
-                '<i class="bx bx-right-arrow-alt" aria-hidden="true"></i>' +
-                'Move to Testing' +
-                '</button>' +
-                '<p class="dev-substatus-action-note">Mark development work as complete and move this ticket to the testing stage.</p>';
-
-        } else if (TICKET_SUBSTATUS === 'testing') {
-            actionHtml +=
-                '<button type="button" class="tw-btn tw-btn-primary" id="devActionBtn"' +
-                ' onclick="confirmSubstatusChange(\'uat\')">' +
-                '<i class="bx bx-right-arrow-alt" aria-hidden="true"></i>' +
-                'Move to UAT' +
-                '</button>' +
-                '<p class="dev-substatus-action-note">Testing complete — move to UAT for client review preparation.</p>';
-
-        } else if (TICKET_SUBSTATUS === 'uat') {
-            actionHtml +=
-                '<button type="button" class="tw-btn tw-btn-success" id="devActionBtn"' +
-                ' onclick="confirmSubmitForUAT()">' +
-                '<i class="bx bx-check-double" aria-hidden="true"></i>' +
-                'Submit for UAT Review' +
-                '</button>' +
-                '<p class="dev-substatus-action-note">All work is complete. Submitting for UAT will send the ticket to the client for final testing and approval.</p>' +
-                '<div class="dev-warning-box">' +
-                '<i class="bx bx-error-circle" aria-hidden="true"></i>' +
-                '<span>Only submit when all work is fully tested. The client will be notified to begin UAT. This action cannot be undone.</span>' +
-                '</div>';
-        }
-
-        actionHtml += '</div>';
-
-        body.innerHTML = stepperHtml + actionHtml;
-    }
-
-
-    /* ============================================================
-     * confirmSubstatusChange(newSubstatus)
-     * Opens confirm modal before advancing to Testing or UAT.
-     * Django: fetch stub fires on confirm.
-     * ============================================================ */
-    function confirmSubstatusChange(newSubstatus) {
-        var labelMap = { testing: 'Testing', uat: 'UAT' };
-        var label    = labelMap[newSubstatus] || capitalize(newSubstatus);
-
-        openDevConfirmModal({
-            iconCls:   'dev-confirm-icon--primary',
-            iconHtml:  '<i class="bx bx-git-branch"></i>',
-            title:     'Move to ' + label + '?',
-            message:   'This will update the sub-status to <strong>' + escapeHtml(label) +
-                       '</strong> and notify the support admin. Continue?',
-            okLabel:   'Yes, Move to ' + label,
-            okCls:     'tw-btn-primary',
-            onConfirm: function () {
-                /* Update shared state */
-                TICKET_SUBSTATUS = newSubstatus;
-                DEV_TICKET_DATA[TICKET_ID].currentSubstatus = newSubstatus;
-
-                /* Update header card border color */
-                var hc = document.getElementById('devHeaderCard');
-                if (hc) hc.dataset.subStatus = newSubstatus;
-
-                /* Update header badge */
-                var badgesEl = document.getElementById('devHeaderBadges');
-                if (badgesEl) {
-                    var ticket = DEV_TICKET_DATA[TICKET_ID];
-                    badgesEl.innerHTML =
-                        '<span class="tw-status-badge tw-status-badge--' + newSubstatus + '">' +
-                        escapeHtml(capitalize(newSubstatus)) + '</span>' +
-                        ' <span class="tw-priority-badge ' + escapeHtml(ticket.priorityClass) + '">' +
-                        escapeHtml(ticket.priority) + '</span>' +
-                        ' <span class="tw-ticket-label">' + escapeHtml(ticket.category) + '</span>';
-                }
-
-                /* Re-render stepper + right column */
-                renderSubstatusPanel();
-                renderDevInfoPanel(DEV_TICKET_DATA[TICKET_ID]);
-                renderDevProgressTimeline();
-
-                /* Django: fetch('{% url "dev:update_substatus" ticket.id %}', {
-                   method: 'POST',
-                   headers: {
-                       'Content-Type': 'application/json',
-                       'X-CSRFToken': getCookie('csrftoken')
-                   },
-                   body: JSON.stringify({ substatus: newSubstatus })
-                }) */
-                console.log('[Dev Portal] updateSubstatus stub:', { id: TICKET_ID, substatus: newSubstatus });
-
-                showDevToast('Stage updated to ' + label + '.', 'success');
-            }
-        });
-    }
-
-
-    /* ============================================================
-     * confirmSubmitForUAT()
-     * Danger modal before submitting ticket for UAT review.
-     * Django: fetch stub fires on confirm.
-     * ============================================================ */
-    function confirmSubmitForUAT() {
-        openDevConfirmModal({
-            iconCls:   'dev-confirm-icon--danger',
-            iconHtml:  '<i class="bx bx-check-double"></i>',
-            title:     'Submit for UAT Review?',
-            message:   'This will submit the ticket for client UAT testing. The admin will be notified and the client will review your work. You cannot undo this action.',
-            okLabel:   'Submit for UAT Review',
-            okCls:     'tw-btn-danger',
-            onConfirm: function () {
-                devTicketSubmittedForUAT = true;
-                localStorage.setItem('dev_uat_submitted_' + TICKET_ID, '1');
-
-                /* Disable action button if still in DOM */
-                var btn = document.getElementById('devActionBtn');
-                if (btn) btn.disabled = true;
-
-                /* Replace panel with UAT submitted banner */
-                renderSubstatusPanel();
-
-                /* Re-render right column to reflect submitted state */
-                renderDevProgressTimeline();
-                renderDevInfoPanel(DEV_TICKET_DATA[TICKET_ID]);
-
-                /* Django: fetch('{% url "dev:submit_for_uat" ticket.id %}', {
-                   method: 'POST',
-                   headers: {
-                       'Content-Type': 'application/json',
-                       'X-CSRFToken': getCookie('csrftoken')
-                   },
-                   body: JSON.stringify({ status: 'uat' })
-                }) */
-                console.log('[Dev Portal] submitForUAT stub:', { id: TICKET_ID });
-
-                showDevToast('Ticket submitted for UAT review. Admin and client will be notified.', 'success');
-            }
-        });
-    }
-
-
-    /* ============================================================
-     * GENERIC CONFIRM MODAL HELPER
-     * opts: { iconCls, iconHtml, title, message, okLabel, okCls, onConfirm }
-     * ============================================================ */
-    function openDevConfirmModal(opts) {
-        var overlay = document.getElementById('devSubstatusConfirmOverlay');
-        if (!overlay) return;
-
-        var iconEl  = document.getElementById('devConfirmIcon');
-        var titleEl = document.getElementById('devConfirmTitle');
-        var msgEl   = document.getElementById('devConfirmMessage');
-        var okBtn   = document.getElementById('devConfirmOkBtn');
-
-        if (iconEl) {
-            iconEl.className = 'dev-confirm-icon ' + (opts.iconCls || 'dev-confirm-icon--primary');
-            iconEl.innerHTML = opts.iconHtml || '';
-        }
-        if (titleEl)  titleEl.textContent = opts.title   || 'Confirm';
-        if (msgEl)    msgEl.innerHTML     = opts.message || '';
-        if (okBtn) {
-            okBtn.className   = 'tw-btn ' + (opts.okCls || 'tw-btn-primary');
-            okBtn.textContent = opts.okLabel || 'Confirm';
-        }
-
-        devConfirmCallback = opts.onConfirm || null;
-        overlay.classList.add('active');
+        document.getElementById('devConfirmOverlay').classList.add('active');
+        return false;
     }
 
     function closeDevConfirmModal() {
-        var overlay = document.getElementById('devSubstatusConfirmOverlay');
-        if (overlay) overlay.classList.remove('active');
-        devConfirmCallback = null;
+        document.getElementById('devConfirmOverlay').classList.remove('active');
+        devPendingAction = null;
+        devPendingForm   = null;
     }
 
-    /* Wire OK button to callback */
     document.addEventListener('DOMContentLoaded', function () {
         var okBtn = document.getElementById('devConfirmOkBtn');
         if (okBtn) {
             okBtn.addEventListener('click', function () {
+                var form = devPendingForm;
                 closeDevConfirmModal();
-                if (devConfirmCallback) devConfirmCallback();
+                if (form) form.submit();
             });
         }
-    });
 
-
-    /* ============================================================
-     * renderDevInfoPanel(ticket)
-     * Builds the right-column Ticket Info rows.
-     * Django: server-rendered from ticket context at deploy time.
-     * ============================================================ */
-    function renderDevInfoPanel(ticket) {
-        var body = document.getElementById('devInfoPanelBody');
-        if (!body) return;
-
-        var substatusBadge =
-            '<span class="tw-status-badge tw-status-badge--' + TICKET_SUBSTATUS + '">' +
-            escapeHtml(capitalize(TICKET_SUBSTATUS)) + '</span>';
-
-        var priorityBadge =
-            '<span class="tw-priority-badge ' + escapeHtml(ticket.priorityClass) + '">' +
-            escapeHtml(ticket.priority) + '</span>';
-
-        var estVal = ticket.isOverdue
-            ? '<span style="color:var(--tw-danger);font-weight:600">' + escapeHtml(ticket.estResolution) + '</span>'
-            : escapeHtml(ticket.estResolution);
-
-        var _tData = DEV_TICKET_DATA[TICKET_ID];
-        var displayStatus, displayStatusClass;
-        if (_tData && _tData.ticketStatus === 'forwarded') {
-            displayStatus      = 'Awaiting Client';
-            displayStatusClass = 'tw-status-badge--forwarded';
-        } else if (_tData && _tData.ticketStatus === 'uat') {
-            displayStatus      = 'UAT Review';
-            displayStatusClass = 'tw-status-badge--uat';
-        } else if (devTicketSubmittedForUAT) {
-            displayStatus      = 'UAT Review';
-            displayStatusClass = 'tw-status-badge--uat';
-        } else if (_tData && _tData.ticketStatus === 'closed') {
-            displayStatus      = 'Closed';
-            displayStatusClass = 'tw-status-badge--closed';
-        } else {
-            displayStatus      = 'In Progress';
-            displayStatusClass = 'tw-status-badge--progress';
-        }
-
-        var rows = [
-            { label: 'Status',          value: '<span class="tw-status-badge ' + displayStatusClass + '">' + displayStatus + '</span>' },
-            { label: 'Sub-status',      value: substatusBadge },
-            { label: 'Priority',        value: priorityBadge },
-            { label: 'Client',          value: escapeHtml(ticket.client) },
-            { label: 'Category',        value: escapeHtml(ticket.category) },
-            { label: 'Issue Date',      value: escapeHtml(ticket.issueDate) },
-            { label: 'Est. Resolution', value: estVal },
-            { label: 'Assigned To',     value: escapeHtml(DEV_USER.name) + ' <span style="font-size:var(--tw-text-xs);color:var(--tw-text-muted)">(you)</span>' }
-        ];
-
-        var html = '';
-        rows.forEach(function (row) {
-            html +=
-                '<div class="dev-info-row">' +
-                '<span class="dev-info-row__label">' + escapeHtml(row.label) + '</span>' +
-                '<span class="dev-info-row__value">' + row.value + '</span>' +
-                '</div>';
-        });
-        body.innerHTML = html;
-    }
-
-
-    /* ============================================================
-     * renderDevProgressTimeline()
-     * Builds the right-column 5-stage vertical timeline.
-     * Stages before current: green + done class.
-     * Current stage: pulsing purple + current class.
-     * Future stages: grey + pending class.
-     * Django: server-rendered from ticket.events.all at deploy time.
-     * ============================================================ */
-    function renderDevProgressTimeline() {
-        var container = document.getElementById('devProgressTimeline');
-        if (!container) return;
-
-        var subOrder = ['development', 'testing', 'uat'];
-        var curIdx   = subOrder.indexOf(TICKET_SUBSTATUS);
-
-        var stages = [
-            { key: null,          label: 'Ticket Assigned',  icon: 'bx-user-check',  staticDate: '16 Apr 2025' },
-            { key: 'development', label: 'Development',       icon: 'bx-code-alt',    staticDate: null },
-            { key: 'testing',     label: 'Testing',           icon: 'bx-test-tube',   staticDate: null },
-            { key: 'uat',         label: 'UAT',               icon: 'bx-check-shield', staticDate: null },
-            { key: 'resolved',    label: 'Resolved',          icon: 'bx-check-circle', staticDate: null }
-        ];
-
-        var html = '';
-
-        stages.forEach(function (stage, i) {
-            var isDone, isCurrent, isPending;
-
-            if (i === 0) {
-                /* Ticket Assigned — always done */
-                isDone = true; isCurrent = false; isPending = false;
-            } else if (stage.key === 'resolved') {
-                isDone = devTicketSubmittedForUAT; isCurrent = false; isPending = !devTicketSubmittedForUAT;
-            } else {
-                var stageIdx = subOrder.indexOf(stage.key);
-                isDone    = stageIdx < curIdx;
-                isCurrent = stageIdx === curIdx;
-                isPending = stageIdx > curIdx;
-            }
-
-            var itemCls = isDone ? 'done' : (isCurrent ? 'current' : 'pending');
-            var isLast  = i === stages.length - 1;
-
-            html += '<div class="dev-progress-tl-item ' + itemCls + '">';
-
-            /* Dot */
-            html += '<div class="dev-progress-tl-dot">';
-            if (isDone) {
-                html += '<i class="bx bx-check" aria-hidden="true"></i>';
-            } else {
-                html += '<i class="bx ' + stage.icon + '" aria-hidden="true"></i>';
-            }
-            html += '</div>';
-
-            /* Content */
-            html += '<div class="dev-progress-tl-content">';
-            html += '<div class="dev-progress-tl-label">' + escapeHtml(stage.label) + '</div>';
-
-            var dateStr;
-            if (i === 0 && isDone) {
-                dateStr = stage.staticDate;
-            } else if (devTicketSubmittedForUAT && stage.key === 'resolved') {
-                dateStr = 'Just now';
-            } else if (isDone) {
-                dateStr = 'Completed';
-            } else if (isCurrent) {
-                dateStr = 'In progress';
-            } else {
-                dateStr = 'Pending';
-            }
-
-            html += '<div class="dev-progress-tl-date">' + escapeHtml(dateStr) + '</div>';
-            html += '</div>';
-            html += '</div>';
-        });
-
-        container.innerHTML = html;
-    }
-
-
-    /* ============================================================
-     * renderDevAttachments()
-     * Renders the devWorkAttachments array into #devAttachList.
-     * ============================================================ */
-    function renderDevAttachments() {
-        var container = document.getElementById('devAttachList');
-        if (!container) return;
-
-        if (devWorkAttachments.length === 0) {
-            container.innerHTML =
-                '<p style="padding:var(--tw-space-4) var(--tw-space-5);color:var(--tw-text-muted);' +
-                'font-size:var(--tw-text-sm);margin:0">No attachments yet.</p>';
-            return;
-        }
-
-        var html = '';
-        devWorkAttachments.forEach(function (att) {
-            var iconCls, iconName;
-            if (att.type === 'pdf') {
-                iconCls = 'tw-file-icon--pdf'; iconName = 'bx-file-pdf';
-            } else if (att.type === 'doc') {
-                iconCls = 'tw-file-icon--doc'; iconName = 'bx-file';
-            } else {
-                iconCls = 'tw-file-icon--img'; iconName = 'bx-image';
-            }
-            html +=
-                '<div class="tw-attachment-item">' +
-                '<div class="tw-file-icon ' + iconCls + '" aria-hidden="true"><i class="bx ' + iconName + '"></i></div>' +
-                '<div class="tw-attachment-info">' +
-                '<span class="tw-attachment-name">' + escapeHtml(att.name) + '</span>' +
-                '<span class="tw-attachment-meta">' + escapeHtml(att.size + ' · ' + att.date) + '</span>' +
-                '</div>' +
-                '<div class="tw-attachment-actions">' +
-                '<button class="tw-btn-icon" aria-label="Download ' + escapeHtml(att.name) + '"' +
-                ' onclick="showDevToast(\'Download started.\', \'success\')">' +
-                '<i class="bx bx-download"></i></button>' +
-                '</div></div>';
-        });
-        container.innerHTML = html;
-    }
-
-    /* Wire "Add Work Attachment" file input — shows preview modal before committing */
-    document.addEventListener('DOMContentLoaded', function () {
-        var attachInput = document.getElementById('devAttachInput');
-        if (attachInput) {
-            attachInput.addEventListener('change', function () {
-                if (!this.files || !this.files[0]) return;
-                showDevFilePreview(this.files[0], 'attachment');
+        /* Close on backdrop click */
+        var overlay = document.getElementById('devConfirmOverlay');
+        if (overlay) {
+            overlay.addEventListener('click', function (e) {
+                if (e.target === overlay) closeDevConfirmModal();
             });
         }
+
+        /* Scroll chat to bottom */
+        var thread = document.getElementById('devChatThread');
+        if (thread) thread.scrollTop = thread.scrollHeight;
     });
-
-
-    /* ============================================================
-     * INLINE CHAT — send message
-     * Purple developer bubble appended to #devChatThread.
-     * Django: fetch stub fires on send.
-     * ============================================================ */
-    function sendDevDetailMessage() {
-        var textarea      = document.getElementById('devChatInput');
-        var chatFileInput = document.getElementById('devChatFileInput');
-        var strip         = document.getElementById('devChatAttachStrip');
-        var text          = (textarea ? textarea.value : '').trim();
-        var hasFile       = !!(strip && strip.classList.contains('show') &&
-                               chatFileInput && chatFileInput.files && chatFileInput.files[0]);
-
-        if (!text && !hasFile) { if (textarea) textarea.focus(); return; }
-
-        if (text) {
-            var thread = document.getElementById('devChatThread');
-            var el     = document.createElement('div');
-            el.className = 'dev-msg dev-msg--dev';
-            el.innerHTML =
-                '<div class="tw-avatar tw-avatar--sm tw-avatar--developer" aria-hidden="true">' +
-                escapeHtml(DEV_USER.initials) + '</div>' +
-                '<div class="dev-msg-body">' +
-                '<div class="dev-msg-sender">You ' +
-                '<span class="tw-role-pill tw-role-pill--developer">Developer</span></div>' +
-                '<div class="dev-msg-bubble">' + escapeHtml(text) + '</div>' +
-                '<div class="dev-msg-time">' + formatNow() + '</div>' +
-                '</div>';
-            if (thread) { thread.appendChild(el); thread.scrollTop = thread.scrollHeight; }
-            if (textarea) { textarea.value = ''; textarea.style.height = 'auto'; }
-        }
-
-        if (hasFile) {
-            processDevChatAttachment(chatFileInput.files[0]);
-            if (chatFileInput) chatFileInput.value = '';
-            if (strip) strip.classList.remove('show');
-        }
-
-        /* Django: fetch('{% url "dev:send_message" ticket.id %}', {method:'POST', body: JSON.stringify({content: text})}) */
-        console.log('[Dev Portal] sendDevDetailMessage stub:', { id: TICKET_ID, content: text });
-
-        showDevToast('Message sent.', 'success');
-    }
-
-    /* Chat file attach — inline preview card (same pattern as admin; no modal) */
-    document.addEventListener('DOMContentLoaded', function () {
-        var chatFileInput = document.getElementById('devChatFileInput');
-        if (chatFileInput) {
-            chatFileInput.addEventListener('change', function () {
-                if (!this.files || !this.files[0]) return;
-                var file     = this.files[0];
-                var strip    = document.getElementById('devChatAttachStrip');
-                var nameSpan = document.getElementById('devChatAttachFileName');
-                if (nameSpan) nameSpan.textContent = file.name;
-                if (strip) strip.classList.add('show');
-            });
-        }
-    });
-
-    function removeDevChatAttachment() {
-        var input = document.getElementById('devChatFileInput');
-        if (input) input.value = '';
-        var strip = document.getElementById('devChatAttachStrip');
-        if (strip) strip.classList.remove('show');
-    }
-
-
-    /* ============================================================
-     * SIDEBAR TOGGLE
-     * ============================================================ */
-
-    var sidebar   = document.getElementById('sidebar');
-    var hamburger = document.getElementById('hamburger-btn');
-
-    function isMobile() { return window.innerWidth <= 768; }
-
-    hamburger.addEventListener('click', function () {
-        if (isMobile()) {
-            sidebar.classList.toggle('mobile-open');
-        } else {
-            sidebar.classList.toggle('hide');
-            document.body.classList.toggle('sidebar-hidden');
-        }
-    });
-
-    window.addEventListener('resize', function () {
-        if (isMobile()) {
-            sidebar.classList.remove('hide');
-            document.body.classList.remove('sidebar-hidden');
-        }
-    });
-
-
-    /* ============================================================
-     * NOTIFICATION BELL
-     * ============================================================ */
-
-    var notifBellBtn = document.getElementById('notifBellBtn');
-    var notifPanel   = document.getElementById('notifPanel');
-
-    notifBellBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var isOpen = notifPanel.classList.toggle('open');
-        notifBellBtn.setAttribute('aria-expanded', isOpen);
-    });
-
-    document.getElementById('markAllReadBtn').addEventListener('click', function () {
-        document.querySelectorAll('.tw-notif-item.unread').forEach(function (item) {
-            item.classList.remove('unread');
-        });
-        var badge = document.getElementById('notifCount');
-        if (badge) badge.remove();
-    });
-
-
-    /* ============================================================
-     * PROFILE DROPDOWN
-     * ============================================================ */
-
-    var profilePanelOpen = false;
-
-    function toggleProfileDropdown(e) {
-        e.stopPropagation();
-        var panel = document.getElementById('profilePanel');
-        if (notifPanel.classList.contains('open')) {
-            notifPanel.classList.remove('open');
-            notifBellBtn.setAttribute('aria-expanded', 'false');
-        }
-        profilePanelOpen = !profilePanelOpen;
-        panel.classList.toggle('open', profilePanelOpen);
-        panel.setAttribute('aria-hidden', profilePanelOpen ? 'false' : 'true');
-    }
-
-    function closeProfileDropdown() {
-        var panel = document.getElementById('profilePanel');
-        if (panel) {
-            panel.classList.remove('open');
-            profilePanelOpen = false;
-            panel.setAttribute('aria-hidden', 'true');
-        }
-    }
-
-
-    /* ============================================================
-     * CLICK-OUTSIDE — closes all open overlays and dropdowns
-     * ============================================================ */
-
-    document.addEventListener('click', function (e) {
-        /* Notification bell */
-        if (!notifBellBtn.contains(e.target) && !notifPanel.contains(e.target)) {
-            notifPanel.classList.remove('open');
-            notifBellBtn.setAttribute('aria-expanded', 'false');
-        }
-        /* Profile panel */
-        var pp = document.getElementById('profilePanel');
-        if (pp && pp.classList.contains('open')) {
-            if (!document.getElementById('profileWrap').contains(e.target)) {
-                closeProfileDropdown();
-            }
-        }
-        /* Confirm modal backdrop */
-        var confirmOverlay = document.getElementById('devSubstatusConfirmOverlay');
-        if (confirmOverlay &&
-            confirmOverlay.classList.contains('active') &&
-            e.target === confirmOverlay) {
-            closeDevConfirmModal();
-        }
-    });
-
-
-    /* ============================================================
-     * ESCAPE KEY — closes all modals, panels, dropdowns
-     * ============================================================ */
 
     document.addEventListener('keydown', function (e) {
-        if (e.key !== 'Escape') return;
-        closeProfileDropdown();
-        notifPanel.classList.remove('open');
-        notifBellBtn.setAttribute('aria-expanded', 'false');
-        closeDevConfirmModal();
+        if (e.key === 'Escape') closeDevConfirmModal();
     });
 
 
-    /* ============================================================
-     * processDevAttachment(file)
-     * Extracted from the devAttachInput handler.
-     * Called by confirmDevFileAttach() when source === 'attachment'.
-     * ============================================================ */
-    function processDevAttachment(file) {
-        var ext  = (file.name.split('.').pop() || '').toLowerCase();
-        var type = ['jpg','jpeg','png','gif','webp'].indexOf(ext) !== -1 ? 'img'
-                 : ext === 'pdf' ? 'pdf' : 'doc';
-        var kb   = Math.round(file.size / 1024);
-        var size = kb > 1024 ? (Math.round(kb / 102.4) / 10) + ' MB' : kb + ' KB';
-        devWorkAttachments.push({
-            name: file.name,
-            type: type,
-            size: size,
-            date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-        });
-        renderDevAttachments();
-        /* Django: fetch('{% url "dev:upload_attachment" ticket.id %}', {method:'POST', body: formData}) */
-        console.log('[Dev Portal] uploadAttachment stub:', { name: file.name });
-        showDevToast('Attachment uploaded.', 'success');
+    /* === CHAT SEND (stub — wired to Django in Phase 5) === */
+    function sendDevDetailMessage() {
+        var textarea = document.getElementById('devChatInput');
+        var text     = textarea ? textarea.value.trim() : '';
+        if (!text) { if (textarea) textarea.focus(); return; }
+
+        showDevToast('Chat sending will be wired in a later phase.', 'info');
+        if (textarea) { textarea.value = ''; textarea.style.height = 'auto'; }
     }
-
-
-    /* ============================================================
-     * processDevChatAttachment(file)
-     * Extracted from the devChatFileInput handler.
-     * Called by confirmDevFileAttach() when source === 'chat'.
-     * ============================================================ */
-    function processDevChatAttachment(file) {
-        var thread = document.getElementById('devChatThread');
-        if (thread) {
-            var el = document.createElement('div');
-            el.className = 'dev-msg dev-msg--dev';
-            el.innerHTML =
-                '<div class="tw-avatar tw-avatar--sm tw-avatar--developer" aria-hidden="true">' +
-                escapeHtml(DEV_USER.initials) + '</div>' +
-                '<div class="dev-msg-body">' +
-                '<div class="dev-msg-sender">You <span class="tw-role-pill tw-role-pill--developer">Developer</span></div>' +
-                '<div class="dev-msg-bubble" style="display:flex;align-items:center;gap:8px">' +
-                '<i class="bx bx-paperclip" aria-hidden="true"></i>' +
-                '<span>' + escapeHtml(file.name) + '</span>' +
-                '</div>' +
-                '<div class="dev-msg-time">' + formatNow() + '</div>' +
-                '</div>';
-            thread.appendChild(el);
-            thread.scrollTop = thread.scrollHeight;
-        }
-        /* Sync to Attachments section — mirrors client portal addSharedAttachment() pattern */
-        var chatExt  = (file.name.split('.').pop() || '').toLowerCase();
-        var chatType = ['jpg','jpeg','png','gif','webp'].indexOf(chatExt) !== -1 ? 'img'
-                     : chatExt === 'pdf' ? 'pdf' : 'doc';
-        var chatKb   = Math.round(file.size / 1024);
-        var chatSize = chatKb > 1024 ? (Math.round(chatKb / 102.4) / 10) + ' MB' : chatKb + ' KB';
-        devWorkAttachments.push({
-            name: file.name,
-            type: chatType,
-            size: chatSize,
-            date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-        });
-        renderDevAttachments();
-        /* Django: attachment uploaded via chat is also saved to ticket.attachments in the same POST */
-        showDevToast('File attached.', 'success');
-    }
-
-
-    /* ============================================================
-     * showDevFilePreview(file, source)
-     * Opens the preview modal before committing the attachment.
-     * source: 'attachment' | 'chat'
-     * ============================================================ */
-    function showDevFilePreview(file, source) {
-        devPendingFile       = file;
-        devPendingFileSource = source;
-
-        var modal = document.getElementById('devFilePreviewModal');
-        document.getElementById('devPreviewFileName').textContent = file.name;
-        document.getElementById('devPreviewFileSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
-        document.getElementById('devPreviewFileType').textContent = file.type || 'Unknown type';
-
-        var ext = (file.name.split('.').pop() || '').toLowerCase();
-        var iconClass = 'bx-file';
-        if (ext === 'pdf')                              iconClass = 'bx-file-pdf';
-        else if (['jpg','jpeg','png','gif','webp'].indexOf(ext) !== -1) iconClass = 'bx-image';
-        else if (['doc','docx'].indexOf(ext)  !== -1)  iconClass = 'bx-file-doc';
-        else if (['xls','xlsx'].indexOf(ext)  !== -1)  iconClass = 'bx-spreadsheet';
-        document.getElementById('devPreviewFileIcon').className = 'bx ' + iconClass;
-
-        var imgContainer = document.getElementById('devPreviewImageContainer');
-        var imgEl        = document.getElementById('devPreviewImage');
-        if (['jpg','jpeg','png','gif','webp'].indexOf(ext) !== -1) {
-            var reader = new FileReader();
-            reader.onload = function (e) { imgEl.src = e.target.result; };
-            reader.readAsDataURL(file);
-            imgContainer.style.display = 'block';
-        } else {
-            imgContainer.style.display = 'none';
-            imgEl.src = '';
-        }
-
-        modal.classList.add('show');
-    }
-
-    function cancelDevFilePreview() {
-        devPendingFile       = null;
-        devPendingFileSource = null;
-        document.getElementById('devFilePreviewModal').classList.remove('show');
-        var attachInput = document.getElementById('devAttachInput');
-        var chatFileInput = document.getElementById('devChatFileInput');
-        if (attachInput)  attachInput.value  = '';
-        if (chatFileInput) chatFileInput.value = '';
-    }
-
-    function confirmDevFileAttach() {
-        if (!devPendingFile) return;
-        document.getElementById('devFilePreviewModal').classList.remove('show');
-        if (devPendingFileSource === 'attachment') {
-            processDevAttachment(devPendingFile);
-        } else if (devPendingFileSource === 'chat') {
-            processDevChatAttachment(devPendingFile);
-        }
-        devPendingFile       = null;
-        devPendingFileSource = null;
-    }
-
-
-    /* ============================================================
-     * applyDevChatState()
-     * Disables chat input for Closed and Awaiting Client states.
-     * Called at the end of initPage() after all render functions.
-     * Django: chat disabled state is enforced server-side by
-     *         checking ticket.status before rendering the chat form.
-     * ============================================================ */
-    function applyDevChatState() {
-        var ticketData = DEV_TICKET_DATA[TICKET_ID];
-        var chatInput  = document.getElementById('devChatInput') || document.querySelector('textarea[placeholder*="message"]');
-        var sendBtn    = document.getElementById('devChatSendBtn') || document.querySelector('.dev-chat-send-btn');
-        var chatNote   = document.getElementById('devChatNote');
-
-        var shouldDisable = false;
-        var disableReason = '';
-
-        if (ticketData && ticketData.ticketStatus === 'closed') {
-            shouldDisable = true;
-            disableReason = 'This ticket is closed — chat is disabled.';
-        } else if (ticketData && ticketData.ticketStatus === 'forwarded') {
-            shouldDisable = true;
-            disableReason = 'Chat is paused while the ticket is awaiting client response.';
-        }
-
-        if (shouldDisable) {
-            if (chatInput) {
-                chatInput.disabled = true;
-                chatInput.placeholder = disableReason;
-            }
-            if (sendBtn) {
-                sendBtn.disabled = true;
-                sendBtn.style.opacity = '0.5';
-                sendBtn.style.cursor = 'not-allowed';
-            }
-            if (chatNote) {
-                chatNote.textContent = disableReason;
-                chatNote.style.color = 'var(--tw-danger)';
-            }
-        }
-    }
-
-
-    /* ============================================================
-     * BOOT — run initPage on DOMContentLoaded
-     * ============================================================ */
-    document.addEventListener('DOMContentLoaded', initPage);
 
 </script>
-
-<!-- ==============================================================
-     FILE PREVIEW MODAL — shown before attaching a file.
-     Triggered by showDevFilePreview(); confirmed by confirmDevFileAttach().
-     ============================================================== -->
-<div id="devFilePreviewModal" class="tw-file-preview-modal">
-    <div class="tw-file-preview-modal__box">
-        <h3 class="tw-file-preview-modal__title">Attach File</h3>
-        <p class="tw-file-preview-modal__subtitle">Review before attaching</p>
-        <div class="tw-file-preview-modal__file-card">
-            <i id="devPreviewFileIcon" class="bx bx-file"
-               style="font-size:32px;color:var(--tw-primary);flex-shrink:0;"></i>
-            <div>
-                <div id="devPreviewFileName"
-                     style="font-weight:600;color:var(--tw-text-primary);font-size:var(--tw-text-base);"></div>
-                <div id="devPreviewFileSize"
-                     style="font-size:var(--tw-text-sm);color:var(--tw-text-muted);margin-top:2px;"></div>
-                <div id="devPreviewFileType"
-                     style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:1px;"></div>
-            </div>
-        </div>
-        <div id="devPreviewImageContainer" style="display:none;margin-bottom:16px;">
-            <img id="devPreviewImage" src="" alt="Preview"
-                 style="max-width:100%;max-height:200px;border-radius:var(--tw-radius-md);
-                        border:1px solid var(--tw-border);object-fit:contain;">
-        </div>
-        <div class="tw-file-preview-modal__actions">
-            <button onclick="cancelDevFilePreview()" class="tw-btn tw-btn-outline">Cancel</button>
-            <button onclick="confirmDevFileAttach()" class="tw-btn tw-btn-primary">Attach File</button>
-        </div>
-    </div>
-</div>
-
-</body>
-</html>
-
-<!-- Django: {% endblock %} -->
+{% endblock %}

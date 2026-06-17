@@ -3,6 +3,12 @@
 from django import template
 from django.utils.html import format_html
 
+from tickets.templatetags.shared_ticket_extras import (
+    event_dot_cls as _event_dot_cls,
+    event_icon as _event_icon,
+    event_label as _event_label,
+)
+
 register = template.Library()
 
 # key: (status, sub_status_or_None) -> (client label, CSS modifier)
@@ -34,82 +40,8 @@ def client_ticket_badge(ticket):
     )
 
 
-# ── Timeline event helpers ────────────────────────────────────────────────────
+# ── Timeline event helpers — data lives in shared_ticket_extras ──────────────
 
-EVENT_LABELS = {
-    "assign": "Assigned to Developer",
-    "reassigned": "Reassigned",
-    "reject": "Rejected",
-    "cancel": "Cancelled",
-    "request_info": "Information Requested",
-    "resume": "Work Resumed",
-    "send_to_uat": "Sent for UAT Review",
-    "approve": "Approved by Client",
-    "request_changes": "Changes Requested",
-    "close": "Closed",
-    "reopen": "Reopened",
-    "restore": "Restored to New",
-    "confirm": "Sub-user Confirmed",
-    "submit_for_testing": "Submitted for Testing",
-    "pass": "Testing Passed",
-    "fail": "Testing Failed",
-    "resubmit_for_testing": "Resubmitted for Testing",
-    "mark_ready": "Marked Ready for UAT",
-}
-
-EVENT_DOT_CLS = {
-    "assign": "assigned",
-    "reassigned": "assigned",
-    "reject": "rejected",
-    "cancel": "rejected",
-    "request_info": "info",
-    "resume": "work",
-    "send_to_uat": "uat",
-    "approve": "resolved",
-    "request_changes": "work",
-    "close": "closed",
-    "reopen": "work",
-    "restore": "work",
-    "confirm": "assigned",
-    "submit_for_testing": "work",
-    "pass": "resolved",
-    "fail": "rejected",
-    "resubmit_for_testing": "work",
-    "mark_ready": "uat",
-}
-
-EVENT_ICONS = {
-    "assign": "bx-user-check",
-    "reassigned": "bx-user",
-    "reject": "bx-x-circle",
-    "cancel": "bx-x-circle",
-    "request_info": "bx-info-circle",
-    "resume": "bx-play",
-    "send_to_uat": "bx-check-shield",
-    "approve": "bx-check-circle",
-    "request_changes": "bx-revision",
-    "close": "bx-lock",
-    "reopen": "bx-refresh",
-    "restore": "bx-undo",
-    "confirm": "bx-user-check",
-    "submit_for_testing": "bx-test-tube",
-    "pass": "bx-check",
-    "fail": "bx-x",
-    "resubmit_for_testing": "bx-refresh",
-    "mark_ready": "bx-check-shield",
-}
-
-
-@register.filter
-def event_label(action):
-    return EVENT_LABELS.get(action, action.replace("_", " ").title())
-
-
-@register.filter
-def event_dot_cls(action):
-    return EVENT_DOT_CLS.get(action, "work")
-
-
-@register.filter
-def event_icon(action):
-    return EVENT_ICONS.get(action, "bx-time-five")
+register.filter("event_label", _event_label)
+register.filter("event_dot_cls", _event_dot_cls)
+register.filter("event_icon", _event_icon)

@@ -1,1408 +1,341 @@
-<!--
-  File: templates/developer_portal/dashboard.html
-  Django template: extends 'developer_base.html'
-  Django view:     developer_portal.views.dashboard
-  Django url:      dev:dashboard
-  Role:            Developer — body class="role-developer" (purple theme)
--->
-<!-- Django: {% extends 'developer_base.html' %} -->
-<!-- Django: {% block body_role %}developer{% endblock %} -->
-<!-- Django: {% block page_css %}
+{% extends 'developer_base.html' %}
+{% load static dev_extras %}
+
+{% block title %}My Assigned Tickets — Tweedle{% endblock %}
+
+{% block page_css %}
 <link rel="stylesheet" href="{% static 'css/pages/developer-dashboard.css' %}">
-{% endblock %} -->
-<!-- Django: {% block content %} -->
+<link rel="stylesheet" href="{% static 'css/pages/chat.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/ticket-timeline.css' %}">
+{% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Django: {% block title %}My Assigned Tickets — Tweedle{% endblock %} -->
-    <title>My Assigned Tickets — Tweedle</title>
+{% block content %}
 
-    <!-- Django: {% load static %} -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css">
-    <!-- Django: href="{% static 'images/favicon.svg' %}" -->
-    <link rel="icon" type="image/svg+xml" href="../../static/images/favicon.svg">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-
-    <!-- CSS load order: 1 tokens → 2 theme-developer → 3 base → 4 components → 5 notification → 6 chat → 7 timeline → 8 page -->
-    <!-- Django: href="{% static 'css/tweedle-tokens.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-tokens.css">
-    <!-- Django: href="{% static 'css/themes/theme-developer.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/themes/theme-developer.css">
-    <!-- Django: href="{% static 'css/tweedle-base.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-base.css">
-    <!-- Django: href="{% static 'css/tweedle-components.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/tweedle-components.css">
-    <!-- Django: href="{% static 'css/pages/notification.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/notification.css">
-    <!-- chat.css: .tw-chat-panel slide-in panel classes -->
-    <!-- Django: href="{% static 'css/pages/chat.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/chat.css">
-    <!-- ticket-timeline.css: .tw-timeline-panel slide-in panel classes -->
-    <!-- Django: href="{% static 'css/pages/ticket-timeline.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/ticket-timeline.css">
-    <!-- Django: href="{% static 'css/pages/developer-dashboard.css' %}" -->
-    <link rel="stylesheet" href="../../static/css/pages/developer-dashboard.css">
-</head>
-
-<!--
-    BODY CLASS: role-developer activates purple theme from theme-developer.css.
-    Django: class="role-{% block body_role %}developer{% endblock %}"
--->
-<body class="role-developer">
-
-
-<!-- ==============================================================
-     SIDEBAR — developer portal: My Tickets + Chat
-     ============================================================== -->
-<nav class="sidebar" id="sidebar">
-
-    <!-- Brand -->
-    <!-- Django: href="{% url 'dev:dashboard' %}" -->
-    <div class="sidebar-brand">
-        <!-- Django: src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" -->
-        <img src="../../static/images/tweedle-logo/tweedle-mark-blue.svg"
-             alt="Tweedle"
-             class="sidebar-logo-img">
-        <span class="brand-text">Tweedle</span>
+<!-- =========================================================
+     PAGE HEADER
+     ========================================================= -->
+<div class="dev-page-header">
+    <div>
+        <h1>My Assigned Tickets</h1>
+        <p class="dev-page-subtitle">Tickets currently assigned to you</p>
     </div>
+</div>
 
-    <ul class="sidebar-nav">
 
-        <!-- My Tickets — active on this page -->
-        <!-- Django: href="{% url 'dev:dashboard' %}" -->
-        <li class="nav-item active-item">
-            <a href="dashboard.html" class="nav-link active" title="My Tickets">
-                <i class='bx bx-task'></i>
-                <span class="nav-label">My Tickets</span>
-            </a>
-        </li>
+<!-- =========================================================
+     STAT STRIP — 5 cards
+     ========================================================= -->
+<div class="dev-stat-strip" aria-label="Ticket status summary">
 
-        <!-- Chat -->
-        <!-- Django: href="{% url 'dev:chat' %}" -->
-        <li class="nav-item">
-            <a href="chat.html" class="nav-link" title="Chat">
-                <i class='bx bx-chat'></i>
-                <span class="nav-label">Chat</span>
-            </a>
-        </li>
-
-    </ul>
-
-    <!-- Sidebar bottom user section -->
-    <div class="sidebar-user">
-        <!-- Django: {{ dev_user.initials }} -->
-        <div class="tw-avatar tw-avatar--developer" id="devAvatarSidebar"
-             style="width:36px;height:36px;font-size:13px;flex-shrink:0;">AM</div>
-        <div class="sidebar-user-info">
-            <!-- Django: {{ dev_user.name }} -->
-            <div class="sidebar-user-name" id="devNameSidebar">Arjun Mehta</div>
-            <div class="sidebar-user-role">Developer</div>
+    <div class="dev-stat-card dev-stat-card--active"
+         data-filter="active"
+         role="button" tabindex="0"
+         aria-label="Active tickets: {{ active_count }}"
+         onclick="filterByStatCard('active', this)">
+        <div class="dev-stat-card__icon" aria-hidden="true"><i class="bx bx-task"></i></div>
+        <div>
+            <div class="dev-stat-card__count">{{ active_count }}</div>
+            <div class="dev-stat-card__label">In progress</div>
         </div>
     </div>
 
-</nav>
-<!-- END SIDEBAR -->
+    <div class="dev-stat-card dev-stat-card--forwarded {% if forwarded_count %}has-items{% endif %}"
+         data-filter="awaiting_client"
+         role="button" tabindex="0"
+         aria-label="Awaiting client: {{ forwarded_count }}"
+         onclick="filterByStatCard('awaiting_client', this)">
+        <div class="dev-stat-card__icon" aria-hidden="true"><i class="bx bx-pause-circle"></i></div>
+        <div>
+            <div class="dev-stat-card__count">{{ forwarded_count }}</div>
+            <div class="dev-stat-card__label">Blocked — awaiting response</div>
+        </div>
+    </div>
+
+    <div class="dev-stat-card dev-stat-card--uat-approval"
+         data-filter="uat"
+         role="button" tabindex="0"
+         aria-label="In UAT review: {{ uat_count }}"
+         onclick="filterByStatCard('uat', this)">
+        <div class="dev-stat-card__icon" aria-hidden="true"><i class="bx bx-user-check"></i></div>
+        <div>
+            <div class="dev-stat-card__count">{{ uat_count }}</div>
+            <div class="dev-stat-card__label">Pending client approval</div>
+        </div>
+    </div>
+
+    <div class="dev-stat-card dev-stat-card--overdue {% if overdue_count %}has-items{% endif %}"
+         data-filter="overdue"
+         role="button" tabindex="0"
+         aria-label="Overdue tickets: {{ overdue_count }}"
+         onclick="filterByStatCard('overdue', this)">
+        <div class="dev-stat-card__icon" aria-hidden="true"><i class="bx bx-time-five"></i></div>
+        <div>
+            <div class="dev-stat-card__count">{{ overdue_count }}</div>
+            <div class="dev-stat-card__label">Past due date</div>
+        </div>
+    </div>
+
+    <div class="dev-stat-card dev-stat-card--resolved-month"
+         data-filter="resolved"
+         role="button" tabindex="0"
+         aria-label="Resolved and closed: {{ resolved_closed_count }}"
+         onclick="filterByStatCard('resolved', this)">
+        <div class="dev-stat-card__icon" aria-hidden="true"><i class="bx bx-check-double"></i></div>
+        <div>
+            <div class="dev-stat-card__count">{{ resolved_closed_count }}</div>
+            <div class="dev-stat-card__label">Resolved &amp; Closed</div>
+            <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px">All time history</div>
+        </div>
+    </div>
+
+</div>
+<!-- END STAT STRIP -->
 
 
-<!-- ==============================================================
-     MAIN CONTENT WRAPPER
-     ============================================================== -->
-<section id="content">
+<!-- =========================================================
+     TABLE CARD
+     ========================================================= -->
+<div class="dev-table-card">
 
-    <!-- ==========================================================
-         TOPBAR
-         ========================================================== -->
-    <nav class="topbar">
+    <!-- FILTER BAR -->
+    <div class="dev-filter-bar">
 
-        <i class="bx bx-menu" id="hamburger-btn" role="button" aria-label="Toggle sidebar"></i>
-
-        <!-- Tweedle logo — mobile only -->
-        <div class="topbar-brand-mobile" style="display:none">
-            <!-- Django: src="{% static 'images/tweedle-logo/tweedle-mark-blue.svg' %}" -->
-            <img src="../../static/images/tweedle-logo/tweedle-mark-blue.svg" alt="Tweedle" style="height:28px;">
+        <div class="dev-filter-pills" role="group" aria-label="Filter by stage">
+            <button class="dev-filter-pill active" data-sub-status="all"
+                    onclick="filterByPill('all', this)">All</button>
+            <button class="dev-filter-pill" data-sub-status="development"
+                    onclick="filterByPill('development', this)">Development</button>
+            <button class="dev-filter-pill" data-sub-status="testing"
+                    onclick="filterByPill('testing', this)">Testing</button>
+            <button class="dev-filter-pill" data-sub-status="awaiting_client"
+                    onclick="filterByPill('awaiting_client', this)">Awaiting</button>
+            <button class="dev-filter-pill" data-sub-status="uat"
+                    onclick="filterByPill('uat', this)">UAT Review</button>
+            <button class="dev-filter-pill" data-sub-status="overdue"
+                    onclick="filterByPill('overdue', this)">Overdue</button>
         </div>
 
-        <!-- NOTIFICATION BELL -->
-        <div class="tw-notif-bell-wrap" id="notifBellWrap">
-            <button
-                class="tw-notif-bell-btn"
-                id="notifBellBtn"
-                aria-label="Notifications"
-                aria-expanded="false"
-                aria-controls="notifPanel">
-                <i class="bx bxs-bell" aria-hidden="true"></i>
-                <!-- Django: {% if unread_notification_count %} -->
-                <span class="tw-notif-count-badge" id="notifCount">3</span>
-                <!-- Django: {% endif %} -->
+        <div class="dev-toolbar-right">
+
+            <div class="dev-dropdown-wrap" id="devPriorityWrap">
+                <button class="dev-toolbar-btn" id="devPriorityBtn"
+                        onclick="toggleDevPriorityDropdown(event)"
+                        aria-haspopup="listbox" aria-expanded="false"
+                        aria-controls="devPriorityDropdown">
+                    <i class="bx bx-filter-alt" aria-hidden="true"></i>
+                    <span id="devPriorityLabel">Priority</span>
+                    <i class="bx bx-chevron-down dev-dropdown-arrow" aria-hidden="true"></i>
+                </button>
+                <div class="dev-priority-dropdown" id="devPriorityDropdown"
+                     role="listbox" aria-label="Priority filter options">
+                    <div class="dev-priority-option" role="option" onclick="applyDevPriority('all', this)">All Priorities</div>
+                    <div class="dev-priority-option" role="option" onclick="applyDevPriority('high', this)">
+                        <span class="dev-priority-dot" style="background:var(--tw-priority-high-text)"></span>High
+                    </div>
+                    <div class="dev-priority-option" role="option" onclick="applyDevPriority('medium', this)">
+                        <span class="dev-priority-dot" style="background:var(--tw-priority-medium-text)"></span>Medium
+                    </div>
+                    <div class="dev-priority-option" role="option" onclick="applyDevPriority('low', this)">
+                        <span class="dev-priority-dot" style="background:var(--tw-priority-low-text)"></span>Low
+                    </div>
+                </div>
+            </div>
+
+            <button class="dev-toolbar-icon-btn" id="devSortBtn"
+                    onclick="cycleDevSort()" title="Sort by issue date"
+                    aria-label="Sort tickets by issue date">
+                <i class="bx bx-sort-alt-2" id="devSortIcon"></i>
             </button>
 
-            <div class="tw-notif-panel" id="notifPanel" role="dialog" aria-label="Notifications">
-                <div class="tw-notif-panel-header">
-                    <span class="tw-notif-panel-title">Notifications</span>
-                    <button
-                        class="tw-btn tw-btn-outline tw-btn--sm"
-                        id="markAllReadBtn"
-                        aria-label="Mark all as read">
-                        Mark all read
-                    </button>
-                </div>
-
-                <div class="tw-notif-list">
-                    <!-- Django: {% for notification in notifications %} -->
-
-                    <div class="tw-notif-item unread" role="button" style="cursor:pointer">
-                        <div class="tw-notif-item-body">
-                            <div class="tw-notif-type-icon tw-notif-type-icon--warning">
-                                <i class="bx bx-time-five" aria-hidden="true"></i>
-                            </div>
-                            <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">Ticket overdue — GMEC25010001</div>
-                                <div class="tw-notif-item-msg">Payment gateway timeout on checkout is past its estimated resolution date.</div>
-                                <div class="tw-notif-item-time">1 day ago</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tw-notif-item unread" role="button" style="cursor:pointer">
-                        <div class="tw-notif-item-body">
-                            <div class="tw-notif-type-icon tw-notif-type-icon--info">
-                                <i class="bx bx-info-circle" aria-hidden="true"></i>
-                            </div>
-                            <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">New ticket assigned — BGEX25010013</div>
-                                <div class="tw-notif-item-msg">User role permissions not saving has been assigned to you.</div>
-                                <div class="tw-notif-item-time">2 days ago</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tw-notif-item" role="button" style="cursor:pointer">
-                        <div class="tw-notif-item-body">
-                            <div class="tw-notif-type-icon tw-notif-type-icon--success">
-                                <i class="bx bx-check-circle" aria-hidden="true"></i>
-                            </div>
-                            <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">Admin note added — GMEC25010004</div>
-                                <div class="tw-notif-item-msg">Admin left a note on Invoice generation wrong totals.</div>
-                                <div class="tw-notif-item-time">3 days ago</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Django: {% endfor %} -->
-                </div>
-
-                <div class="tw-notif-panel-footer">
-                    <!-- Django: href="{% url 'dev:notifications' %}" -->
-                    <!-- Django: href="{% url 'dev:notifications' %}" -->
-                    <a href="notifications.html" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
-                </div>
-            </div>
-        </div>
-        <!-- END NOTIFICATION BELL -->
-
-        <!-- PROFILE DROPDOWN -->
-        <div class="tw-profile-wrap" id="profileWrap">
-
-            <!-- Django: {{ dev_user.initials }} -->
-            <div class="tw-avatar tw-avatar--developer"
-                 id="devAvatarTopbar"
-                 role="button"
-                 aria-label="Profile"
-                 style="width:36px;height:36px;font-size:14px;cursor:pointer"
-                 onclick="toggleProfileDropdown(event)">AM</div>
-
-            <div class="tw-profile-panel" id="profilePanel" role="menu" aria-hidden="true">
-                <div class="tw-profile-header">
-                    <!-- Django: {{ dev_user.initials }}, {{ dev_user.name }}, {{ dev_user.email }} -->
-                    <div class="tw-avatar tw-avatar--developer"
-                         style="width:40px;height:40px;font-size:15px;flex-shrink:0"
-                         id="devAvatarPanel">AM</div>
-                    <div>
-                        <div style="font-size:var(--tw-text-base);font-weight:600;color:var(--tw-text-primary);line-height:1.3"
-                             id="devNamePanel">Arjun Mehta</div>
-                        <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px"
-                             id="devEmailPanel">arjun.mehta@tweedle.io</div>
-                        <span class="tw-role-pill tw-role-pill--developer" style="margin-top:4px;display:inline-block">Developer</span>
-                    </div>
-                </div>
-
-                <div class="tw-profile-divider"></div>
-
-                <!-- Django: href="{% url 'dev:profile' %}" -->
-                <div class="tw-profile-menu-item" role="menuitem"
-                     onclick="closeProfileDropdown(); window.location.href='profile.html'">
-                    <i class="bx bx-user" aria-hidden="true"></i>
-                    <span>View Profile</span>
-                </div>
-                <!-- Django: href="{% url 'dev:settings' %}" -->
-                <div class="tw-profile-menu-item" role="menuitem"
-                     onclick="closeProfileDropdown(); showDevToast('Password settings coming soon.', 'info')">
-                    <i class="bx bx-lock-alt" aria-hidden="true"></i>
-                    <span>Change Password</span>
-                </div>
-
-                <div class="tw-profile-divider"></div>
-
-                <!-- Django: window.location.href="{% url 'logout' %}" -->
-                <div class="tw-profile-menu-item tw-profile-menu-item--danger" role="menuitem"
-                     onclick="window.location.href = '../login.html'">
-                    <i class="bx bx-log-out" aria-hidden="true"></i>
-                    <span>Sign Out</span>
-                </div>
-            </div>
-
-        </div>
-        <!-- END PROFILE DROPDOWN -->
-
-    </nav>
-    <!-- END TOPBAR -->
-
-
-    <!-- ==========================================================
-         MAIN PAGE CONTENT
-         ========================================================== -->
-    <main id="main-content">
-
-        <!-- =========================================================
-             PAGE HEADER
-             ========================================================= -->
-        <div class="dev-page-header">
-            <div>
-                <h1>My Assigned Tickets</h1>
-                <p class="dev-page-subtitle">Tickets currently assigned to you</p>
-            </div>
-        </div>
-        <!-- END PAGE HEADER -->
-
-
-        <!-- =========================================================
-             STAT STRIP — 5 cards
-             Django: {{ active_count }}, {{ forwarded_count }}, {{ uat_count }},
-                     {{ overdue_count }}, {{ resolved_month_count }}
-             ========================================================= -->
-        <div class="dev-stat-strip" aria-label="Ticket status summary">
-
-            <!-- Card 1: Active — purple tint -->
-            <div class="dev-stat-card dev-stat-card--active"
-                 data-filter="active"
-                 role="button" tabindex="0"
-                 aria-label="Active tickets: 7"
-                 onclick="filterByStatCard('active', this)">
-                <div class="dev-stat-card__icon" aria-hidden="true">
-                    <i class='bx bx-task'></i>
-                </div>
-                <div>
-                    <!-- Django: active_count = tickets.filter(assigned_to=request.user).exclude(status__in=['resolved','closed']).count() -->
-                    <div class="dev-stat-card__count">7</div>
-                    <div class="dev-stat-card__label">In progress</div>
-                </div>
-            </div>
-
-            <!-- Card 2: Awaiting Client — amber tint, pulsing border -->
-            <div class="dev-stat-card dev-stat-card--forwarded has-items"
-                 data-filter="forwarded"
-                 role="button" tabindex="0"
-                 aria-label="Awaiting client: 1"
-                 onclick="filterByStatCard('forwarded', this)">
-                <div class="dev-stat-card__icon" aria-hidden="true">
-                    <i class='bx bx-pause-circle'></i>
-                </div>
-                <div>
-                    <!-- Django: {{ forwarded_count }} -->
-                    <div class="dev-stat-card__count">1</div>
-                    <div class="dev-stat-card__label">Blocked — awaiting response</div>
-                </div>
-            </div>
-
-            <!-- Card 3: In UAT Review — purple light tint -->
-            <div class="dev-stat-card dev-stat-card--uat-approval"
-                 data-filter="uat"
-                 role="button" tabindex="0"
-                 aria-label="In UAT review: 1"
-                 onclick="filterByStatCard('uat', this)">
-                <div class="dev-stat-card__icon" aria-hidden="true">
-                    <i class='bx bx-user-check'></i>
-                </div>
-                <div>
-                    <!-- Django: {{ uat_count }} -->
-                    <div class="dev-stat-card__count">1</div>
-                    <div class="dev-stat-card__label">Pending client approval</div>
-                </div>
-            </div>
-
-            <!-- Card 4: Overdue — danger red, pulsing border -->
-            <div class="dev-stat-card dev-stat-card--overdue has-items"
-                 data-filter="overdue"
-                 role="button" tabindex="0"
-                 aria-label="Overdue tickets: 3"
-                 onclick="filterByStatCard('overdue', this)">
-                <div class="dev-stat-card__icon" aria-hidden="true">
-                    <i class='bx bx-time-five'></i>
-                </div>
-                <div>
-                    <!-- Django: {{ overdue_count }} -->
-                    <div class="dev-stat-card__count">3</div>
-                    <div class="dev-stat-card__label">Past due date</div>
-                </div>
-            </div>
-
-            <!-- Card 5: Resolved & Closed — green -->
-            <div class="dev-stat-card dev-stat-card--resolved-month"
-                 data-filter="resolved"
-                 role="button" tabindex="0"
-                 aria-label="Resolved and closed: 10"
-                 onclick="filterByStatCard('resolved', this)">
-                <div class="dev-stat-card__icon" aria-hidden="true">
-                    <i class='bx bx-check-double'></i>
-                </div>
-                <div>
-                    <!-- Django: {{ resolved_closed_count }} -->
-                    <div class="dev-stat-card__count">10</div>
-                    <div class="dev-stat-card__label">Resolved & Closed</div>
-                    <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px;">All time history</div>
-                </div>
-            </div>
-
-        </div>
-        <!-- END STAT STRIP -->
-
-
-        <!-- =========================================================
-             TABLE CARD
-             ========================================================= -->
-        <div class="dev-table-card">
-
-            <!-- =====================================================
-                 FILTER BAR
-                 Left: sub-status pills
-                 Right: Priority dropdown | Search | Sort
-                 ===================================================== -->
-            <div class="dev-filter-bar">
-
-                <!-- Django: To pre-select a filter from server side, pass substatus_filter and priority_filter
-                     from the view via context, then render each pill/option with:
-                     class="dev-filter-pill {% if request.GET.substatus == 'development' %}active{% endif %}"
-                     and for the priority dropdown:
-                     <option value="high" {% if request.GET.priority == 'high' %}selected{% endif %}>High</option>
-                     View should read: substatus_filter = request.GET.get('substatus', 'all') -->
-                <!-- Sub-status filter pills -->
-                <div class="dev-filter-pills" role="group" aria-label="Filter by stage">
-                    <button class="dev-filter-pill active" data-sub-status="all"
-                            onclick="filterByPill('all', this)">All</button>
-                    <button class="dev-filter-pill" data-sub-status="development"
-                            onclick="filterByPill('development', this)">Development</button>
-                    <button class="dev-filter-pill" data-sub-status="testing"
-                            onclick="filterByPill('testing', this)">Testing</button>
-                    <button class="dev-filter-pill" data-sub-status="uat"
-                            onclick="filterByPill('uat', this)">UAT Stage</button>
-                    <button class="dev-filter-pill" data-sub-status="forwarded"
-                            onclick="filterByPill('forwarded', this)">Awaiting</button>
-                    <button class="dev-filter-pill" data-sub-status="uat"
-                            onclick="filterByPill('uat', this)">UAT Review</button>
-                    <button class="dev-filter-pill" data-sub-status="overdue"
-                            onclick="filterByPill('overdue', this)">Overdue</button>
-                </div>
-
-                <!-- Right cluster: Priority | Sort | Search -->
-                <div class="dev-toolbar-right">
-
-                    <!-- Django: priority_filter = request.GET.get('priority', 'all') passed from view context -->
-                    <!-- Priority dropdown -->
-                    <div class="dev-dropdown-wrap" id="devPriorityWrap">
-                        <button
-                            class="dev-toolbar-btn"
-                            id="devPriorityBtn"
-                            onclick="toggleDevPriorityDropdown(event)"
-                            aria-haspopup="listbox"
-                            aria-expanded="false"
-                            aria-controls="devPriorityDropdown">
-                            <i class="bx bx-filter-alt" aria-hidden="true"></i>
-                            <span id="devPriorityLabel">Priority</span>
-                            <i class="bx bx-chevron-down dev-dropdown-arrow" aria-hidden="true"></i>
-                        </button>
-                        <div class="dev-priority-dropdown" id="devPriorityDropdown"
-                             role="listbox" aria-label="Priority filter options">
-                            <!-- Django: {% for priority in priority_choices %} -->
-                            <div class="dev-priority-option" role="option"
-                                 onclick="applyDevPriority('all', this)">
-                                All Priorities
-                            </div>
-                            <div class="dev-priority-option" role="option"
-                                 onclick="applyDevPriority('high', this)">
-                                <span class="dev-priority-dot"
-                                      style="background:var(--tw-priority-high-text)"></span>
-                                High
-                            </div>
-                            <div class="dev-priority-option" role="option"
-                                 onclick="applyDevPriority('medium', this)">
-                                <span class="dev-priority-dot"
-                                      style="background:var(--tw-priority-medium-text)"></span>
-                                Medium
-                            </div>
-                            <div class="dev-priority-option" role="option"
-                                 onclick="applyDevPriority('low', this)">
-                                <span class="dev-priority-dot"
-                                      style="background:var(--tw-priority-low-text)"></span>
-                                Low
-                            </div>
-                            <!-- Django: {% endfor %} -->
-                        </div>
-                    </div>
-
-                    <!-- Sort toggle -->
-                    <button
-                        class="dev-toolbar-icon-btn"
-                        id="devSortBtn"
-                        onclick="cycleDevSort()"
-                        title="Sort by issue date"
-                        aria-label="Sort tickets by issue date">
-                        <i class="bx bx-sort-alt-2" id="devSortIcon"></i>
-                    </button>
-
-                    <!-- Search input -->
-                    <div class="dev-search-wrap">
-                        <i class="bx bx-search dev-search-icon" aria-hidden="true"></i>
-                        <input
-                            type="text"
-                            id="devSearchInput"
-                            class="dev-search-input"
-                            placeholder="Search by ticket ID or subject…"
-                            aria-label="Search tickets"
-                            oninput="devFilters.search = this.value.toLowerCase().trim(); applyDevFilters()">
-                    </div>
-
-                </div>
-                <!-- END TOOLBAR RIGHT -->
-
-            </div>
-            <!-- END FILTER BAR -->
-
-
-            <!-- =====================================================
-                 TICKET TABLE
-                 Columns: Ticket ID | Subject | Client | Issue Date |
-                          Est. Resolution | Priority | Stage | Actions
-                 Django: {% for ticket in assigned_tickets %}
-                 ===================================================== -->
-            <div class="table-scroll-wrapper">
-                <table class="tw-table" aria-label="My assigned tickets">
-                    <thead>
-                        <tr>
-                            <th>Ticket ID</th>
-                            <th>Subject</th>
-                            <th>Client</th>
-                            <th>Issue Date</th>
-                            <th>Est. Resolution</th>
-                            <th>Priority</th>
-                            <th>Stage</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="devTableBody">
-
-                        <!-- Django: {% for ticket in assigned_tickets %} -->
-
-                        <!--
-                            Row 1: GMEC25010001 | Wallet Option Agents | GMEC
-                            High | Testing | OVERDUE (15 May 2025)
-                        -->
-                        <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
-                        <tr data-sub-status="testing"
-                            data-priority="high"
-                            data-overdue="true"
-                            data-id="GMEC25010001"
-                            data-subject="wallet option agents"
-                            data-issue-date="2021-09-11"
-                            style="cursor:pointer"
-                            data-status="in_progress"
-                            onclick="window.location.href='ticket-detail.html?id=GMEC25010001&amp;substatus=testing'"
-                            aria-label="View ticket GMEC25010001">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <!-- Django: {{ ticket.id }} -->
-                                    <span class="tw-ticket-id">GMEC25010001</span>
-                                    <span class="tw-overdue-badge" aria-label="Overdue">Overdue</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div title="Wallet Option Agents">
-                                    Wallet Option Agents
-                                </div>
-                                <!-- Attachment chip -->
-                                <div class="dev-row-attachment">
-                                    <i class="bx bxs-file-pdf attach-icon pdf" aria-hidden="true"></i>
-                                    <span class="attach-name">wallet_specs.pdf</span>
-                                </div>
-                            </td>
-                            <td>GMEC</td>
-                            <td>11 Sep 2021</td>
-                            <!-- Red date if overdue -->
-                            <td style="color:var(--tw-danger);font-weight:600">15 May 2025</td>
-                            <td>
-                                <span class="tw-priority-badge tw-priority-badge--high">High</span>
-                            </td>
-                            <td>
-                                <span class="tw-status-badge tw-status-badge--testing">Testing</span>
-                            </td>
-                            <td>
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openDevTimelinePanel('GMEC25010001', 'Wallet Option Agents')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openDevChatPanel('GMEC25010001', 'Wallet Option Agents')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!--
-                            Row 2: GMEC25010004 | Kumari API Integration | GMEC
-                            Medium | Development | OVERDUE (20 May 2025)
-                        -->
-                        <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
-                        <tr data-sub-status="development"
-                            data-priority="medium"
-                            data-overdue="true"
-                            data-id="GMEC25010004"
-                            data-subject="kumari api integration"
-                            data-issue-date="2022-01-08"
-                            style="cursor:pointer"
-                            data-status="in_progress"
-                            onclick="window.location.href='ticket-detail.html?id=GMEC25010004&amp;substatus=development'"
-                            aria-label="View ticket GMEC25010004">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <!-- Django: {{ ticket.id }} -->
-                                    <span class="tw-ticket-id">GMEC25010004</span>
-                                    <span class="tw-overdue-badge" aria-label="Overdue">Overdue</span>
-                                </div>
-                            </td>
-                            <td>Kumari API Integration</td>
-                            <td>GMEC</td>
-                            <td>08 Jan 2022</td>
-                            <td style="color:var(--tw-danger);font-weight:600">20 May 2025</td>
-                            <td>
-                                <span class="tw-priority-badge tw-priority-badge--medium">Medium</span>
-                            </td>
-                            <td>
-                                <span class="tw-status-badge tw-status-badge--development">Development</span>
-                            </td>
-                            <td>
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openDevTimelinePanel('GMEC25010004', 'Kumari API Integration')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openDevChatPanel('GMEC25010004', 'Kumari API Integration')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!--
-                            Row 3: BGEX25010013 | User role permissions not saving | BGEX
-                            Medium | UAT | not overdue
-                        -->
-                        <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
-                        <tr data-sub-status="uat"
-                            data-priority="medium"
-                            data-overdue="false"
-                            data-id="BGEX25010013"
-                            data-subject="user role permissions not saving"
-                            data-issue-date="2025-05-05"
-                            style="cursor:pointer"
-                            data-status="in_progress"
-                            onclick="window.location.href='ticket-detail.html?id=BGEX25010013&amp;substatus=uat'"
-                            aria-label="View ticket BGEX25010013">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <!-- Django: {{ ticket.id }} -->
-                                    <span class="tw-ticket-id">BGEX25010013</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div title="User role permissions not saving">
-                                    User role permissions not saving
-                                </div>
-                                <div class="dev-row-attachment">
-                                    <i class="bx bxs-file-pdf attach-icon pdf" aria-hidden="true"></i>
-                                    <span class="attach-name">access_issue_log.pdf</span>
-                                </div>
-                            </td>
-                            <td>BGEX</td>
-                            <td>05 May 2025</td>
-                            <td>30 May 2025</td>
-                            <td>
-                                <span class="tw-priority-badge tw-priority-badge--medium">Medium</span>
-                            </td>
-                            <td>
-                                <span class="tw-status-badge tw-status-badge--uat">UAT</span>
-                            </td>
-                            <td>
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openDevTimelinePanel('BGEX25010013', 'User role permissions not saving')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openDevChatPanel('BGEX25010013', 'User role permissions not saving')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!--
-                            Row 4: GMEC25010010 | Payment gateway timeout on checkout | GMEC
-                            High | Development | not overdue
-                        -->
-                        <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
-                        <tr data-sub-status="development"
-                            data-priority="high"
-                            data-overdue="false"
-                            data-id="GMEC25010010"
-                            data-subject="payment gateway timeout on checkout"
-                            data-issue-date="2025-04-14"
-                            style="cursor:pointer"
-                            data-status="in_progress"
-                            onclick="window.location.href='ticket-detail.html?id=GMEC25010010&amp;substatus=development'"
-                            aria-label="View ticket GMEC25010010">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <!-- Django: {{ ticket.id }} -->
-                                    <span class="tw-ticket-id">GMEC25010010</span>
-                                </div>
-                            </td>
-                            <td>Payment gateway timeout on checkout</td>
-                            <td>GMEC</td>
-                            <td>14 Apr 2025</td>
-                            <td>25 May 2025</td>
-                            <td>
-                                <span class="tw-priority-badge tw-priority-badge--high">High</span>
-                            </td>
-                            <td>
-                                <span class="tw-status-badge tw-status-badge--development">Development</span>
-                            </td>
-                            <td>
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openDevTimelinePanel('GMEC25010010', 'Payment gateway timeout on checkout')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openDevChatPanel('GMEC25010010', 'Payment gateway timeout on checkout')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!--
-                            Row 5: BGEX25020003 | Mobile App Crash on Login | BGEX
-                            Low | Testing | not overdue
-                        -->
-                        <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
-                        <tr data-sub-status="testing"
-                            data-priority="low"
-                            data-overdue="false"
-                            data-id="BGEX25020003"
-                            data-subject="mobile app crash on login"
-                            data-issue-date="2025-02-21"
-                            style="cursor:pointer"
-                            data-status="in_progress"
-                            onclick="window.location.href='ticket-detail.html?id=BGEX25020003&amp;substatus=testing'"
-                            aria-label="View ticket BGEX25020003">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <!-- Django: {{ ticket.id }} -->
-                                    <span class="tw-ticket-id">BGEX25020003</span>
-                                </div>
-                            </td>
-                            <td>Mobile App Crash on Login</td>
-                            <td>BGEX</td>
-                            <td>21 Feb 2025</td>
-                            <td>28 May 2025</td>
-                            <td>
-                                <span class="tw-priority-badge tw-priority-badge--low">Low</span>
-                            </td>
-                            <td>
-                                <span class="tw-status-badge tw-status-badge--testing">Testing</span>
-                            </td>
-                            <td>
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openDevTimelinePanel('BGEX25020003', 'Mobile App Crash on Login')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openDevChatPanel('BGEX25020003', 'Mobile App Crash on Login')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!--
-                            Row 6: GMEC25010012 | Invoice generation incorrect totals | GMEC
-                            High | Development | not overdue
-                        -->
-                        <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
-                        <tr data-sub-status="development"
-                            data-priority="high"
-                            data-overdue="false"
-                            data-id="GMEC25010012"
-                            data-subject="invoice generation incorrect totals"
-                            data-issue-date="2025-05-02"
-                            style="cursor:pointer"
-                            data-status="in_progress"
-                            onclick="window.location.href='ticket-detail.html?id=GMEC25010012&amp;substatus=development'"
-                            aria-label="View ticket GMEC25010012">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <!-- Django: {{ ticket.id }} -->
-                                    <span class="tw-ticket-id">GMEC25010012</span>
-                                </div>
-                            </td>
-                            <td>Invoice generation incorrect totals</td>
-                            <td>GMEC</td>
-                            <td>02 May 2025</td>
-                            <td>10 Jun 2025</td>
-                            <td>
-                                <span class="tw-priority-badge tw-priority-badge--high">High</span>
-                            </td>
-                            <td>
-                                <span class="tw-status-badge tw-status-badge--development">Development</span>
-                            </td>
-                            <td>
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="event.stopPropagation(); openDevTimelinePanel('GMEC25010012', 'Invoice generation incorrect totals')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="event.stopPropagation(); openDevChatPanel('GMEC25010012', 'Invoice generation incorrect totals')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!--
-                            Row 7: GMEC25010007 | Email notification delay | GMEC
-                            Medium | Awaiting Client | OVERDUE (22 May 2025)
-                        -->
-                        <!-- Django: {% if ticket.status == 'forwarded' %} render this row variant {% endif %} -->
-                        <!-- Django: onclick="window.location.href='{% url 'dev:ticket_detail' ticket.id %}'" -->
-                        <tr data-sub-status="forwarded"
-                            data-status="forwarded"
-                            data-priority="medium"
-                            data-overdue="true"
-                            data-id="GMEC25010007"
-                            data-subject="email notification delay on ticket updates"
-                            data-issue-date="2025-05-05"
-                            style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html?id=GMEC25010007&amp;substatus=development&amp;status=forwarded'"
-                            aria-label="View ticket GMEC25010007">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <!-- Django: {{ ticket.id }} -->
-                                    <span class="tw-ticket-id">GMEC25010007</span>
-                                    <span class="tw-overdue-badge" aria-label="Overdue">Overdue</span>
-                                </div>
-                            </td>
-                            <td>Email notification delay on ticket updates</td>
-                            <td>GMEC</td>
-                            <td>05 May 2025</td>
-                            <td style="color:var(--tw-danger);font-weight:500;">22 May 2025</td>
-                            <td>
-                                <span class="tw-priority-badge tw-priority-badge--medium">Medium</span>
-                            </td>
-                            <td>
-                                <span class="dev-stage-badge--awaiting">
-                                    Awaiting Client
-                                </span>
-                            </td>
-                            <td onclick="event.stopPropagation()">
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="openDevTimelinePanel('GMEC25010007', 'Email notification delay on ticket updates')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="openDevChatPanel('GMEC25010007', 'Email notification delay on ticket updates')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!--
-                            Row 8: GMEC25010003 | Payment confirmation email not sending | GMEC
-                            High | Resolved
-                        -->
-                        <!-- Django: resolved ticket row -->
-                        <tr data-sub-status="resolved"
-                            data-status="resolved"
-                            data-priority="high"
-                            data-overdue="false"
-                            data-id="GMEC25010003"
-                            data-subject="payment confirmation email not sending"
-                            data-issue-date="2025-04-01"
-                            style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html?id=GMEC25010003&amp;status=resolved'"
-                            aria-label="View ticket GMEC25010003">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <span class="tw-ticket-id">GMEC25010003</span>
-                                </div>
-                            </td>
-                            <td>Payment confirmation email not sending</td>
-                            <td>GMEC</td>
-                            <td>01 Apr 2025</td>
-                            <td>18 Apr 2025</td>
-                            <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
-                            <td>
-                                <span class="tw-status-badge tw-status-badge--closed" style="font-size:11px;">Resolved</span>
-                            </td>
-                            <td onclick="event.stopPropagation()">
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="openDevTimelinePanel('GMEC25010003', 'Payment confirmation email not sending')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="openDevChatPanel('GMEC25010003', 'Payment confirmation email not sending')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!--
-                            Row 9: BGEX25010009 | Report export timeout on large datasets | BGEX
-                            Medium | Resolved
-                        -->
-                        <!-- Django: resolved ticket row -->
-                        <tr data-sub-status="resolved"
-                            data-status="resolved"
-                            data-priority="medium"
-                            data-overdue="false"
-                            data-id="BGEX25010009"
-                            data-subject="report export timeout on large datasets"
-                            data-issue-date="2025-03-15"
-                            style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html?id=BGEX25010009&amp;status=resolved'"
-                            aria-label="View ticket BGEX25010009">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <span class="tw-ticket-id">BGEX25010009</span>
-                                </div>
-                            </td>
-                            <td>Report export timeout on large datasets</td>
-                            <td>BGEX</td>
-                            <td>15 Mar 2025</td>
-                            <td>02 Apr 2025</td>
-                            <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
-                            <td>
-                                <span class="tw-status-badge tw-status-badge--closed" style="font-size:11px;">Resolved</span>
-                            </td>
-                            <td onclick="event.stopPropagation()">
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="openDevTimelinePanel('BGEX25010009', 'Report export timeout on large datasets')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="openDevChatPanel('BGEX25010009', 'Report export timeout on large datasets')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!--
-                            Row 10: BGEX25010008 | Two-factor authentication not triggering | BGEX
-                            High | UAT Review | OVERDUE (28 Apr 2025)
-                        -->
-                        <!-- Django: uat ticket row -->
-                        <tr data-sub-status="uat"
-                            data-status="uat"
-                            data-priority="high"
-                            data-overdue="true"
-                            data-id="BGEX25010008"
-                            data-subject="two-factor authentication not triggering on login"
-                            data-issue-date="2025-04-12"
-                            style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html?id=BGEX25010008&amp;substatus=uat&amp;status=uat'"
-                            aria-label="View ticket BGEX25010008">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <span class="tw-ticket-id">BGEX25010008</span>
-                                    <span class="tw-overdue-badge" aria-label="Overdue">Overdue</span>
-                                </div>
-                            </td>
-                            <td>Two-factor authentication not triggering on login</td>
-                            <td>BGEX</td>
-                            <td>12 Apr 2025</td>
-                            <td style="color:var(--tw-danger);font-weight:500;">28 Apr 2025</td>
-                            <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
-                            <td>
-                                <span class="tw-substatus-badge"
-                                      style="display:inline-flex;align-items:center;padding:3px 10px;
-                                             border-radius:var(--tw-radius-pill);font-size:var(--tw-text-xs);
-                                             font-weight:500;background:var(--tw-primary-light);
-                                             color:var(--tw-primary);border:1px solid var(--tw-primary);">
-                                    UAT Review
-                                </span>
-                            </td>
-                            <td onclick="event.stopPropagation()">
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="openDevTimelinePanel('BGEX25010008', 'Two-factor authentication not triggering on login')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="openDevChatPanel('BGEX25010008', 'Two-factor authentication not triggering on login')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!--
-                            Row 11: GMEC25010005 | Session timeout too aggressive | GMEC
-                            Low | Closed (28 Mar 2025)
-                        -->
-                        <!-- Django: closed ticket row -->
-                        <tr data-sub-status="closed"
-                            data-status="closed"
-                            data-priority="low"
-                            data-overdue="false"
-                            data-id="GMEC25010005"
-                            data-subject="session timeout too aggressive on dashboard"
-                            data-issue-date="2025-03-01"
-                            style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html?id=GMEC25010005&amp;status=closed'"
-                            aria-label="View ticket GMEC25010005">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <span class="tw-ticket-id">GMEC25010005</span>
-                                </div>
-                            </td>
-                            <td>Session timeout too aggressive on dashboard</td>
-                            <td>GMEC</td>
-                            <td>01 Mar 2025</td>
-                            <td>28 Mar 2025</td>
-                            <td><span class="tw-priority-badge tw-priority-badge--low">Low</span></td>
-                            <td>
-                                <span class="tw-substatus-badge"
-                                      style="display:inline-flex;align-items:center;padding:3px 10px;
-                                             border-radius:var(--tw-radius-pill);font-size:var(--tw-text-xs);
-                                             font-weight:500;background:var(--tw-bg-body);color:var(--tw-text-muted);
-                                             border:1px solid var(--tw-border);">
-                                    Closed
-                                </span>
-                            </td>
-                            <td onclick="event.stopPropagation()">
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="openDevTimelinePanel('GMEC25010005', 'Session timeout too aggressive on dashboard')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="openDevChatPanel('GMEC25010005', 'Session timeout too aggressive on dashboard')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!--
-                            Row 12: BGEX25010006 | Login page not redirecting after password reset | BGEX
-                            Medium | Closed (01 Mar 2025)
-                        -->
-                        <!-- Django: closed ticket row -->
-                        <tr data-sub-status="closed"
-                            data-status="closed"
-                            data-priority="medium"
-                            data-overdue="false"
-                            data-id="BGEX25010006"
-                            data-subject="login page not redirecting after password reset"
-                            data-issue-date="2025-02-10"
-                            style="cursor:pointer"
-                            onclick="window.location.href='ticket-detail.html?id=BGEX25010006&amp;status=closed'"
-                            aria-label="View ticket BGEX25010006">
-                            <td>
-                                <div class="ticket-id-cell">
-                                    <i class="bx bxs-star tw-star-icon"
-                                       onclick="event.stopPropagation(); this.classList.toggle('active')"
-                                       role="button" tabindex="0"
-                                       aria-label="Star this ticket"></i>
-                                    <span class="tw-ticket-id">BGEX25010006</span>
-                                </div>
-                            </td>
-                            <td>Login page not redirecting after password reset</td>
-                            <td>BGEX</td>
-                            <td>10 Feb 2025</td>
-                            <td>01 Mar 2025</td>
-                            <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
-                            <td>
-                                <span class="tw-substatus-badge"
-                                      style="display:inline-flex;align-items:center;padding:3px 10px;
-                                             border-radius:var(--tw-radius-pill);font-size:var(--tw-text-xs);
-                                             font-weight:500;background:var(--tw-bg-body);color:var(--tw-text-muted);
-                                             border:1px solid var(--tw-border);">
-                                    Closed
-                                </span>
-                            </td>
-                            <td onclick="event.stopPropagation()">
-                                <div class="tw-row-actions">
-                                    <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
-                                       onclick="openDevTimelinePanel('BGEX25010006', 'Login page not redirecting after password reset')"
-                                       role="button" tabindex="0"
-                                       aria-label="View timeline"></i>
-                                    <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
-                                       onclick="openDevChatPanel('BGEX25010006', 'Login page not redirecting after password reset')"
-                                       role="button" tabindex="0"
-                                       aria-label="Open chat"></i>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Empty state — shown by JS when no rows match the active filter -->
-                        <!-- Django: {% empty %} -->
-                        <tr id="devEmptyState" style="display:none;">
-                            <td colspan="8">
-                                <div class="dev-empty-state">
-                                    <i class='bx bx-task' aria-hidden="true"></i>
-                                    <p id="devEmptyMsg">No tickets currently assigned to you.</p>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Django: {% endfor %} -->
-
-                    </tbody>
-                </table>
-            </div>
-            <!-- END TABLE -->
-
-        </div>
-        <!-- END TABLE CARD -->
-
-    </main>
-    <!-- END MAIN -->
-
-
-    <!-- ==============================================================
-         DEVELOPER CHAT PANEL
-         Single shared instance — header updated by openDevChatPanel().
-         Reuses .tw-chat-panel CSS from chat.css.
-         Admin messages: grey bubble (received). Dev messages: purple (sent).
-         Django: {{ ticket.messages.all }} populates messages area.
-         ============================================================== -->
-    <div class="tw-chat-panel" id="devChatPanel"
-         role="dialog" aria-modal="false" aria-label="Ticket chat">
-
-        <div class="tw-chat-header">
-            <div class="chat-header-info">
-                <!-- Updated by openDevChatPanel(ticketId, subject) -->
-                <div class="chat-ticket-id" id="devChatTicketId">Ticket ID: —</div>
-                <div class="chat-ticket-subject" id="devChatSubject">—</div>
-            </div>
-            <button class="chat-close-btn" onclick="closeDevChatPanel()" aria-label="Close chat">
-                <i class="bx bx-x" aria-hidden="true"></i>
-            </button>
-        </div>
-
-        <div class="tw-messages-area" id="devMessagesArea">
-
-            <!-- System event -->
-            <div class="tw-chat-status-msg">
-                Ticket assigned to you
-                <span class="tw-chat-status-time">• 16 Apr 2025</span>
-            </div>
-
-            <!-- Admin message (received = left-aligned, grey bubble) -->
-            <div class="tw-message received">
-                <div class="tw-avatar tw-avatar--sm tw-avatar--admin" aria-hidden="true">S</div>
-                <div>
-                    <div class="tw-message-sender">
-                        Support Admin
-                        <span class="tw-role-pill tw-role-pill--admin">Admin</span>
-                    </div>
-                    <div class="tw-message-bubble">
-                        <div class="tw-message-text">Hi Arjun, this ticket has been assigned to you. Please investigate and update the stage as you progress.</div>
-                        <div class="tw-message-time">16 Apr 2025 at 11:30 AM</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Developer message (sent = right-aligned, purple bubble via --tw-primary) -->
-            <div class="tw-message sent">
-                <div class="tw-avatar tw-avatar--sm tw-avatar--developer" aria-hidden="true">AM</div>
-                <div>
-                    <div class="tw-message-sender">
-                        You
-                        <span class="tw-role-pill tw-role-pill--developer">Developer</span>
-                    </div>
-                    <div class="tw-message-bubble">
-                        <div class="tw-message-text">Understood, I'll start investigating right away and update the stage shortly.</div>
-                        <div class="tw-message-time">16 Apr 2025 at 11:45 AM</div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="tw-chat-footer">
-
-            <div class="tw-attach-preview-strip" id="devPanelAttachStrip" aria-live="polite">
-                <i class="bx bx-file" aria-hidden="true"></i>
-                <span id="devPanelAttachFileName"></span>
-                <button class="tw-file-chip-remove" onclick="removeDevPanelAttachment()" aria-label="Remove attachment">
-                    <i class="bx bx-x" aria-hidden="true"></i>
-                </button>
-            </div>
-
-            <div class="tw-chat-input-row">
-                <input type="file" id="devPanelChatFile" style="display:none;" accept="*/*">
-                <button class="tw-chat-attach-btn" onclick="document.getElementById('devPanelChatFile').click()" aria-label="Attach file">
-                    <i class="bx bx-paperclip" aria-hidden="true"></i>
-                </button>
-                <textarea
-                    class="tw-chat-textarea"
-                    id="devChatTextarea"
-                    placeholder="Type your message…"
-                    rows="1"
-                    aria-label="Message input"
-                    oninput="this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
-                <button class="tw-chat-send-btn" onclick="sendDevMessage()" aria-label="Send message">
-                    <i class="bx bx-send" aria-hidden="true"></i>
-                </button>
+            <div class="dev-search-wrap">
+                <i class="bx bx-search dev-search-icon" aria-hidden="true"></i>
+                <input type="text" id="devSearchInput" class="dev-search-input"
+                       placeholder="Search by ticket ID or subject…"
+                       aria-label="Search tickets"
+                       oninput="devFilters.search = this.value.toLowerCase().trim(); applyDevFilters()">
             </div>
 
         </div>
 
     </div>
-    <!-- END DEV CHAT PANEL -->
+    <!-- END FILTER BAR -->
 
 
-    <!-- ==============================================================
-         DEVELOPER TIMELINE PANEL
-         Single shared instance — header updated by openDevTimelinePanel().
-         Reuses .tw-timeline-panel CSS from ticket-timeline.css.
-         Django: {{ ticket.events.all }} populates entries.
-         ============================================================== -->
-    <div class="tw-timeline-panel" id="devTimelinePanel"
-         role="dialog" aria-modal="false" aria-label="Ticket timeline">
+    <!-- TICKET TABLE -->
+    <div class="table-scroll-wrapper">
+        <table class="tw-table" aria-label="My assigned tickets">
+            <thead>
+                <tr>
+                    <th>Ticket ID</th>
+                    <th>Subject</th>
+                    <th>Client</th>
+                    <th>Issue Date</th>
+                    <th>Priority</th>
+                    <th>Stage</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="devTableBody">
 
-        <div class="tw-timeline-panel-header">
-            <div>
-                <!-- Updated by openDevTimelinePanel(ticketId, subject) -->
-                <div class="tw-timeline-panel-ticket-id" id="devTimelineTicketId">Ticket ID: —</div>
-                <div class="tw-timeline-panel-subject" id="devTimelineSubject">—</div>
-            </div>
-            <button class="tw-timeline-panel-close" onclick="closeDevTimelinePanel()" aria-label="Close timeline">
-                <i class="bx bx-x" aria-hidden="true"></i>
-            </button>
-        </div>
+                {% for ticket in assigned_tickets %}
+                <tr data-status="{{ ticket.status }}"
+                    data-sub-status="{% if ticket.status == 'in_progress' %}{{ ticket.sub_status }}{% elif ticket.status == 'awaiting_client' %}awaiting_client{% else %}{{ ticket.status }}{% endif %}"
+                    data-priority="{{ ticket.priority }}"
+                    data-overdue="false"
+                    data-id="{{ ticket.reference|lower }}"
+                    data-subject="{{ ticket.subject|lower }}"
+                    data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}"
+                    style="cursor:pointer"
+                    onclick="window.location.href='{% url 'dev:ticket_detail' ticket.pk %}'"
+                    aria-label="View ticket {{ ticket.reference }}">
+                    <td>
+                        <div class="ticket-id-cell">
+                            <i class="bx bxs-star tw-star-icon"
+                               onclick="event.stopPropagation(); this.classList.toggle('active')"
+                               role="button" tabindex="0"
+                               aria-label="Star this ticket"></i>
+                            <span class="tw-ticket-id">{{ ticket.reference }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div title="{{ ticket.subject }}">{{ ticket.subject }}</div>
+                    </td>
+                    <td>{{ ticket.client.code|default:"—" }}</td>
+                    <td>{{ ticket.created_at|date:"d M Y" }}</td>
+                    <td>
+                        <span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">
+                            {{ ticket.get_priority_display }}
+                        </span>
+                    </td>
+                    <td>{% dev_ticket_badge ticket %}</td>
+                    <td onclick="event.stopPropagation()">
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
+                               onclick="openDevTimelinePanel('{{ ticket.reference }}', '{{ ticket.subject|escapejs }}')"
+                               role="button" tabindex="0"
+                               aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat"
+                               onclick="openDevChatPanel('{{ ticket.reference }}', '{{ ticket.subject|escapejs }}')"
+                               role="button" tabindex="0"
+                               aria-label="Open chat"></i>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7">
+                        <div class="dev-empty-state">
+                            <i class="bx bx-task" aria-hidden="true"></i>
+                            <p>No tickets currently assigned to you.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
 
-        <div class="tw-timeline-panel-body">
+                <!-- JS-controlled empty state (shown when filters match nothing) -->
+                <tr id="devEmptyStateFilter" style="display:none;">
+                    <td colspan="7">
+                        <div class="dev-empty-state">
+                            <i class="bx bx-task" aria-hidden="true"></i>
+                            <p id="devEmptyMsg">No tickets match your filters.</p>
+                        </div>
+                    </td>
+                </tr>
 
-            <!-- Django: {% for event in ticket.events.all %} -->
-
-            <div class="tw-tl-panel-entry">
-                <div class="tw-tl-panel-dot tw-tl-panel-dot--created">
-                    <i class="bx bx-plus" aria-hidden="true"></i>
-                </div>
-                <div class="tw-tl-panel-content">
-                    <div class="tw-tl-panel-event">Ticket Submitted</div>
-                    <div class="tw-tl-panel-meta">16 Apr 2025 at 9:30 AM</div>
-                </div>
-            </div>
-
-            <div class="tw-tl-panel-entry">
-                <div class="tw-tl-panel-dot tw-tl-panel-dot--accepted">
-                    <i class="bx bx-check" aria-hidden="true"></i>
-                </div>
-                <div class="tw-tl-panel-content">
-                    <div class="tw-tl-panel-event">Reviewed by Admin</div>
-                    <div class="tw-tl-panel-meta">16 Apr 2025 at 10:15 AM</div>
-                </div>
-            </div>
-
-            <div class="tw-tl-panel-entry">
-                <div class="tw-tl-panel-dot tw-tl-panel-dot--assigned">
-                    <i class="bx bx-user" aria-hidden="true"></i>
-                </div>
-                <div class="tw-tl-panel-content">
-                    <div class="tw-tl-panel-event">Assigned to Arjun Mehta</div>
-                    <div class="tw-tl-panel-meta">16 Apr 2025 at 11:30 AM</div>
-                </div>
-            </div>
-
-            <div class="tw-tl-panel-entry">
-                <div class="tw-tl-panel-dot tw-tl-panel-dot--current">
-                    <i class="bx bx-code-alt" aria-hidden="true"></i>
-                </div>
-                <div class="tw-tl-panel-content">
-                    <div class="tw-tl-panel-event">Development Started</div>
-                    <div class="tw-tl-panel-meta">17 Apr 2025 at 9:00 AM</div>
-                </div>
-            </div>
-
-            <!-- Django: {% endfor %} -->
-
-        </div>
-
+            </tbody>
+        </table>
     </div>
-    <!-- END DEV TIMELINE PANEL -->
+    <!-- END TABLE -->
 
-</section>
-<!-- END CONTENT WRAPPER -->
-
-
-<!-- ==============================================================
-     VENDOR SCRIPTS
-     ============================================================== -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+<!-- END TABLE CARD -->
 
 
 <!-- ==============================================================
-     PAGE SCRIPT
-     All top-level vars use var (never const/let) to prevent TDZ
-     crashes when the page router re-executes this script.
-     Django: {% block page_js %}
+     DEVELOPER CHAT PANEL (dashboard slide-in drawer stub)
      ============================================================== -->
+<div class="tw-chat-panel" id="devChatPanel"
+     role="dialog" aria-modal="false" aria-label="Ticket chat">
+
+    <div class="tw-chat-header">
+        <div class="chat-header-info">
+            <div class="chat-ticket-id" id="devChatTicketId">Ticket ID: —</div>
+            <div class="chat-ticket-subject" id="devChatSubject">—</div>
+        </div>
+        <button class="chat-close-btn" onclick="closeDevChatPanel()" aria-label="Close chat">
+            <i class="bx bx-x" aria-hidden="true"></i>
+        </button>
+    </div>
+
+    <div class="tw-messages-area" id="devMessagesArea">
+        <div style="padding:20px;text-align:center;color:var(--tw-text-muted);font-size:var(--tw-text-sm)">
+            Open the ticket for the full chat thread.
+        </div>
+    </div>
+
+    <div class="tw-chat-footer">
+        <div class="tw-chat-input-row">
+            <textarea class="tw-chat-textarea" id="devChatTextarea"
+                      placeholder="Open the ticket to send messages…"
+                      rows="1" disabled aria-label="Message input"></textarea>
+        </div>
+    </div>
+
+</div>
+<!-- END DEV CHAT PANEL -->
+
+
+<!-- ==============================================================
+     DEVELOPER TIMELINE PANEL (dashboard slide-in drawer stub)
+     ============================================================== -->
+<div class="tw-timeline-panel" id="devTimelinePanel"
+     role="dialog" aria-modal="false" aria-label="Ticket timeline">
+
+    <div class="tw-timeline-panel-header">
+        <div>
+            <div class="tw-timeline-panel-ticket-id" id="devTimelineTicketId">Ticket ID: —</div>
+            <div class="tw-timeline-panel-subject" id="devTimelineSubject">—</div>
+        </div>
+        <button class="tw-timeline-panel-close" onclick="closeDevTimelinePanel()" aria-label="Close timeline">
+            <i class="bx bx-x" aria-hidden="true"></i>
+        </button>
+    </div>
+
+    <div class="tw-timeline-panel-body">
+        <div style="padding:20px;text-align:center;color:var(--tw-text-muted);font-size:var(--tw-text-sm)">
+            Open the ticket for the full timeline.
+        </div>
+    </div>
+
+</div>
+<!-- END DEV TIMELINE PANEL -->
+
+{% endblock %}
+
+
+{% block page_js %}
 <script>
 
     /* ============================================================
-     * DEVELOPER IDENTITY — single source of truth.
-     * Django: var DEV_USER = {{ dev_user|safe }};
+     * COMPOSABLE FILTER STATE
      * ============================================================ */
-    var DEV_USER = {
-        name:     'Arjun Mehta',
-        initials: 'AM',
-        email:    'arjun.mehta@tweedle.io',
-        role:     'Developer'
+    var devFilters = {
+        substatus: 'all',
+        priority:  'all',
+        overdue:   false,
+        search:    ''
     };
 
-    document.addEventListener('DOMContentLoaded', function () {
-        var idMap = {
-            devAvatarTopbar: DEV_USER.initials,
-            devAvatarSidebar: DEV_USER.initials,
-            devAvatarPanel:  DEV_USER.initials,
-            devNameSidebar:  DEV_USER.name,
-            devNamePanel:    DEV_USER.name,
-            devEmailPanel:   DEV_USER.email
-        };
-        Object.keys(idMap).forEach(function (id) {
-            var el = document.getElementById(id);
-            if (el) el.textContent = idMap[id];
-        });
+    var devSortOrder = 'default';
 
-        /* Store original row order for sort-reset */
+    document.addEventListener('DOMContentLoaded', function () {
         var rows = document.querySelectorAll('#devTableBody tr[data-sub-status]');
         rows.forEach(function (row, i) { row.dataset.originalOrder = i; });
-
-        /* Restore active filter from URL param (back-link navigation from ticket-detail) */
-        var _urlP = new URLSearchParams(window.location.search);
-        var _filterParam = _urlP.get('filter');
-        if (_filterParam && _filterParam !== 'all') {
-            if (_filterParam === 'forwarded') {
-                devFilters.substatus = 'forwarded';
-            } else if (_filterParam === 'uat') {
-                devFilters.substatus = 'uat';
-            } else if (_filterParam === 'resolved') {
-                devFilters.substatus = 'resolved';
-            } else if (['development', 'testing', 'uat', 'overdue'].indexOf(_filterParam) !== -1) {
-                devFilters.substatus = _filterParam;
-            }
-            var _matchingPill = document.querySelector('.dev-filter-pill[data-sub-status="' + _filterParam + '"]');
-            if (_matchingPill) {
-                document.querySelectorAll('.dev-filter-pill').forEach(function (p) { p.classList.remove('active'); });
-                _matchingPill.classList.add('active');
-            }
-            applyDevFilters();
-        }
-        /* Django: substatus filter will be preserved via request.GET in the Django view */
     });
 
 
     /* ============================================================
-     * COMPOSABLE FILTER STATE
-     * devFilters: single state object — all filters AND together.
-     * Mirrors admin portal's activeFilters + applyAllFilters() pattern.
-     * Django: filter values come from request.GET context vars.
-     * ============================================================ */
-    var devFilters = {
-        substatus: 'all',   /* 'all'|'development'|'testing'|'uat' */
-        priority:  'all',   /* 'all'|'high'|'medium'|'low' */
-        overdue:   false,   /* true when "Overdue" stat card or pill is active */
-        search:    ''       /* lowercased string */
-    };
-
-    var devSortOrder = 'default'; /* 'default'|'oldest'|'newest' */
-
-
-    /* ============================================================
      * applyDevFilters()
-     * Master filter: ANDs substatus + priority + overdue + search.
-     * Runs after every state change, then applies sort.
      * ============================================================ */
     function applyDevFilters() {
         var rows = document.querySelectorAll('#devTableBody tr[data-sub-status]');
@@ -1417,13 +350,10 @@
             }
         });
 
-        /* Re-sort after filtering */
         applyDevSortOrder();
-
         updateDevEmptyState(visibleCount);
     }
 
-    /* devRowMatches(row): returns true if ALL active filters match */
     function devRowMatches(row) {
         var rowSubstatus = (row.dataset.subStatus || '').toLowerCase();
         var rowPriority  = (row.dataset.priority  || '').toLowerCase();
@@ -1432,24 +362,26 @@
         var rowSubject   = (row.dataset.subject  || '').toLowerCase();
         var rowStatus    = row.getAttribute('data-status') || '';
 
-        /* Resolved and Closed rows: only visible when filtering for resolved/closed */
+        /* Resolved / Closed rows: only visible under 'resolved' filter */
         if (rowStatus === 'resolved' || rowStatus === 'closed') {
             return devFilters.substatus === 'resolved';
         }
 
-        /* UAT Approval rows: only visible under 'all' or 'uat' filter */
+        /* UAT rows: visible under 'all' or 'uat' filter */
         if (rowStatus === 'uat') {
             return devFilters.substatus === 'all' || devFilters.substatus === 'uat';
         }
 
-        /* Forwarded rows: visible under 'all', 'forwarded', or overdue filter */
-        if (rowStatus === 'forwarded') {
-            if (devFilters.substatus !== 'all' && devFilters.substatus !== 'overdue' && devFilters.substatus !== 'forwarded') {
+        /* Awaiting Client rows */
+        if (rowStatus === 'awaiting_client') {
+            if (devFilters.substatus !== 'all' &&
+                devFilters.substatus !== 'overdue' &&
+                devFilters.substatus !== 'awaiting_client') {
                 return false;
             }
         }
 
-        /* Overdue filter (set by "Overdue" stat card or pill) */
+        /* Overdue filter */
         if (devFilters.overdue) {
             if (!rowOverdue) return false;
         } else if (devFilters.substatus !== 'all') {
@@ -1470,12 +402,9 @@
     /* ============================================================
      * SORT
      * ============================================================ */
-
     function applyDevSortOrder() {
         var tbody = document.getElementById('devTableBody');
-        var rows  = Array.prototype.slice.call(
-            tbody.querySelectorAll('tr[data-sub-status]')
-        );
+        var rows  = Array.prototype.slice.call(tbody.querySelectorAll('tr[data-sub-status]'));
 
         rows.sort(function (a, b) {
             if (devSortOrder === 'oldest') {
@@ -1495,15 +424,15 @@
         var btn  = document.getElementById('devSortBtn');
 
         if (devSortOrder === 'default') {
-            devSortOrder  = 'oldest';
+            devSortOrder = 'oldest';
             if (icon) icon.className = 'bx bx-sort-up';
             if (btn)  btn.title      = 'Sorting: Oldest first — click for Newest first';
         } else if (devSortOrder === 'oldest') {
-            devSortOrder  = 'newest';
+            devSortOrder = 'newest';
             if (icon) icon.className = 'bx bx-sort-down';
             if (btn)  btn.title      = 'Sorting: Newest first — click to reset';
         } else {
-            devSortOrder  = 'default';
+            devSortOrder = 'default';
             if (icon) icon.className = 'bx bx-sort-alt-2';
             if (btn)  btn.title      = 'Sort by issue date';
         }
@@ -1515,15 +444,12 @@
     /* ============================================================
      * STAT CARD CLICK
      * ============================================================ */
-
     function filterByStatCard(filter, card) {
-        /* Highlight selected stat card */
         document.querySelectorAll('.dev-stat-card').forEach(function (c) {
             c.classList.remove('active');
         });
         if (card) card.classList.add('active');
 
-        /* Map stat card filter → filter state */
         devFilters.overdue = false;
 
         if (filter === 'overdue') {
@@ -1533,15 +459,15 @@
         } else if (filter === 'active') {
             devFilters.substatus = 'all';
             setActivePill('all');
-        } else if (filter === 'forwarded') {
-            devFilters.substatus = 'forwarded';
-            setActivePill('forwarded'); /* no pill matches → all pills cleared */
+        } else if (filter === 'awaiting_client') {
+            devFilters.substatus = 'awaiting_client';
+            setActivePill('awaiting_client');
         } else if (filter === 'uat') {
             devFilters.substatus = 'uat';
-            setActivePill('uat'); /* no pill matches → all pills cleared */
+            setActivePill('uat');
         } else if (filter === 'resolved') {
             devFilters.substatus = 'resolved';
-            setActivePill('resolved'); /* no pill matches → all pills cleared */
+            setActivePill('resolved');
         }
 
         applyDevFilters();
@@ -1556,9 +482,8 @@
 
 
     /* ============================================================
-     * SUB-STATUS PILL CLICK
+     * PILL CLICK
      * ============================================================ */
-
     function filterByPill(substatus, btn) {
         devFilters.overdue   = substatus === 'overdue';
         devFilters.substatus = devFilters.overdue ? 'all' : substatus;
@@ -1568,7 +493,6 @@
         });
         if (btn) btn.classList.add('active');
 
-        /* Deactivate stat cards */
         document.querySelectorAll('.dev-stat-card').forEach(function (c) {
             c.classList.remove('active');
         });
@@ -1580,7 +504,6 @@
     /* ============================================================
      * PRIORITY DROPDOWN
      * ============================================================ */
-
     function toggleDevPriorityDropdown(e) {
         e.stopPropagation();
         var dd  = document.getElementById('devPriorityDropdown');
@@ -1613,27 +536,47 @@
         applyDevFilters();
     }
 
+    /* Close priority dropdown on outside click */
+    document.addEventListener('click', function (e) {
+        var pdWrap = document.getElementById('devPriorityWrap');
+        var pd     = document.getElementById('devPriorityDropdown');
+        if (pd && pd.classList.contains('open') && pdWrap && !pdWrap.contains(e.target)) {
+            pd.classList.remove('open');
+            document.getElementById('devPriorityBtn').setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        closeDevChatPanel();
+        closeDevTimelinePanel();
+        var pd = document.getElementById('devPriorityDropdown');
+        if (pd) {
+            pd.classList.remove('open');
+            var pb = document.getElementById('devPriorityBtn');
+            if (pb) pb.setAttribute('aria-expanded', 'false');
+        }
+    });
+
 
     /* ============================================================
      * EMPTY STATE
      * ============================================================ */
-
     function updateDevEmptyState(visibleCount) {
-        var es  = document.getElementById('devEmptyState');
+        var es  = document.getElementById('devEmptyStateFilter');
         var msg = document.getElementById('devEmptyMsg');
         if (!es) return;
 
         if (visibleCount === 0) {
             es.style.display = '';
             var msgs = {
-                'all':          'No tickets currently assigned to you.',
-                'development':  'No tickets in Development stage.',
-                'testing':      'No tickets in Testing stage.',
-                'uat':          'No tickets in UAT stage.',
-                'overdue':      'No overdue tickets. Great work!',
-                'forwarded':    'No tickets currently awaiting client response.',
-                'uat': 'No tickets currently in UAT review.',
-                'resolved':     'No resolved or closed tickets.'
+                'all':            'No tickets currently assigned to you.',
+                'development':    'No tickets in Development stage.',
+                'testing':        'No tickets in Testing stage.',
+                'awaiting_client':'No tickets currently awaiting client response.',
+                'uat':            'No tickets currently in UAT review.',
+                'overdue':        'No overdue tickets. Great work!',
+                'resolved':       'No resolved or closed tickets.'
             };
             var key = devFilters.overdue ? 'overdue' : devFilters.substatus;
             if (msg) msg.textContent = msgs[key] || 'No tickets match your filters.';
@@ -1644,26 +587,18 @@
 
 
     /* ============================================================
-     * CHAT PANEL
+     * CHAT PANEL (stub — full chat is on ticket-detail)
      * ============================================================ */
-
     function openDevChatPanel(ticketId, subject) {
-        /* Mutual exclusion with timeline panel */
         var tp = document.getElementById('devTimelinePanel');
         if (tp && tp.classList.contains('open')) tp.classList.remove('open');
 
-        /* Update header */
         var idEl  = document.getElementById('devChatTicketId');
         var subEl = document.getElementById('devChatSubject');
         if (idEl)  idEl.textContent  = 'Ticket ID: ' + ticketId;
         if (subEl) subEl.textContent = subject || '—';
 
-        /* Open */
         document.getElementById('devChatPanel').classList.add('open');
-
-        /* Scroll to bottom */
-        var area = document.getElementById('devMessagesArea');
-        if (area) area.scrollTop = area.scrollHeight;
     }
 
     function closeDevChatPanel() {
@@ -1671,80 +606,19 @@
         if (panel) panel.classList.remove('open');
     }
 
-    /* sendDevMessage() — purple sent bubbles via var(--tw-primary) */
-    function sendDevMessage() {
-        var textarea  = document.getElementById('devChatTextarea');
-        var panelFile = document.getElementById('devPanelChatFile');
-        var strip     = document.getElementById('devPanelAttachStrip');
-        var area      = document.getElementById('devMessagesArea');
-        var text      = textarea ? textarea.value.trim() : '';
-
-        if (!text && !(strip && strip.classList.contains('show'))) {
-            if (textarea) textarea.focus();
-            return;
-        }
-
-        var time = new Date().toLocaleString('en-US', {
-            month: 'short', day: 'numeric', year: 'numeric',
-            hour: 'numeric', minute: '2-digit', hour12: true
-        });
-
-        var attachHTML = '';
-        if (panelFile && panelFile.files && panelFile.files.length > 0) {
-            var file = panelFile.files[0];
-            if (file.type.startsWith('image/')) {
-                var url = URL.createObjectURL(file);
-                attachHTML = '<img src="' + url + '" alt="' + escapeHtml(file.name) + '" class="tw-chat-img-attachment">';
-            } else {
-                attachHTML =
-                    '<div class="tw-file-chip">' +
-                    '<i class="bx bx-paperclip" aria-hidden="true"></i>' +
-                    '<span class="tw-file-chip-name">' + escapeHtml(file.name) + '</span>' +
-                    '</div>';
-            }
-        }
-
-        var msgEl = document.createElement('div');
-        msgEl.className = 'tw-message sent';
-        msgEl.innerHTML =
-            '<div class="tw-avatar tw-avatar--sm tw-avatar--developer" aria-hidden="true">' + escapeHtml(DEV_USER.initials) + '</div>' +
-            '<div>' +
-            '<div class="tw-message-sender">You <span class="tw-role-pill tw-role-pill--developer">Developer</span></div>' +
-            '<div class="tw-message-bubble">' +
-            (text ? '<div class="tw-message-text">' + escapeHtml(text).replace(/\n/g, '<br>') + '</div>' : '') +
-            attachHTML +
-            '<div class="tw-message-time">' + time + '</div>' +
-            '</div></div>';
-
-        if (area) { area.appendChild(msgEl); area.scrollTop = area.scrollHeight; }
-
-        if (textarea) { textarea.value = ''; textarea.style.height = 'auto'; }
-        if (panelFile) panelFile.value = '';
-        if (strip) strip.classList.remove('show');
-
-        /* Django: fetch('{% url "dev:send_message" %}', {method:'POST', body: JSON.stringify({content: text})}) */
-        console.log('[Dev Portal] sendDevMessage stub:', { content: text });
-
-        showDevToast('Message sent.', 'success');
-    }
-
 
     /* ============================================================
-     * TIMELINE PANEL
+     * TIMELINE PANEL (stub — full timeline is on ticket-detail)
      * ============================================================ */
-
     function openDevTimelinePanel(ticketId, subject) {
-        /* Mutual exclusion with chat panel */
         var cp = document.getElementById('devChatPanel');
         if (cp && cp.classList.contains('open')) cp.classList.remove('open');
 
-        /* Update header */
         var idEl  = document.getElementById('devTimelineTicketId');
         var subEl = document.getElementById('devTimelineSubject');
         if (idEl)  idEl.textContent  = 'Ticket ID: ' + ticketId;
         if (subEl) subEl.textContent = subject || '—';
 
-        /* Open */
         document.getElementById('devTimelinePanel').classList.add('open');
     }
 
@@ -1753,185 +627,5 @@
         if (panel) panel.classList.remove('open');
     }
 
-
-    /* ============================================================
-     * SIDEBAR TOGGLE
-     * ============================================================ */
-
-    var sidebar   = document.getElementById('sidebar');
-    var hamburger = document.getElementById('hamburger-btn');
-
-    function isMobile() { return window.innerWidth <= 768; }
-
-    hamburger.addEventListener('click', function () {
-        if (isMobile()) {
-            sidebar.classList.toggle('mobile-open');
-        } else {
-            sidebar.classList.toggle('hide');
-            document.body.classList.toggle('sidebar-hidden');
-        }
-    });
-
-    window.addEventListener('resize', function () {
-        if (isMobile()) {
-            sidebar.classList.remove('hide');
-            document.body.classList.remove('sidebar-hidden');
-        }
-    });
-
-
-    /* ============================================================
-     * NOTIFICATION BELL
-     * ============================================================ */
-
-    var notifBellBtn = document.getElementById('notifBellBtn');
-    var notifPanel   = document.getElementById('notifPanel');
-
-    notifBellBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var isOpen = notifPanel.classList.toggle('open');
-        notifBellBtn.setAttribute('aria-expanded', isOpen);
-    });
-
-    document.getElementById('markAllReadBtn').addEventListener('click', function () {
-        document.querySelectorAll('.tw-notif-item.unread').forEach(function (item) {
-            item.classList.remove('unread');
-        });
-        var badge = document.getElementById('notifCount');
-        if (badge) badge.remove();
-    });
-
-
-    /* ============================================================
-     * PROFILE DROPDOWN
-     * ============================================================ */
-
-    var profilePanelOpen = false;
-
-    function toggleProfileDropdown(e) {
-        e.stopPropagation();
-        var panel = document.getElementById('profilePanel');
-        if (notifPanel.classList.contains('open')) {
-            notifPanel.classList.remove('open');
-            notifBellBtn.setAttribute('aria-expanded', 'false');
-        }
-        profilePanelOpen = !profilePanelOpen;
-        panel.classList.toggle('open', profilePanelOpen);
-        panel.setAttribute('aria-hidden', profilePanelOpen ? 'false' : 'true');
-    }
-
-    function closeProfileDropdown() {
-        var panel = document.getElementById('profilePanel');
-        if (panel) {
-            panel.classList.remove('open');
-            profilePanelOpen = false;
-            panel.setAttribute('aria-hidden', 'true');
-        }
-    }
-
-
-    /* ============================================================
-     * CLICK-OUTSIDE — closes all open panels and dropdowns
-     * ============================================================ */
-
-    document.addEventListener('click', function (e) {
-        /* Notification bell */
-        if (!notifBellBtn.contains(e.target) && !notifPanel.contains(e.target)) {
-            notifPanel.classList.remove('open');
-            notifBellBtn.setAttribute('aria-expanded', 'false');
-        }
-        /* Profile panel */
-        var profilePanel = document.getElementById('profilePanel');
-        if (profilePanel && profilePanel.classList.contains('open')) {
-            if (!document.getElementById('profileWrap').contains(e.target)) {
-                closeProfileDropdown();
-            }
-        }
-        /* Priority dropdown */
-        var pdWrap = document.getElementById('devPriorityWrap');
-        var pd     = document.getElementById('devPriorityDropdown');
-        if (pd && pd.classList.contains('open') && pdWrap && !pdWrap.contains(e.target)) {
-            pd.classList.remove('open');
-            document.getElementById('devPriorityBtn').setAttribute('aria-expanded', 'false');
-        }
-    });
-
-
-    /* ============================================================
-     * ESCAPE KEY — closes all open panels, modals, and dropdowns
-     * ============================================================ */
-
-    document.addEventListener('keydown', function (e) {
-        if (e.key !== 'Escape') return;
-        closeProfileDropdown();
-        notifPanel.classList.remove('open');
-        notifBellBtn.setAttribute('aria-expanded', 'false');
-        closeDevChatPanel();
-        closeDevTimelinePanel();
-        var pd = document.getElementById('devPriorityDropdown');
-        if (pd) {
-            pd.classList.remove('open');
-            document.getElementById('devPriorityBtn').setAttribute('aria-expanded', 'false');
-        }
-    });
-
-
-    /* ============================================================
-     * UTILITIES
-     * ============================================================ */
-
-    function escapeHtml(str) {
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-    }
-
-    function formatNow() {
-        var d = new Date();
-        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) +
-               ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-    }
-
-    /* Dashboard chat panel — file select shows inline preview card (admin pattern) */
-    document.addEventListener('DOMContentLoaded', function () {
-        var panelChatFile = document.getElementById('devPanelChatFile');
-        if (panelChatFile) {
-            panelChatFile.addEventListener('change', function () {
-                if (!this.files || !this.files[0]) return;
-                var file     = this.files[0];
-                var strip    = document.getElementById('devPanelAttachStrip');
-                var nameSpan = document.getElementById('devPanelAttachFileName');
-                if (nameSpan) nameSpan.textContent = file.name;
-                if (strip) strip.classList.add('show');
-            });
-        }
-    });
-
-    function removeDevPanelAttachment() {
-        var input = document.getElementById('devPanelChatFile');
-        if (input) input.value = '';
-        var strip = document.getElementById('devPanelAttachStrip');
-        if (strip) strip.classList.remove('show');
-    }
-
-    /* showDevToast(message, type) — bottom-right transient notification */
-    function showDevToast(message, type) {
-        var t = document.createElement('div');
-        t.className = 'dev-toast dev-toast--' + (type || 'success');
-        t.textContent = message;
-        document.body.appendChild(t);
-        setTimeout(function () { t.classList.add('show'); }, 10);
-        setTimeout(function () {
-            t.classList.remove('show');
-            setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 300);
-        }, 3000);
-    }
-
 </script>
-
-</body>
-</html>
-
-<!-- Django: {% endblock %} -->
+{% endblock %}
