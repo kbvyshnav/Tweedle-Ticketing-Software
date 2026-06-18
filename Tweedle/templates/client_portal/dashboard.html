@@ -1,5 +1,5 @@
 {% extends 'client_base.html' %}
-{% load static client_extras %}
+{% load static ticket_labels %}
 
 {% block title %}My Tickets — Tweedle{% endblock %}
 
@@ -222,7 +222,7 @@
                     <td>{{ ticket.created_at|date:"d M Y" }}</td>
                     <td>{{ ticket.updated_at|date:"d M Y" }}</td>
                     <td>
-                        {% client_ticket_badge ticket %}
+                        {% role_ticket_badge ticket "client" %}
                         {% if ticket.status == 'uat' or ticket.status == 'awaiting_client' %}
                         <span class="tw-action-dot" title="Your action is needed" aria-label="Your action is needed"></span>
                         {% endif %}

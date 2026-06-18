@@ -1,5 +1,5 @@
 {% extends 'client_base.html' %}
-{% load static client_extras %}
+{% load static client_extras ticket_labels %}
 
 {% block title %}{{ ticket.reference }} — Tweedle{% endblock %}
 
@@ -30,7 +30,7 @@
         <div>
             <div class="tw-ticket-header-id">{{ ticket.reference }}</div>
             <div class="tw-ticket-header-card__meta">
-                {% client_ticket_badge ticket %}
+                {% role_ticket_badge ticket "client" %}
                 <span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">
                     {{ ticket.get_priority_display }}
                 </span>
@@ -333,7 +333,7 @@
                 {% if ticket.status == 'closed' or ticket.status == 'rejected' or ticket.status == 'cancelled' %}
                 <div class="tw-chat-notice" aria-live="polite">
                     <i class="bx bx-lock" aria-hidden="true"></i>
-                    This ticket is {{ ticket.get_status_display|lower }}. Chat history is read-only.
+                    This ticket is {% role_ticket_label ticket "client" as cl_status_label %}{{ cl_status_label|lower }}. Chat history is read-only.
                 </div>
                 {% else %}
                 <div class="tw-chat-input-area" id="chatInputArea">
@@ -376,7 +376,7 @@
 
                     <div class="tw-info-row">
                         <span class="tw-info-row__label">Status</span>
-                        <span class="tw-info-row__value">{% client_ticket_badge ticket %}</span>
+                        <span class="tw-info-row__value">{% role_ticket_badge ticket "client" %}</span>
                     </div>
 
                     <div class="tw-info-row">
