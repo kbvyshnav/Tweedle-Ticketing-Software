@@ -1,4 +1,4 @@
-{% load admin_extras %}
+{% load ticket_labels %}
 <div class="tw-modal-header">
     <div class="tw-modal-header-left">
         <h2 class="tw-modal-title">
@@ -7,7 +7,7 @@
         </h2>
         <p class="tw-modal-subtitle">{{ ticket.subject }}</p>
         <div class="tw-modal-header-meta">
-            {% ticket_badge ticket %}
+            {% role_ticket_badge ticket "admin" %}
             {% if ticket.assigned_developer %}
             <span class="tw-modal-allottee-tag">
                 <i class="bx bx-user" aria-hidden="true"></i>

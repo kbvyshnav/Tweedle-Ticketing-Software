@@ -457,3 +457,92 @@ class SubuserRenderTests(TestCase):
         t = self._make(S.UAT, subuser_confirmed=True)
         resp = self.client.get(reverse("subuser:ticket_detail", args=[t.pk]))
         self.assertContains(resp, "Confirmed — Awaiting Approval")
+
+
+class AdminRenderTests(TestCase):
+    """The migrated admin dashboard + detail partial render the §6 admin labels."""
+
+    def setUp(self):
+        self.org = Client.objects.create(name="Acme Corp", code="ACME")
+        self.admin = User.objects.create_user(
+            "admin_main", email="admin@test.local", password="pw", role="admin"
+        )
+        self.requester = User.objects.create_user(
+            "req_a", email="reqa@test.local", password="pw", role="client", client=self.org
+        )
+        self.client.force_login(self.admin)
+
+    def _make(self, status, sub_status=None, **kw):
+        return Ticket.objects.create(
+            subject="Admin render ticket", description="Body.",
+            requester=self.requester, client=self.org,
+            status=status, sub_status=sub_status, **kw,
+        )
+
+    # ── Detail partial: every §6 admin cell ─────────────────────────────────
+    def test_detail_partial_renders_each_admin_cell(self):
+        cases = [
+            (S.NEW, None, False,
+             '<span class="tw-status-badge tw-status-badge--new">New</span>'),
+            (S.IN_PROGRESS, SS.DEVELOPMENT, False,
+             '<span class="tw-status-badge tw-status-badge--development">Development</span>'),
+            (S.IN_PROGRESS, SS.TESTING, False,
+             '<span class="tw-status-badge tw-status-badge--testing">Testing</span>'),
+            (S.IN_PROGRESS, SS.RETURNED, False,
+             '<span class="tw-status-badge tw-status-badge--returned" title="Returned from Testing">Returned from QA</span>'),
+            (S.IN_PROGRESS, SS.READY_FOR_UAT, False,
+             '<span class="tw-status-badge tw-status-badge--testing-passed" title="Testing Passed — Ready for UAT">Ready for UAT</span>'),
+            (S.AWAITING_CLIENT, None, False,
+             '<span class="tw-status-badge tw-status-badge--forwarded">Awaiting Client</span>'),
+            (S.UAT, None, False,
+             '<span class="tw-status-badge tw-status-badge--uat">UAT Approval</span>'),
+            (S.UAT, None, True,
+             '<span class="tw-status-badge tw-status-badge--uat" title="Sub-user confirmed — awaiting client approval">UAT — sub-user confirmed, awaiting client approval</span>'),
+            (S.RESOLVED, None, False,
+             '<span class="tw-status-badge tw-status-badge--resolved">Resolved</span>'),
+            (S.CLOSED, None, False,
+             '<span class="tw-status-badge tw-status-badge--closed">Closed</span>'),
+            (S.REJECTED, None, False,
+             '<span class="tw-status-badge tw-status-badge--rejected">Rejected</span>'),
+            (S.CANCELLED, None, False,
+             '<span class="tw-status-badge tw-status-badge--rejected">Cancelled</span>'),
+        ]
+        for status, sub, confirmed, fragment in cases:
+            t = self._make(status, sub, subuser_confirmed=confirmed)
+            resp = self.client.get(reverse("admin_ticket_detail", args=[t.pk]))
+            self.assertContains(resp, fragment, msg_prefix=f"{status}/{sub}/confirmed={confirmed}")
+
+    def test_detail_returned_has_no_short_label(self):
+        t = self._make(S.IN_PROGRESS, SS.RETURNED)
+        resp = self.client.get(reverse("admin_ticket_detail", args=[t.pk]))
+        self.assertContains(resp, ">Returned from QA</span>")
+        self.assertNotContains(resp, ">Returned</span>")
+
+    # ── Dashboard tabs that render a badge ───────────────────────────────────
+    def test_dashboard_tab_badges(self):
+        self._make(S.NEW)
+        self._make(S.IN_PROGRESS, SS.RETURNED)
+        self._make(S.AWAITING_CLIENT)
+        self._make(S.CLOSED)
+        resp = self.client.get(reverse("admin_dashboard"))
+        self.assertContains(
+            resp, '<span class="tw-status-badge tw-status-badge--new">New</span>')
+        # In-Progress Stage column shows the full §6 label, not the short one.
+        self.assertContains(resp, ">Returned from QA</span>")
+        self.assertNotContains(resp, ">Returned</span>")
+        self.assertContains(
+            resp,
+            '<span class="tw-status-badge tw-status-badge--forwarded">Awaiting Client</span>')
+        self.assertContains(
+            resp, '<span class="tw-status-badge tw-status-badge--closed">Closed</span>')
+
+    # ── Option A: search-feed row attributes are matrix-sourced ──────────────
+    def test_search_rows_carry_matrix_status_attrs(self):
+        # In-Progress (returned) row → sub-status-aware label + css.
+        self._make(S.IN_PROGRESS, SS.RETURNED)
+        # A uat row has no in-table badge, but search must still surface its §6 label.
+        self._make(S.UAT)
+        resp = self.client.get(reverse("admin_dashboard"))
+        self.assertContains(resp, 'data-status-label="Returned from QA"')
+        self.assertContains(resp, 'data-status-css="returned"')
+        self.assertContains(resp, 'data-status-label="UAT Approval"')

@@ -49,3 +49,16 @@ def role_ticket_label(ticket, role):
     """Return just the role-appropriate §6 label string for a ticket."""
     label, _css, _title = _resolve(ticket, role)
     return label
+
+
+@register.simple_tag
+def role_status_data_attrs(ticket, role):
+    """Emit ``data-status-label`` + ``data-status-css`` for a row element.
+
+    Lets client-side features (e.g. the admin global-search dropdown) render the
+    matrix §6 label + css-modifier without re-deriving status text in JS. Both
+    values are matrix-resolved (sub-status- and subuser_confirmed-aware) and
+    escaped for the HTML attribute context.
+    """
+    label, css, _title = _resolve(ticket, role)
+    return format_html('data-status-label="{}" data-status-css="{}"', label, css)

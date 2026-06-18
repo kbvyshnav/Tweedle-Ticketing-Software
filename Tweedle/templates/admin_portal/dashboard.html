@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load admin_extras %}
+{% load ticket_labels %}
 
 {% block title %}Dashboard — Tweedle{% endblock %}
 
@@ -377,7 +377,7 @@
             <tbody>
             {% endverbatim %}
             {% for ticket in inbox_tickets %}
-                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="new" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="new" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}" {% role_status_data_attrs ticket "admin" %}>
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
@@ -388,7 +388,7 @@
                     <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
                     <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
                     <td>{{ ticket.client.code|default:"—" }}</td>
-                    <td>{% ticket_badge ticket %}</td>
+                    <td>{% role_ticket_badge ticket "admin" %}</td>
                     <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
                     {% if ticket.assigned_developer %}
                     <td>
@@ -453,7 +453,7 @@
             <tbody>
             {% endverbatim %}
             {% for ticket in inprogress_tickets %}
-                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-sub-status="{{ ticket.sub_status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-sub-status="{{ ticket.sub_status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}" {% role_status_data_attrs ticket "admin" %}>
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
@@ -465,7 +465,7 @@
                     <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
                     <td>{{ ticket.client.code|default:"—" }}</td>
                     <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
-                    <td>{% ticket_badge ticket %}</td>
+                    <td>{% role_ticket_badge ticket "admin" %}</td>
                     {% if ticket.assigned_developer %}
                     <td>
                         <div class="allottee-cell">
@@ -534,7 +534,7 @@
             <tbody>
             {% endverbatim %}
             {% for ticket in forwarded_tickets %}
-                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}" {% role_status_data_attrs ticket "admin" %}>
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
@@ -545,7 +545,7 @@
                     <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
                     <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
                     <td>{{ ticket.client.code|default:"—" }}</td>
-                    <td>{% ticket_badge ticket %}</td>
+                    <td>{% role_ticket_badge ticket "admin" %}</td>
                     <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
                     {% if ticket.assigned_developer %}
                     <td>
@@ -616,7 +616,7 @@
             <tbody>
             {% endverbatim %}
             {% for ticket in uat_tickets %}
-                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}" {% role_status_data_attrs ticket "admin" %}>
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
@@ -686,7 +686,7 @@
             <tbody>
             {% endverbatim %}
             {% for ticket in resolved_tickets %}
-                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}" {% role_status_data_attrs ticket "admin" %}>
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
@@ -753,7 +753,7 @@
             <tbody>
             {% endverbatim %}
             {% for ticket in closed_tickets %}
-                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}" {% role_status_data_attrs ticket "admin" %}>
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
@@ -764,7 +764,7 @@
                     <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
                     <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
                     <td>{{ ticket.client.code|default:"—" }}</td>
-                    <td>{% ticket_badge ticket %}</td>
+                    <td>{% role_ticket_badge ticket "admin" %}</td>
                     <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
                     {% if ticket.assigned_developer %}
                     <td>
@@ -826,7 +826,7 @@
             <tbody>
             {% endverbatim %}
             {% for ticket in rejected_tickets %}
-                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="rejected" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}">
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="rejected" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}" {% role_status_data_attrs ticket "admin" %}>
                     <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
                     <td>
                         <div class="ticket-id-cell">
@@ -2295,6 +2295,8 @@
                     id:      row.dataset.ticketId  || '',
                     subject: row.dataset.subject   || '',
                     status:  row.dataset.status    || '',
+                    statusLabel: row.dataset.statusLabel || '',
+                    statusCss:   row.dataset.statusCss   || '',
                     tab:     row.closest('.tab-content') ? row.closest('.tab-content').dataset.tabContent : '',
                     client:  row.dataset.client || '',
                 });
@@ -2342,7 +2344,7 @@
                         <div class="tw-search-result-subject">${ticket.subject}</div>
                         <div class="tw-search-result-client">${ticket.client}</div>
                     </div>
-                    <span class="tw-status-badge tw-status-badge--${ticket.status}">${ticket.status}</span>`;
+                    <span class="tw-status-badge tw-status-badge--${ticket.statusCss}">${ticket.statusLabel}</span>`;
 
                 item.addEventListener('click', function() {
                     hideOverlay();
