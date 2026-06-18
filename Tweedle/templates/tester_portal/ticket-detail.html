@@ -1,5 +1,5 @@
 {% extends 'tester_base.html' %}
-{% load static tester_extras %}
+{% load static tester_extras ticket_labels %}
 
 {% block title %}{{ ticket.subject }} — Tweedle{% endblock %}
 
@@ -36,7 +36,7 @@
             {{ ticket.reference }}
         </div>
         <div class="dev-ticket-header-badges">
-            {% tester_ticket_badge ticket %}
+            {% role_ticket_badge ticket "tester" %}
             <span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">
                 {{ ticket.get_priority_display }}
             </span>
@@ -315,7 +315,7 @@
 
             <div class="dev-info-row">
                 <span class="dev-info-row__label">Status</span>
-                <span class="dev-info-row__value">{% tester_ticket_badge ticket %}</span>
+                <span class="dev-info-row__value">{% role_ticket_badge ticket "tester" %}</span>
             </div>
             <div class="dev-info-row">
                 <span class="dev-info-row__label">Priority</span>

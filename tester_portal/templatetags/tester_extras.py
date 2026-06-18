@@ -1,6 +1,13 @@
-"""Tester-portal display helpers (TARGET §6 tester column)."""
+"""Tester-portal display helpers.
+
+The role-aware status badge now lives in the shared matrix
+(``tickets.labels`` + ``{% load ticket_labels %}``); the old
+``TESTER_TICKET_BADGES`` dict and ``tester_ticket_badge`` tag were removed when
+the tester portal migrated onto it. This module now only re-exports the timeline
+event helpers that the tester detail template still uses.
+"""
+
 from django import template
-from django.utils.html import format_html
 
 from tickets.templatetags.shared_ticket_extras import (
     event_dot_cls as _event_dot_cls,
@@ -10,31 +17,9 @@ from tickets.templatetags.shared_ticket_extras import (
 
 register = template.Library()
 
-TESTER_TICKET_BADGES = {
-    ("in_progress", "testing"):       ("Testing",  "testing",        ""),
-    ("in_progress", "returned"):      ("Failed",   "returned",       "Returned to Developer"),
-    ("in_progress", "ready_for_uat"): ("Passed",   "testing-passed", "Testing Passed — Ready for UAT"),
-}
-
-
-@register.simple_tag
-def tester_ticket_badge(ticket):
-    sub = ticket.sub_status if ticket.status == "in_progress" else None
-    label, css, title = TESTER_TICKET_BADGES.get(
-        (ticket.status, sub), (ticket.get_status_display(), ticket.status, "")
-    )
-    if title:
-        return format_html(
-            '<span class="tw-status-badge tw-status-badge--{}" title="{}">{}</span>',
-            css, title, label,
-        )
-    return format_html(
-        '<span class="tw-status-badge tw-status-badge--{}">{}</span>',
-        css, label,
-    )
-
 
 # ── Timeline event helpers — data lives in shared_ticket_extras ──────────────
+
 register.filter("event_label", _event_label)
 register.filter("event_dot_cls", _event_dot_cls)
 register.filter("event_icon", _event_icon)

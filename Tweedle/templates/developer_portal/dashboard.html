@@ -1,5 +1,5 @@
 {% extends 'developer_base.html' %}
-{% load static dev_extras %}
+{% load static ticket_labels %}
 
 {% block title %}My Assigned Tickets — Tweedle{% endblock %}
 
@@ -207,7 +207,7 @@
                             {{ ticket.get_priority_display }}
                         </span>
                     </td>
-                    <td>{% dev_ticket_badge ticket %}</td>
+                    <td>{% role_ticket_badge ticket "developer" %}</td>
                     <td onclick="event.stopPropagation()">
                         <div class="tw-row-actions">
                             <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"

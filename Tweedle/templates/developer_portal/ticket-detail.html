@@ -1,5 +1,5 @@
 {% extends 'developer_base.html' %}
-{% load static dev_extras %}
+{% load static dev_extras ticket_labels %}
 
 {% block title %}{{ ticket.subject }} — Tweedle{% endblock %}
 
@@ -35,7 +35,7 @@
             {{ ticket.reference }}
         </div>
         <div class="dev-ticket-header-badges">
-            {% dev_ticket_badge ticket %}
+            {% role_ticket_badge ticket "developer" %}
             <span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">
                 {{ ticket.get_priority_display }}
             </span>
@@ -119,7 +119,7 @@
                 <div class="dev-closed-banner">
                     <i class="bx bx-x-circle" aria-hidden="true"></i>
                     <div>
-                        <div class="dev-closed-banner__title">Ticket {{ ticket.get_status_display }}</div>
+                        <div class="dev-closed-banner__title">Ticket {% role_ticket_label ticket "developer" %}</div>
                         <div class="dev-closed-banner__body">No further action is required.</div>
                     </div>
                 </div>
@@ -303,7 +303,7 @@
             </div>
             {% else %}
             <div style="padding:var(--tw-space-3) var(--tw-space-5);font-size:var(--tw-text-xs);color:var(--tw-text-muted);font-style:italic">
-                Chat is disabled — this ticket is {{ ticket.get_status_display|lower }}.
+                Chat is disabled — this ticket is {% role_ticket_label ticket "developer" as dev_status_label %}{{ dev_status_label|lower }}.
             </div>
             {% endif %}
 
@@ -328,7 +328,7 @@
 
             <div class="dev-info-row">
                 <span class="dev-info-row__label">Status</span>
-                <span class="dev-info-row__value">{% dev_ticket_badge ticket %}</span>
+                <span class="dev-info-row__value">{% role_ticket_badge ticket "developer" %}</span>
             </div>
             <div class="dev-info-row">
                 <span class="dev-info-row__label">Priority</span>

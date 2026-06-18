@@ -1,5 +1,5 @@
 {% extends 'subuser_base.html' %}
-{% load static subuser_extras %}
+{% load static ticket_labels %}
 
 {% block title %}My Tickets — Tweedle{% endblock %}
 
@@ -179,7 +179,7 @@
                         {{ ticket.get_priority_display }}
                     </span>
                 </td>
-                <td>{% subuser_ticket_badge ticket %}</td>
+                <td>{% role_ticket_badge ticket "subuser" %}</td>
                 <td>{{ ticket.created_at|date:"d M Y" }}</td>
             </tr>
             {% empty %}

@@ -296,3 +296,164 @@ class ClientRenderTests(TestCase):
         resp = self.client.get(reverse("client_ticket_detail", args=[t.pk]))
         self.assertContains(resp, "This ticket is completed.")
         self.assertNotContains(resp, "This ticket is closed.")
+
+
+class DeveloperRenderTests(TestCase):
+    """The migrated developer dashboard + detail render the §6 developer labels."""
+
+    def setUp(self):
+        self.org = Client.objects.create(name="Acme Corp", code="ACME")
+        self.dev = User.objects.create_user(
+            "dev_main", email="dev@test.local", password="pw", role="developer"
+        )
+        self.requester = User.objects.create_user(
+            "req", email="req@test.local", password="pw", role="client", client=self.org
+        )
+        self.client.force_login(self.dev)
+
+    def _make(self, status, sub_status=None, **kw):
+        kw.setdefault("assigned_developer", self.dev)
+        return Ticket.objects.create(
+            subject="Dev render ticket", description="Body.",
+            requester=self.requester, client=self.org,
+            status=status, sub_status=sub_status, **kw,
+        )
+
+    def test_dashboard_awaiting_client_uses_paused_label(self):
+        self._make(S.AWAITING_CLIENT)
+        resp = self.client.get(reverse("dev:dashboard"))
+        self.assertContains(
+            resp,
+            '<span class="tw-status-badge tw-status-badge--forwarded">Paused — Awaiting Client</span>',
+        )
+        # The old (pre-matrix) badge fragment must be gone (matched in full, since
+        # "Awaiting Client" is a substring of the new label).
+        self.assertNotContains(
+            resp,
+            '<span class="tw-status-badge tw-status-badge--forwarded">Awaiting Client</span>',
+        )
+
+    def test_dashboard_development_and_uat_labels(self):
+        self._make(S.IN_PROGRESS, SS.DEVELOPMENT)
+        self._make(S.UAT)
+        resp = self.client.get(reverse("dev:dashboard"))
+        self.assertContains(resp, ">Development</span>")
+        self.assertContains(resp, ">In Client UAT</span>")
+
+    def test_detail_awaiting_client_paused_badge(self):
+        t = self._make(S.AWAITING_CLIENT)
+        resp = self.client.get(reverse("dev:ticket_detail", args=[t.pk]))
+        self.assertContains(
+            resp,
+            '<span class="tw-status-badge tw-status-badge--forwarded">Paused — Awaiting Client</span>',
+        )
+        self.assertNotContains(
+            resp,
+            '<span class="tw-status-badge tw-status-badge--forwarded">Awaiting Client</span>',
+        )
+
+
+class TesterRenderTests(TestCase):
+    """The migrated tester dashboard + detail render the §6 tester labels."""
+
+    def setUp(self):
+        self.org = Client.objects.create(name="Acme Corp", code="ACME")
+        self.tester = User.objects.create_user(
+            "qa_main", email="qam@test.local", password="pw", role="tester"
+        )
+        self.dev = User.objects.create_user(
+            "dev2", email="dev2@test.local", password="pw", role="developer"
+        )
+        self.requester = User.objects.create_user(
+            "req2", email="req2@test.local", password="pw", role="client", client=self.org
+        )
+        self.client.force_login(self.tester)
+
+    def _make(self, sub_status, **kw):
+        return Ticket.objects.create(
+            subject="QA render ticket", description="Body.",
+            requester=self.requester, client=self.org,
+            status=S.IN_PROGRESS, sub_status=sub_status,
+            assigned_developer=self.dev, assigned_tester=self.tester, **kw,
+        )
+
+    def test_dashboard_three_states(self):
+        self._make(SS.TESTING)
+        self._make(SS.RETURNED)
+        self._make(SS.READY_FOR_UAT)
+        resp = self.client.get(reverse("tester:dashboard"))
+        self.assertContains(
+            resp,
+            '<span class="tw-status-badge tw-status-badge--testing">Testing</span>',
+        )
+        self.assertContains(
+            resp,
+            '<span class="tw-status-badge tw-status-badge--returned" title="Returned to Developer">Failed</span>',
+        )
+        self.assertContains(
+            resp,
+            '<span class="tw-status-badge tw-status-badge--testing-passed" title="Testing Passed — Ready for UAT">Passed</span>',
+        )
+
+    def test_detail_testing_badge(self):
+        t = self._make(SS.TESTING)
+        resp = self.client.get(reverse("tester:ticket_detail", args=[t.pk]))
+        self.assertContains(
+            resp,
+            '<span class="tw-status-badge tw-status-badge--testing">Testing</span>',
+        )
+
+
+class SubuserRenderTests(TestCase):
+    """The migrated sub-user dashboard + detail render the §6 sub-user labels."""
+
+    def setUp(self):
+        self.org = Client.objects.create(name="Acme Corp", code="ACME")
+        self.subuser = User.objects.create_user(
+            "sub_main", email="sub@test.local", password="pw",
+            role="subuser", client=self.org,
+        )
+        self.client.force_login(self.subuser)
+
+    def _make(self, status, sub_status=None, **kw):
+        return Ticket.objects.create(
+            subject="Sub render ticket", description="Body.",
+            requester=self.subuser, client=self.org,
+            status=status, sub_status=sub_status, **kw,
+        )
+
+    def test_dashboard_labels(self):
+        self._make(S.NEW)
+        self._make(S.UAT)
+        self._make(S.RESOLVED)
+        self._make(S.CLOSED)
+        self._make(S.REJECTED)
+        resp = self.client.get(reverse("subuser:dashboard"))
+        self.assertContains(
+            resp,
+            '<span class="tw-status-badge tw-status-badge--new">New — Received</span>',
+        )
+        self.assertContains(resp, "Please Verify")
+        self.assertContains(
+            resp,
+            '<span class="tw-status-badge tw-status-badge--resolved">Awaiting Closure</span>',
+        )
+        self.assertContains(
+            resp,
+            '<span class="tw-status-badge tw-status-badge--closed">Completed</span>',
+        )
+        self.assertContains(
+            resp,
+            '<span class="tw-status-badge tw-status-badge--rejected">Not Accepted</span>',
+        )
+
+    def test_dashboard_uat_confirmed_variant(self):
+        self._make(S.UAT, subuser_confirmed=True)
+        resp = self.client.get(reverse("subuser:dashboard"))
+        self.assertContains(resp, "Confirmed — Awaiting Approval")
+        self.assertNotContains(resp, ">Please Verify<")
+
+    def test_detail_uat_confirmed_variant(self):
+        t = self._make(S.UAT, subuser_confirmed=True)
+        resp = self.client.get(reverse("subuser:ticket_detail", args=[t.pk]))
+        self.assertContains(resp, "Confirmed — Awaiting Approval")

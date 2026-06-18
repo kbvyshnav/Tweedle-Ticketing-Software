@@ -1,5 +1,5 @@
 {% extends 'tester_base.html' %}
-{% load static tester_extras %}
+{% load static ticket_labels %}
 
 {% block title %}My Testing Queue — Tweedle{% endblock %}
 
@@ -178,7 +178,7 @@
                             {{ ticket.get_priority_display }}
                         </span>
                     </td>
-                    <td>{% tester_ticket_badge ticket %}</td>
+                    <td>{% role_ticket_badge ticket "tester" %}</td>
                     <td onclick="event.stopPropagation()">
                         <div class="tw-row-actions">
                             <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline"
