@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts.models import Client
+from notifications.models import Notification
 from tickets.models import Ticket, TicketEvent, TicketMessage
 from tickets.transitions import transition
 
@@ -255,15 +256,13 @@ class AdminTicketTransitionTests(TestCase):
         self.assertTrue(self._errors(resp))
 
     def test_unsupported_action_surfaces_error(self):
-        # 'cancel' is a real engine action but is NOT exposed by this endpoint
-        # yet (deferred until the Cancelled tab exists). (reopen/restore are now
-        # exposed — see AdminReopenRestoreTests.)
-        t = self._make(S.IN_PROGRESS, SS.DEVELOPMENT, assigned_developer=self.developer)
-        resp = self.client.post(
-            self._url(t), {"action": "cancel", "reason": "x"}, follow=True
-        )
+        # 'approve' is a real engine action but is NOT exposed by this admin
+        # endpoint (it's a client/requester action). cancel/reopen/restore ARE
+        # now exposed — see AdminCancelTests / AdminReopenRestoreTests.
+        t = self._make(S.UAT, assigned_developer=self.developer)
+        resp = self.client.post(self._url(t), {"action": "approve"}, follow=True)
         t.refresh_from_db()
-        self.assertEqual(t.status, S.IN_PROGRESS)
+        self.assertEqual(t.status, S.UAT)
         self.assertTrue(self._errors(resp))
 
     # ── auth / CSRF ──────────────────────────────────────────────────────
@@ -569,3 +568,97 @@ class AdminReopenRestoreTests(TestCase):
             resp = self.client.get(self._detail_url(t))
             self.assertNotContains(resp, 'value="reopen"', msg_prefix=str(status))
             self.assertNotContains(resp, 'value="restore"', msg_prefix=str(status))
+
+
+class AdminCancelTests(TestCase):
+    """Step 5: admin Cancel (T3) + the Cancelled tab.
+
+    Engine-level cancel correctness is covered in tickets/tests.py; here we cover
+    the admin endpoint whitelist/optional-reason extraction, the dashboard
+    Cancelled-tab context/render, and the detail-partial control gating.
+    """
+
+    def setUp(self):
+        self.admin = User.objects.create_user("admin_cx", role="admin")
+        self.requester = User.objects.create_user("client_cx", role="client")
+        self.developer = User.objects.create_user("dev_cx", role="developer")
+        self.org = Client.objects.create(name="Acme", code="ACME")
+        self.client.force_login(self.admin)
+
+    def _make(self, status, sub_status=None, **kw):
+        return Ticket.objects.create(
+            subject="A ticket", description="Body.",
+            requester=self.requester, client=self.org,
+            status=status, sub_status=sub_status, **kw,
+        )
+
+    def _url(self, t):
+        return reverse("ticket_transition", args=[t.pk])
+
+    def _detail_url(self, t):
+        return reverse("admin_ticket_detail", args=[t.pk])
+
+    # ── view-level cancel from each legal state ──────────────────────────
+    def test_cancel_from_new_without_reason(self):
+        t = self._make(S.NEW)
+        self.client.post(self._url(t), {"action": "cancel"})  # no reason (optional)
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.CANCELLED)
+        self.assertEqual(t.events.filter(action="cancel").count(), 1)
+        self.assertTrue(
+            Notification.objects.filter(
+                recipient=self.requester, ticket=t, action="cancel"
+            ).exists()
+        )
+
+    def test_cancel_from_in_progress_with_reason(self):
+        t = self._make(S.IN_PROGRESS, SS.DEVELOPMENT, assigned_developer=self.developer)
+        self.client.post(self._url(t), {"action": "cancel", "reason": "Duplicate"})
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.CANCELLED)
+        self.assertIsNone(t.sub_status)
+        self.assertEqual(t.events.filter(action="cancel").first().note, "Duplicate")
+
+    def test_cancel_from_awaiting_client_without_reason(self):
+        t = self._make(S.AWAITING_CLIENT)
+        self.client.post(self._url(t), {"action": "cancel"})
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.CANCELLED)
+
+    # ── dashboard Cancelled-tab context + render ─────────────────────────
+    def test_dashboard_includes_cancelled_context(self):
+        t = self._make(S.CANCELLED)
+        resp = self.client.get(reverse("admin_dashboard"))
+        self.assertEqual(resp.context["cancelled_count"], 1)
+        self.assertIn(t.pk, [x.pk for x in resp.context["cancelled_tickets"]])
+
+    def test_cancelled_tab_renders_ticket_with_badge(self):
+        t = self._make(S.CANCELLED)
+        resp = self.client.get(reverse("admin_dashboard"))
+        self.assertContains(resp, 'id="tab-cancelled"')
+        self.assertContains(resp, t.reference)
+        self.assertContains(
+            resp,
+            '<span class="tw-status-badge tw-status-badge--rejected">Cancelled</span>',
+        )
+
+    def test_cancelled_tab_empty_state_when_none(self):
+        resp = self.client.get(reverse("admin_dashboard"))
+        self.assertEqual(resp.context["cancelled_count"], 0)
+        # Empty-state row is rendered visible (no display:none) when none match.
+        self.assertContains(
+            resp, 'id="emptyState-cancelled" class="tw-empty-state-row">'
+        )
+
+    # ── detail-partial control gating ────────────────────────────────────
+    def test_cancel_shows_on_in_progress_and_awaiting_client(self):
+        for status, sub in [(S.IN_PROGRESS, SS.DEVELOPMENT), (S.AWAITING_CLIENT, None)]:
+            t = self._make(status, sub, assigned_developer=self.developer)
+            resp = self.client.get(self._detail_url(t))
+            self.assertContains(resp, 'name="action" value="cancel"', msg_prefix=str(status))
+
+    def test_cancelled_detail_is_read_only(self):
+        t = self._make(S.CANCELLED)
+        resp = self.client.get(self._detail_url(t))
+        self.assertNotContains(resp, 'name="action"')
+        self.assertContains(resp, "This ticket was cancelled")

@@ -38,6 +38,11 @@
         <i class="bx bx-user-check" style="margin-right:6px;" aria-hidden="true"></i>
         This ticket is with the client for UAT approval.
     </div>
+    {% elif ticket.status == 'cancelled' %}
+    <div style="background:var(--tw-bg-input);color:var(--tw-text-secondary);padding:8px 14px;border-radius:var(--tw-radius-sm);font-size:var(--tw-text-sm);margin-bottom:12px;">
+        <i class="bx bx-x-circle" style="margin-right:6px;" aria-hidden="true"></i>
+        This ticket was cancelled — no further actions are available.
+    </div>
     {% endif %}
 
     <div class="tw-info-grid">
@@ -143,6 +148,19 @@
             </select>
             <button type="submit" class="tw-btn tw-modal-action-btn" id="detailReassignBtn">
                 <i class="bx bx-transfer" aria-hidden="true"></i> Reassign
+            </button>
+        </form>
+        {% endif %}
+
+        {% if ticket.status == 'in_progress' or ticket.status == 'awaiting_client' %}
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="cancel">
+            <label class="tw-form-label" for="cancelReason">Cancel ticket — reason (optional)</label>
+            <textarea class="tw-comment-textarea" id="cancelReason" name="reason" rows="2" placeholder="Optional: why is this ticket being cancelled?"></textarea>
+            <button type="submit" class="tw-btn tw-btn-danger" id="detailCancelBtn"
+                    onclick="return confirm('Cancel this ticket? This cannot be undone.');">
+                <i class="bx bx-x-circle" aria-hidden="true"></i> Cancel Ticket
             </button>
         </form>
         {% endif %}

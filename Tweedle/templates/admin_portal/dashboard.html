@@ -231,6 +231,15 @@
                 Rejected
             </button>
 
+            <button
+                class="tw-ticket-tab"
+                role="tab"
+                aria-selected="false"
+                data-tab="cancelled"
+                aria-controls="tab-cancelled">
+                Cancelled
+            </button>
+
         </div>
         <!-- END TAB ROW -->
 
@@ -862,6 +871,78 @@
         </div>
         </div>
         <!-- END TAB: REJECTED -->
+
+
+        <!-- ==================================================
+             C3 — TAB CONTENT: CANCELLED
+             Withdrawn before completion (admin or requester).
+             data-ticket-type="existing" → read-only detail modal.
+             Django: {% for ticket in cancelled_tickets %}
+             ================================================== -->
+        <div class="tab-content" id="tab-cancelled" data-tab-content="cancelled" role="tabpanel" aria-label="Cancelled tickets">
+        <div class="table-scroll-wrapper">
+        <table class="tw-table">
+            <thead>
+                <tr>
+                    <th scope="col" class="tw-bulk-col"><input type="checkbox" class="tw-bulk-select-all" data-tab="cancelled" aria-label="Select all"></th>
+                    <th scope="col">Ticket ID</th>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Issue Date</th>
+                    <th scope="col">Client</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Priority</th>
+                    <th scope="col">Dev / Tester</th>
+                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% endverbatim %}
+            {% for ticket in cancelled_tickets %}
+                <tr data-ticket-id="{{ ticket.reference }}" data-ticket-pk="{{ ticket.pk }}" data-ticket-type="existing" data-subject="{{ ticket.subject }}" data-status="{{ ticket.status }}" data-client="{{ ticket.client.code|default:'' }}" data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}" {% role_status_data_attrs ticket "admin" %}>
+                    <td class="tw-bulk-col" onclick="event.stopPropagation()"><input type="checkbox" class="tw-row-check" data-ticket-id="{{ ticket.reference }}" aria-label="Select {{ ticket.reference }}"></td>
+                    <td>
+                        <div class="ticket-id-cell">
+                            <i class="bx bxs-star tw-star-icon" role="button" tabindex="0" aria-label="Favorite this ticket"></i>
+                            <span class="tw-ticket-id">{{ ticket.reference }}</span>
+                        </div>
+                    </td>
+                    <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
+                    <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
+                    <td>{{ ticket.client.code|default:"—" }}</td>
+                    <td>{% role_ticket_badge ticket "admin" %}</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
+                    {% if ticket.assigned_developer %}
+                    <td>
+                        <div class="allottee-cell">
+                            <div class="tw-avatar tw-avatar--sm tw-avatar--blue" aria-hidden="true">{{ ticket.assigned_developer.username|first|upper }}</div>
+                            {{ ticket.assigned_developer.username }}
+                        </div>
+                    </td>
+                    {% else %}
+                    <td><div class="allottee-cell unassigned">—</div></td>
+                    {% endif %}
+                    <td>
+                        <div class="tw-row-actions">
+                            <i class="bx bx-time-five tw-action-icon tw-action-icon--timeline" role="button" tabindex="0" aria-label="View timeline"></i>
+                            <i class="bx bx-chat tw-action-icon tw-action-icon--chat" role="button" tabindex="0" aria-label="Open chat"></i>
+                            <i class="bx bx-dots-vertical-rounded tw-action-icon tw-action-icon--more" role="button" tabindex="0" aria-label="More options"></i>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+                <tr id="emptyState-cancelled" class="tw-empty-state-row"{% if cancelled_tickets %} style="display:none;"{% endif %}>
+                    <td colspan="9" style="padding:48px 24px;text-align:center;">
+                        <i class="bx bx-inbox" style="font-size:40px;color:var(--tw-text-muted);opacity:0.4;display:block;margin-bottom:12px;"></i>
+                        <p class="tw-empty-status" style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;">No cancelled tickets.</p>
+                        <p class="tw-empty-filter" style="color:var(--tw-text-muted);font-size:var(--tw-text-base);margin:0;display:none;">No tickets match your filters.</p>
+                    </td>
+                </tr>
+            {% verbatim %}
+            </tbody>
+        </table>
+        </div>
+        </div>
+        <!-- END TAB: CANCELLED -->
 
     </div>
     <!-- END TICKET TABLE CARD -->
@@ -1663,6 +1744,7 @@
         resolved:  { heading: 'Resolved Tickets',    desc: 'Awaiting your confirmation to close' },
         closed:    { heading: 'Closed Tickets',      desc: 'Successfully resolved' },
         rejected:  { heading: 'Rejected Tickets',    desc: 'Declined by admin — client has been notified' },
+        cancelled: { heading: 'Cancelled Tickets',   desc: 'Withdrawn before completion' },
     };
 
     function updateTabHeading(tabId) {

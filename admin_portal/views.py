@@ -25,6 +25,7 @@ TAB_STATUS = {
     "resolved": S.RESOLVED,
     "closed": S.CLOSED,
     "rejected": S.REJECTED,
+    "cancelled": S.CANCELLED,
 }
 
 # Actions this admin endpoint exposes: list-level (Phase 4.2) plus the
@@ -33,6 +34,7 @@ ALLOWED_ACTIONS = {
     "assign", "reject", "resume", "send_to_uat",      # 4.2 list-level
     "request_info", "reassign", "request_changes", "close",  # 4.3 modal
     "reopen", "restore",  # reopen: resolved/closed -> in_progress; restore: rejected -> new
+    "cancel",  # cancel: new/in_progress/awaiting_client -> cancelled (reason optional)
 }
 
 
@@ -88,7 +90,8 @@ def ticket_transition(request, pk):
         tester_pk = request.POST.get("tester")
         if tester_pk:
             data["tester"] = get_object_or_404(User, pk=tester_pk, role="tester")
-    elif action in ("reject", "reopen"):
+    elif action in ("reject", "reopen", "cancel"):
+        # cancel's reason is optional (T3) — an empty string is fine.
         data["reason"] = request.POST.get("reason", "").strip()
     elif action == "request_info":
         data["message"] = request.POST.get("message", "").strip()
@@ -135,6 +138,8 @@ def _success_message(action, ticket, data):
         return f"Ticket {ref} reopened — back in development."
     if action == "restore":
         return f"Ticket {ref} restored to the inbox as New."
+    if action == "cancel":
+        return f"Ticket {ref} cancelled."
     return f"Ticket {ref} updated."
 
 
