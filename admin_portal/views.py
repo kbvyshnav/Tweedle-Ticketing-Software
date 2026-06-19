@@ -32,6 +32,7 @@ TAB_STATUS = {
 ALLOWED_ACTIONS = {
     "assign", "reject", "resume", "send_to_uat",      # 4.2 list-level
     "request_info", "reassign", "request_changes", "close",  # 4.3 modal
+    "reopen", "restore",  # reopen: resolved/closed -> in_progress; restore: rejected -> new
 }
 
 
@@ -87,7 +88,7 @@ def ticket_transition(request, pk):
         tester_pk = request.POST.get("tester")
         if tester_pk:
             data["tester"] = get_object_or_404(User, pk=tester_pk, role="tester")
-    elif action == "reject":
+    elif action in ("reject", "reopen"):
         data["reason"] = request.POST.get("reason", "").strip()
     elif action == "request_info":
         data["message"] = request.POST.get("message", "").strip()
@@ -130,6 +131,10 @@ def _success_message(action, ticket, data):
         return f"Ticket {ref} recalled to development."
     if action == "close":
         return f"Ticket {ref} closed."
+    if action == "reopen":
+        return f"Ticket {ref} reopened — back in development."
+    if action == "restore":
+        return f"Ticket {ref} restored to the inbox as New."
     return f"Ticket {ref} updated."
 
 

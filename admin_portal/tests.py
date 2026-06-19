@@ -255,13 +255,15 @@ class AdminTicketTransitionTests(TestCase):
         self.assertTrue(self._errors(resp))
 
     def test_unsupported_action_surfaces_error(self):
-        # 'reopen' is a real engine action but is NOT exposed by this endpoint.
-        t = self._make(S.RESOLVED)
+        # 'cancel' is a real engine action but is NOT exposed by this endpoint
+        # yet (deferred until the Cancelled tab exists). (reopen/restore are now
+        # exposed — see AdminReopenRestoreTests.)
+        t = self._make(S.IN_PROGRESS, SS.DEVELOPMENT, assigned_developer=self.developer)
         resp = self.client.post(
-            self._url(t), {"action": "reopen", "reason": "x"}, follow=True
+            self._url(t), {"action": "cancel", "reason": "x"}, follow=True
         )
         t.refresh_from_db()
-        self.assertEqual(t.status, S.RESOLVED)
+        self.assertEqual(t.status, S.IN_PROGRESS)
         self.assertTrue(self._errors(resp))
 
     # ── auth / CSRF ──────────────────────────────────────────────────────
@@ -415,11 +417,15 @@ class AdminTicketDetailTests(TestCase):
         self.assertContains(resp, 'name="action" value="reassign"')
         self.assertNotContains(resp, 'value="request_info"')
 
-    def test_closed_shows_no_action_forms(self):
+    def test_closed_shows_reopen_only(self):
+        # Closed is no longer read-only: admin can reopen (Step 4). The other
+        # action forms must still be absent.
         t = self._make(S.CLOSED, assigned_developer=self.developer)
         resp = self.client.get(self._url(t))
-        self.assertNotContains(resp, 'name="action"')
-        self.assertContains(resp, "no further actions")
+        self.assertContains(resp, 'name="action" value="reopen"')
+        self.assertNotContains(resp, 'value="close"')
+        self.assertNotContains(resp, 'value="request_info"')
+        self.assertNotContains(resp, 'value="request_changes"')
 
 
 class AdminTicketDrawerTests(TestCase):
@@ -471,3 +477,95 @@ class AdminTicketDrawerTests(TestCase):
         self.assertEqual(
             self.client.get(reverse("admin_ticket_chat", args=[t.pk])).status_code, 403
         )
+
+
+class AdminReopenRestoreTests(TestCase):
+    """Step 4: admin reopen (resolved/closed) + restore (rejected) wired into UI.
+
+    Engine-level transition correctness is covered in tickets/tests.py; here we
+    cover the admin endpoint whitelist/data-extraction and the detail-partial
+    control gating.
+    """
+
+    def setUp(self):
+        self.admin = User.objects.create_user("admin_rr", role="admin")
+        self.requester = User.objects.create_user("client_rr", role="client")
+        self.developer = User.objects.create_user("dev_rr", role="developer")
+        self.org = Client.objects.create(name="Acme", code="ACME")
+        self.client.force_login(self.admin)
+
+    def _make(self, status, sub_status=None, **kw):
+        return Ticket.objects.create(
+            subject="A ticket", description="Body.",
+            requester=self.requester, client=self.org,
+            status=status, sub_status=sub_status, **kw,
+        )
+
+    def _url(self, t):
+        return reverse("ticket_transition", args=[t.pk])
+
+    def _detail_url(self, t):
+        return reverse("admin_ticket_detail", args=[t.pk])
+
+    def _errors(self, resp):
+        return [m for m in resp.context["messages"] if m.level_tag == "error"]
+
+    # ── view-level: reopen / restore through the admin endpoint ───────────
+    def test_reopen_from_resolved(self):
+        t = self._make(S.RESOLVED, assigned_developer=self.developer)
+        self.client.post(self._url(t), {"action": "reopen", "reason": "Bug came back"})
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.IN_PROGRESS)
+        self.assertEqual(t.sub_status, SS.DEVELOPMENT)
+        self.assertEqual(t.assigned_developer, self.developer)  # re-routed to original dev
+        self.assertEqual(t.events.filter(action="reopen").count(), 1)
+
+    def test_reopen_from_closed(self):
+        t = self._make(S.CLOSED, assigned_developer=self.developer)
+        self.client.post(self._url(t), {"action": "reopen", "reason": "Regression"})
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.IN_PROGRESS)
+        self.assertEqual(t.sub_status, SS.DEVELOPMENT)
+        self.assertEqual(t.assigned_developer, self.developer)
+        self.assertEqual(t.events.filter(action="reopen").count(), 1)
+
+    def test_reopen_without_reason_is_rejected(self):
+        t = self._make(S.RESOLVED, assigned_developer=self.developer)
+        resp = self.client.post(
+            self._url(t), {"action": "reopen", "reason": ""}, follow=True
+        )
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.RESOLVED)  # unchanged
+        self.assertTrue(self._errors(resp))
+
+    def test_restore_from_rejected(self):
+        t = self._make(S.REJECTED)
+        self.client.post(self._url(t), {"action": "restore"})
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.NEW)
+        self.assertIsNone(t.sub_status)
+        self.assertEqual(t.events.filter(action="restore").count(), 1)
+
+    # ── detail-partial render gating ─────────────────────────────────────
+    def test_resolved_shows_reopen_and_close(self):
+        t = self._make(S.RESOLVED, assigned_developer=self.developer)
+        resp = self.client.get(self._detail_url(t))
+        self.assertContains(resp, 'name="action" value="reopen"')
+        self.assertContains(resp, 'name="action" value="close"')
+
+    def test_closed_shows_reopen(self):
+        t = self._make(S.CLOSED, assigned_developer=self.developer)
+        resp = self.client.get(self._detail_url(t))
+        self.assertContains(resp, 'name="action" value="reopen"')
+
+    def test_rejected_shows_restore(self):
+        t = self._make(S.REJECTED)
+        resp = self.client.get(self._detail_url(t))
+        self.assertContains(resp, 'name="action" value="restore"')
+
+    def test_reopen_restore_absent_where_not_applicable(self):
+        for status, sub in [(S.NEW, None), (S.IN_PROGRESS, SS.DEVELOPMENT), (S.UAT, None)]:
+            t = self._make(status, sub, assigned_developer=self.developer)
+            resp = self.client.get(self._detail_url(t))
+            self.assertNotContains(resp, 'value="reopen"', msg_prefix=str(status))
+            self.assertNotContains(resp, 'value="restore"', msg_prefix=str(status))

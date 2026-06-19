@@ -26,7 +26,7 @@
     {% if ticket.status == 'closed' %}
     <div style="background:var(--tw-status-closed-bg);color:var(--tw-status-closed-text);padding:8px 14px;border-radius:var(--tw-radius-sm);font-size:var(--tw-text-sm);margin-bottom:12px;">
         <i class="bx bx-lock-alt" style="margin-right:6px;" aria-hidden="true"></i>
-        This ticket is closed — no further actions are available.
+        This ticket is closed — you can reopen it from the actions below if needed.
     </div>
     {% elif ticket.status == 'rejected' %}
     <div style="background:var(--tw-priority-high-bg);color:var(--tw-priority-high-text);padding:8px 14px;border-radius:var(--tw-radius-sm);font-size:var(--tw-text-sm);margin-bottom:12px;">
@@ -97,7 +97,7 @@
     </div>
 
     {# ── Admin actions — visibility mirrors the transition engine ────────── #}
-    {% if ticket.status == 'in_progress' or ticket.status == 'awaiting_client' or ticket.status == 'uat' or ticket.status == 'resolved' %}
+    {% if ticket.status == 'in_progress' or ticket.status == 'awaiting_client' or ticket.status == 'uat' or ticket.status == 'resolved' or ticket.status == 'closed' or ticket.status == 'rejected' %}
     <div class="tw-modal-section" id="adminActions">
         <h3 class="section-title">Actions</h3>
 
@@ -160,11 +160,42 @@
         {% endif %}
 
         {% if ticket.status == 'resolved' %}
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reopen">
+            <label class="tw-form-label" for="reopenReason">Reopen — reason <span class="tw-required">*</span></label>
+            <textarea class="tw-comment-textarea" id="reopenReason" name="reason" rows="2" required placeholder="Why is this ticket being reopened?"></textarea>
+            <button type="submit" class="tw-btn tw-btn-outline" id="detailReopenBtn">
+                <i class="bx bx-refresh" aria-hidden="true"></i> Reopen Ticket
+            </button>
+        </form>
         <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form">
             {% csrf_token %}
             <input type="hidden" name="action" value="close">
             <button type="submit" class="tw-btn-close-ticket" id="detailCloseBtn">
                 <i class="bx bx-x-circle" aria-hidden="true"></i> Close Ticket
+            </button>
+        </form>
+        {% endif %}
+
+        {% if ticket.status == 'closed' %}
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reopen">
+            <label class="tw-form-label" for="reopenReason">Reopen — reason <span class="tw-required">*</span></label>
+            <textarea class="tw-comment-textarea" id="reopenReason" name="reason" rows="2" required placeholder="Why is this ticket being reopened?"></textarea>
+            <button type="submit" class="tw-btn tw-btn-outline" id="detailReopenBtn">
+                <i class="bx bx-refresh" aria-hidden="true"></i> Reopen Ticket
+            </button>
+        </form>
+        {% endif %}
+
+        {% if ticket.status == 'rejected' %}
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="restore">
+            <button type="submit" class="tw-btn tw-btn-success" id="detailRestoreBtn">
+                <i class="bx bx-undo" aria-hidden="true"></i> Restore to Inbox
             </button>
         </form>
         {% endif %}
