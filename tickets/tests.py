@@ -320,13 +320,51 @@ class AuthorizationTests(EngineTestBase):
         t.refresh_from_db()
         self.assertEqual(t.status, S.NEW)
 
-    def test_non_requester_client_cannot_approve(self):
-        other = User.objects.create_user("client2", role="client", client=self.org)
-        t = self.in_uat()  # requester is self.client_user
+    def test_org_client_can_approve_subuser_ticket(self):
+        # A sub-user submits; the org's primary client (not the requester) may
+        # approve it (TARGET §4/§6: client/admin hold approval).
+        t = self.make_ticket(status=S.UAT, sub_status=None, requester=self.subuser,
+                             assigned_developer=self.developer)
+        transition(t, "approve", self.client_user)
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.RESOLVED)
+
+    def test_org_client_can_request_changes_subuser_ticket(self):
+        t = self.make_ticket(status=S.UAT, sub_status=None, requester=self.subuser,
+                             assigned_developer=self.developer)
+        transition(t, "request_changes", self.client_user, feedback="Still off")
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.IN_PROGRESS)
+        self.assertEqual(t.sub_status, SS.DEVELOPMENT)
+
+    def test_org_client_can_reopen_subuser_ticket(self):
+        t = self.make_ticket(status=S.RESOLVED, sub_status=None, requester=self.subuser,
+                             assigned_developer=self.developer)
+        transition(t, "reopen", self.client_user, reason="Regressed")
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.IN_PROGRESS)
+        self.assertEqual(t.sub_status, SS.DEVELOPMENT)
+
+    def test_cross_org_client_cannot_approve(self):
+        other_org = Client.objects.create(name="Initech", code="INTC")
+        other_client = User.objects.create_user(
+            "client_other", role="client", client=other_org
+        )
+        t = self.in_uat()  # requester is self.client_user (org GMEC)
         with self.assertRaises(TransitionNotAllowed):
-            transition(t, "approve", other)
+            transition(t, "approve", other_client)
         t.refresh_from_db()
         self.assertEqual(t.status, S.UAT)
+
+    def test_org_client_reopen_closed_past_window_still_raises(self):
+        # The org-client extension does not bypass the closed reopen window.
+        t = self.make_ticket(status=S.CLOSED, sub_status=None, requester=self.subuser,
+                             assigned_developer=self.developer,
+                             closed_at=timezone.now() - timedelta(days=30))
+        with self.assertRaises(InvalidTransition):
+            transition(t, "reopen", self.client_user, reason="Too late")
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.CLOSED)
 
 
 class IllegalTransitionTests(EngineTestBase):

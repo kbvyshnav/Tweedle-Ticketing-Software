@@ -61,16 +61,36 @@ def _require_requester_or_admin(ticket, actor):
         )
 
 
+def _require_org_client_or_requester_or_admin(ticket, actor):
+    """Admin, the ticket's requester, or the org's primary (client-role) account.
+
+    Lets the org's client-role account holder act on a SUB-USER's ticket
+    (TARGET §4/§6: the client/admin hold approval of a sub-user's ticket), while
+    keeping cross-org clients and non-requester sub-users out. The role check in
+    each Rule still gates which roles may attempt the action at all.
+    """
+    if actor.role == "admin":
+        return
+    if actor.pk == ticket.requester_id:
+        return
+    if actor.role == "client" and actor.client_id and actor.client_id == ticket.client_id:
+        return
+    raise TransitionNotAllowed(
+        f"{actor} may not act on {ticket.reference}."
+    )
+
+
 def guard_cancel(ticket, actor, data):
+    # §6 gives the client no cancel verb; T3 is requester/admin only.
     _require_requester_or_admin(ticket, actor)
 
 
 def guard_approve(ticket, actor, data):
-    _require_requester_or_admin(ticket, actor)
+    _require_org_client_or_requester_or_admin(ticket, actor)
 
 
 def guard_request_changes(ticket, actor, data):
-    _require_requester_or_admin(ticket, actor)
+    _require_org_client_or_requester_or_admin(ticket, actor)
 
 
 def guard_confirm(ticket, actor, data):
@@ -84,8 +104,9 @@ def guard_confirm(ticket, actor, data):
 def guard_reopen(ticket, actor, data):
     if actor.role == "admin":
         return  # admin may reopen resolved/closed anytime
-    if actor.pk != ticket.requester_id:
-        raise TransitionNotAllowed("Only the requester or an admin may reopen.")
+    # Requester or the org's primary client may reopen (resolved unrestricted;
+    # closed is window-bounded below for non-admins).
+    _require_org_client_or_requester_or_admin(ticket, actor)
     if ticket.status == S.CLOSED:
         if ticket.closed_at is None:
             raise InvalidTransition("Closed ticket has no closed_at timestamp.")

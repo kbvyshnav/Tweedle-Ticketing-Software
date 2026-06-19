@@ -359,22 +359,13 @@ class BranchTests(E2EBase):
         self.assertContains(self._dash(self.client_user, "client_dashboard"), ">Cancelled</span>")
         self.assertNotContains(self._detail(self.admin, "admin_ticket_detail", t), 'name="action"')
 
-    def test_branch_subuser_confirm_resolution_blocked(self):
-        """Sub-user-submitted ticket: confirm works, but resolution is BLOCKED.
+    def test_branch_subuser_confirm_then_client_approve(self):
+        """Sub-user-submitted ticket: sub-user confirms, primary client approves.
 
-        KNOWN DIVERGENCE (escalates finding #2 — captured, NOT fixed this step;
-        a fix decision is pending). TARGET §4/§6 say the client/admin hold final
-        approval of a sub-user-submitted ticket. In the current build NEITHER can
-        approve it through any portal:
-          * client endpoint `approve` → engine ownership guard
-            (`_require_requester_or_admin`) blocks the non-requester client;
-          * admin endpoint has NO `approve` in ALLOWED_ACTIONS (approve was only
-            ever wired into the client portal as the T7 action), so admin
-            `approve` is rejected as an unsupported action;
-          * the sub-user (the requester) lacks the `approve` role entirely.
-        ⇒ a sub-user-submitted ticket is STUCK at `uat` — the only portal moves
-        are admin Recall (request_changes) or Cancel. This test characterises the
-        stuck-state; it must be updated when the gap is fixed.
+        Step 7 fix: the org's primary (client-role) account may now approve a
+        sub-user's ticket (TARGET §4/§6 — client/admin hold approval). Asserts the
+        three confirmed-variant labels, then the primary CLIENT (not the
+        requester) resolves it.
         """
         t = self._drive_to_uat(self.subuser, "subuser:submit_ticket")
         self.assertEqual(t.requester, self.subuser)
@@ -385,29 +376,21 @@ class BranchTests(E2EBase):
         self.assertTrue(t.subuser_confirmed)
         self.assertTrue(self._notified(self.client_user, t, "confirm"))  # primary client
         self.assertTrue(self._notified(self.admin, t, "confirm"))
-        # confirmed-variant labels render correctly for each role (matrix is fine)
+        # confirmed-variant labels render correctly for each role
         self.assertContains(self._detail(self.subuser, "subuser:ticket_detail", t),
                             "Confirmed — Awaiting Approval")
         self.assertContains(self._dash(self.client_user, "client_dashboard"),
                             "Ready for Your Review (sub-user confirmed)")
         self.assertContains(self._detail(self.admin, "admin_ticket_detail", t),
                             "UAT — sub-user confirmed, awaiting client approval")
-        # SYMPTOM: client detail RENDERS Approve/Request Changes (org-scoped view)
-        # — present-but-broken — but the POST is engine-rejected (ownership).
+        # the primary client detail offers Approve / Request Changes…
         cdetail = self._detail(self.client_user, "client_ticket_detail", t)
         self.assertContains(cdetail, 'value="approve"')
         self.assertContains(cdetail, 'value="request_changes"')
-        self._act(self.client_user, "client_ticket_transition", t, action="approve")
-        t.refresh_from_db()
-        self.assertEqual(t.status, S.UAT)  # client approve blocked → unchanged
-        # admin `approve` is NOT exposed by the admin endpoint → unsupported.
-        self._act(self.admin, "ticket_transition", t, action="approve")
-        t.refresh_from_db()
-        self.assertEqual(t.status, S.UAT)  # admin approve unsupported → still stuck
-        # The only forward move available to admin is Recall (→ development).
-        self._act(self.admin, "ticket_transition", t,
-                  expect_status=S.IN_PROGRESS, expect_sub=SS.DEVELOPMENT,
-                  action="request_changes", feedback="No approve path; recalling.")
+        # …and the primary client (non-requester) can now resolve it.
+        self._act(self.client_user, "client_ticket_transition", t,
+                  expect_status=S.RESOLVED, expect_sub=None, action="approve")
+        self.assertTrue(self._notified(self.admin, t, "approve"))
 
     def test_branch_subuser_still_broken(self):
         """Sub-user request_changes ('Still Broken') on their OWN uat ticket."""

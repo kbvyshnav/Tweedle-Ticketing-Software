@@ -19,16 +19,14 @@ Demo logins (all password `TweedleDemo!2026`): `demo_admin`, `demo_client`,
 menu → Sign Out, or an incognito window per role). Org for the demo client/subuser is
 **GMEC**.
 
-> **Two expected anomalies — do NOT treat as walkthrough failures:**
+> **One expected anomaly — do NOT treat as a walkthrough failure:**
 > - **(A) Client "Respond" dead button** (defect #3): on an *Awaiting Client* ticket the
 >   client/sub-user detail shows a **disabled** "Respond"/"Reply in Chat" button — chat
 >   posting isn't wired yet. The loop is driven by the admin (Resume). Expected.
-> - **(B) Sub-user-submitted tickets can't be approved** (finding #2, escalated): a ticket
->   *submitted by a sub-user* cannot be moved to Resolved by any portal — the client's
->   Approve is engine-blocked (not the requester) and the admin portal has no Approve
->   control. Only admin **Recall** or **Cancel** work. The main walkthrough below uses a
->   **client-submitted** ticket, which approves normally. The sub-user path is exercised
->   separately in §B at the end and is expected to stick at UAT.
+>
+> *(Former anomaly (B) — sub-user-submitted tickets being unresolvable — was FIXED in Step 7:
+> the org's primary client can now approve/request_changes/reopen a sub-user's ticket. The §B
+> path below now resolves normally.)*
 
 ---
 
@@ -120,7 +118,7 @@ menu → Sign Out, or an incognito window per role). Org for the demo client/sub
 
 ---
 
-## §B. SUB-USER PATH (exercises anomalies A + B)
+## §B. SUB-USER PATH (sub-user confirm → primary client approves)
 
 1. **`demo_subuser`** at **/subuser/** → **Submit a Ticket** → submit. Badge
    **"New — Received"**.
@@ -131,12 +129,9 @@ menu → Sign Out, or an incognito window per role). Org for the demo client/sub
    - **Expect:** the sub-user badge/card becomes **"Confirmed — Awaiting Approval"**; the
      primary client (`demo_client`) sees **"Ready for Your Review (sub-user confirmed)"**; the
      admin detail badge reads **"UAT — sub-user confirmed, awaiting client approval"**.
-4. **`demo_client`** → open that ticket → you'll see **Approve & Close / Request Changes**
-   buttons **(anomaly B: present-but-broken)**. Clicking **Approve** produces an **error
-   toast** and the ticket **stays at UAT** — the primary client is not the requester, so the
-   engine blocks it.
-5. **`demo_admin`** → the admin portal has **no Approve control** for this ticket; the only
-   forward moves are **Recall** (→ Development) or **Cancel**.
-   - **Expect / FINDING:** a sub-user-submitted ticket currently **cannot be moved to
-     Resolved by any portal** — it is stuck at UAT pending a fix decision (see finding #2,
-     escalated). This is a known, captured gap, not a walkthrough error.
+4. **`demo_client`** → open that ticket → **Approve & Close / Request Changes** are shown.
+   Click **Approve & Close** → confirm.
+   - **Expect (Step 7 fix):** success toast; the ticket moves to **Resolved** — the org's
+     primary client can now resolve a sub-user's ticket even though they aren't the original
+     requester. (A **different-org** client still cannot — they get a 404/error.)
+5. **`demo_admin`** → **Resolved** tab → **Close Ticket** to finish the lifecycle.
