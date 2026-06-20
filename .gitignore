@@ -8,6 +8,7 @@ TODO.txt
 !requirements.txt
 
 # ── AI and project meta files ───────────────────────────────────
+docs/
 .claude/
 PROJECT_HANDOFF.md
 RECON_REPORT.md
@@ -16,6 +17,7 @@ STATUS_TAXONOMY.md
 TARGET_TICKET_FLOW.md
 CURRENT_TICKET_FLOW.md
 BACKEND_BUILD_STATE.md
+FLOW_WALKTHROUGH.md
 
 # ── OS generated files ──────────────────────────────────────────
 .DS_Store
