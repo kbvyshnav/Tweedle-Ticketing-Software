@@ -102,9 +102,42 @@
     </div>
 
     {# ── Admin actions — visibility mirrors the transition engine ────────── #}
-    {% if ticket.status == 'in_progress' or ticket.status == 'awaiting_client' or ticket.status == 'uat' or ticket.status == 'resolved' or ticket.status == 'closed' or ticket.status == 'rejected' %}
+    {% if ticket.status == 'new' or ticket.status == 'in_progress' or ticket.status == 'awaiting_client' or ticket.status == 'uat' or ticket.status == 'resolved' or ticket.status == 'closed' or ticket.status == 'rejected' %}
     <div class="tw-modal-section" id="adminActions">
         <h3 class="section-title">Actions</h3>
+
+        {% if ticket.status == 'new' %}
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;" onsubmit="return confirmAssignDetail(event)">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="assign">
+            <label class="tw-form-label" for="assignDev">Assign developer <span class="tw-required">*</span></label>
+            <select class="tw-select" id="assignDev" name="developer" required>
+                <option value="">— choose developer —</option>
+                {% for d in developers %}
+                <option value="{{ d.pk }}">{{ d.username }}</option>
+                {% endfor %}
+            </select>
+            <label class="tw-form-label" for="assignTester">Assign tester (optional)</label>
+            <select class="tw-select" id="assignTester" name="tester">
+                <option value="">— no tester —</option>
+                {% for t in testers %}
+                <option value="{{ t.pk }}">{{ t.username }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="tw-btn tw-btn-success" id="detailAssignBtn">
+                <i class="bx bx-user-check" aria-hidden="true"></i> Assign Ticket
+            </button>
+        </form>
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" onsubmit="return confirmRejectDetail(event)">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reject">
+            <label class="tw-form-label" for="rejectReasonDetail">Reject — reason <span class="tw-required">*</span></label>
+            <textarea class="tw-comment-textarea" id="rejectReasonDetail" name="reason" rows="2" required placeholder="Why is this ticket being rejected?"></textarea>
+            <button type="submit" class="tw-btn tw-btn-danger" id="detailRejectBtn">
+                <i class="bx bx-x-circle" aria-hidden="true"></i> Reject Ticket
+            </button>
+        </form>
+        {% endif %}
 
         {% if ticket.status == 'awaiting_client' %}
         <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;">
@@ -124,6 +157,17 @@
             <textarea class="tw-comment-textarea" id="requestInfoMsg" name="message" rows="2" required placeholder="What do you need from the client?"></textarea>
             <button type="submit" class="tw-btn tw-modal-action-btn--warning" id="detailRequestInfoBtn">
                 <i class="bx bx-share" aria-hidden="true"></i> Request Info
+            </button>
+        </form>
+        {% endif %}
+
+        {% if ticket.status == 'in_progress' and ticket.sub_status == 'ready_for_uat' %}
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="send_to_uat">
+            <button type="button" class="tw-btn tw-btn-success" id="detailSendUatBtn"
+                    onclick="confirmInlineAction(this, 'Send to Client UAT?', 'This moves the ticket to UAT Approval and notifies the client to review and approve.')">
+                <i class="bx bx-check-shield" aria-hidden="true"></i> Send to Client UAT
             </button>
         </form>
         {% endif %}

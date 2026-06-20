@@ -1870,12 +1870,9 @@
             var type     = this.dataset.ticketType || 'existing';
             var subject  = this.dataset.subject || '';
 
-            if (type === 'new') {
-                openNewTicketModal(ticketId, subject, 'New Ticket');
-            } else {
-                /* existing AND rejected -> the server-rendered detail modal */
-                openTicketDetails(this.dataset.ticketPk);
-            }
+            /* All tickets (new/existing/rejected) open the server-rendered detail
+               partial; the new-ticket assign/reject controls live in it now. */
+            openTicketDetails(this.dataset.ticketPk);
         });
     });
 
@@ -1931,6 +1928,57 @@
                 if (form.requestSubmit) { form.requestSubmit(); } else { form.submit(); }
             }
         });
+    }
+
+    /* Detail-partial Assign / Reject — form-scoped so they work from the injected
+       partial and never touch the orphaned #newTicketModal element IDs. They reuse
+       the page-level confirm box. onConfirm uses form.submit() (NOT requestSubmit)
+       so it bypasses these onsubmit guards and actually POSTs. */
+    function _htmlEscape(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function confirmAssignDetail(e) {
+        e.preventDefault();
+        var form   = e.target;
+        var devSel = form.querySelector('select[name="developer"]');
+        if (!devSel || !devSel.value) {
+            showDashToast('Please select a developer.', 'error');
+            if (devSel) devSel.focus();
+            return false;
+        }
+        var devName   = devSel.options[devSel.selectedIndex].text;
+        var testerSel = form.querySelector('select[name="tester"]');
+        var testerName = (testerSel && testerSel.value)
+            ? testerSel.options[testerSel.selectedIndex].text : null;
+        openConfirmModal({
+            type:    'success',
+            title:   'Confirm Assignment',
+            message: testerName
+                ? 'Assign ' + devName + ' (developer) and ' + testerName + ' (tester) to this ticket?'
+                : 'Assign ' + devName + ' as developer? A tester can be assigned later.',
+            onConfirm: function () { form.submit(); }
+        });
+        return false;
+    }
+
+    function confirmRejectDetail(e) {
+        e.preventDefault();
+        var form = e.target;
+        var ta   = form.querySelector('textarea[name="reason"]');
+        if (!ta || !ta.value.trim()) {
+            showDashToast('A rejection reason is required.', 'error');
+            if (ta) ta.focus();
+            return false;
+        }
+        openConfirmModal({
+            type:    'danger',
+            title:   'Reject Ticket',
+            message: 'Reject this ticket? The requester will be notified.',
+            details: '<p><strong>Reason:</strong> ' + _htmlEscape(ta.value.trim()) + '</p>',
+            onConfirm: function () { form.submit(); }
+        });
+        return false;
     }
 
     /* === TOAST NOTIFICATION === */
@@ -2445,13 +2493,8 @@
                         row.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         setTimeout(function() { row.classList.remove('row-highlight'); }, 1800);
 
-                        /* Open the appropriate modal for this ticket */
-                        var type = row.dataset.ticketType || 'existing';
-                        if (type === 'new') {
-                            openNewTicketModal(ticket.id, ticket.subject, 'New Ticket');
-                        } else {
-                            openTicketDetails(row.dataset.ticketPk);
-                        }
+                        /* Open the server-rendered detail partial for this ticket. */
+                        openTicketDetails(row.dataset.ticketPk);
                     }, 120);
                 });
 
@@ -2681,12 +2724,7 @@
             var row = document.querySelector('.tab-content tbody tr[data-ticket-id="' + ticketId + '"]');
             if (!row) return;
             row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            var type = row.dataset.ticketType || 'existing';
-            if (type === 'new') {
-                openNewTicketModal(ticketId, row.dataset.subject || '', 'New Ticket');
-            } else {
-                openTicketDetails(row.dataset.ticketPk);
-            }
+            openTicketDetails(row.dataset.ticketPk);
         }, 150);
     }
 

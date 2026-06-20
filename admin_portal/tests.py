@@ -662,3 +662,83 @@ class AdminCancelTests(TestCase):
         resp = self.client.get(self._detail_url(t))
         self.assertNotContains(resp, 'name="action"')
         self.assertContains(resp, "This ticket was cancelled")
+
+
+class AdminNewTicketDetailTests(TestCase):
+    """Step B: new tickets open the real detail partial (not the static modal),
+    with relocated Assign/Reject; send_to_uat is in the modal at ready_for_uat.
+    """
+
+    def setUp(self):
+        self.admin = User.objects.create_user("admin_nt", role="admin")
+        self.requester = User.objects.create_user("client_nt", role="client")
+        self.developer = User.objects.create_user("dev_nt", role="developer")
+        self.tester = User.objects.create_user("tester_nt", role="tester")
+        self.org = Client.objects.create(name="Globomantics", code="GMEC")
+        self.requester.client = self.org
+        self.requester.save(update_fields=["client"])
+        self.client.force_login(self.admin)
+
+    def _make(self, status=S.NEW, sub_status=None, **kw):
+        return Ticket.objects.create(
+            subject="Federal API failing", description="500s on payment webhook.",
+            category="Integration", priority="high",
+            requester=self.requester, client=self.org,
+            status=status, sub_status=sub_status, **kw,
+        )
+
+    def _detail(self, t):
+        return reverse("admin_ticket_detail", args=[t.pk])
+
+    def _transition(self, t):
+        return reverse("ticket_transition", args=[t.pk])
+
+    def test_new_detail_renders_real_data_and_assign_reject(self):
+        t = self._make()
+        resp = self.client.get(self._detail(t))
+        self.assertEqual(resp.status_code, 200)
+        # real, per-ticket data (not the old hardcoded modal placeholders)
+        self.assertContains(resp, "Federal API failing")
+        self.assertContains(resp, self.requester.username)
+        self.assertContains(resp, "GMEC")
+        self.assertContains(resp, "tw-priority-badge--high")
+        # relocated assign / reject controls
+        self.assertContains(resp, 'name="action" value="assign"')
+        self.assertContains(resp, 'name="action" value="reject"')
+        # the old static modal fakes never appear in the partial
+        self.assertNotContains(resp, "Rahul R Nair")
+        self.assertNotContains(resp, "wallet_specs.pdf")
+
+    def test_new_ticket_timeline_drawer_shows_submitted(self):
+        t = self._make()
+        resp = self.client.get(reverse("admin_ticket_timeline", args=[t.pk]))
+        self.assertContains(resp, "Ticket Submitted")
+
+    def test_assign_from_partial_posts_and_transitions(self):
+        t = self._make()
+        self.client.post(self._transition(t), {
+            "action": "assign", "developer": self.developer.pk, "tester": self.tester.pk,
+        })
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.IN_PROGRESS)
+        self.assertEqual(t.sub_status, SS.DEVELOPMENT)
+        self.assertEqual(t.assigned_developer, self.developer)
+        self.assertEqual(t.assigned_tester, self.tester)
+
+    def test_reject_from_partial_posts_and_transitions(self):
+        t = self._make()
+        self.client.post(self._transition(t), {"action": "reject", "reason": "Out of scope"})
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.REJECTED)
+
+    def test_ready_for_uat_detail_shows_send_to_uat(self):
+        t = self._make(status=S.IN_PROGRESS, sub_status=SS.READY_FOR_UAT,
+                       assigned_developer=self.developer)
+        resp = self.client.get(self._detail(t))
+        self.assertContains(resp, 'name="action" value="send_to_uat"')
+
+    def test_development_detail_has_no_send_to_uat(self):
+        t = self._make(status=S.IN_PROGRESS, sub_status=SS.DEVELOPMENT,
+                       assigned_developer=self.developer)
+        resp = self.client.get(self._detail(t))
+        self.assertNotContains(resp, 'value="send_to_uat"')
