@@ -742,3 +742,86 @@ class AdminNewTicketDetailTests(TestCase):
                        assigned_developer=self.developer)
         resp = self.client.get(self._detail(t))
         self.assertNotContains(resp, 'value="send_to_uat"')
+
+
+class AdminConfirmHookTests(TestCase):
+    """Step C: every admin modal action routes through the custom confirm box.
+
+    These assert the confirm HOOK is present in the partial (and the underlying
+    POST still transitions). The visual confirm behavior — box appears, input
+    echoed, Cancel aborts, Confirm acts — needs BROWSER verification; the Django
+    test client does not run JS.
+    """
+
+    def setUp(self):
+        self.admin = User.objects.create_user("admin_ch", role="admin")
+        self.requester = User.objects.create_user("client_ch", role="client")
+        self.developer = User.objects.create_user("dev_ch", role="developer")
+        self.tester = User.objects.create_user("tester_ch", role="tester")
+        self.org = Client.objects.create(name="Globomantics", code="GMEC")
+        self.client.force_login(self.admin)
+
+    def _make(self, status=S.NEW, sub_status=None, **kw):
+        return Ticket.objects.create(
+            subject="A ticket", description="Body.",
+            requester=self.requester, client=self.org,
+            status=status, sub_status=sub_status, **kw,
+        )
+
+    def _detail(self, t):
+        return self.client.get(reverse("admin_ticket_detail", args=[t.pk]))
+
+    def _txn(self, t):
+        return reverse("ticket_transition", args=[t.pk])
+
+    # ── hook presence per action ─────────────────────────────────────────
+    def test_new_keeps_assign_and_reject_helpers(self):
+        resp = self._detail(self._make(S.NEW))
+        self.assertContains(resp, "confirmAssignDetail")
+        self.assertContains(resp, "confirmRejectDetail")
+
+    def test_awaiting_client_resume_reassign_cancel_hooked(self):
+        t = self._make(S.AWAITING_CLIENT, assigned_developer=self.developer)
+        resp = self._detail(t)
+        self.assertContains(resp, "confirmDetailAction(event, {title:'Resume Ticket'")
+        self.assertContains(resp, "confirmDetailAction(event, {reassign:true")
+        self.assertContains(resp, "optional:true, type:'danger', title:'Cancel Ticket'")
+        self.assertNotContains(resp, 'onclick="return confirm(')  # native confirm gone
+
+    def test_in_progress_request_info_reassign_cancel_hooked(self):
+        t = self._make(S.IN_PROGRESS, SS.DEVELOPMENT, assigned_developer=self.developer)
+        resp = self._detail(t)
+        self.assertContains(resp, "{field:'message', title:'Request Info'")
+        self.assertContains(resp, "confirmDetailAction(event, {reassign:true")
+        self.assertContains(resp, "title:'Cancel Ticket'")
+        self.assertNotContains(resp, 'onclick="return confirm(')
+
+    def test_uat_request_changes_hooked(self):
+        resp = self._detail(self._make(S.UAT, assigned_developer=self.developer))
+        self.assertContains(resp, "{field:'feedback', title:'Recall to In Progress'")
+
+    def test_resolved_reopen_and_close_hooked(self):
+        resp = self._detail(self._make(S.RESOLVED, assigned_developer=self.developer))
+        self.assertContains(resp, "title:'Reopen Ticket'")
+        self.assertContains(resp, "{type:'danger', title:'Close Ticket'")
+
+    def test_closed_reopen_hooked(self):
+        resp = self._detail(self._make(S.CLOSED, assigned_developer=self.developer))
+        self.assertContains(resp, "title:'Reopen Ticket'")
+
+    def test_rejected_restore_hooked(self):
+        resp = self._detail(self._make(S.REJECTED))
+        self.assertContains(resp, "title:'Restore Ticket'")
+
+    # ── no-regression: the underlying POSTs still transition ─────────────
+    def test_close_post_still_transitions(self):
+        t = self._make(S.RESOLVED, assigned_developer=self.developer)
+        self.client.post(self._txn(t), {"action": "close"})
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.CLOSED)
+
+    def test_cancel_post_still_transitions(self):
+        t = self._make(S.IN_PROGRESS, SS.DEVELOPMENT, assigned_developer=self.developer)
+        self.client.post(self._txn(t), {"action": "cancel", "reason": "Duplicate"})
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.CANCELLED)

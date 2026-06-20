@@ -140,7 +140,7 @@
         {% endif %}
 
         {% if ticket.status == 'awaiting_client' %}
-        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;">
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;" onsubmit="return confirmDetailAction(event, {title:'Resume Ticket', message:'Resume this ticket — back to In Progress?'})">
             {% csrf_token %}
             <input type="hidden" name="action" value="resume">
             <button type="submit" class="tw-btn tw-btn-success" id="detailResumeBtn">
@@ -150,7 +150,7 @@
         {% endif %}
 
         {% if ticket.status == 'in_progress' %}
-        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;">
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;" onsubmit="return confirmDetailAction(event, {field:'message', title:'Request Info', message:'Send this information request to the client?', echoLabel:'Message', requiredMsg:'A message is required.'})">
             {% csrf_token %}
             <input type="hidden" name="action" value="request_info">
             <label class="tw-form-label" for="requestInfoMsg">Request info from the client <span class="tw-required">*</span></label>
@@ -173,7 +173,7 @@
         {% endif %}
 
         {% if ticket.status == 'in_progress' or ticket.status == 'awaiting_client' %}
-        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;">
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;" onsubmit="return confirmDetailAction(event, {reassign:true, title:'Reassign Ticket', message:'Reassign this ticket?'})">
             {% csrf_token %}
             <input type="hidden" name="action" value="reassign">
             <label class="tw-form-label" for="reassignDev">Reassign developer</label>
@@ -197,20 +197,19 @@
         {% endif %}
 
         {% if ticket.status == 'in_progress' or ticket.status == 'awaiting_client' %}
-        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;">
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;" onsubmit="return confirmDetailAction(event, {field:'reason', optional:true, type:'danger', title:'Cancel Ticket', message:'Cancel this ticket? This cannot be undone.', echoLabel:'Reason'})">
             {% csrf_token %}
             <input type="hidden" name="action" value="cancel">
             <label class="tw-form-label" for="cancelReason">Cancel ticket — reason (optional)</label>
             <textarea class="tw-comment-textarea" id="cancelReason" name="reason" rows="2" placeholder="Optional: why is this ticket being cancelled?"></textarea>
-            <button type="submit" class="tw-btn tw-btn-danger" id="detailCancelBtn"
-                    onclick="return confirm('Cancel this ticket? This cannot be undone.');">
+            <button type="submit" class="tw-btn tw-btn-danger" id="detailCancelBtn">
                 <i class="bx bx-x-circle" aria-hidden="true"></i> Cancel Ticket
             </button>
         </form>
         {% endif %}
 
         {% if ticket.status == 'uat' %}
-        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;">
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;" onsubmit="return confirmDetailAction(event, {field:'feedback', title:'Recall to In Progress', message:'Recall this ticket to development?', echoLabel:'Feedback', requiredMsg:'Feedback is required.'})">
             {% csrf_token %}
             <input type="hidden" name="action" value="request_changes">
             <label class="tw-form-label" for="recallFeedback">Recall to In Progress — feedback <span class="tw-required">*</span></label>
@@ -222,7 +221,7 @@
         {% endif %}
 
         {% if ticket.status == 'resolved' %}
-        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;">
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" style="margin-bottom:12px;" onsubmit="return confirmDetailAction(event, {field:'reason', title:'Reopen Ticket', message:'Reopen this ticket — back to development?', echoLabel:'Reason', requiredMsg:'A reopen reason is required.'})">
             {% csrf_token %}
             <input type="hidden" name="action" value="reopen">
             <label class="tw-form-label" for="reopenReason">Reopen — reason <span class="tw-required">*</span></label>
@@ -231,7 +230,7 @@
                 <i class="bx bx-refresh" aria-hidden="true"></i> Reopen Ticket
             </button>
         </form>
-        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form">
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" onsubmit="return confirmDetailAction(event, {type:'danger', title:'Close Ticket', message:'Close this resolved ticket? This signs it off.'})">
             {% csrf_token %}
             <input type="hidden" name="action" value="close">
             <button type="submit" class="tw-btn-close-ticket" id="detailCloseBtn">
@@ -241,7 +240,7 @@
         {% endif %}
 
         {% if ticket.status == 'closed' %}
-        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form">
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" onsubmit="return confirmDetailAction(event, {field:'reason', title:'Reopen Ticket', message:'Reopen this ticket — back to development?', echoLabel:'Reason', requiredMsg:'A reopen reason is required.'})">
             {% csrf_token %}
             <input type="hidden" name="action" value="reopen">
             <label class="tw-form-label" for="reopenReason">Reopen — reason <span class="tw-required">*</span></label>
@@ -253,7 +252,7 @@
         {% endif %}
 
         {% if ticket.status == 'rejected' %}
-        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form">
+        <form method="post" action="{% url 'ticket_transition' ticket.pk %}" class="tw-detail-action-form" onsubmit="return confirmDetailAction(event, {title:'Restore Ticket', message:'Restore this ticket to the inbox as New?'})">
             {% csrf_token %}
             <input type="hidden" name="action" value="restore">
             <button type="submit" class="tw-btn tw-btn-success" id="detailRestoreBtn">

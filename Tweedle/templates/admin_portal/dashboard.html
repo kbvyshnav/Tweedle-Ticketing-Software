@@ -1981,6 +1981,55 @@
         return false;
     }
 
+    /* Generalized detail-partial confirm for the remaining modal actions
+       (close/cancel/reopen/restore/reassign/request_info/request_changes/resume).
+       Form-scoped (works from the injected partial); validates + echoes input;
+       onConfirm uses form.submit() to bypass this onsubmit guard and POST. */
+    function confirmDetailAction(e, opts) {
+        e.preventDefault();
+        var form = e.target;
+        opts = opts || {};
+        var details = '';
+
+        if (opts.field) {  // required / optional text field
+            var input = form.querySelector('[name="' + opts.field + '"]');
+            var val   = input ? input.value.trim() : '';
+            if (!val && !opts.optional) {
+                showDashToast(opts.requiredMsg || 'This field is required.', 'error');
+                if (input) input.focus();
+                return false;
+            }
+            if (val) {
+                details = '<p><strong>' + (opts.echoLabel || 'Note') + ':</strong> '
+                        + _htmlEscape(val) + '</p>';
+            }
+        }
+
+        if (opts.reassign) {  // selects: show chosen names, require at least one
+            var devSel = form.querySelector('select[name="developer"]');
+            var tstSel = form.querySelector('select[name="tester"]');
+            var devName = (devSel && devSel.value) ? devSel.options[devSel.selectedIndex].text : null;
+            var tstName = (tstSel && tstSel.value) ? tstSel.options[tstSel.selectedIndex].text : null;
+            if (!devName && !tstName) {
+                showDashToast('Choose a new developer and/or tester.', 'error');
+                return false;
+            }
+            var parts = [];
+            if (devName) parts.push('developer ' + devName);
+            if (tstName) parts.push('tester ' + tstName);
+            details = '<p><strong>New:</strong> ' + parts.join(', ') + '</p>';
+        }
+
+        openConfirmModal({
+            type:    opts.type || 'success',
+            title:   opts.title || 'Confirm Action',
+            message: opts.message || 'Proceed?',
+            details: details,
+            onConfirm: function () { form.submit(); }
+        });
+        return false;
+    }
+
     /* === TOAST NOTIFICATION === */
     function showDashToast(message, type) {
         type = type || 'success';
