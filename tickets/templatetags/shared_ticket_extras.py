@@ -6,6 +6,7 @@ the three filter functions under their own `register` instances.
 """
 
 EVENT_LABELS = {
+    "submitted": "Ticket Submitted",
     "assign": "Assigned to Developer",
     "reassigned": "Reassigned",
     "reject": "Rejected",
@@ -27,6 +28,7 @@ EVENT_LABELS = {
 }
 
 EVENT_DOT_CLS = {
+    "submitted": "created",
     "assign": "assigned",
     "reassigned": "assigned",
     "reject": "rejected",
@@ -48,6 +50,7 @@ EVENT_DOT_CLS = {
 }
 
 EVENT_ICONS = {
+    "submitted": "bx-plus",
     "assign": "bx-user-check",
     "reassigned": "bx-user",
     "reject": "bx-x-circle",

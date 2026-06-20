@@ -1,11 +1,12 @@
 {# Timeline drawer body (4.3b): real TicketEvents, injected into the panel. #}
+{% load ticket_labels %}
 {% for ev in events %}
 <div class="tw-tl-panel-entry">
-    <div class="tw-tl-panel-dot tw-tl-panel-dot--current">
-        <i class="bx bx-revision" aria-hidden="true"></i>
+    <div class="tw-tl-panel-dot tw-tl-panel-dot--{{ ev.action|event_dot_cls }}">
+        <i class="bx {{ ev.action|event_icon }}" aria-hidden="true"></i>
     </div>
     <div class="tw-tl-panel-content">
-        <div class="tw-tl-panel-event">{{ ev.action }}</div>
+        <div class="tw-tl-panel-event">{{ ev.action|event_label }}</div>
         <div class="tw-tl-panel-meta">
             {{ ev.created_at|date:"d-m-Y H:i" }} · {{ ev.actor.username|default:"system" }}
         </div>

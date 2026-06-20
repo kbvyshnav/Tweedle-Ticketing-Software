@@ -198,7 +198,7 @@ class AdminTicketTransitionTests(TestCase):
         self.assertEqual(t.sub_status, SS.DEVELOPMENT)
         self.assertEqual(t.assigned_developer, self.developer)
         self.assertEqual(t.assigned_tester, self.tester)
-        self.assertEqual(t.events.count(), 1)
+        self.assertEqual(t.events.exclude(action="submitted").count(), 1)
 
     def test_assign_success_message_is_human_friendly(self):
         t = self._make(S.NEW)
@@ -244,7 +244,7 @@ class AdminTicketTransitionTests(TestCase):
         resp = self.client.post(self._url(t), {"action": "assign"}, follow=True)
         t.refresh_from_db()
         self.assertEqual(t.status, S.NEW)
-        self.assertEqual(t.events.count(), 0)
+        self.assertEqual(t.events.exclude(action="submitted").count(), 0)
         self.assertTrue(self._errors(resp))
 
     def test_illegal_transition_surfaces_error_and_unchanged(self):
@@ -252,7 +252,7 @@ class AdminTicketTransitionTests(TestCase):
         resp = self.client.post(self._url(t), {"action": "send_to_uat"}, follow=True)
         t.refresh_from_db()
         self.assertEqual(t.status, S.NEW)
-        self.assertEqual(t.events.count(), 0)
+        self.assertEqual(t.events.exclude(action="submitted").count(), 0)
         self.assertTrue(self._errors(resp))
 
     def test_unsupported_action_surfaces_error(self):
@@ -327,7 +327,7 @@ class AdminTicketTransitionTests(TestCase):
         resp = self.client.post(self._url(t), {"action": "close"}, follow=True)
         t.refresh_from_db()
         self.assertEqual(t.status, S.IN_PROGRESS)
-        self.assertEqual(t.events.count(), 0)
+        self.assertEqual(t.events.exclude(action="submitted").count(), 0)
         self.assertTrue(self._errors(resp))
 
     def test_request_info_without_message_errors(self):

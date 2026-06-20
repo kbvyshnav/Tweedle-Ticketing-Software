@@ -445,16 +445,6 @@
                 </div>
                 <div class="tw-client-timeline">
 
-                    <div class="tw-client-tl-entry">
-                        <div class="tw-client-tl-dot tw-client-tl-dot--created">
-                            <i class="bx bx-plus" aria-hidden="true"></i>
-                        </div>
-                        <div class="tw-client-tl-content">
-                            <div class="tw-client-tl-label">Ticket Submitted</div>
-                            <div class="tw-client-tl-date">{{ ticket.created_at|date:"d M Y" }}</div>
-                        </div>
-                    </div>
-
                     {% for event in events %}
                     <div class="tw-client-tl-entry">
                         <div class="tw-client-tl-dot tw-client-tl-dot--{{ event.action|event_dot_cls }}">

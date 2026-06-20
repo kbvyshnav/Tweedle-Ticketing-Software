@@ -92,7 +92,7 @@ class LegalTransitionTests(EngineTestBase):
         self.assertEqual(t.status, S.IN_PROGRESS)
         self.assertEqual(t.sub_status, SS.DEVELOPMENT)
         self.assertEqual(t.assigned_developer, self.developer)
-        self.assertEqual(t.events.count(), 1)
+        self.assertEqual(t.events.exclude(action="submitted").count(), 1)
 
     def test_happy_path_with_tester(self):
         t = self.make_ticket()
@@ -230,7 +230,7 @@ class GuardTests(EngineTestBase):
             transition(t, "mark_ready", self.developer)
         t.refresh_from_db()
         self.assertEqual(t.sub_status, SS.DEVELOPMENT)  # unchanged
-        self.assertEqual(t.events.count(), 0)
+        self.assertEqual(t.events.exclude(action="submitted").count(), 0)
 
     def test_submit_for_testing_requires_tester(self):
         t = self.in_development()  # no tester
@@ -311,7 +311,7 @@ class AuthorizationTests(EngineTestBase):
             transition(t, "close", self.developer)
         t.refresh_from_db()
         self.assertEqual(t.status, S.RESOLVED)
-        self.assertEqual(t.events.count(), 0)
+        self.assertEqual(t.events.exclude(action="submitted").count(), 0)
 
     def test_client_cannot_assign(self):
         t = self.make_ticket()
@@ -374,7 +374,7 @@ class IllegalTransitionTests(EngineTestBase):
             transition(t, "approve", self.admin)
         t.refresh_from_db()
         self.assertEqual(t.status, S.NEW)
-        self.assertEqual(t.events.count(), 0)
+        self.assertEqual(t.events.exclude(action="submitted").count(), 0)
 
     def test_unknown_action_raises(self):
         t = self.make_ticket()
@@ -387,7 +387,7 @@ class IllegalTransitionTests(EngineTestBase):
             transition(t, "reject", self.admin)  # missing reason
         t.refresh_from_db()
         self.assertEqual(t.status, S.NEW)
-        self.assertEqual(t.events.count(), 0)
+        self.assertEqual(t.events.exclude(action="submitted").count(), 0)
 
 
 class AuditAndNotificationTests(EngineTestBase):
@@ -397,7 +397,9 @@ class AuditAndNotificationTests(EngineTestBase):
                    developer=self.developer, tester=self.tester)
         transition(t, "submit_for_testing", self.developer)
         transition(t, "pass", self.tester)
-        self.assertEqual(TicketEvent.objects.filter(ticket=t).count(), 3)
+        self.assertEqual(
+            TicketEvent.objects.filter(ticket=t).exclude(action="submitted").count(), 3
+        )
 
     def test_event_records_from_and_to(self):
         t = self.make_ticket()
@@ -472,7 +474,7 @@ class OwnershipTests(EngineTestBase):
             transition(t, "submit_for_testing", self.developer)
         t.refresh_from_db()
         self.assertEqual(t.sub_status, SS.DEVELOPMENT)
-        self.assertEqual(t.events.count(), 0)
+        self.assertEqual(t.events.exclude(action="submitted").count(), 0)
 
     def test_developer_blocked_on_other_devs_ticket(self):
         # ticket belongs to developer2; developer (dev1) should be rejected.
@@ -486,7 +488,7 @@ class OwnershipTests(EngineTestBase):
             transition(t, "submit_for_testing", self.developer)
         t.refresh_from_db()
         self.assertEqual(t.sub_status, SS.DEVELOPMENT)
-        self.assertEqual(t.events.count(), 0)
+        self.assertEqual(t.events.exclude(action="submitted").count(), 0)
 
     def test_developer_passes_on_own_ticket(self):
         t = self.make_ticket(
@@ -512,7 +514,7 @@ class OwnershipTests(EngineTestBase):
             transition(t, "pass", self.tester)
         t.refresh_from_db()
         self.assertEqual(t.sub_status, SS.TESTING)
-        self.assertEqual(t.events.count(), 0)
+        self.assertEqual(t.events.exclude(action="submitted").count(), 0)
 
     def test_tester_blocked_on_other_testers_ticket(self):
         t = self.make_ticket(
@@ -525,7 +527,7 @@ class OwnershipTests(EngineTestBase):
             transition(t, "pass", self.tester)
         t.refresh_from_db()
         self.assertEqual(t.sub_status, SS.TESTING)
-        self.assertEqual(t.events.count(), 0)
+        self.assertEqual(t.events.exclude(action="submitted").count(), 0)
 
     def test_tester_passes_on_own_ticket(self):
         t = self.make_ticket(
@@ -547,7 +549,7 @@ class OwnershipTests(EngineTestBase):
             transition(t, "approve", self.other_client)
         t.refresh_from_db()
         self.assertEqual(t.status, S.UAT)
-        self.assertEqual(t.events.count(), 0)
+        self.assertEqual(t.events.exclude(action="submitted").count(), 0)
 
     def test_client_passes_on_own_org_ticket(self):
         # client_user belongs to self.org; ticket.client = self.org.
@@ -575,7 +577,7 @@ class OwnershipTests(EngineTestBase):
             transition(t, "confirm", self.other_subuser)
         t.refresh_from_db()
         self.assertFalse(t.subuser_confirmed)
-        self.assertEqual(t.events.count(), 0)
+        self.assertEqual(t.events.exclude(action="submitted").count(), 0)
 
     # ── Admin has no ownership restriction ───────────────────────────────────
 

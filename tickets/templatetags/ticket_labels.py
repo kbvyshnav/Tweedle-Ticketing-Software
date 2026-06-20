@@ -16,8 +16,19 @@ from django import template
 from django.utils.html import format_html
 
 from tickets.labels import resolve_ticket_label
+from tickets.templatetags.shared_ticket_extras import (
+    event_dot_cls as _event_dot_cls,
+    event_icon as _event_icon,
+    event_label as _event_label,
+)
 
 register = template.Library()
+
+# Timeline event helpers (single source: shared_ticket_extras) — registered here
+# so any portal can `{% load ticket_labels %}` and render a TicketEvent.action.
+register.filter("event_label", _event_label)
+register.filter("event_dot_cls", _event_dot_cls)
+register.filter("event_icon", _event_icon)
 
 
 def _resolve(ticket, role):
