@@ -34,6 +34,25 @@ class AdminDashboardTemplateTests(TestCase):
         self.client.force_login(self.client_user)
         self.assertEqual(self.client.get(self.url).status_code, 403)
 
+    def test_orphaned_modals_removed_from_dashboard(self):
+        # Sweep S1/S2: the orphaned #newTicketModal / #rejectedTicketModal are gone,
+        # along with their hardcoded fake data and the dead workload-stat JS refs (S6).
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 200)
+        # dead markup removed
+        self.assertNotContains(resp, 'id="newTicketModal"')
+        self.assertNotContains(resp, 'id="rejectedTicketModal"')
+        # hardcoded fakes removed
+        self.assertNotContains(resp, "Rahul R Nair")
+        self.assertNotContains(resp, "wallet_specs.pdf")
+        self.assertNotContains(resp, "TKT-00089")
+        # dead JS refs (S6 leftover) removed
+        self.assertNotContains(resp, "showDeveloperInfo")
+        self.assertNotContains(resp, "showTesterInfo")
+        # live path intact: the real detail modal shell still ships
+        self.assertContains(resp, 'id="ticketDetailsModal"')
+
 
 class AdminDashboardDataBindingTests(TestCase):
     def setUp(self):

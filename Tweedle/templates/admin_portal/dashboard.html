@@ -365,7 +365,7 @@
 
         <!-- ==================================================
              C3 — TAB CONTENT: INBOX (shown by default)
-             data-ticket-type="new" → opens newTicketModal.
+             All rows open the server-rendered detail partial.
              ================================================== -->
         <div class="tab-content active" id="tab-inbox" data-tab-content="inbox" role="tabpanel" aria-label="Inbox tickets">
         <div class="table-scroll-wrapper">
@@ -1001,295 +1001,6 @@
     <!-- END TICKET DETAILS MODAL -->
 
 
-    <!-- ==============================================================
-         REJECTED TICKET MODAL (read-only)
-         Opened by clicking any row in #tab-rejected.
-         No action buttons — terminal state view only.
-         ============================================================== -->
-    <div class="tw-modal-overlay" id="rejectedTicketModal" role="dialog" aria-modal="true" aria-labelledby="rejModalTicketId">
-    <div class="tw-modal-container">
-
-        <div class="tw-modal-header">
-            <div class="tw-modal-header-left">
-
-                <h2 class="tw-modal-title">
-                    <i class="bx bx-receipt" aria-hidden="true"></i>
-                    <span id="rejModalTicketId">TKT-00089</span>
-                </h2>
-
-                <p class="tw-modal-subtitle" id="rejModalSubject">Subject</p>
-
-                <div class="tw-modal-header-meta">
-                    <span class="tw-modal-status-pill" style="background:var(--tw-danger-light,#fdecea);color:var(--tw-danger)">Rejected</span>
-                </div>
-
-            </div>
-
-            <button class="tw-modal-close" onclick="closeRejectedModal()" aria-label="Close rejected ticket details">
-                <i class="bx bx-x" aria-hidden="true"></i>
-            </button>
-        </div>
-
-        <div class="tw-modal-body">
-
-            <!-- Read-only banner -->
-            <div style="background:var(--tw-danger-light,#fdecea);color:var(--tw-danger);padding:8px 12px;border-radius:var(--tw-radius-sm);font-size:var(--tw-text-sm);margin-bottom:var(--tw-space-4)">
-                This ticket has been rejected. No further actions are available.
-            </div>
-
-            <div class="tw-info-grid tw-info-grid--3col">
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Client</div>
-                    <div class="tw-info-value" id="rejModalClient">—</div>
-                </div>
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Priority</div>
-                    <div class="tw-info-value" id="rejModalPriority">—</div>
-                </div>
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Issue Date</div>
-                    <div class="tw-info-value" id="rejModalIssueDate">—</div>
-                </div>
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Rejected By</div>
-                    <div class="tw-info-value" id="rejModalRejectedBy">—</div>
-                </div>
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Rejected On</div>
-                    <div class="tw-info-value" id="rejModalRejectedOn">—</div>
-                </div>
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Category</div>
-                    <div class="tw-info-value" id="rejModalCategory">—</div>
-                </div>
-            </div>
-
-            <div class="tw-modal-section">
-                <h3 class="section-title">Rejection Reason</h3>
-                <div class="tw-description-box" id="rejModalReason"></div>
-            </div>
-
-        </div>
-
-    </div>
-    </div>
-    <!-- END REJECTED TICKET MODAL -->
-
-
-    <!-- ==============================================================
-         NEW TICKET ASSIGNMENT MODAL
-         Django: {% include 'components/new_ticket_modal.html' %}
-         ============================================================== -->
-    <div class="tw-modal-overlay" id="newTicketModal" role="dialog" aria-modal="true" aria-labelledby="newModalTicketId">
-    <div class="tw-modal-container tw-modal-container--wide">
-
-        <div class="tw-modal-header tw-modal-header--new">
-            <div class="tw-modal-header-left">
-
-                <h2 class="tw-modal-title">
-                    <i class="bx bx-receipt" aria-hidden="true"></i>
-                    <span id="newModalTicketId">GMEC25010007</span>
-                </h2>
-
-                <p class="tw-modal-subtitle" id="newModalSubject">Federal bank API failure</p>
-
-                <div class="tw-modal-header-meta">
-                    <span class="tw-modal-status-pill" id="newModalStatus">New Ticket</span>
-                </div>
-
-            </div>
-
-            <button class="tw-modal-close" id="newModalClose" aria-label="Close ticket">
-                <i class="bx bx-x" aria-hidden="true"></i>
-            </button>
-        </div>
-
-        <div class="tw-modal-body">
-
-            <div class="tw-info-grid tw-info-grid--6">
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Ticket Maker</div>
-                    <div class="tw-info-value">Rahul R Nair</div>
-                </div>
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Issue Date</div>
-                    <div class="tw-info-value">10-12-2025</div>
-                </div>
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Priority</div>
-                    <div class="tw-info-value">
-                        <span class="tw-priority-badge tw-priority-badge--high">High</span>
-                    </div>
-                </div>
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Category</div>
-                    <div class="tw-info-value">Integration</div>
-                </div>
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Client</div>
-                    <div class="tw-info-value">BGEX</div>
-                </div>
-                <div class="tw-info-item">
-                    <div class="tw-info-label">Department</div>
-                    <div class="tw-info-value">Development</div>
-                </div>
-            </div>
-
-            <div class="tw-modal-section">
-                <h3 class="section-title">Description</h3>
-                <div class="tw-description-box">
-                    Federal bank API is returning 500 errors intermittently. Needs investigation and hotfix before the payment window closes at end of month.
-                </div>
-            </div>
-
-            <div class="tw-modal-section">
-                <h3 class="section-title">Attachments</h3>
-                <div class="tw-attachments-area">
-                    <div class="tw-attachment-item">
-                        <div class="tw-attachment-icon tw-attachment-icon--pdf" aria-hidden="true">
-                            <i class="bx bxs-file-pdf"></i>
-                        </div>
-                        <div class="tw-attachment-info">
-                            <div class="tw-attachment-name">wallet_specs.pdf</div>
-                            <div class="tw-attachment-meta">Uploaded on 10-12-2025 &bull; 245 KB</div>
-                        </div>
-                        <div class="tw-attachment-actions">
-                            <button class="tw-icon-btn" title="Download" aria-label="Download wallet_specs.pdf">
-                                <i class="bx bx-download" aria-hidden="true"></i>
-                            </button>
-                            <button class="tw-icon-btn" title="View" aria-label="View wallet_specs.pdf">
-                                <i class="bx bx-show" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tw-assignment-section">
-            {% endverbatim %}
-            <form id="newTicketForm" method="post" action="." data-url-template="{% url 'ticket_transition' 0 %}">
-                {% csrf_token %}
-                <input type="hidden" name="action" id="newTicketAction" value="">
-                <input type="hidden" name="reason" id="formRejectReason" value="">
-            {% verbatim %}
-
-                <div class="tw-assignment-title">
-                    <i class="bx bx-user-check" aria-hidden="true"></i>
-                    Assign Developer
-                </div>
-
-                <div class="tw-form-group">
-                    <label class="tw-form-label" for="developerSelect">
-                        Select Developer <span class="tw-required">*</span>
-                    </label>
-                    <select class="tw-developer-select" id="developerSelect" name="developer" onchange="showDeveloperInfo()">
-                        {% endverbatim %}
-                        <option value="">-- Choose Developer --</option>
-                        {% for d in developers %}
-                        <option value="{{ d.pk }}">{{ d.username }}</option>
-                        {% endfor %}
-                        {% verbatim %}
-                    </select>
-
-                    <div class="tw-developer-info" id="developerInfo" aria-live="polite">
-                        <div class="tw-workload-grid">
-                            <div class="tw-dev-stat">
-                                <span class="tw-dev-stat-value" id="devPending">0</span>
-                                <span class="tw-dev-stat-label">Pending</span>
-                            </div>
-                            <div class="tw-dev-stat">
-                                <span class="tw-dev-stat-value" id="devCompleted">0</span>
-                                <span class="tw-dev-stat-label">Completed</span>
-                            </div>
-                            <div class="tw-dev-stat">
-                                <span class="tw-dev-stat-value" id="devTotal">0</span>
-                                <span class="tw-dev-stat-label">Total Assigned</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <hr class="tw-modal-divider" style="border:none;border-top:1px solid var(--tw-border);margin:var(--tw-space-4) 0">
-
-                <p class="tw-modal-section-label" style="font-size:var(--tw-text-sm);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--tw-text-secondary);margin-bottom:var(--tw-space-3)">Assign Tester</p>
-
-                <label class="tw-assign-tester-toggle" for="assignTesterNow" style="display:flex;align-items:center;gap:var(--tw-space-2);font-size:var(--tw-text-base);color:var(--tw-text-primary);margin-bottom:var(--tw-space-3);cursor:pointer">
-                    <input type="checkbox" id="assignTesterNow" checked onchange="document.getElementById('testerAssignSection').style.display = this.checked ? 'block' : 'none'">
-                    <span>Assign tester now</span>
-                </label>
-
-                <div id="testerAssignSection">
-                    <div class="tw-form-group">
-                        <label class="tw-form-label" for="testerSelect">
-                            Select Tester <span class="tw-required">*</span>
-                        </label>
-                        <select class="tw-select" id="testerSelect" name="tester" onchange="showTesterInfo()">
-                        {% endverbatim %}
-                            <option value="">Select a tester</option>
-                            {% for t in testers %}
-                            <option value="{{ t.pk }}">{{ t.username }}</option>
-                            {% endfor %}
-                        {% verbatim %}
-                        </select>
-
-                        <div class="tw-developer-info" id="testerWorkloadStats" aria-live="polite" style="display:none">
-                            <div class="tw-workload-grid">
-                                <div class="tw-dev-stat">
-                                    <span class="tw-dev-stat-value" id="testerPendingCount">0</span>
-                                    <span class="tw-dev-stat-label">Pending</span>
-                                </div>
-                                <div class="tw-dev-stat">
-                                    <span class="tw-dev-stat-value" id="testerCompletedCount">0</span>
-                                    <span class="tw-dev-stat-label">Completed</span>
-                                </div>
-                                <div class="tw-dev-stat">
-                                    <span class="tw-dev-stat-value" id="testerTotalCount">0</span>
-                                    <span class="tw-dev-stat-label">Total Assigned</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tw-form-group">
-                    <label class="tw-form-label" for="assignComment">Comments / Remarks</label>
-                    <textarea
-                        class="tw-comment-textarea"
-                        id="assignComment"
-                        placeholder="Add any notes or instructions for the developer…"
-                        aria-label="Comments for developer"></textarea>
-                </div>
-
-                <div class="tw-form-group">
-                    <div class="tw-email-checkbox-group">
-                        <input type="checkbox" id="sendEmail" checked aria-label="Send email notification to assigned developer">
-                        <label for="sendEmail">Send email notification to assigned developer</label>
-                    </div>
-                </div>
-
-                <div class="tw-modal-action-buttons">
-                    <button type="button" class="tw-btn-assign" id="assignBtn" onclick="confirmAssignment()" disabled aria-label="Assign ticket to selected developer">
-                        <i class="bx bx-check-circle" aria-hidden="true"></i>
-                        Assign Ticket
-                    </button>
-                    <button type="button" class="tw-btn-reject" id="rejectBtn" onclick="confirmRejection()" aria-label="Reject ticket">
-                        <i class="bx bx-x-circle" aria-hidden="true"></i>
-                        Reject Ticket
-                    </button>
-                </div>
-            {% endverbatim %}
-            </form>
-            {% verbatim %}
-
-            </div>
-
-        </div>
-
-    </div>
-    </div>
-    <!-- END NEW TICKET MODAL -->
-
-
     <!-- Django: replace this block with {% include 'components/confirm-modal.html' %} -->
     <div class="tw-confirm-overlay" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
         <div class="tw-confirm-box">
@@ -1854,8 +1565,8 @@
 
     /* ============================================================
      * TICKET ROW CLICK → MODAL
-     * data-ticket-type="existing" → ticketDetailsModal
-     * data-ticket-type="new"      → newTicketModal
+     * Every row (new/existing/rejected) opens ticketDetailsModal,
+     * which fetches the server-rendered detail partial.
      * ============================================================ */
     document.querySelectorAll('.tab-content tbody tr[data-ticket-id]').forEach(function(row) {
         row.addEventListener('click', function(e) {
@@ -1931,9 +1642,8 @@
     }
 
     /* Detail-partial Assign / Reject — form-scoped so they work from the injected
-       partial and never touch the orphaned #newTicketModal element IDs. They reuse
-       the page-level confirm box. onConfirm uses form.submit() (NOT requestSubmit)
-       so it bypasses these onsubmit guards and actually POSTs. */
+       partial. They reuse the page-level confirm box. onConfirm uses form.submit()
+       (NOT requestSubmit) so it bypasses these onsubmit guards and actually POSTs. */
     function _htmlEscape(s) {
         return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
@@ -2106,42 +1816,12 @@
 
 
     /* ============================================================
-     * NEW TICKET ASSIGNMENT MODAL
-     * ============================================================ */
-    var _selectedDeveloper = '';
-
-    function openNewTicketModal(ticketId, subject, status) {
-        document.getElementById('newModalTicketId').textContent = ticketId;
-        document.getElementById('newModalSubject').textContent  = subject;
-        document.getElementById('newModalStatus').textContent   = status || 'New Ticket';
-        /* Point the form at this ticket's transition endpoint (pk from its row). */
-        var form = document.getElementById('newTicketForm');
-        var row  = document.querySelector('#tab-inbox tbody tr[data-ticket-id="' + ticketId + '"]');
-        var pk   = row ? row.dataset.ticketPk : '';
-        if (form && pk) form.action = form.dataset.urlTemplate.replace('/0/', '/' + pk + '/');
-        document.getElementById('newTicketModal').classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeNewTicketModal() {
-        document.getElementById('newTicketModal').classList.remove('active');
-        document.body.style.overflow = '';
-        resetNewTicketForm();
-    }
-
-    document.getElementById('newModalClose').addEventListener('click', closeNewTicketModal);
-
-    document.getElementById('newTicketModal').addEventListener('click', function(e) {
-        if (e.target === this) closeNewTicketModal();
-    });
-
-    /* ============================================================
      * WORKLOAD STATS (Issue 1b)
      * Fills the stats panel next to the detail-partial Assign/Reassign
      * selects from the chosen <option>'s data-* counts (annotated by
      * admin_ticket_detail). Page-level + partial-scoped (panel passed by
      * id) so it works from the injected partial — same pattern as the
-     * confirm* hooks. Replaces the dead showDeveloperInfo/showTesterInfo.
+     * confirm* hooks.
      * ============================================================ */
     function _wlStat(label, val) {
         return '<span class="tw-workload-stat">' +
@@ -2166,108 +1846,6 @@
         panel.innerHTML = _wlStat('In Testing', d.inTesting) + _wlStat('Queued', d.queued) + _wlStat('Active', d.active);
         panel.hidden = false;
     }
-
-    function confirmAssignment() {
-        var developerSelect = document.getElementById('developerSelect');
-        if (!developerSelect.value) {
-            showDashToast('Please select a developer.', 'error');
-            return;
-        }
-        var devName         = developerSelect.options[developerSelect.selectedIndex].text;
-        var assignTesterNow = document.getElementById('assignTesterNow').checked;
-        var testerSelect    = document.getElementById('testerSelect');
-
-        /* Tester validation — only required when "Assign tester now" is checked */
-        if (assignTesterNow && !testerSelect.value) {
-            testerSelect.classList.add('tw-input--error');
-            testerSelect.focus();
-            return;
-        }
-        /* If not assigning a tester now, make sure none is posted. */
-        if (!assignTesterNow) testerSelect.value = '';
-
-        var testerName = assignTesterNow
-            ? testerSelect.options[testerSelect.selectedIndex].text
-            : null;
-
-        openConfirmModal({
-            type:    'success',
-            title:   'Confirm Assignment',
-            message: testerName
-                ? 'Assign ' + devName + ' (developer) and ' + testerName + ' (tester) to this ticket?'
-                : 'Assign ' + devName + ' as developer? A tester can be assigned later.',
-            onConfirm: function () { submitNewTicket('assign'); }
-        });
-    }
-
-    function confirmRejection() {
-        var ticketId = document.getElementById('newModalTicketId').textContent;
-        var subject  = document.getElementById('newModalSubject').textContent;
-
-        openConfirmModal({
-            type:    'danger',
-            title:   'Reject Ticket',
-            message: 'Are you sure you want to reject this ticket? The requester will be notified.',
-            details: `
-                <p><strong>Ticket:</strong> ${ticketId}</p>
-                <p><strong>Subject:</strong> ${subject}</p>
-                <label class="tw-form-label" for="rejectReason">
-                    Rejection Reason <span class="tw-required">*</span>
-                </label>
-                <textarea
-                    id="rejectReason"
-                    class="tw-comment-textarea tw-comment-textarea--sm"
-                    placeholder="Why is this ticket being rejected?"
-                    aria-label="Rejection reason"></textarea>
-                <p id="rejectError" class="tw-error-text">Reason is required to proceed.</p>`,
-            onConfirm: function () {
-                var reason    = document.getElementById('rejectReason').value.trim();
-                var errorText = document.getElementById('rejectError');
-                var textarea  = document.getElementById('rejectReason');
-
-                if (!reason) {
-                    errorText.classList.add('show');
-                    textarea.classList.add('tw-input--error');
-                    return false;
-                }
-                /* Carry the reason on the real form and POST to the engine. */
-                document.getElementById('formRejectReason').value = reason;
-                submitNewTicket('reject');
-            }
-        });
-    }
-
-    /* Set the action and submit the New-Ticket form to transition(). */
-    function submitNewTicket(action) {
-        document.getElementById('newTicketAction').value = action;
-        var f = document.getElementById('newTicketForm');
-        if (f.requestSubmit) { f.requestSubmit(); } else { f.submit(); }
-    }
-
-    function resetNewTicketForm() {
-        var select    = document.getElementById('developerSelect');
-        var infoPanel = document.getElementById('developerInfo');
-        var assignBtn = document.getElementById('assignBtn');
-
-        select.value = '';
-        infoPanel.classList.remove('active');
-        document.getElementById('assignComment').value = '';
-        assignBtn.disabled = true;
-        document.getElementById('sendEmail').checked = true;
-        _selectedDeveloper = '';
-
-        /* Reset tester section */
-        var testerSelect    = document.getElementById('testerSelect');
-        var testerStats     = document.getElementById('testerWorkloadStats');
-        var testerSection   = document.getElementById('testerAssignSection');
-        var assignTesterNow = document.getElementById('assignTesterNow');
-
-        if (testerSelect)    { testerSelect.selectedIndex = 0; testerSelect.classList.remove('tw-input--error'); }
-        if (testerStats)     { testerStats.style.display = 'none'; }
-        if (testerSection)   { testerSection.style.display = 'block'; }
-        if (assignTesterNow) { assignTesterNow.checked = true; }
-    }
-
 
     /* ============================================================
      * CONFIRM MODAL — JS API
@@ -2586,12 +2164,6 @@
         if (document.getElementById('ticketDetailsModal').classList.contains('active')) {
             closeTicketDetailsModal(); return;
         }
-        if (document.getElementById('newTicketModal').classList.contains('active')) {
-            closeNewTicketModal(); return;
-        }
-        if (document.getElementById('rejectedTicketModal').classList.contains('active')) {
-            closeRejectedModal(); return;
-        }
         if (document.getElementById('chatPanel').classList.contains('open')) {
             closeChatPanel(); return;
         }
@@ -2736,21 +2308,6 @@
         showDashToast('Exporting ' + selectedTicketIds.size + ' ticket(s)…');
         clearBulkSelection();
     }
-
-
-    /* ============================================================
-     * REJECTED TICKET MODAL — retired in Phase 4.3.
-     * Rejected rows now open the same server-rendered detail modal
-     * (read-only); the rejection reason shows in its timeline.
-     * ============================================================ */
-    function closeRejectedModal() {
-        document.getElementById('rejectedTicketModal').classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    document.getElementById('rejectedTicketModal').addEventListener('click', function(e) {
-        if (e.target === this) closeRejectedModal();
-    });
 
 
     /* ============================================================

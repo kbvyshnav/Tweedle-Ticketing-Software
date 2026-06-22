@@ -1250,7 +1250,3 @@ body {
 #ticketDetailsModal[data-status="closed"] .tw-modal-container {
     border-left: 4px solid var(--tw-status-closed-text);
 }
-
-#rejectedTicketModal .tw-modal-container {
-    border-left: 4px solid var(--tw-danger);
-}
