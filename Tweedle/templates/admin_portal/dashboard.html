@@ -2135,41 +2135,36 @@
         if (e.target === this) closeNewTicketModal();
     });
 
-    function showDeveloperInfo() {
-        const select    = document.getElementById('developerSelect');
-        const infoPanel = document.getElementById('developerInfo');
-        const assignBtn = document.getElementById('assignBtn');
-        const option    = select.options[select.selectedIndex];
-
-        if (select.value) {
-            document.getElementById('devPending').textContent   = option.getAttribute('data-pending');
-            document.getElementById('devCompleted').textContent = option.getAttribute('data-completed');
-            document.getElementById('devTotal').textContent     = option.getAttribute('data-tickets');
-            infoPanel.classList.add('active');
-            assignBtn.disabled  = false;
-            _selectedDeveloper  = option.text;
-        } else {
-            infoPanel.classList.remove('active');
-            assignBtn.disabled  = true;
-            _selectedDeveloper  = '';
-        }
+    /* ============================================================
+     * WORKLOAD STATS (Issue 1b)
+     * Fills the stats panel next to the detail-partial Assign/Reassign
+     * selects from the chosen <option>'s data-* counts (annotated by
+     * admin_ticket_detail). Page-level + partial-scoped (panel passed by
+     * id) so it works from the injected partial — same pattern as the
+     * confirm* hooks. Replaces the dead showDeveloperInfo/showTesterInfo.
+     * ============================================================ */
+    function _wlStat(label, val) {
+        return '<span class="tw-workload-stat">' +
+               '<span class="tw-workload-stat__num">' + (val || '0') + '</span>' +
+               '<span class="tw-workload-stat__label">' + label + '</span></span>';
     }
 
-    function showTesterInfo() {
-        var select   = document.getElementById('testerSelect');
-        var opt      = select.options[select.selectedIndex];
-        var statsBox = document.getElementById('testerWorkloadStats');
+    function fillDevWorkload(select, panelId) {
+        var panel = document.getElementById(panelId);
+        if (!panel) return;
+        if (!select.value) { panel.hidden = true; panel.innerHTML = ''; return; }
+        var d = select.options[select.selectedIndex].dataset;
+        panel.innerHTML = _wlStat('Active', d.active) + _wlStat('In Dev', d.inDev) + _wlStat('In UAT', d.inUat);
+        panel.hidden = false;
+    }
 
-        if (!opt || !opt.value) {
-            statsBox.style.display = 'none';
-            return;
-        }
-
-        select.classList.remove('tw-input--error');
-        document.getElementById('testerPendingCount').textContent   = opt.dataset.ticketsPending;
-        document.getElementById('testerCompletedCount').textContent = opt.dataset.ticketsCompleted;
-        document.getElementById('testerTotalCount').textContent     = opt.dataset.ticketsTotal;
-        statsBox.style.display = 'block';
+    function fillTesterWorkload(select, panelId) {
+        var panel = document.getElementById(panelId);
+        if (!panel) return;
+        if (!select.value) { panel.hidden = true; panel.innerHTML = ''; return; }
+        var d = select.options[select.selectedIndex].dataset;
+        panel.innerHTML = _wlStat('In Testing', d.inTesting) + _wlStat('Queued', d.queued) + _wlStat('Active', d.active);
+        panel.hidden = false;
     }
 
     function confirmAssignment() {

@@ -971,6 +971,198 @@ body {
 }
 
 
+/* ============================================================
+ * === ISSUES 1+4 (+ browser fixes): ADMIN ACTIONS ==========
+ * Primary forward-action card stays expanded at the top; every
+ * other action is a collapsed <details> disclosure below it.
+ * Tokens only — no new hex.
+ * ============================================================ */
+
+/* Spacing now comes from the cards/disclosures, not the form's old inline margin. */
+#adminActions .tw-detail-action-form {
+    margin-bottom: 0;
+}
+
+.tw-action-card {
+    background: var(--tw-bg-body);
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-md);
+    padding: var(--tw-space-4);
+    margin-bottom: var(--tw-space-3);
+}
+
+/* Primary — the prominent forward-action card with a full-width button. */
+.tw-action-card--primary {
+    background: var(--tw-bg-surface);
+    border-color: var(--tw-primary);
+    border-left: 3px solid var(--tw-primary);
+}
+
+/* Generic button selector: covers type="submit" AND the send_to_uat
+   type="button" (confirm-hook onclick), so every primary button is full-width.
+   margin-top guarantees a gap above the button even when the workload panel is
+   [hidden] and collapses to nothing (FIX 2). */
+.tw-action-card--primary button {
+    width: 100%;
+    justify-content: center;
+    margin-top: var(--tw-space-4);
+}
+
+/* Subtle "Manage" heading — only rendered for 2+ manage disclosures. */
+.tw-disclosure-list {
+    margin-top: var(--tw-space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--tw-space-2);
+}
+
+.tw-disclosure-list__heading {
+    font-size: var(--tw-text-xs);
+    font-weight: var(--tw-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--tw-text-muted);
+}
+
+/* Disclosure — native <details>/<summary>, no JS. */
+.tw-disclosure {
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-md);
+    background: var(--tw-bg-surface);
+    overflow: hidden;
+}
+
+.tw-disclosure__trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-space-2);
+    padding: var(--tw-space-3) var(--tw-space-4);
+    cursor: pointer;
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    list-style: none;          /* hide default marker (Firefox) */
+    user-select: none;
+}
+
+.tw-disclosure__trigger::-webkit-details-marker {
+    display: none;             /* hide default marker (WebKit) */
+}
+
+.tw-disclosure__trigger:hover {
+    background: var(--tw-hover-row);
+}
+
+.tw-disclosure__chevron {
+    margin-left: auto;
+    color: var(--tw-text-muted);
+    transition: transform var(--tw-transition-fast);
+}
+
+.tw-disclosure[open] .tw-disclosure__chevron {
+    transform: rotate(180deg);
+}
+
+.tw-disclosure__body {
+    padding: var(--tw-space-4);
+    border-top: 1px solid var(--tw-border-light);
+}
+
+/* Destructive disclosures (Reject / Cancel) — red trigger, no section heading. */
+.tw-disclosure--danger {
+    border-color: var(--tw-danger);
+}
+
+.tw-disclosure--danger .tw-disclosure__trigger {
+    color: var(--tw-danger-dark);
+}
+
+.tw-disclosure--danger .tw-disclosure__trigger i {
+    color: var(--tw-danger);
+}
+
+.tw-disclosure--danger .tw-disclosure__body {
+    border-top-color: var(--tw-danger-light);
+}
+
+/* FIX 4 — the Reassign/Request-Info buttons were styled white-on-translucent
+   for the dark modal header; on the light disclosure body that's invisible.
+   Re-tint to readable tokens, scoped to the actions section. */
+#adminActions .tw-modal-action-btn {
+    background: var(--tw-bg-surface);
+    color: var(--tw-text-primary);
+    border: 1px solid var(--tw-border);
+}
+
+#adminActions .tw-modal-action-btn:hover {
+    background: var(--tw-hover-row);
+}
+
+#adminActions .tw-modal-action-btn--warning {
+    background: var(--tw-warning-light);
+    color: var(--tw-warning-dark);
+    border-color: var(--tw-warning);
+}
+
+
+/* === S7: DATES GROUP ========================================
+ * Date fields (Issue Date + conditional Accepted/Closed) grouped
+ * into one labelled section instead of appearing mid info-grid.
+ * ============================================================ */
+.tw-info-dates {
+    margin-bottom: var(--tw-space-5);
+}
+
+.tw-info-dates__label {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+    font-weight: var(--tw-weight-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--tw-space-2);
+}
+
+.tw-info-dates .tw-info-grid {
+    margin-bottom: 0;
+}
+
+
+/* === ISSUE 1b: WORKLOAD STATS PANEL ========================
+ * Restyled off the inline JS styles onto design tokens; sits
+ * cleanly beneath its dropdown inside the Assign/Reassign card.
+ * ============================================================ */
+.tw-workload-stats {
+    display: flex;
+    gap: var(--tw-space-4);
+    margin: var(--tw-space-2) 0 var(--tw-space-3);
+    padding-top: var(--tw-space-2);
+    border-top: 1px solid var(--tw-border-light);
+}
+
+/* The JS toggles the `hidden` attribute — must beat display:flex. */
+.tw-workload-stats[hidden] {
+    display: none;
+}
+
+.tw-workload-stat {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tw-workload-stat__num {
+    font-size: var(--tw-text-md);
+    font-weight: var(--tw-weight-semibold);
+    color: var(--tw-text-primary);
+    line-height: 1.1;
+}
+
+.tw-workload-stat__label {
+    font-size: var(--tw-text-xs);
+    color: var(--tw-text-muted);
+}
+
+
 /* === RESPONSIVE =============================================
  * 768px + 576px breakpoints.
  * ============================================================ */

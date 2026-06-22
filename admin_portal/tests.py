@@ -825,3 +825,205 @@ class AdminConfirmHookTests(TestCase):
         self.client.post(self._txn(t), {"action": "cancel", "reason": "Duplicate"})
         t.refresh_from_db()
         self.assertEqual(t.status, S.CANCELLED)
+
+
+class AdminWorkloadStatsTests(TestCase):
+    """Issue 1b: dev/tester workload counts annotated onto the Assign/Reassign
+    dropdown <option>s by admin_ticket_detail.
+
+    These cover the annotation math + data-attr render. The on-change panel fill
+    is browser-verified — the Django test client runs no JS.
+    """
+
+    def setUp(self):
+        self.admin = User.objects.create_user("admin_wl", role="admin")
+        self.requester = User.objects.create_user("client_wl", role="client")
+        self.org = Client.objects.create(name="Workload", code="WLOD")
+        self.dev = User.objects.create_user("dev_wl", role="developer")
+        self.dev2 = User.objects.create_user("dev_wl2", role="developer")
+        self.tester = User.objects.create_user("tester_wl", role="tester")
+        self.tester2 = User.objects.create_user("tester_wl2", role="tester")
+        # Any ticket gives us a URL; it carries no assignment so it adds no counts.
+        self.anchor = self._make(S.NEW)
+        self.url = reverse("admin_ticket_detail", args=[self.anchor.pk])
+        self.client.force_login(self.admin)
+
+    def _make(self, status, sub_status=None, dev=None, tester=None):
+        return Ticket.objects.create(
+            subject=f"WL {status} {sub_status or ''}".strip(),
+            requester=self.requester, client=self.org,
+            status=status, sub_status=sub_status,
+            assigned_developer=dev, assigned_tester=tester,
+        )
+
+    def _dev(self, resp, username):
+        return {d.username: d for d in resp.context["developers"]}[username]
+
+    def _tester(self, resp, username):
+        return {t.username: t for t in resp.context["testers"]}[username]
+
+    def test_developer_workload_counts(self):
+        # active = in_progress + awaiting_client; in_dev = in_progress·{development,returned};
+        # in_uat = uat. resolved/closed count toward none of the three.
+        self._make(S.IN_PROGRESS, SS.DEVELOPMENT, dev=self.dev)
+        self._make(S.IN_PROGRESS, SS.RETURNED, dev=self.dev)
+        self._make(S.AWAITING_CLIENT, dev=self.dev)
+        self._make(S.UAT, dev=self.dev)
+        self._make(S.RESOLVED, dev=self.dev)
+        self._make(S.CLOSED, dev=self.dev)
+
+        d = self._dev(self.client.get(self.url), "dev_wl")
+        self.assertEqual(d.wl_active, 3)
+        self.assertEqual(d.wl_in_dev, 2)
+        self.assertEqual(d.wl_in_uat, 1)
+
+    def test_tester_workload_counts(self):
+        # in_testing = in_progress·testing; queued = in_progress·{returned,ready_for_uat};
+        # active = in_progress·{testing,returned,ready_for_uat} (its own filtered Count).
+        self._make(S.IN_PROGRESS, SS.TESTING, tester=self.tester)
+        self._make(S.IN_PROGRESS, SS.RETURNED, tester=self.tester)
+        self._make(S.IN_PROGRESS, SS.READY_FOR_UAT, tester=self.tester)
+        self._make(S.UAT, tester=self.tester)  # counts toward none
+
+        t = self._tester(self.client.get(self.url), "tester_wl")
+        self.assertEqual(t.wl_in_testing, 1)
+        self.assertEqual(t.wl_queued, 2)
+        self.assertEqual(t.wl_active, 3)
+
+    def test_developer_workload_isolation(self):
+        # Another dev's tickets must not count toward this one (both directions).
+        self._make(S.IN_PROGRESS, SS.DEVELOPMENT, dev=self.dev)
+        self._make(S.IN_PROGRESS, SS.DEVELOPMENT, dev=self.dev2)
+        self._make(S.IN_PROGRESS, SS.DEVELOPMENT, dev=self.dev2)
+
+        resp = self.client.get(self.url)
+        d1 = self._dev(resp, "dev_wl")
+        d2 = self._dev(resp, "dev_wl2")
+        self.assertEqual((d1.wl_active, d1.wl_in_dev), (1, 1))
+        self.assertEqual((d2.wl_active, d2.wl_in_dev), (2, 2))
+
+    def test_tester_workload_isolation(self):
+        self._make(S.IN_PROGRESS, SS.TESTING, tester=self.tester)
+        self._make(S.IN_PROGRESS, SS.TESTING, tester=self.tester2)
+        self._make(S.IN_PROGRESS, SS.TESTING, tester=self.tester2)
+
+        resp = self.client.get(self.url)
+        t1 = self._tester(resp, "tester_wl")
+        t2 = self._tester(resp, "tester_wl2")
+        self.assertEqual((t1.wl_in_testing, t1.wl_active), (1, 1))
+        self.assertEqual((t2.wl_in_testing, t2.wl_active), (2, 2))
+
+    def test_assign_dropdown_renders_workload_data_attr(self):
+        # data-in-dev is dev-only; with one dev at in_dev=1 the attr renders once.
+        self._make(S.IN_PROGRESS, SS.DEVELOPMENT, dev=self.dev)
+        resp = self.client.get(self.url)
+        self.assertContains(resp, 'data-in-dev="1"')
+
+
+class AdminActionTierTests(TestCase):
+    """Issues 1+4 + browser-fix redesign: the detail-modal Actions section keeps
+    the forward action as a prominent Primary card, with every other action as a
+    collapsed <details> disclosure (destructive ones red + last, NO "Danger"
+    heading). Structural guards only (wrapper class + action presence) — the
+    expand-on-click behavior is browser-verified. Exhaustive per-state action
+    availability is covered by the existing detail tests.
+    """
+
+    def setUp(self):
+        self.admin = User.objects.create_user("admin_at", role="admin")
+        self.requester = User.objects.create_user("client_at", role="client")
+        self.developer = User.objects.create_user("dev_at", role="developer")
+        self.org = Client.objects.create(name="Acme", code="ACME")
+        self.client.force_login(self.admin)
+
+    def _make(self, status, sub_status=None, **kw):
+        return Ticket.objects.create(
+            subject="A ticket", description="Body.",
+            requester=self.requester, client=self.org,
+            status=status, sub_status=sub_status, **kw,
+        )
+
+    def _detail(self, t):
+        return self.client.get(reverse("admin_ticket_detail", args=[t.pk]))
+
+    def test_new_has_primary_assign_and_destructive_reject(self):
+        resp = self._detail(self._make(S.NEW))
+        self.assertContains(resp, "tw-action-card--primary")
+        self.assertContains(resp, 'name="action" value="assign"')
+        # Reject is a destructive disclosure — no old danger tier, no headings.
+        self.assertContains(resp, "tw-disclosure--danger")
+        self.assertContains(resp, 'name="action" value="reject"')
+        self.assertNotContains(resp, "tw-action-tier--danger")
+        self.assertNotContains(resp, ">Danger<")
+        self.assertNotContains(resp, ">Manage<")
+
+    def test_ready_for_uat_primary_send_to_uat_and_destructive_cancel(self):
+        t = self._make(S.IN_PROGRESS, SS.READY_FOR_UAT, assigned_developer=self.developer)
+        resp = self._detail(t)
+        self.assertContains(resp, "tw-action-card--primary")
+        self.assertContains(resp, 'name="action" value="send_to_uat"')
+        self.assertContains(resp, "tw-disclosure--danger")
+        self.assertContains(resp, 'name="action" value="cancel"')
+        # 2+ manage disclosures (Request Info + Reassign) → "Manage" heading shows.
+        self.assertContains(resp, ">Manage<")
+        self.assertNotContains(resp, ">Danger<")
+
+    def test_resolved_primary_close_and_reopen_disclosure(self):
+        resp = self._detail(self._make(S.RESOLVED, assigned_developer=self.developer))
+        self.assertContains(resp, "tw-action-card--primary")
+        self.assertContains(resp, 'name="action" value="close"')
+        self.assertContains(resp, "tw-disclosure")
+        self.assertContains(resp, 'name="action" value="reopen"')
+        # Single manage disclosure → no "Manage" heading.
+        self.assertNotContains(resp, ">Manage<")
+        self.assertNotContains(resp, ">Danger<")
+
+    def test_cancelled_has_no_actions(self):
+        resp = self._detail(self._make(S.CANCELLED))
+        self.assertNotContains(resp, "tw-disclosure")
+        self.assertNotContains(resp, "tw-action-card--primary")
+        self.assertNotContains(resp, 'name="action"')
+
+    def test_uat_recall_disclosure_only(self):
+        # Single manage disclosure, no primary, no destructive, no headings.
+        resp = self._detail(self._make(S.UAT, assigned_developer=self.developer))
+        self.assertContains(resp, "tw-disclosure")
+        self.assertContains(resp, 'name="action" value="request_changes"')
+        self.assertNotContains(resp, "tw-disclosure--danger")
+        self.assertNotContains(resp, "tw-action-card--primary")
+        self.assertNotContains(resp, ">Manage<")
+        self.assertNotContains(resp, ">Danger<")
+
+    def test_manage_heading_only_for_multi_manage_states(self):
+        # Renders for in_progress (Request Info + Reassign = 2 manage), absent for
+        # the single-disclosure states.
+        in_prog = self._detail(
+            self._make(S.IN_PROGRESS, SS.DEVELOPMENT, assigned_developer=self.developer)
+        )
+        self.assertContains(in_prog, ">Manage<")
+        for status in (S.RESOLVED, S.UAT, S.CLOSED):
+            resp = self._detail(self._make(status, assigned_developer=self.developer))
+            self.assertNotContains(resp, ">Manage<", msg_prefix=str(status))
+
+    def test_partial_has_no_leaked_template_comment(self):
+        # A multi-line {# #} leaks as text (Django comments are single-line); the
+        # text contained "<details>" which the browser parsed as empty UA markers.
+        # No rendered partial may contain a literal "{#".
+        new = self._detail(self._make(S.NEW))
+        self.assertNotContains(new, "{#")
+        in_prog = self._detail(
+            self._make(S.IN_PROGRESS, SS.DEVELOPMENT, assigned_developer=self.developer)
+        )
+        self.assertNotContains(in_prog, "{#")
+
+    def test_disclosure_summaries_render_action_labels(self):
+        # Each <summary> must carry its action-name label (an empty summary that
+        # falls back to the UA "Details" marker would fail these).
+        new = self._detail(self._make(S.NEW))
+        self.assertContains(new, 'tw-disclosure__label">Reject Ticket</span>')
+        in_prog = self._detail(
+            self._make(S.IN_PROGRESS, SS.DEVELOPMENT, assigned_developer=self.developer)
+        )
+        self.assertContains(in_prog, 'tw-disclosure__label">Request Info</span>')
+        self.assertContains(in_prog, 'tw-disclosure__label">Reassign</span>')
+        self.assertContains(in_prog, 'tw-disclosure__label">Cancel Ticket</span>')

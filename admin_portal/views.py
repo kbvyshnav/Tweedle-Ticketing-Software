@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
@@ -15,6 +16,7 @@ from tickets.transitions import (
 
 User = get_user_model()
 S = Ticket.Status
+SS = Ticket.SubStatus
 
 # Dashboard tab key -> the ticket status it lists.
 TAB_STATUS = {
@@ -157,10 +159,61 @@ def admin_ticket_detail(request, pk):
         ),
         pk=pk,
     )
+    # Workload counts surfaced on the Assign/Reassign <option>s (Issue 1b).
+    # All dev annotations target the same `dev_tickets` reverse relation (and all
+    # tester annotations the same `test_tickets`), so Django uses one join + a
+    # FILTER/CASE per count — they don't inflate each other.
+    developers = (
+        User.objects.filter(role="developer")
+        .annotate(
+            wl_active=Count(
+                "dev_tickets",
+                filter=Q(dev_tickets__status__in=[S.IN_PROGRESS, S.AWAITING_CLIENT]),
+            ),
+            wl_in_dev=Count(
+                "dev_tickets",
+                filter=Q(
+                    dev_tickets__status=S.IN_PROGRESS,
+                    dev_tickets__sub_status__in=[SS.DEVELOPMENT, SS.RETURNED],
+                ),
+            ),
+            wl_in_uat=Count("dev_tickets", filter=Q(dev_tickets__status=S.UAT)),
+        )
+        .order_by("username")
+    )
+    testers = (
+        User.objects.filter(role="tester")
+        .annotate(
+            wl_in_testing=Count(
+                "test_tickets",
+                filter=Q(
+                    test_tickets__status=S.IN_PROGRESS,
+                    test_tickets__sub_status=SS.TESTING,
+                ),
+            ),
+            wl_queued=Count(
+                "test_tickets",
+                filter=Q(
+                    test_tickets__status=S.IN_PROGRESS,
+                    test_tickets__sub_status__in=[SS.RETURNED, SS.READY_FOR_UAT],
+                ),
+            ),
+            wl_active=Count(
+                "test_tickets",
+                filter=Q(
+                    test_tickets__status=S.IN_PROGRESS,
+                    test_tickets__sub_status__in=[
+                        SS.TESTING, SS.RETURNED, SS.READY_FOR_UAT,
+                    ],
+                ),
+            ),
+        )
+        .order_by("username")
+    )
     context = {
         "ticket": ticket,
-        "developers": User.objects.filter(role="developer").order_by("username"),
-        "testers": User.objects.filter(role="tester").order_by("username"),
+        "developers": developers,
+        "testers": testers,
     }
     return render(request, "admin_portal/_ticket_detail.html", context)
 
