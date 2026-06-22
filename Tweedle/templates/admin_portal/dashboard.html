@@ -395,7 +395,7 @@
                         </div>
                     </td>
                     <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
-                    <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
+                    <td>{{ ticket.created_at|tw_datetime }}</td>
                     <td>{{ ticket.client.code|default:"—" }}</td>
                     <td>{% role_ticket_badge ticket "admin" %}</td>
                     <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
@@ -471,7 +471,7 @@
                         </div>
                     </td>
                     <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
-                    <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
+                    <td>{{ ticket.created_at|tw_datetime }}</td>
                     <td>{{ ticket.client.code|default:"—" }}</td>
                     <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
                     <td>{% role_ticket_badge ticket "admin" %}</td>
@@ -552,7 +552,7 @@
                         </div>
                     </td>
                     <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
-                    <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
+                    <td>{{ ticket.created_at|tw_datetime }}</td>
                     <td>{{ ticket.client.code|default:"—" }}</td>
                     <td>{% role_ticket_badge ticket "admin" %}</td>
                     <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
@@ -634,7 +634,7 @@
                         </div>
                     </td>
                     <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
-                    <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
+                    <td>{{ ticket.created_at|tw_datetime }}</td>
                     <td>{{ ticket.client.code|default:"—" }}</td>
                     <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
                     {% if ticket.assigned_developer %}
@@ -704,7 +704,7 @@
                         </div>
                     </td>
                     <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
-                    <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
+                    <td>{{ ticket.created_at|tw_datetime }}</td>
                     <td>{{ ticket.client.code|default:"—" }}</td>
                     <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
                     {% if ticket.assigned_developer %}
@@ -771,7 +771,7 @@
                         </div>
                     </td>
                     <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
-                    <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
+                    <td>{{ ticket.created_at|tw_datetime }}</td>
                     <td>{{ ticket.client.code|default:"—" }}</td>
                     <td>{% role_ticket_badge ticket "admin" %}</td>
                     <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
@@ -848,7 +848,7 @@
                     <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
                     {# Rejected By / Reason come from the reject TicketEvent (audit) — wired later. #}
                     <td>—</td>
-                    <td>{{ ticket.updated_at|date:"d-m-Y" }}</td>
+                    <td>{{ ticket.updated_at|tw_datetime }}</td>
                     <td><div>—</div></td>
                     <td onclick="event.stopPropagation()">
                         <div class="tw-row-actions">
@@ -907,7 +907,7 @@
                         </div>
                     </td>
                     <td><div title="{{ ticket.subject }}">{{ ticket.subject }}</div></td>
-                    <td>{{ ticket.created_at|date:"d-m-Y" }}</td>
+                    <td>{{ ticket.created_at|tw_datetime }}</td>
                     <td>{{ ticket.client.code|default:"—" }}</td>
                     <td>{% role_ticket_badge ticket "admin" %}</td>
                     <td><span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>

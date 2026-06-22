@@ -53,7 +53,7 @@
         <div class="dev-ticket-header-dates">
             <div class="dev-ticket-header-date-item">
                 <span class="dev-ticket-header-date-label">Issue Date</span>
-                <span class="dev-ticket-header-date-val">{{ ticket.created_at|date:"d M Y" }}</span>
+                <span class="dev-ticket-header-date-val">{{ ticket.created_at|tw_datetime }}</span>
             </div>
         </div>
     </div>
@@ -222,7 +222,7 @@
                     </div>
                     <div class="tw-attachment-info">
                         <span class="tw-attachment-name">{{ att.file.name|cut:"ticket_attachments/" }}</span>
-                        <span class="tw-attachment-meta">{{ att.created_at|date:"d M Y" }}</span>
+                        <span class="tw-attachment-meta">{{ att.created_at|tw_datetime }}</span>
                     </div>
                 </div>
                 {% empty %}
@@ -262,7 +262,7 @@
                             <span class="tw-role-pill tw-role-pill--developer">Developer</span>
                         </div>
                         <div class="dev-msg-bubble">{{ msg.body }}</div>
-                        <div class="dev-msg-time">{{ msg.created_at|date:"d M Y" }} at {{ msg.created_at|time:"H:i" }}</div>
+                        <div class="dev-msg-time">{{ msg.created_at|tw_datetime }}</div>
                     </div>
                 </div>
                 {% else %}
@@ -276,7 +276,7 @@
                             <span class="tw-role-pill tw-role-pill--admin">Admin</span>
                         </div>
                         <div class="dev-msg-bubble">{{ msg.body }}</div>
-                        <div class="dev-msg-time">{{ msg.created_at|date:"d M Y" }} at {{ msg.created_at|time:"H:i" }}</div>
+                        <div class="dev-msg-time">{{ msg.created_at|tw_datetime }}</div>
                     </div>
                 </div>
                 {% endif %}
@@ -348,7 +348,7 @@
             </div>
             <div class="dev-info-row">
                 <span class="dev-info-row__label">Issue Date</span>
-                <span class="dev-info-row__value">{{ ticket.created_at|date:"d M Y" }}</span>
+                <span class="dev-info-row__value">{{ ticket.created_at|tw_datetime }}</span>
             </div>
             <div class="dev-info-row">
                 <span class="dev-info-row__label">Assigned To</span>
@@ -382,7 +382,7 @@
                     </div>
                     <div class="dev-progress-tl-content">
                         <div class="dev-progress-tl-label">{{ event.action|event_label }}</div>
-                        <div class="dev-progress-tl-date">{{ event.created_at|date:"d M Y" }} at {{ event.created_at|time:"H:i" }}</div>
+                        <div class="dev-progress-tl-date">{{ event.created_at|tw_datetime }}</div>
                     </div>
                 </div>
                 {% empty %}

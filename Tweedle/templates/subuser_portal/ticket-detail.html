@@ -43,11 +43,11 @@
     <div class="tw-ticket-header-dates">
         <div class="tw-ticket-header-date-item">
             <span class="tw-ticket-header-date-label">Submitted</span>
-            <span class="tw-ticket-header-date-val">{{ ticket.created_at|date:"d M Y" }}</span>
+            <span class="tw-ticket-header-date-val">{{ ticket.created_at|tw_datetime }}</span>
         </div>
         <div class="tw-ticket-header-date-item">
             <span class="tw-ticket-header-date-label">Last Updated</span>
-            <span class="tw-ticket-header-date-val">{{ ticket.updated_at|date:"d M Y" }}</span>
+            <span class="tw-ticket-header-date-val">{{ ticket.updated_at|tw_datetime }}</span>
         </div>
     </div>
 </div>
@@ -272,7 +272,7 @@
                 <div class="tw-client-message tw-client-message--client">
                     <div class="tw-client-message__sender">You</div>
                     <div class="tw-client-message__bubble">{{ msg.body }}</div>
-                    <div class="tw-client-message__time">{{ msg.created_at|date:"d M Y" }} at {{ msg.created_at|time:"H:i" }}</div>
+                    <div class="tw-client-message__time">{{ msg.created_at|tw_datetime }}</div>
                 </div>
                 {% else %}
                 <div class="tw-client-message tw-client-message--admin">
@@ -281,7 +281,7 @@
                         <span class="tw-role-pill tw-role-pill--admin">Admin</span>
                     </div>
                     <div class="tw-client-message__bubble">{{ msg.body }}</div>
-                    <div class="tw-client-message__time">{{ msg.created_at|date:"d M Y" }} at {{ msg.created_at|time:"H:i" }}</div>
+                    <div class="tw-client-message__time">{{ msg.created_at|tw_datetime }}</div>
                 </div>
                 {% endif %}
                 {% empty %}
@@ -350,11 +350,11 @@
                 </div>
                 <div class="tw-info-row">
                     <span class="tw-info-row__label">Submitted</span>
-                    <span class="tw-info-row__value">{{ ticket.created_at|date:"d M Y" }}</span>
+                    <span class="tw-info-row__value">{{ ticket.created_at|tw_datetime }}</span>
                 </div>
                 <div class="tw-info-row">
                     <span class="tw-info-row__label">Last Updated</span>
-                    <span class="tw-info-row__value">{{ ticket.updated_at|date:"d M Y" }}</span>
+                    <span class="tw-info-row__value">{{ ticket.updated_at|tw_datetime }}</span>
                 </div>
                 {% if ticket.assigned_developer %}
                 <div class="tw-info-row">
@@ -382,7 +382,7 @@
                     </div>
                     <div class="tw-client-tl-content">
                         <div class="tw-client-tl-label">{{ event.action|event_label }}</div>
-                        <div class="tw-client-tl-date">{{ event.created_at|date:"d M Y" }} at {{ event.created_at|time:"H:i" }}</div>
+                        <div class="tw-client-tl-date">{{ event.created_at|tw_datetime }}</div>
                     </div>
                 </div>
                 {% empty %}

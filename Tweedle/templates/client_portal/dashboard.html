@@ -219,8 +219,8 @@
                         <div title="{{ ticket.subject }}">{{ ticket.subject }}</div>
                     </td>
                     <td>{{ ticket.category|default:"—" }}</td>
-                    <td>{{ ticket.created_at|date:"d M Y" }}</td>
-                    <td>{{ ticket.updated_at|date:"d M Y" }}</td>
+                    <td>{{ ticket.created_at|tw_datetime }}</td>
+                    <td>{{ ticket.updated_at|tw_datetime }}</td>
                     <td>
                         {% role_ticket_badge ticket "client" %}
                         {% if ticket.status == 'uat' or ticket.status == 'awaiting_client' %}

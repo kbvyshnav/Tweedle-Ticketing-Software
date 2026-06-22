@@ -8,7 +8,7 @@
     <div class="tw-tl-panel-content">
         <div class="tw-tl-panel-event">{{ ev.action|event_label }}</div>
         <div class="tw-tl-panel-meta">
-            {{ ev.created_at|date:"d-m-Y H:i" }} · {{ ev.actor.username|default:"system" }}
+            {{ ev.created_at|tw_datetime }} · {{ ev.actor.username|default:"system" }}
         </div>
         <div class="tw-tl-panel-meta">
             {{ ev.from_status }}{% if ev.from_sub_status %}/{{ ev.from_sub_status }}{% endif %}

@@ -172,7 +172,7 @@
                     </td>
                     <td>{{ ticket.client.name|default:"—" }}</td>
                     <td>{{ ticket.assigned_developer.get_full_name|default:ticket.assigned_developer.username|default:"—" }}</td>
-                    <td>{{ ticket.created_at|date:"d M Y" }}</td>
+                    <td>{{ ticket.created_at|tw_datetime }}</td>
                     <td>
                         <span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">
                             {{ ticket.get_priority_display }}

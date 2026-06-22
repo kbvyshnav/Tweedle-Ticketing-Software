@@ -52,7 +52,7 @@
         </div>
         <div class="tw-info-item">
             <div class="tw-info-label">Issue Date</div>
-            <div class="tw-info-value">{{ ticket.created_at|date:"d-m-Y" }}</div>
+            <div class="tw-info-value">{{ ticket.created_at|tw_datetime }}</div>
         </div>
         <div class="tw-info-item">
             <div class="tw-info-label">Priority</div>
@@ -85,13 +85,13 @@
         {% if ticket.accepted_at %}
         <div class="tw-info-item">
             <div class="tw-info-label">Accepted On</div>
-            <div class="tw-info-value">{{ ticket.accepted_at|date:"d-m-Y" }}</div>
+            <div class="tw-info-value">{{ ticket.accepted_at|tw_datetime }}</div>
         </div>
         {% endif %}
         {% if ticket.closed_at %}
         <div class="tw-info-item">
             <div class="tw-info-label">Closed On</div>
-            <div class="tw-info-value">{{ ticket.closed_at|date:"d-m-Y" }}</div>
+            <div class="tw-info-value">{{ ticket.closed_at|tw_datetime }}</div>
         </div>
         {% endif %}
     </div>

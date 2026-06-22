@@ -4,13 +4,16 @@ Every created ticket gets exactly one `submitted` TicketEvent via a post_save
 signal, so every portal's timeline starts at "Ticket Submitted" (TARGET §7).
 """
 
+from io import StringIO
+
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from accounts.models import Client
-from tickets.models import Ticket
+from tickets.models import Ticket, TicketEvent
 from tickets.transitions import transition
 
 User = get_user_model()
@@ -127,3 +130,94 @@ class SubmissionTimelineRenderTests(SubmissionEventBase):
         self.assertContains(resp, "Ticket Submitted")
         # The drawer now renders friendly labels, not the raw action name.
         self.assertContains(resp, "Assigned to Developer")
+
+
+class BackfillSubmittedEventsTests(SubmissionEventBase):
+    """The backfill_submitted_events management command (Issue 2).
+
+    Simulates pre-signal tickets by deleting their auto-created submitted event,
+    then asserts the command reproduces a byte-identical, correctly-sorted event.
+    """
+
+    def _strip_submitted(self, ticket):
+        """Delete a ticket's signal-created submitted event (simulate a pre-signal row)."""
+        ticket.events.filter(action="submitted").delete()
+
+    def test_backfill_creates_event_for_pre_signal_ticket(self):
+        t = self._make()
+        self._strip_submitted(t)
+        self.assertEqual(t.events.filter(action="submitted").count(), 0)
+
+        call_command("backfill_submitted_events")
+
+        evs = t.events.filter(action="submitted")
+        self.assertEqual(evs.count(), 1)
+        ev = evs.first()
+        # All seven fields equal the signal's values.
+        self.assertEqual(ev.actor, t.requester)
+        self.assertEqual(ev.action, "submitted")
+        self.assertEqual(ev.from_status, "")
+        self.assertIsNone(ev.from_sub_status)
+        self.assertEqual(ev.to_status, "new")
+        self.assertIsNone(ev.to_sub_status)
+        self.assertEqual(ev.note, "")
+        # Backdated past auto_now_add to the ticket's creation time.
+        self.assertEqual(ev.created_at, t.created_at)
+
+    def test_backfilled_event_sorts_first_among_events(self):
+        t = self._make()
+        self._strip_submitted(t)
+        # Backdate the ticket (and thus the backfilled event) clearly before later events.
+        Ticket.objects.filter(pk=t.pk).update(
+            created_at=t.created_at - timezone.timedelta(days=2)
+        )
+        t.refresh_from_db()
+        # Add later transition events, forward-dated so ordering is unambiguous (not an id tie-break).
+        later = t.created_at + timezone.timedelta(days=1)
+        ev1 = TicketEvent.objects.create(
+            ticket=t, actor=self.admin, action="assign",
+            from_status="new", to_status="in_progress", to_sub_status="development",
+        )
+        TicketEvent.objects.filter(pk=ev1.pk).update(created_at=later)
+
+        call_command("backfill_submitted_events")
+
+        self.assertEqual(t.events.first().action, "submitted")
+
+    def test_backfill_is_idempotent(self):
+        t = self._make()
+        self._strip_submitted(t)
+
+        call_command("backfill_submitted_events")
+        first_count = TicketEvent.objects.filter(action="submitted").count()
+
+        call_command("backfill_submitted_events")
+        second_count = TicketEvent.objects.filter(action="submitted").count()
+
+        self.assertEqual(first_count, second_count)
+        self.assertEqual(t.events.filter(action="submitted").count(), 1)
+
+    def test_backfill_leaves_existing_event_untouched(self):
+        t = self._make()  # signal already fired
+        ev = t.events.filter(action="submitted").get()
+        original_created_at = ev.created_at
+
+        call_command("backfill_submitted_events")
+
+        self.assertEqual(t.events.filter(action="submitted").count(), 1)
+        ev.refresh_from_db()
+        self.assertEqual(ev.created_at, original_created_at)
+
+    def test_backfill_mixed_reports_correct_counts(self):
+        ticket_a = self._make()                 # keep its signal-created event
+        ticket_b = self._make()
+        self._strip_submitted(ticket_b)         # simulate a pre-signal row
+
+        out = StringIO()
+        call_command("backfill_submitted_events", stdout=out)
+        summary = out.getvalue()
+
+        self.assertIn("Backfilled 1", summary)
+        self.assertIn("skipped 1", summary)
+        self.assertEqual(ticket_b.events.filter(action="submitted").count(), 1)
+        self.assertEqual(ticket_a.events.filter(action="submitted").count(), 1)

@@ -201,7 +201,7 @@
                         <div title="{{ ticket.subject }}">{{ ticket.subject }}</div>
                     </td>
                     <td>{{ ticket.client.code|default:"—" }}</td>
-                    <td>{{ ticket.created_at|date:"d M Y" }}</td>
+                    <td>{{ ticket.created_at|tw_datetime }}</td>
                     <td>
                         <span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">
                             {{ ticket.get_priority_display }}

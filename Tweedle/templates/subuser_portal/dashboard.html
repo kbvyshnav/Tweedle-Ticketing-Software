@@ -180,7 +180,7 @@
                     </span>
                 </td>
                 <td>{% role_ticket_badge ticket "subuser" %}</td>
-                <td>{{ ticket.created_at|date:"d M Y" }}</td>
+                <td>{{ ticket.created_at|tw_datetime }}</td>
             </tr>
             {% empty %}
             <tr id="subuserEmptyStateRow">

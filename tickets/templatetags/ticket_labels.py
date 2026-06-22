@@ -13,6 +13,7 @@ truth — passing the ticket's model display as the fallback.
 """
 
 from django import template
+from django.template.defaultfilters import date as _date
 from django.utils.html import format_html
 
 from tickets.labels import resolve_ticket_label
@@ -29,6 +30,18 @@ register = template.Library()
 register.filter("event_label", _event_label)
 register.filter("event_dot_cls", _event_dot_cls)
 register.filter("event_icon", _event_icon)
+
+# The ONE date/time format for ticket timestamps everywhere (Issue 3 / S5):
+# "20 Jun 2026, 2:00 PM". Delegates to Django's built-in date filter so timezone
+# localization, locale handling, and None→"" behaviour stay identical to the
+# inline `|date:"…"` usages this replaces — just centralized.
+TW_DATETIME_FMT = "d M Y, g:i A"
+
+
+@register.filter
+def tw_datetime(value):
+    """Render a ticket timestamp in the single Tweedle standard format."""
+    return _date(value, TW_DATETIME_FMT)
 
 
 def _resolve(ticket, role):

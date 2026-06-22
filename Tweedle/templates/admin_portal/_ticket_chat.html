@@ -1,7 +1,8 @@
 {# Chat drawer body (4.3b): real TicketMessages, read-only. Posting deferred. #}
+{% load ticket_labels %}
 <div class="tw-chat-status-msg">
     Ticket created
-    <span class="tw-chat-status-time">• {{ ticket.created_at|date:"d-m-Y H:i" }}</span>
+    <span class="tw-chat-status-time">• {{ ticket.created_at|tw_datetime }}</span>
 </div>
 {% for m in chat_messages %}
 <div class="tw-message received">
@@ -13,7 +14,7 @@
         </div>
         <div class="tw-message-bubble">
             <div class="tw-message-text">{{ m.body|linebreaksbr }}</div>
-            <div class="tw-message-time">{{ m.created_at|date:"d-m-Y H:i" }}</div>
+            <div class="tw-message-time">{{ m.created_at|tw_datetime }}</div>
         </div>
     </div>
 </div>

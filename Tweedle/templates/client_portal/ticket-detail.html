@@ -42,11 +42,11 @@
         <div class="tw-ticket-header-dates">
             <div class="tw-ticket-header-date-item">
                 <span class="tw-ticket-header-date-label">Submitted</span>
-                <span class="tw-ticket-header-date-val">{{ ticket.created_at|date:"d M Y" }}</span>
+                <span class="tw-ticket-header-date-val">{{ ticket.created_at|tw_datetime }}</span>
             </div>
             <div class="tw-ticket-header-date-item">
                 <span class="tw-ticket-header-date-label">Last Updated</span>
-                <span class="tw-ticket-header-date-val">{{ ticket.updated_at|date:"d M Y" }}</span>
+                <span class="tw-ticket-header-date-val">{{ ticket.updated_at|tw_datetime }}</span>
             </div>
         </div>
     </div>
@@ -263,7 +263,7 @@
                         {% endif %}
                         <div class="tw-rejection-meta-row">
                             <span class="tw-rejection-meta-row__label">Rejected On</span>
-                            <span class="tw-rejection-meta-row__value">{{ reject_event.created_at|date:"d M Y" }}</span>
+                            <span class="tw-rejection-meta-row__value">{{ reject_event.created_at|tw_datetime }}</span>
                         </div>
                         {% if reject_event.note %}
                         <span class="tw-rejection-reason-label">Reason</span>
@@ -315,7 +315,7 @@
                 </div>
 
                 <div class="tw-client-chat-thread" id="chatThread">
-                    <div class="tw-status-msg-client">Ticket submitted — {{ ticket.created_at|date:"d M Y" }}</div>
+                    <div class="tw-status-msg-client">Ticket submitted — {{ ticket.created_at|tw_datetime }}</div>
 
                     {% for message in chat_messages %}
                     <div class="tw-client-message tw-client-message--{% if message.author.role == 'client' or message.author.role == 'subuser' %}client{% else %}admin{% endif %}">
@@ -325,7 +325,7 @@
                         <div class="tw-client-message__bubble">
                             {{ message.body|linebreaksbr }}
                         </div>
-                        <span class="tw-client-message__time">{{ message.created_at|date:"d M Y, g:i A" }}</span>
+                        <span class="tw-client-message__time">{{ message.created_at|tw_datetime }}</span>
                     </div>
                     {% endfor %}
                 </div>
@@ -397,7 +397,7 @@
 
                     <div class="tw-info-row">
                         <span class="tw-info-row__label">Submitted</span>
-                        <span class="tw-info-row__value">{{ ticket.created_at|date:"d M Y" }}</span>
+                        <span class="tw-info-row__value">{{ ticket.created_at|tw_datetime }}</span>
                     </div>
 
                     {% if ticket.assigned_developer %}
@@ -428,7 +428,7 @@
                     {% if ticket.status == 'closed' and ticket.closed_at %}
                     <div class="tw-info-row">
                         <span class="tw-info-row__label">Closed On</span>
-                        <span class="tw-info-row__value">{{ ticket.closed_at|date:"d M Y" }}</span>
+                        <span class="tw-info-row__value">{{ ticket.closed_at|tw_datetime }}</span>
                     </div>
                     {% endif %}
 
@@ -452,7 +452,7 @@
                         </div>
                         <div class="tw-client-tl-content">
                             <div class="tw-client-tl-label">{{ event.action|event_label }}</div>
-                            <div class="tw-client-tl-date">{{ event.created_at|date:"d M Y" }}</div>
+                            <div class="tw-client-tl-date">{{ event.created_at|tw_datetime }}</div>
                         </div>
                     </div>
                     {% endfor %}
