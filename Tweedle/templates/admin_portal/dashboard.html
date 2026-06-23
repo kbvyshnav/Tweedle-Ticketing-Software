@@ -2379,4 +2379,18 @@
     });
 </script>
 {% endif %}
+<script>
+    /* Phase 4.20: a notification deep-link lands here as ?open=<ref>&tab=<tab>.
+       Fire the existing tweedle:openTicket handler so the right tab + ticket
+       modal open automatically. */
+    document.addEventListener('DOMContentLoaded', function () {
+        var params = new URLSearchParams(window.location.search);
+        var ref = params.get('open');
+        if (ref) {
+            window.dispatchEvent(new CustomEvent('tweedle:openTicket', {
+                detail: { ticketId: ref, tab: params.get('tab') || '' }
+            }));
+        }
+    });
+</script>
 {% endblock %}

@@ -2,15 +2,12 @@
 {% load ticket_labels %}
 {% block title %}Notifications — Tweedle{% endblock %}
 {% block content %}
-<div style="padding:var(--tw-space-6);max-width:860px;margin:0 auto">
+<div class="tw-notif-page">
 
-    <div style="display:flex;align-items:center;justify-content:space-between;
-                gap:var(--tw-space-4);margin-bottom:var(--tw-space-5)">
+    <div class="tw-notif-page-head">
         <div>
-            <h1 style="font-size:var(--tw-text-2xl);font-weight:700;color:var(--tw-text-primary);margin:0">
-                Notifications
-            </h1>
-            <p style="margin:4px 0 0;color:var(--tw-text-secondary);font-size:var(--tw-text-sm)">
+            <h1 class="tw-notif-page-title">Notifications</h1>
+            <p class="tw-notif-page-sub">
                 {% if unread_total %}{{ unread_total }} unread{% else %}You're all caught up.{% endif %}
             </p>
         </div>
@@ -18,35 +15,31 @@
         <form method="post" action="{% url 'notifications_mark_all_read' %}" style="margin:0">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.path }}">
-            <button type="submit" class="tw-btn tw-btn-outline tw-btn--sm">Mark all read</button>
+            <button type="submit" class="tw-btn tw-btn-outline tw-btn--sm">
+                <i class="bx bx-check-double" aria-hidden="true"></i> Mark all read
+            </button>
         </form>
         {% endif %}
     </div>
 
-    <div style="background:var(--tw-bg-surface);border:1px solid var(--tw-border);
-                border-radius:var(--tw-radius-lg);overflow:hidden">
+    <div class="tw-notif-page-card">
         {% for n in notifications %}
-        <a href="{% url 'notification_open' n.pk %}"
-           style="display:flex;gap:12px;align-items:flex-start;padding:14px 16px;
-                  border-bottom:1px solid var(--tw-border-light);text-decoration:none;color:inherit;
-                  {% if not n.is_read %}background:var(--tw-notif-unread-bg){% endif %}">
-            <div class="tw-notif-type-icon tw-notif-type-icon--info" style="flex-shrink:0">
+        <a class="tw-notif-row{% if not n.is_read %} unread{% endif %}"
+           href="{% url 'notification_open' n.pk %}">
+            <div class="tw-notif-type-icon tw-notif-type-icon--info">
                 <i class="bx bxs-bell" aria-hidden="true"></i>
             </div>
-            <div style="flex:1;min-width:0">
-                {% if n.ticket %}<div style="font-weight:600;color:var(--tw-text-primary);font-size:var(--tw-text-sm)">{{ n.ticket.reference }}</div>{% endif %}
-                <div style="color:var(--tw-text-secondary);font-size:var(--tw-text-sm)">{{ n.message }}</div>
-                <div style="color:var(--tw-text-muted);font-size:var(--tw-text-xs);margin-top:2px">{{ n.created_at|tw_datetime }}</div>
+            <div class="tw-notif-row-text">
+                {% if n.ticket %}<span class="tw-notif-row-ref">{{ n.ticket.reference }}</span>{% endif %}
+                <span class="tw-notif-row-msg">{{ n.message }}</span>
             </div>
-            {% if not n.is_read %}
-            <span style="flex-shrink:0;width:8px;height:8px;border-radius:50%;
-                         background:var(--tw-primary);margin-top:6px" aria-label="unread"></span>
-            {% endif %}
+            <span class="tw-notif-row-time">{{ n.created_at|tw_datetime }}</span>
+            {% if not n.is_read %}<span class="tw-notif-row-dot" aria-label="unread"></span>{% endif %}
         </a>
         {% empty %}
-        <div style="padding:48px;text-align:center;color:var(--tw-text-muted)">
-            <i class="bx bx-bell" style="font-size:36px;display:block;margin-bottom:8px" aria-hidden="true"></i>
-            No notifications yet.
+        <div class="tw-notif-empty">
+            <i class="bx bx-bell" aria-hidden="true"></i>
+            <p>No notifications yet.</p>
         </div>
         {% endfor %}
     </div>

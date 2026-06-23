@@ -16,6 +16,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
+from .context_processors import STATUS_TAB
 from .models import Notification
 
 # Each role's base template — the feed page extends the caller's own themed base.
@@ -43,8 +44,10 @@ def _ticket_target(user, notification):
     if ticket is None:
         return reverse("notifications_feed")
     if user.role == "admin":
-        # Land on the dashboard; ``?open=<ref>`` lets it auto-open the modal.
-        return f"{reverse('admin_dashboard')}?open={ticket.reference}"
+        # Land on the dashboard; ``?open=<ref>&tab=<tab>`` lets it switch to the
+        # right tab and auto-open the ticket modal (handled in dashboard.html).
+        tab = STATUS_TAB.get(ticket.status) or ""
+        return f"{reverse('admin_dashboard')}?open={ticket.reference}&tab={tab}"
     name = _ROLE_TICKET_URL.get(user.role)
     if not name:
         return reverse("notifications_feed")

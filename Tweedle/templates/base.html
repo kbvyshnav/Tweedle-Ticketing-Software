@@ -227,14 +227,10 @@
 
                 <div class="tw-notif-list">
                     {% for n in recent_notifications %}
-                    {# Per-item NAVIGATION only — dispatches tweedle:openTicket (handled in
-                       dashboard.html). No cosmetic unread-stripping: marking-as-read is not
-                       built yet, and a control that only edits the DOM implies persistence
-                       that does not exist. n.tab degrades gracefully (empty -> no tab switch,
-                       the handler still tries to open the ticket). #}
-                    <div class="tw-notif-item{% if not n.is_read %} unread{% endif %}"
-                         {% if n.ticket %}role="button" style="cursor:pointer"
-                         onclick="document.getElementById('notifPanel').classList.remove('open'); document.getElementById('notifBellBtn').setAttribute('aria-expanded','false'); window.dispatchEvent(new CustomEvent('tweedle:openTicket', {detail:{ticketId:'{{ n.ticket.reference|escapejs }}',tab:'{{ n.tab|default:''|escapejs }}'}}));"{% endif %}>
+                    {# Item click marks-read server-side then deep-links to the ticket (admin: dashboard ?open=&tab=, auto-opens modal); unread styling = persisted is_read. #}
+                    <a class="tw-notif-item{% if not n.is_read %} unread{% endif %}"
+                       href="{% url 'notification_open' n.pk %}"
+                       style="display:block;text-decoration:none;color:inherit">
                         <div class="tw-notif-item-body">
                             <div class="tw-notif-type-icon tw-notif-type-icon--info">
                                 <i class="bx bxs-bell" aria-hidden="true"></i>
@@ -245,7 +241,7 @@
                                 <div class="tw-notif-item-time">{{ n.created_at|timesince }} ago</div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                     {% empty %}
                     <div style="padding:20px;text-align:center;color:var(--tw-text-muted);font-size:var(--tw-text-sm)">
                         No notifications yet.
