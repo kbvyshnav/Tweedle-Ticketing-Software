@@ -1046,3 +1046,117 @@ class AdminActionTierTests(TestCase):
         self.assertContains(in_prog, 'tw-disclosure__label">Request Info</span>')
         self.assertContains(in_prog, 'tw-disclosure__label">Reassign</span>')
         self.assertContains(in_prog, 'tw-disclosure__label">Cancel Ticket</span>')
+
+
+class AdminTopbarIdentityTests(TestCase):
+    """Sweep S3: the admin topbar binds request.user, not the dummy."""
+
+    def setUp(self):
+        self.url = reverse("admin_dashboard")
+        self.admin = User.objects.create_user(
+            "demo_admin",
+            email="demo.admin@tweedle.local",
+            password="pw",
+            role="admin",
+            first_name="Demo",
+            last_name="Admin",
+        )
+
+    def test_topbar_shows_real_user_identity(self):
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 200)
+        # Name, email, and slice(:2)-upper initials from request.user.
+        self.assertContains(resp, "Demo Admin")
+        self.assertContains(resp, "demo.admin@tweedle.local")
+        self.assertContains(resp, ">DE<")  # "Demo Admin"[:2].upper()
+
+    def test_topbar_dummy_identity_removed(self):
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.url)
+        self.assertNotContains(resp, "Jinoy Jose")
+        self.assertNotContains(resp, "jinoy@tweedle.io")
+        self.assertNotContains(resp, "CURRENT_USER")
+
+
+class AdminNotificationBellTests(TestCase):
+    """Sweep S4: the bell shows real notifications for request.user (read-only)."""
+
+    def setUp(self):
+        self.url = reverse("admin_dashboard")
+        self.admin = User.objects.create_user(
+            "admin_n", email="admin_n@tweedle.local", password="pw", role="admin"
+        )
+        self.other_admin = User.objects.create_user(
+            "admin_n2", email="admin_n2@tweedle.local", password="pw", role="admin"
+        )
+        self.requester = User.objects.create_user(
+            "client_n", email="client_n@tweedle.local", password="pw", role="client"
+        )
+        self.org = Client.objects.create(name="Acme", code="ACME")
+        self.ticket = Ticket.objects.create(
+            subject="Bell ticket",
+            requester=self.requester,
+            client=self.org,
+            status=S.NEW,
+        )
+
+    def _notif(self, recipient, message, is_read=False):
+        return Notification.objects.create(
+            recipient=recipient,
+            ticket=self.ticket,
+            action="assign",
+            message=message,
+            is_read=is_read,
+        )
+
+    def test_bell_shows_unread_count_and_notifications(self):
+        self._notif(self.admin, "First bell message")
+        self._notif(self.admin, "Second bell message")
+        self._notif(self.admin, "Already read message", is_read=True)
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.context["unread_notification_count"], 2)
+        self.assertContains(resp, "First bell message")
+        self.assertContains(resp, "Second bell message")
+        self.assertContains(resp, "Already read message")
+        # The unread badge renders the real count.
+        self.assertContains(resp, 'id="notifCount">2<')
+        # Each item links to its ticket via the existing openTicket event.
+        self.assertContains(resp, "tweedle:openTicket")
+        self.assertContains(resp, self.ticket.reference)
+
+    def test_bell_empty_state_when_none(self):
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.context["unread_notification_count"], 0)
+        self.assertEqual(list(resp.context["recent_notifications"]), [])
+        self.assertContains(resp, "No notifications yet.")
+        # No badge element when there are zero unread.
+        self.assertNotContains(resp, 'id="notifCount"')
+
+    def test_bell_excludes_other_users_notifications(self):
+        self._notif(self.other_admin, "Not your notification")
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.context["unread_notification_count"], 0)
+        self.assertNotContains(resp, "Not your notification")
+
+    def test_bell_dummy_notifications_removed(self):
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.url)
+        # The hardcoded "8" badge and the four dummy notifications are gone.
+        self.assertNotContains(resp, 'id="notifCount">8<')
+        self.assertNotContains(resp, "Wallet Option Agents")
+        self.assertNotContains(resp, "Recon issue has passed")
+        self.assertNotContains(resp, "Payment Gateway Integration")
+        self.assertNotContains(resp, "Authentication Flow Fix")
+
+    def test_cosmetic_mark_all_read_control_removed(self):
+        # S4 decision: a control that only strips a CSS class (no persistence)
+        # is worse than the dummy — remove the button and its wiring entirely.
+        self._notif(self.admin, "A message")
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.url)
+        self.assertNotContains(resp, 'id="markAllReadBtn"')
+        self.assertNotContains(resp, "Mark all read")

@@ -208,91 +208,42 @@
                 aria-expanded="false"
                 aria-controls="notifPanel">
                 <i class="bx bxs-bell" aria-hidden="true"></i>
-                <!-- TODO: render only when there are unread notifications -->
-                <span class="tw-notif-count-badge" id="notifCount">8</span>
+                {% if unread_notification_count %}
+                <span class="tw-notif-count-badge" id="notifCount">{{ unread_notification_count }}</span>
+                {% endif %}
             </button>
 
             <div class="tw-notif-panel" id="notifPanel" role="dialog" aria-label="Notifications">
                 <div class="tw-notif-panel-header">
                     <span class="tw-notif-panel-title">Notifications</span>
-                    <button
-                        class="tw-btn tw-btn-outline tw-btn--sm"
-                        id="markAllReadBtn"
-                        aria-label="Mark all notifications as read">
-                        Mark all read
-                    </button>
                 </div>
 
                 <div class="tw-notif-list">
-                    <!-- TODO: loop over the user's notifications (dummy data for now) -->
-
-                    <!-- Notification 1: GMEC25010001 → In Progress -->
-                    <div class="tw-notif-item unread" role="button" style="cursor:pointer"
-                         onclick="this.classList.remove('unread'); document.getElementById('notifPanel').classList.remove('open'); document.getElementById('notifBellBtn').setAttribute('aria-expanded','false'); window.dispatchEvent(new CustomEvent('tweedle:openTicket', {detail:{ticketId:'GMEC25010001',tab:'progress'}}));">
-                        <div class="tw-notif-item-body">
-                            <div class="tw-notif-type-icon tw-notif-type-icon--warning">
-                                <i class="bx bx-user-check" aria-hidden="true"></i>
-                            </div>
-                            <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">Ticket assigned — GMEC25010001</div>
-                                <div class="tw-notif-item-msg">
-                                    <span class="tw-notif-user-name">Manju</span> assigned to Wallet Option Agents
-                                </div>
-                                <div class="tw-notif-item-time">5 minutes ago</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Notification 2: GMEC25010003 → In Progress (overdue) -->
-                    <div class="tw-notif-item unread" role="button" style="cursor:pointer"
-                         onclick="this.classList.remove('unread'); document.getElementById('notifPanel').classList.remove('open'); document.getElementById('notifBellBtn').setAttribute('aria-expanded','false'); window.dispatchEvent(new CustomEvent('tweedle:openTicket', {detail:{ticketId:'GMEC25010003',tab:'progress'}}));">
-                        <div class="tw-notif-item-body">
-                            <div class="tw-notif-type-icon tw-notif-type-icon--warning">
-                                <i class="bx bx-time-five" aria-hidden="true"></i>
-                            </div>
-                            <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">Overdue alert — GMEC25010003</div>
-                                <div class="tw-notif-item-msg">
-                                    Recon issue has passed its estimated close date
-                                </div>
-                                <div class="tw-notif-item-time">30 minutes ago</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Notification 3: BGEX25020001 → Awaiting Client (client replied) -->
-                    <div class="tw-notif-item" role="button" style="cursor:pointer"
-                         onclick="this.classList.remove('unread'); document.getElementById('notifPanel').classList.remove('open'); document.getElementById('notifBellBtn').setAttribute('aria-expanded','false'); window.dispatchEvent(new CustomEvent('tweedle:openTicket', {detail:{ticketId:'BGEX25020001',tab:'forwarded'}}));">
+                    {% for n in recent_notifications %}
+                    {# Per-item NAVIGATION only — dispatches tweedle:openTicket (handled in
+                       dashboard.html). No cosmetic unread-stripping: marking-as-read is not
+                       built yet, and a control that only edits the DOM implies persistence
+                       that does not exist. n.tab degrades gracefully (empty -> no tab switch,
+                       the handler still tries to open the ticket). #}
+                    <div class="tw-notif-item{% if not n.is_read %} unread{% endif %}"
+                         {% if n.ticket %}role="button" style="cursor:pointer"
+                         onclick="document.getElementById('notifPanel').classList.remove('open'); document.getElementById('notifBellBtn').setAttribute('aria-expanded','false'); window.dispatchEvent(new CustomEvent('tweedle:openTicket', {detail:{ticketId:'{{ n.ticket.reference|escapejs }}',tab:'{{ n.tab|default:''|escapejs }}'}}));"{% endif %}>
                         <div class="tw-notif-item-body">
                             <div class="tw-notif-type-icon tw-notif-type-icon--info">
-                                <i class="bx bx-chat" aria-hidden="true"></i>
+                                <i class="bx bxs-bell" aria-hidden="true"></i>
                             </div>
                             <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">Client responded — BGEX25020001</div>
-                                <div class="tw-notif-item-msg">
-                                    <span class="tw-notif-user-name">BGEX</span> replied on Payment Gateway Integration
-                                </div>
-                                <div class="tw-notif-item-time">1 hour ago</div>
+                                {% if n.ticket %}<div class="tw-notif-item-title">{{ n.ticket.reference }}</div>{% endif %}
+                                <div class="tw-notif-item-msg">{{ n.message }}</div>
+                                <div class="tw-notif-item-time">{{ n.created_at|timesince }} ago</div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Notification 4: GMEC25010099 → Closed -->
-                    <div class="tw-notif-item" role="button" style="cursor:pointer"
-                         onclick="this.classList.remove('unread'); document.getElementById('notifPanel').classList.remove('open'); document.getElementById('notifBellBtn').setAttribute('aria-expanded','false'); window.dispatchEvent(new CustomEvent('tweedle:openTicket', {detail:{ticketId:'GMEC25010099',tab:'closed'}}));">
-                        <div class="tw-notif-item-body">
-                            <div class="tw-notif-type-icon tw-notif-type-icon--success">
-                                <i class="bx bx-check-circle" aria-hidden="true"></i>
-                            </div>
-                            <div class="tw-notif-item-text">
-                                <div class="tw-notif-item-title">Ticket closed — GMEC25010099</div>
-                                <div class="tw-notif-item-msg">Authentication Flow Fix has been closed</div>
-                                <div class="tw-notif-item-time">Yesterday</div>
-                            </div>
-                        </div>
+                    {% empty %}
+                    <div style="padding:20px;text-align:center;color:var(--tw-text-muted);font-size:var(--tw-text-sm)">
+                        No notifications yet.
                     </div>
-
-                    <!-- TODO: end notifications loop -->
+                    {% endfor %}
                 </div>
 
                 <div class="tw-notif-panel-footer">
@@ -307,17 +258,16 @@
         <!-- TODO 4.0b: extract to a components/profile_dropdown.html include -->
         <div class="tw-profile-wrap" id="profileWrap">
 
-            <div class="tw-avatar tw-avatar--admin" id="profile-avatar" role="button" aria-label="Profile" style="width:36px;height:36px;font-size:14px;cursor:pointer" onclick="toggleProfileDropdown(event)">JJ</div>
+            <div class="tw-avatar tw-avatar--admin" id="profile-avatar" role="button" aria-label="Profile" style="width:36px;height:36px;font-size:14px;cursor:pointer" onclick="toggleProfileDropdown(event)">{{ request.user.get_full_name|default:request.user.username|slice:":2"|upper }}</div>
 
             <div class="tw-profile-panel" id="profilePanel" role="menu" aria-hidden="true">
 
                 <!-- Header section -->
-                <!-- TODO 4.0b: bind initials/email/role badge from request.user -->
                 <div class="tw-profile-header">
-                    <div class="tw-avatar tw-avatar--admin" style="width:40px;height:40px;font-size:15px;flex-shrink:0">JJ</div>
+                    <div class="tw-avatar tw-avatar--admin" style="width:40px;height:40px;font-size:15px;flex-shrink:0">{{ request.user.get_full_name|default:request.user.username|slice:":2"|upper }}</div>
                     <div>
-                        <div style="font-size:var(--tw-text-base);font-weight:600;color:var(--tw-text-primary);line-height:1.3">Jinoy Jose</div>
-                        <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px">jinoy@tweedle.io</div>
+                        <div style="font-size:var(--tw-text-base);font-weight:600;color:var(--tw-text-primary);line-height:1.3">{{ request.user.get_full_name|default:request.user.username }}</div>
+                        <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:2px">{{ request.user.email }}</div>
                         <span class="tw-role-badge tw-role-badge--admin" style="margin-top:4px;display:inline-block">Admin</span>
                     </div>
                 </div>
@@ -472,17 +422,6 @@
             e.stopPropagation();
             const isOpen = notifPanel.classList.toggle('open');
             notifBellBtn.setAttribute('aria-expanded', isOpen);
-        });
-    }
-
-    var markAllReadBtn = document.getElementById('markAllReadBtn');
-    if (markAllReadBtn) {
-        markAllReadBtn.addEventListener('click', function () {
-            document.querySelectorAll('.tw-notif-item.unread').forEach(function (item) {
-                item.classList.remove('unread');
-            });
-            const badge = document.getElementById('notifCount');
-            if (badge) badge.remove();
         });
     }
 
