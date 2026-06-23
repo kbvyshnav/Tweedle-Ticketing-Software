@@ -10,7 +10,7 @@ from core.auth import RoleRequiredMixin, role_required
 from tickets.chat import ChatError, post_info_request, post_ticket_message
 from tickets.models import Ticket
 
-from .forms import ClientOnboardForm
+from .forms import ClientOnboardForm, TeamMemberForm
 from tickets.transitions import (
     InvalidTransition,
     TransitionNotAllowed,
@@ -110,6 +110,74 @@ def admin_onboard_client(request):
     ctx = _clients_context(form)
     ctx["open_onboard_modal"] = True
     return render(request, "admin_portal/clients.html", ctx)
+
+
+# ── Team (developers / testers) ──────────────────────────────────────────────
+
+def _team_context(form=None):
+    """Shared context for the Team page (member list + add-member form)."""
+    members = (
+        User.objects.filter(role__in=[User.Role.DEVELOPER, User.Role.TESTER])
+        .annotate(
+            wl_dev=Count(
+                "dev_tickets",
+                filter=Q(dev_tickets__status__in=OPEN_TICKET_STATUSES),
+                distinct=True,
+            ),
+            wl_test=Count(
+                "test_tickets",
+                filter=Q(test_tickets__status__in=OPEN_TICKET_STATUSES),
+                distinct=True,
+            ),
+        )
+        .order_by("role", "username")
+    )
+    return {
+        "team_members": members,
+        "member_form": form if form is not None else TeamMemberForm(),
+        "active_nav": "team",
+    }
+
+
+@role_required("admin")
+def admin_team(request):
+    """Admin Team page: every developer/tester with their active workload."""
+    return render(request, "admin_portal/team.html", _team_context())
+
+
+@require_POST
+@role_required("admin")
+def admin_add_team_member(request):
+    """Create a new developer/tester login account from the add-member modal."""
+    form = TeamMemberForm(request.POST)
+    if form.is_valid():
+        member = form.save()
+        name = member.get_full_name() or member.username
+        messages.success(
+            request, f"{name} added as {member.get_role_display()} (username: {member.username})."
+        )
+        return redirect("admin_team")
+
+    messages.error(request, "Please correct the highlighted fields and try again.")
+    ctx = _team_context(form)
+    ctx["open_member_modal"] = True
+    return render(request, "admin_portal/team.html", ctx)
+
+
+@require_POST
+@role_required("admin")
+def admin_toggle_team_member(request, pk):
+    """Enable/disable a team member's login (flips is_active)."""
+    member = get_object_or_404(
+        User, pk=pk, role__in=[User.Role.DEVELOPER, User.Role.TESTER]
+    )
+    member.is_active = not member.is_active
+    member.save(update_fields=["is_active"])
+    name = member.get_full_name() or member.username
+    messages.success(
+        request, f"{name} {'enabled' if member.is_active else 'disabled'}."
+    )
+    return redirect("admin_team")
 
 
 @require_POST

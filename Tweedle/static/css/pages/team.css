@@ -82,6 +82,35 @@ body > main {
 }
 
 
+/* === ROLE TOGGLE (add-member modal) ========================
+ * Developer / Tester segmented control.
+ * ============================================================ */
+.tw-toggle-group {
+    display: flex;
+    border: 1px solid var(--tw-border);
+    border-radius: var(--tw-radius-sm);
+    overflow: hidden;
+}
+
+.tw-toggle-btn {
+    flex: 1;
+    padding: var(--tw-space-2) var(--tw-space-4);
+    background: none;
+    border: none;
+    font-family: var(--tw-font-primary);
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-medium);
+    color: var(--tw-text-secondary);
+    cursor: pointer;
+    transition: all var(--tw-transition-fast);
+}
+
+.tw-toggle-btn.active {
+    background: var(--tw-primary);
+    color: #ffffff;
+}
+
+
 /* === RESPONSIVE ============================================= */
 
 @media screen and (max-width: 768px) {

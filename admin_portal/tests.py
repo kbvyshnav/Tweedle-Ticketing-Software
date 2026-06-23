@@ -1267,3 +1267,136 @@ class AdminClientsPageTests(TestCase):
     def test_onboard_get_not_allowed(self):
         self.client.force_login(self.admin)
         self.assertEqual(self.client.get(self.onboard_url).status_code, 405)
+
+
+class AdminTeamPageTests(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_user(
+            "admin_tm", email="admin_tm@tweedle.local", password="pw", role="admin"
+        )
+        self.outsider = User.objects.create_user(
+            "client_tm", email="client_tm@tweedle.local", password="pw", role="client"
+        )
+        self.dev = User.objects.create_user(
+            "dev_one", email="dev_one@tweedle.local", password="pw", role="developer"
+        )
+        self.tester = User.objects.create_user(
+            "test_one", email="test_one@tweedle.local", password="pw", role="tester"
+        )
+        self.list_url = reverse("admin_team")
+        self.add_url = reverse("admin_add_team_member")
+
+    # ── Access / list ────────────────────────────────────────────────────────
+
+    def test_list_requires_admin(self):
+        self.client.force_login(self.outsider)
+        self.assertEqual(self.client.get(self.list_url).status_code, 403)
+
+    def test_list_shows_only_dev_and_tester(self):
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.list_url)
+        self.assertEqual(resp.status_code, 200)
+        usernames = [m.username for m in resp.context["team_members"]]
+        self.assertIn("dev_one", usernames)
+        self.assertIn("test_one", usernames)
+        self.assertNotIn("admin_tm", usernames)
+        self.assertNotIn("client_tm", usernames)
+
+    def test_workload_counts_active_assigned_tickets(self):
+        org = Client.objects.create(name="Acme", code="ACME")
+        requester = self.outsider
+        requester.client = org
+        requester.save()
+        Ticket.objects.create(
+            subject="a", description="d" * 20, requester=requester, client=org,
+            status=S.IN_PROGRESS, sub_status=SS.DEVELOPMENT, assigned_developer=self.dev,
+        )
+        Ticket.objects.create(
+            subject="b", description="d" * 20, requester=requester, client=org,
+            status=S.CLOSED, assigned_developer=self.dev,
+        )
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.list_url)
+        dev_row = [m for m in resp.context["team_members"] if m.pk == self.dev.pk][0]
+        self.assertEqual(dev_row.wl_dev + dev_row.wl_test, 1)
+
+    # ── Add member ───────────────────────────────────────────────────────────
+
+    def _payload(self, **extra):
+        data = {
+            "full_name": "Arjun Menon",
+            "email": "arjun@tweedle.test",
+            "role": "developer",
+            "password": "TempPass!2026",
+            "is_active": "on",
+        }
+        data.update(extra)
+        return data
+
+    def test_add_member_creates_active_user(self):
+        self.client.force_login(self.admin)
+        resp = self.client.post(self.add_url, self._payload())
+        self.assertRedirects(resp, self.list_url)
+        member = User.objects.get(email="arjun@tweedle.test")
+        self.assertEqual(member.role, "developer")
+        self.assertEqual(member.first_name, "Arjun")
+        self.assertEqual(member.last_name, "Menon")
+        self.assertTrue(member.is_active)
+        self.assertEqual(member.username, "arjun_m")
+        # Password is hashed and usable.
+        self.assertTrue(member.check_password("TempPass!2026"))
+
+    def test_add_member_inactive_when_unchecked(self):
+        self.client.force_login(self.admin)
+        payload = self._payload()
+        payload.pop("is_active")  # checkbox unchecked
+        self.client.post(self.add_url, payload)
+        member = User.objects.get(email="arjun@tweedle.test")
+        self.assertFalse(member.is_active)
+
+    def test_add_member_unique_username(self):
+        User.objects.create_user("arjun_m", email="other@x.test", password="pw", role="tester")
+        self.client.force_login(self.admin)
+        self.client.post(self.add_url, self._payload())
+        member = User.objects.get(email="arjun@tweedle.test")
+        self.assertEqual(member.username, "arjun_m2")
+
+    def test_add_member_duplicate_email_rejected(self):
+        self.client.force_login(self.admin)
+        resp = self.client.post(self.add_url, self._payload(email="dev_one@tweedle.local"))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.context["open_member_modal"])
+
+    def test_add_member_short_password_rejected(self):
+        self.client.force_login(self.admin)
+        resp = self.client.post(self.add_url, self._payload(password="short"))
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse(User.objects.filter(email="arjun@tweedle.test").exists())
+
+    def test_add_member_requires_admin(self):
+        self.client.force_login(self.outsider)
+        resp = self.client.post(self.add_url, self._payload())
+        self.assertEqual(resp.status_code, 403)
+        self.assertFalse(User.objects.filter(email="arjun@tweedle.test").exists())
+
+    # ── Enable / disable ─────────────────────────────────────────────────────
+
+    def test_toggle_disables_then_enables(self):
+        self.client.force_login(self.admin)
+        url = reverse("admin_toggle_team_member", args=[self.dev.pk])
+        self.client.post(url)
+        self.dev.refresh_from_db()
+        self.assertFalse(self.dev.is_active)
+        self.client.post(url)
+        self.dev.refresh_from_db()
+        self.assertTrue(self.dev.is_active)
+
+    def test_toggle_rejects_non_team_user(self):
+        self.client.force_login(self.admin)
+        url = reverse("admin_toggle_team_member", args=[self.outsider.pk])
+        self.assertEqual(self.client.post(url).status_code, 404)
+
+    def test_toggle_requires_admin(self):
+        self.client.force_login(self.outsider)
+        url = reverse("admin_toggle_team_member", args=[self.dev.pk])
+        self.assertEqual(self.client.post(url).status_code, 403)

@@ -9,6 +9,13 @@ urlpatterns = [
     path("", AdminDashboardView.as_view(), name="admin_dashboard"),
     path("clients/", views.admin_clients, name="admin_clients"),
     path("clients/onboard/", views.admin_onboard_client, name="admin_onboard_client"),
+    path("team/", views.admin_team, name="admin_team"),
+    path("team/add/", views.admin_add_team_member, name="admin_add_team_member"),
+    path(
+        "team/<int:pk>/toggle/",
+        views.admin_toggle_team_member,
+        name="admin_toggle_team_member",
+    ),
     path(
         "ticket/<int:pk>/transition/",
         views.ticket_transition,
