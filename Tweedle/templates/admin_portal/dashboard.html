@@ -1038,27 +1038,23 @@
         <!-- Real TicketMessages are fetched and injected here (Phase 4.3b). -->
         <div class="tw-messages-area" id="messagesArea"></div>
 
-        <div class="tw-chat-footer">
-            <!-- Compose is disabled — posting replies is a later phase (no fake submit). -->
+        <form class="tw-chat-footer" id="chatComposeForm" method="post" {% endverbatim %}data-url-template="{% url 'admin_post_message' 0 %}"{% verbatim %}>
+            {% endverbatim %}{% csrf_token %}{% verbatim %}
             <div class="tw-chat-input-row">
                 <textarea
                     class="tw-chat-textarea"
                     id="chatTextarea"
-                    placeholder="Replies are read-only for now…"
+                    name="body"
+                    placeholder="Type a message…"
                     rows="1"
                     aria-label="Message input"
-                    disabled></textarea>
+                    required></textarea>
 
-                <button class="tw-chat-send-btn" id="sendBtn" aria-label="Send message" disabled>
+                <button type="submit" class="tw-chat-send-btn" id="sendBtn" aria-label="Send message">
                     <i class="bx bx-send" aria-hidden="true"></i>
                 </button>
             </div>
-
-            <div class="tw-chat-email-row" style="color:var(--tw-text-muted);font-size:var(--tw-text-xs);">
-                <i class="bx bx-info-circle" aria-hidden="true"></i>
-                Posting replies is coming in a later phase — this chat is read-only.
-            </div>
-        </div>
+        </form>
 
     </div>
     <!-- END CHAT PANEL -->
@@ -1894,6 +1890,12 @@
         area.innerHTML = '<div style="padding:32px;text-align:center;color:var(--tw-text-muted)">' +
             '<i class="bx bx-loader-alt bx-spin" style="font-size:24px"></i></div>';
         document.getElementById('chatPanel').classList.add('open');
+        var composeForm = document.getElementById('chatComposeForm');
+        if (composeForm) {
+            composeForm.action = pk
+                ? composeForm.dataset.urlTemplate.replace('/0/', '/' + pk + '/')
+                : '';
+        }
         if (!pk) return;
         var tpl = document.getElementById('chatPanel').dataset.urlTemplate;
         fetch(tpl.replace('/0/', '/' + pk + '/'), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })

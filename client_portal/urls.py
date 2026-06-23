@@ -2,6 +2,7 @@ from django.urls import path
 
 from .views import (
     ClientDashboardView,
+    client_post_message,
     client_submit_ticket,
     client_ticket_detail,
     client_ticket_transition,
@@ -12,4 +13,5 @@ urlpatterns = [
     path("submit/", client_submit_ticket, name="client_submit_ticket"),
     path("ticket/<int:pk>/", client_ticket_detail, name="client_ticket_detail"),
     path("ticket/<int:pk>/action/", client_ticket_transition, name="client_ticket_transition"),
+    path("ticket/<int:pk>/message/", client_post_message, name="client_post_message"),
 ]

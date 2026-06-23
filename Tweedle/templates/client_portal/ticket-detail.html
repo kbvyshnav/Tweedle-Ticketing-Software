@@ -113,14 +113,11 @@
                         the Activity &amp; Messages section below so we can continue working on your ticket.
                     </p>
                     <div class="tw-action-card__buttons">
-                        <button type="button" class="tw-btn tw-btn-primary" disabled>
+                        <button type="button" class="tw-btn tw-btn-primary" onclick="focusChatInput()">
                             <i class="bx bx-send" aria-hidden="true"></i>
                             Respond
                         </button>
                     </div>
-                    <p style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:8px;margin-bottom:0">
-                        Chat reply coming soon — use the Activity &amp; Messages section below to respond.
-                    </p>
                 </div>
             </div>
             {% endif %}
@@ -336,22 +333,20 @@
                     This ticket is {% role_ticket_label ticket "client" as cl_status_label %}{{ cl_status_label|lower }}. Chat history is read-only.
                 </div>
                 {% else %}
-                <div class="tw-chat-input-area" id="chatInputArea">
+                <form class="tw-chat-input-area" id="chatInputArea" method="post"
+                      action="{% url 'client_post_message' ticket.pk %}">
+                    {% csrf_token %}
                     <div class="tw-chat-input-row-client">
-                        <textarea id="chatInput" class="tw-chat-textarea-client"
-                                  placeholder="Type a message… (chat reply coming soon)"
+                        <textarea id="chatInput" name="body" class="tw-chat-textarea-client"
+                                  placeholder="Type a message…"
                                   rows="2" aria-label="Message input"
-                                  oninput="autoResizeChatInput(this)"
-                                  disabled style="opacity:0.6;cursor:not-allowed"></textarea>
-                        <button type="button" class="tw-btn tw-btn-primary tw-chat-send-btn"
-                                id="chatSendBtn" disabled aria-label="Send message">
+                                  oninput="autoResizeChatInput(this)" required></textarea>
+                        <button type="submit" class="tw-btn tw-btn-primary tw-chat-send-btn"
+                                id="chatSendBtn" aria-label="Send message">
                             <i class="bx bx-send" aria-hidden="true"></i>
                         </button>
                     </div>
-                    <p style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:6px;margin-bottom:0">
-                        Chat messaging coming soon.
-                    </p>
-                </div>
+                </form>
                 {% endif %}
 
             </div>
@@ -503,6 +498,13 @@
 function autoResizeChatInput(el) {
     el.style.height = 'auto';
     el.style.height = el.scrollHeight + 'px';
+}
+
+function focusChatInput() {
+    var input = document.getElementById('chatInput');
+    if (!input) return;
+    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    input.focus();
 }
 
 {% if ticket.status == 'uat' %}

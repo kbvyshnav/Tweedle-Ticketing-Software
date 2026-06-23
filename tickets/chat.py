@@ -1,0 +1,33 @@
+"""Ticket chat (TicketMessage) posting — the one place a message is created.
+
+Mirrors the spirit of the transition engine: a single guarded helper that every
+portal's message-post view calls. Views still enforce object-level ownership
+(who may see the ticket); this helper enforces the message-level rules (non-empty
+body, ticket not in a locked/terminal state). Display stays read-only in the
+templates; this adds the write path (Level 1: plain form-POST, no live socket).
+"""
+
+from .models import Ticket, TicketMessage
+
+# Chat is closed once a ticket reaches a terminal state — no new replies.
+CHAT_LOCKED_STATUSES = frozenset(
+    {Ticket.Status.CLOSED, Ticket.Status.REJECTED, Ticket.Status.CANCELLED}
+)
+
+
+class ChatError(Exception):
+    """Raised when a chat message cannot be posted (empty / locked ticket)."""
+
+
+def post_ticket_message(ticket, author, body):
+    """Create one TicketMessage after validating it. Raises ChatError on failure.
+
+    The caller is responsible for object-level access (it has already fetched the
+    ticket scoped to the requesting user). This only validates the message itself.
+    """
+    body = (body or "").strip()
+    if not body:
+        raise ChatError("Message cannot be empty.")
+    if ticket.status in CHAT_LOCKED_STATUSES:
+        raise ChatError("This ticket is closed — no new messages can be posted.")
+    return TicketMessage.objects.create(ticket=ticket, author=author, body=body)

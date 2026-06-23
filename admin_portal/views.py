@@ -6,6 +6,7 @@ from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 
 from core.auth import RoleRequiredMixin, role_required
+from tickets.chat import ChatError, post_ticket_message
 from tickets.models import Ticket
 from tickets.transitions import (
     InvalidTransition,
@@ -238,3 +239,16 @@ def admin_ticket_chat(request, pk):
         "admin_portal/_ticket_chat.html",
         {"ticket": ticket, "chat_messages": ticket.messages.select_related("author").all()},
     )
+
+
+@require_POST
+@role_required("admin")
+def admin_post_message(request, pk):
+    """Post a chat message on any ticket (admin), then return to the dashboard."""
+    ticket = get_object_or_404(Ticket, pk=pk)
+    try:
+        post_ticket_message(ticket, request.user, request.POST.get("body", ""))
+        messages.success(request, f"Message sent on {ticket.reference}.")
+    except ChatError as exc:
+        messages.error(request, str(exc))
+    return redirect("admin_dashboard")

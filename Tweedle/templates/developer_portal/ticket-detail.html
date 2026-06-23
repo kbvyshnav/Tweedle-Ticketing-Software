@@ -288,19 +288,21 @@
             </div>
 
             {% if ticket.status not in 'closed,resolved,rejected,cancelled' %}
-            <div class="dev-chat-footer">
+            <form class="dev-chat-footer" method="post"
+                  action="{% url 'dev:post_message' ticket.pk %}">
+                {% csrf_token %}
                 <div class="dev-chat-input-row">
-                    <textarea class="dev-chat-textarea" id="devChatInput"
-                              placeholder="Type a message to admin…" rows="1"
+                    <textarea class="dev-chat-textarea" id="devChatInput" name="body"
+                              placeholder="Type a message to admin…" rows="1" required
                               aria-label="Chat message input"
                               oninput="this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
-                    <button type="button" class="tw-btn tw-btn-primary tw-btn--sm"
-                            style="flex-shrink:0" onclick="sendDevDetailMessage()"
+                    <button type="submit" class="tw-btn tw-btn-primary tw-btn--sm"
+                            style="flex-shrink:0"
                             aria-label="Send message">
                         <i class="bx bx-send" aria-hidden="true"></i>
                     </button>
                 </div>
-            </div>
+            </form>
             {% else %}
             <div style="padding:var(--tw-space-3) var(--tw-space-5);font-size:var(--tw-text-xs);color:var(--tw-text-muted);font-style:italic">
                 Chat is disabled — this ticket is {% role_ticket_label ticket "developer" as dev_status_label %}{{ dev_status_label|lower }}.
@@ -483,17 +485,6 @@
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeDevConfirmModal();
     });
-
-
-    /* === CHAT SEND (stub — wired to Django in Phase 5) === */
-    function sendDevDetailMessage() {
-        var textarea = document.getElementById('devChatInput');
-        var text     = textarea ? textarea.value.trim() : '';
-        if (!text) { if (textarea) textarea.focus(); return; }
-
-        showDevToast('Chat sending will be wired in a later phase.', 'info');
-        if (textarea) { textarea.value = ''; textarea.style.height = 'auto'; }
-    }
 
 </script>
 {% endblock %}

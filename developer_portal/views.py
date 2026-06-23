@@ -5,6 +5,7 @@ from django.views.generic import TemplateView
 from django.utils import timezone
 
 from core.auth import RoleRequiredMixin, role_required
+from tickets.chat import ChatError, post_ticket_message
 from tickets.models import Ticket
 from tickets.transitions import InvalidTransition, TransitionNotAllowed, transition
 
@@ -74,4 +75,16 @@ def dev_ticket_transition(request, pk):
     except (InvalidTransition, TransitionNotAllowed) as exc:
         messages.error(request, str(exc))
 
+    return redirect("dev:ticket_detail", pk=pk)
+
+
+@role_required("developer")
+@require_POST
+def dev_post_message(request, pk):
+    ticket = get_object_or_404(Ticket, pk=pk, assigned_developer=request.user)
+    try:
+        post_ticket_message(ticket, request.user, request.POST.get("body", ""))
+        messages.success(request, "Message sent.")
+    except ChatError as exc:
+        messages.error(request, str(exc))
     return redirect("dev:ticket_detail", pk=pk)

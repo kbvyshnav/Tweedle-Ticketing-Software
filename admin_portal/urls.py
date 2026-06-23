@@ -27,4 +27,9 @@ urlpatterns = [
         views.admin_ticket_chat,
         name="admin_ticket_chat",
     ),
+    path(
+        "ticket/<int:pk>/message/",
+        views.admin_post_message,
+        name="admin_post_message",
+    ),
 ]

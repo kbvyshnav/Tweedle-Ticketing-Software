@@ -51,7 +51,7 @@ so users instantly recognise their workspace.
 - Priority, date, resolution stats bar
 
 ### Admin Portal
-- Dashboard with stat tiles (Inbox / InProgress / Forwarded / Closed)
+- Dashboard with stat tiles (Inbox / In Progress / Awaiting Client / UAT / Resolved / Closed / Rejected / Cancelled)
 - Client management — onboard, manage users, status
 - Team management — add developers and testers, enable/disable
 - Reports — filter by date, status, developer, client
@@ -82,10 +82,12 @@ so users instantly recognise their workspace.
 - Boxicons — icon library
 - Google Fonts — Poppins (primary) + Lato (secondary)
 
-### Backend (Built — through Phase 4.7)
+### Backend (Built — through Phase 4.18)
 - Python Django 5.2 LTS — web framework (server-rendered; DRF not used)
 - PostgreSQL — primary database (SQLite fallback for local dev)
 - django-allauth — authentication (signup closed; admin-provisioned)
+- Guarded transition engine — every ticket state change flows through one audited `transition()` service
+- All five portals wired end-to-end; admin ticket lifecycle complete (286 tests green)
 - Django REST Framework — not built (deferred; server-rendered form-POST is the target)
 - django-otp — two-factor authentication (Phase 3b — deferred)
 

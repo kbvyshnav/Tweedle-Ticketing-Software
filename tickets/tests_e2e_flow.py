@@ -21,8 +21,8 @@ KNOWN DIVERGENCES asserted/characterised here (captured, not fixed this step):
     ticket (engine ownership guard restricts these to the requester-or-admin);
     only admin can resolve such a ticket. See
     test_branch_subuser_confirm_then_admin_approve.
-  * #3 — the client `awaiting_client` "Respond" button is a disabled placeholder
-    (blocked on chat posting). See test_branch_request_info_resume.
+  * #3 — RESOLVED: the client `awaiting_client` "Respond" button now focuses a
+    working chat compose form (P0 chat posting). See test_branch_request_info_resume.
 """
 
 from django.contrib.auth import get_user_model
@@ -299,11 +299,12 @@ class BranchTests(E2EBase):
                             ">Your Input Needed</span>")
         self.assertContains(self._dash(self.developer, "dev:dashboard"),
                             ">Paused — Awaiting Client</span>")
-        # KNOWN DIVERGENCE #3: the client "Respond" control is a disabled placeholder
-        # (blocked on chat posting). Assert it renders disabled, NOT functional.
+        # Divergence #3 RESOLVED (P0 chat posting): on awaiting_client the client
+        # detail shows a functional Respond control + a working chat compose form
+        # that posts to the message endpoint.
         cdetail = self._detail(self.client_user, "client_ticket_detail", t)
         self.assertContains(cdetail, "Respond")
-        self.assertContains(cdetail, "disabled")
+        self.assertContains(cdetail, reverse("client_post_message", args=[t.pk]))
         # admin drives the resume → back in_progress (restores paused dev stage)
         self._act(self.admin, "ticket_transition", t,
                   expect_status=S.IN_PROGRESS, expect_sub=SS.DEVELOPMENT, action="resume")

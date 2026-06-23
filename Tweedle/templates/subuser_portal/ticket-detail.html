@@ -292,20 +292,21 @@
             </div>
 
             {% if ticket.status == 'awaiting_client' %}
-            <div class="tw-chat-input-area">
+            <form class="tw-chat-input-area" method="post"
+                  action="{% url 'subuser:post_message' ticket.pk %}">
+                {% csrf_token %}
                 <div class="tw-chat-input-row-client">
-                    <textarea class="tw-chat-textarea-client" id="subuserChatInput"
+                    <textarea class="tw-chat-textarea-client" id="subuserChatInput" name="body"
                               placeholder="Type your reply to the support team…"
-                              rows="2"
+                              rows="2" required
                               aria-label="Chat message input"></textarea>
-                    <button type="button" class="tw-btn tw-btn-primary"
+                    <button type="submit" class="tw-btn tw-btn-primary"
                             style="flex-shrink:0;align-self:flex-end"
-                            onclick="showSubuserToast('Chat sending will be wired in a later phase.', 'info')"
                             aria-label="Send message">
                         <i class="bx bx-send" aria-hidden="true"></i>
                     </button>
                 </div>
-            </div>
+            </form>
             {% else %}
             <div class="tw-chat-notice">
                 <i class="bx bx-lock" aria-hidden="true"></i>

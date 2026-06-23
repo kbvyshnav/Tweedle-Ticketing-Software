@@ -7,6 +7,7 @@ from django.views.generic import TemplateView
 from django.utils import timezone
 
 from core.auth import RoleRequiredMixin, role_required
+from tickets.chat import ChatError, post_ticket_message
 from tickets.models import Ticket
 from tickets.transitions import (
     REOPEN_WINDOW_DAYS,
@@ -138,6 +139,18 @@ def client_ticket_transition(request, pk):
         messages.success(request, _success_msg(action, ticket))
 
     return redirect("client_dashboard")
+
+
+@require_POST
+@role_required("client")
+def client_post_message(request, pk):
+    ticket = get_object_or_404(Ticket, pk=pk, client=request.user.client)
+    try:
+        post_ticket_message(ticket, request.user, request.POST.get("body", ""))
+        messages.success(request, "Message sent.")
+    except ChatError as exc:
+        messages.error(request, str(exc))
+    return redirect("client_ticket_detail", pk=pk)
 
 
 def _success_msg(action, ticket):

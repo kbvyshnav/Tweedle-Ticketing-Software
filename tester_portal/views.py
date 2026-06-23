@@ -4,6 +4,7 @@ from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 
 from core.auth import RoleRequiredMixin, role_required
+from tickets.chat import ChatError, post_ticket_message
 from tickets.models import Ticket
 from tickets.transitions import InvalidTransition, TransitionNotAllowed, TransitionValidationError, transition
 
@@ -75,4 +76,16 @@ def tester_ticket_transition(request, pk):
     except (InvalidTransition, TransitionNotAllowed, TransitionValidationError) as exc:
         messages.error(request, str(exc))
 
+    return redirect("tester:ticket_detail", pk=pk)
+
+
+@role_required("tester")
+@require_POST
+def tester_post_message(request, pk):
+    ticket = get_object_or_404(Ticket, pk=pk, assigned_tester=request.user)
+    try:
+        post_ticket_message(ticket, request.user, request.POST.get("body", ""))
+        messages.success(request, "Message sent.")
+    except ChatError as exc:
+        messages.error(request, str(exc))
     return redirect("tester:ticket_detail", pk=pk)
