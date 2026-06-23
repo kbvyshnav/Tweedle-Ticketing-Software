@@ -216,6 +216,13 @@
             <div class="tw-notif-panel" id="notifPanel" role="dialog" aria-label="Notifications">
                 <div class="tw-notif-panel-header">
                     <span class="tw-notif-panel-title">Notifications</span>
+                    {% if unread_notification_count %}
+                    <form method="post" action="{% url 'notifications_mark_all_read' %}" style="margin:0">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <button type="submit" class="tw-btn tw-btn-outline tw-btn--sm">Mark all read</button>
+                    </form>
+                    {% endif %}
                 </div>
 
                 <div class="tw-notif-list">
@@ -247,8 +254,7 @@
                 </div>
 
                 <div class="tw-notif-panel-footer">
-                    {# TODO 4.0b: href="{% url 'admin_notifications' %}" — page not built yet #}
-                    <a href="{% url 'admin_dashboard' %}" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
+                    <a href="{% url 'notifications_feed' %}" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
                 </div>
             </div>
         </div>

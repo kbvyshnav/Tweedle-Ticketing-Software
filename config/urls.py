@@ -21,4 +21,5 @@ urlpatterns = [
     path('developer/', include('developer_portal.urls')),
     path('tester/', include('tester_portal.urls')),
     path('subuser/', include('subuser_portal.urls')),
+    path('notifications/', include('notifications.urls')),
 ]

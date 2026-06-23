@@ -81,20 +81,45 @@
             <button class="tw-notif-bell-btn" id="notifBellBtn"
                     aria-label="Notifications" aria-expanded="false" aria-controls="notifPanel">
                 <i class="bx bxs-bell" aria-hidden="true"></i>
+                {% if unread_notification_count %}
+                <span class="tw-notif-count-badge" id="notifCount">{{ unread_notification_count }}</span>
+                {% endif %}
             </button>
             <div class="tw-notif-panel" id="notifPanel" role="dialog" aria-label="Notifications">
                 <div class="tw-notif-panel-header">
                     <span class="tw-notif-panel-title">Notifications</span>
-                    <button class="tw-btn tw-btn-outline tw-btn--sm" id="markAllReadBtn"
-                            aria-label="Mark all as read">Mark all read</button>
+                    {% if unread_notification_count %}
+                    <form method="post" action="{% url 'notifications_mark_all_read' %}" style="margin:0">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <button type="submit" class="tw-btn tw-btn-outline tw-btn--sm">Mark all read</button>
+                    </form>
+                    {% endif %}
                 </div>
                 <div class="tw-notif-list" id="notifList">
+                    {% for n in recent_notifications %}
+                    <a class="tw-notif-item{% if not n.is_read %} unread{% endif %}"
+                       href="{% url 'notification_open' n.pk %}"
+                       style="display:block;text-decoration:none;color:inherit">
+                        <div class="tw-notif-item-body">
+                            <div class="tw-notif-type-icon tw-notif-type-icon--info">
+                                <i class="bx bxs-bell" aria-hidden="true"></i>
+                            </div>
+                            <div class="tw-notif-item-text">
+                                {% if n.ticket %}<div class="tw-notif-item-title">{{ n.ticket.reference }}</div>{% endif %}
+                                <div class="tw-notif-item-msg">{{ n.message }}</div>
+                                <div class="tw-notif-item-time">{{ n.created_at|timesince }} ago</div>
+                            </div>
+                        </div>
+                    </a>
+                    {% empty %}
                     <div style="padding:20px;text-align:center;color:var(--tw-text-muted);font-size:var(--tw-text-sm)">
                         No notifications yet.
                     </div>
+                    {% endfor %}
                 </div>
-                <div class="tw-notif-panel-footer" style="display:none">
-                    <a href="#" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
+                <div class="tw-notif-panel-footer">
+                    <a href="{% url 'notifications_feed' %}" class="tw-btn tw-btn-outline tw-btn--sm">View all notifications</a>
                 </div>
             </div>
         </div>
@@ -224,16 +249,7 @@ if (notifBellBtn) {
     });
 }
 
-var markAllReadBtn = document.getElementById('markAllReadBtn');
-if (markAllReadBtn) {
-    markAllReadBtn.addEventListener('click', function () {
-        document.querySelectorAll('.tw-notif-item.unread').forEach(function (item) {
-            item.classList.remove('unread');
-        });
-        var badge = document.getElementById('notifCount');
-        if (badge) badge.remove();
-    });
-}
+/* Mark-all-read is a server-side POST form now (see the bell header). */
 
 /* === PROFILE DROPDOWN === */
 var profilePanelOpen = false;

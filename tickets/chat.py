@@ -7,7 +7,13 @@ body, ticket not in a locked/terminal state). Display stays read-only in the
 templates; this adds the write path (Level 1: plain form-POST, no live socket).
 """
 
+from django.contrib.auth import get_user_model
+
+from notifications.models import Notification
+
 from .models import Ticket, TicketMessage
+
+User = get_user_model()
 
 # Chat is closed once a ticket reaches a terminal state — no new replies.
 CHAT_LOCKED_STATUSES = frozenset(
@@ -17,6 +23,32 @@ CHAT_LOCKED_STATUSES = frozenset(
 
 class ChatError(Exception):
     """Raised when a chat message cannot be posted (empty / locked ticket)."""
+
+
+def _notify_message_recipients(ticket, author):
+    """Notify the other ticket participants (requester, assignees, admins) of a
+    new chat message — never the author. Mirrors the engine's notify dedupe."""
+    candidates = []
+    if ticket.requester_id:
+        candidates.append(ticket.requester)
+    if ticket.assigned_developer_id:
+        candidates.append(ticket.assigned_developer)
+    if ticket.assigned_tester_id:
+        candidates.append(ticket.assigned_tester)
+    candidates.extend(User.objects.filter(role="admin"))
+
+    seen = set()
+    for user in candidates:
+        if user is None or user.pk == author.pk or user.pk in seen:
+            continue
+        seen.add(user.pk)
+        Notification.objects.create(
+            recipient=user,
+            ticket=ticket,
+            actor=author,
+            action="message",
+            message=f"{ticket.reference}: new message from {author.get_username()}",
+        )
 
 
 def post_ticket_message(ticket, author, body):
@@ -30,7 +62,9 @@ def post_ticket_message(ticket, author, body):
         raise ChatError("Message cannot be empty.")
     if ticket.status in CHAT_LOCKED_STATUSES:
         raise ChatError("This ticket is closed — no new messages can be posted.")
-    return TicketMessage.objects.create(ticket=ticket, author=author, body=body)
+    message = TicketMessage.objects.create(ticket=ticket, author=author, body=body)
+    _notify_message_recipients(ticket, author)
+    return message
 
 
 def post_info_request(ticket, author, body):

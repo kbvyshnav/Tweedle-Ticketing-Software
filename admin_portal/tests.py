@@ -1163,11 +1163,12 @@ class AdminNotificationBellTests(TestCase):
         self.assertNotContains(resp, "Payment Gateway Integration")
         self.assertNotContains(resp, "Authentication Flow Fix")
 
-    def test_cosmetic_mark_all_read_control_removed(self):
-        # S4 decision: a control that only strips a CSS class (no persistence)
-        # is worse than the dummy — remove the button and its wiring entirely.
+    def test_mark_all_read_is_a_real_server_form(self):
+        # Phase 4.20: the cosmetic DOM-only button (id="markAllReadBtn") is gone;
+        # the bell now exposes a REAL mark-all-read POST form when there are unread.
         self._notif(self.admin, "A message")
         self.client.force_login(self.admin)
         resp = self.client.get(self.url)
         self.assertNotContains(resp, 'id="markAllReadBtn"')
-        self.assertNotContains(resp, "Mark all read")
+        self.assertContains(resp, reverse("notifications_mark_all_read"))
+        self.assertContains(resp, "Mark all read")
