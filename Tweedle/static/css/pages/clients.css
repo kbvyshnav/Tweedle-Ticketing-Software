@@ -56,6 +56,15 @@ body > main {
     font-weight: var(--tw-weight-medium);
 }
 
+.tw-status-badge--pending {
+    background: var(--tw-warning-light);
+    color: var(--tw-warning-dark);
+    padding: var(--tw-space-1) var(--tw-space-3);
+    border-radius: var(--tw-radius-pill);
+    font-size: var(--tw-text-sm);
+    font-weight: var(--tw-weight-medium);
+}
+
 
 /* === CLIENT NAME CELL ====================================== */
 .client-name-cell {

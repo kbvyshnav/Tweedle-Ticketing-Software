@@ -7,6 +7,8 @@ from .views import AdminDashboardView
 # and the `admin:` namespace is already taken by Django's built-in admin site.
 urlpatterns = [
     path("", AdminDashboardView.as_view(), name="admin_dashboard"),
+    path("clients/", views.admin_clients, name="admin_clients"),
+    path("clients/onboard/", views.admin_onboard_client, name="admin_onboard_client"),
     path(
         "ticket/<int:pk>/transition/",
         views.ticket_transition,

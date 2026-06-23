@@ -5,9 +5,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 
+from accounts.models import Client
 from core.auth import RoleRequiredMixin, role_required
 from tickets.chat import ChatError, post_info_request, post_ticket_message
 from tickets.models import Ticket
+
+from .forms import ClientOnboardForm
 from tickets.transitions import (
     InvalidTransition,
     TransitionNotAllowed,
@@ -64,7 +67,49 @@ class AdminDashboardView(RoleRequiredMixin, TemplateView):
         # Assignment-modal selects come from real users.
         ctx["developers"] = User.objects.filter(role="developer").order_by("username")
         ctx["testers"] = User.objects.filter(role="tester").order_by("username")
+        ctx["active_nav"] = "dashboard"
         return ctx
+
+
+# Tickets that count as "active" for a client's active-ticket badge.
+OPEN_TICKET_STATUSES = [S.NEW, S.IN_PROGRESS, S.AWAITING_CLIENT, S.UAT]
+
+
+def _clients_context(form=None):
+    """Shared context for the Clients page (list + onboard form)."""
+    clients = Client.objects.annotate(
+        active_tickets=Count(
+            "tickets", filter=Q(tickets__status__in=OPEN_TICKET_STATUSES)
+        )
+    ).order_by("name")
+    return {
+        "clients": clients,
+        "onboard_form": form if form is not None else ClientOnboardForm(),
+        "active_nav": "clients",
+    }
+
+
+@role_required("admin")
+def admin_clients(request):
+    """Admin Clients page: every client org with its active-ticket count."""
+    return render(request, "admin_portal/clients.html", _clients_context())
+
+
+@require_POST
+@role_required("admin")
+def admin_onboard_client(request):
+    """Create a new client organisation from the onboard modal."""
+    form = ClientOnboardForm(request.POST)
+    if form.is_valid():
+        client = form.save()
+        messages.success(request, f"Client {client.name} onboarded successfully.")
+        return redirect("admin_clients")
+
+    # Re-render the list with the bound form so the modal reopens with errors.
+    messages.error(request, "Please correct the highlighted fields and try again.")
+    ctx = _clients_context(form)
+    ctx["open_onboard_modal"] = True
+    return render(request, "admin_portal/clients.html", ctx)
 
 
 @require_POST

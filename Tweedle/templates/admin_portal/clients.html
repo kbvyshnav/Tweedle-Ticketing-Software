@@ -1,18 +1,13 @@
-<!--
-  File: templates/admin_portal/clients.html
-  Moved from: cAdmin/clients.html (Phase 6 restructure)
-  Phase 9: converted to Django partial template (Task 1)
-  Django template: extends 'base.html'
-  Django view: admin_portal.views.clients
-  Django url:  admin:clients
--->
-<!-- Django: {% extends 'base.html' %} -->
+{% extends 'base.html' %}
+{% load static %}
 
-<!-- Django: {% block page_css %}
+{% block title %}Clients — Tweedle{% endblock %}
+
+{% block page_css %}
 <link rel="stylesheet" href="{% static 'css/pages/clients.css' %}">
-{% endblock %} -->
+{% endblock %}
 
-<!-- Django: {% block content %} -->
+{% block content %}
 
     <!-- === PAGE HEADER ======================================= -->
     <div class="tw-page-header">
@@ -38,8 +33,7 @@
             <div class="tw-table-head-left">
                 <h3 class="tw-table-title">
                     All Clients
-                    <!-- Django: {{ clients|length }} -->
-                    <span class="tw-count-badge" id="clientCount">3</span>
+                    <span class="tw-count-badge" id="clientCount">{{ clients|length }}</span>
                 </h3>
 
                 <div class="tw-table-search">
@@ -47,13 +41,12 @@
                     <input
                         type="text"
                         id="clientSearchInput"
-                        placeholder="Search by name, email, or country..."
+                        placeholder="Search by name, code, contact, or email..."
                         aria-label="Search clients">
                 </div>
             </div>
 
             <div class="tw-table-head-right">
-                <!-- Django: opens {% url 'admin_onboard_client' %} or modal -->
                 <button
                     class="tw-btn tw-btn-primary onboard-btn"
                     id="onboardBtn"
@@ -67,7 +60,6 @@
         </div>
 
         <!-- Clients table -->
-        <!-- Django: {% for client in clients %} -->
         <div class="table-scroll-wrapper">
         <table class="tw-table" id="clientsTable">
             <thead>
@@ -84,123 +76,59 @@
             </thead>
             <tbody>
 
-                <!-- Row 1: GMEC -->
-                <tr data-status="active" data-client-id="GMEC">
+                {% for client in clients %}
+                <tr data-status="{{ client.status }}" data-client-id="{{ client.code }}">
                     <td>
                         <div class="client-name-cell">
-                            <div class="tw-avatar tw-avatar--gmec" aria-hidden="true">G</div>
+                            <div class="tw-avatar tw-avatar--{% cycle 'blue' 'purple' 'teal' 'rose' 'violet' 'pink' %}" aria-hidden="true">{{ client.name|slice:":1"|upper }}</div>
                             <div class="client-info">
-                                <!-- Django: {{ client.company_name }} -->
-                                <span class="client-company">Global Money Exchange CO.LLC</span>
-                                <!-- Django: {{ client.client_id }} -->
-                                <span class="client-id-label">Client ID: GMEC</span>
+                                <span class="client-company">{{ client.name }}</span>
+                                <span class="client-id-label">Client ID: {{ client.code }}</span>
                             </div>
                         </div>
                     </td>
                     <td>
+                        {% if client.country %}
                         <span class="tw-country-tag">
-                            <i class="bx bx-flag" aria-hidden="true"></i> Oman
+                            <i class="bx bx-flag" aria-hidden="true"></i> {{ client.country }}
                         </span>
+                        {% else %}—{% endif %}
                     </td>
-                    <!-- Django: {{ client.contact }} -->
-                    <td>+977-1234567890</td>
-                    <!-- Django: {{ client.email }} -->
-                    <td>contact@gmec.com.np</td>
+                    <td>{{ client.contact_name|default:"—" }}</td>
+                    <td>{{ client.contact_email|default:"—" }}</td>
                     <td>
-                        <!-- Django: class="tw-status-badge tw-status-badge--{{ client.status }}" -->
-                        <span class="tw-status-badge tw-status-badge--active">Active</span>
+                        <span class="tw-status-badge tw-status-badge--{{ client.status }}">{{ client.get_status_display }}</span>
                     </td>
-                    <td><span class="tw-count-badge">6</span></td>
-                    <td>Mar 2023</td>
+                    <td><span class="tw-count-badge">{{ client.active_tickets }}</span></td>
+                    <td>{{ client.created_at|date:"M Y" }}</td>
                     <td>
                         <div class="clients-actions">
-                            <!-- Django: {% url 'admin_manage_users' client.id %} -->
-                            <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers('GMEC')">
+                            <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers('{{ client.code }}')">
                                 <i class='bx bx-group'></i> Manage Users
                             </button>
-                            <button class="clients-more-btn" onclick="toggleClientMenu(event, this)" aria-label="More options for GMEC">
+                            <button class="clients-more-btn" onclick="toggleClientMenu(event, this)" aria-label="More options for {{ client.name }}">
                                 <i class='bx bx-dots-vertical-rounded'></i>
                             </button>
                         </div>
                     </td>
                 </tr>
-
-                <!-- Row 2: BGEX -->
-                <tr data-status="active" data-client-id="BGEX">
-                    <td>
-                        <div class="client-name-cell">
-                            <div class="tw-avatar tw-avatar--bgex" aria-hidden="true">B</div>
-                            <div class="client-info">
-                                <span class="client-company">Belhasa Global Exchange Co.LLC</span>
-                                <span class="client-id-label">Client ID: BGEX</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="tw-country-tag">
-                            <i class="bx bx-flag" aria-hidden="true"></i> Dubai
-                        </span>
-                    </td>
-                    <td>+880-9876543210</td>
-                    <td>info@bgex.com.bd</td>
-                    <td><span class="tw-status-badge tw-status-badge--active">Active</span></td>
-                    <td><span class="tw-count-badge">4</span></td>
-                    <td>Aug 2023</td>
-                    <td>
-                        <div class="clients-actions">
-                            <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers('BGEX')">
-                                <i class='bx bx-group'></i> Manage Users
-                            </button>
-                            <button class="clients-more-btn" onclick="toggleClientMenu(event, this)" aria-label="More options for BGEX">
-                                <i class='bx bx-dots-vertical-rounded'></i>
-                            </button>
-                        </div>
+                {% empty %}
+                <tr id="clientsEmptyRow">
+                    <td colspan="8" style="text-align:center;padding:var(--tw-space-6);color:var(--tw-text-muted)">
+                        No clients yet. Click <strong>Onboard New Client</strong> to add the first one.
                     </td>
                 </tr>
-
-                <!-- Row 3: TCS -->
-                <tr data-status="active" data-client-id="TCS">
-                    <td>
-                        <div class="client-name-cell">
-                            <div class="tw-avatar tw-avatar--tcs" aria-hidden="true">T</div>
-                            <div class="client-info">
-                                <span class="client-company">Tata Consultancy Services</span>
-                                <span class="client-id-label">Client ID: TCS</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="tw-country-tag">
-                            <i class="bx bx-flag" aria-hidden="true"></i> India
-                        </span>
-                    </td>
-                    <td>+91-987654321</td>
-                    <td>info@tcs.com.in</td>
-                    <td><span class="tw-status-badge tw-status-badge--active">Active</span></td>
-                    <td><span class="tw-count-badge">2</span></td>
-                    <td>Jan 2024</td>
-                    <td>
-                        <div class="clients-actions">
-                            <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers('TCS')">
-                                <i class='bx bx-group'></i> Manage Users
-                            </button>
-                            <button class="clients-more-btn" onclick="toggleClientMenu(event, this)" aria-label="More options for TCS">
-                                <i class='bx bx-dots-vertical-rounded'></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
+                {% endfor %}
 
             </tbody>
         </table>
         </div>
-        <!-- Django: {% endfor %} -->
 
     </div>
     <!-- END TABLE CARD -->
 
 
-    <!-- === ONBOARD CLIENT MODAL STUB ========================= -->
+    <!-- === ONBOARD CLIENT MODAL ============================== -->
     <div class="tw-modal-overlay" id="onboardModal" role="dialog" aria-modal="true" aria-labelledby="onboardModalTitle">
         <div class="tw-modal tw-modal--lg">
 
@@ -211,50 +139,52 @@
                         Onboard New Client
                     </h2>
                 </div>
-                <button class="tw-btn-close" id="onboardModalClose" aria-label="Close modal">
+                <button class="tw-btn-close" id="onboardModalClose" type="button" aria-label="Close modal">
                     <i class="bx bx-x" aria-hidden="true"></i>
                 </button>
             </div>
 
-            <div class="tw-modal-body">
-                <!-- Django: form action="{% url 'admin_onboard_client' %}" method="POST" {% csrf_token %} -->
-                <form id="onboardForm" novalidate>
+            <form id="onboardForm" method="post" action="{% url 'admin_onboard_client' %}" novalidate>
+                {% csrf_token %}
+                <div class="tw-modal-body">
+
+                    {% if onboard_form.non_field_errors %}
+                    <div class="tw-form-group">
+                        <span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger)">{{ onboard_form.non_field_errors.0 }}</span>
+                    </div>
+                    {% endif %}
 
                     <!-- SECTION 1: Company Details -->
                     <p class="tw-modal-section-label" style="font-size:var(--tw-text-sm);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--tw-text-secondary);margin-bottom:var(--tw-space-3);margin-top:var(--tw-space-2);display:block">Company Details</p>
 
-                    <div class="tw-form-group">
-                        <label class="tw-form-label" for="onboardCompanyName">Company Name <span class="tw-required">*</span></label>
-                        <input class="tw-input" id="onboardCompanyName" type="text" placeholder="e.g. Acme Corporation" autocomplete="organization">
-                        <span class="tw-field-error" id="onboardCompanyNameError" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
+                    <div class="tw-form-group" style="display:grid;grid-template-columns:2fr 1fr;gap:var(--tw-space-4);align-items:start">
+                        <div class="tw-form-group" style="width:100%">
+                            <label class="tw-form-label" for="onboardCompanyName">Company Name <span class="tw-required">*</span></label>
+                            <input class="tw-input{% if onboard_form.name.errors %} tw-input--error{% endif %}" id="onboardCompanyName" name="name" type="text" value="{{ onboard_form.name.value|default:'' }}" placeholder="e.g. Acme Corporation" autocomplete="organization">
+                            {% if onboard_form.name.errors %}<span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px">{{ onboard_form.name.errors.0 }}</span>{% endif %}
+                        </div>
+                        <div class="tw-form-group" style="width:100%">
+                            <label class="tw-form-label" for="onboardCode">Client Code <span class="tw-required">*</span></label>
+                            <input class="tw-input{% if onboard_form.code.errors %} tw-input--error{% endif %}" id="onboardCode" name="code" type="text" value="{{ onboard_form.code.value|default:'' }}" placeholder="e.g. ACME" maxlength="10" style="text-transform:uppercase">
+                            {% if onboard_form.code.errors %}<span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px">{{ onboard_form.code.errors.0 }}</span>{% endif %}
+                        </div>
                     </div>
 
                     <div class="tw-form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--tw-space-4);align-items:start">
                         <div class="tw-form-group" style="width:100%">
                             <label class="tw-form-label" for="onboardIndustry">Industry / Sector</label>
-                            <input class="tw-input" id="onboardIndustry" type="text" placeholder="e.g. Healthcare, Fintech">
+                            <input class="tw-input" id="onboardIndustry" name="industry" type="text" value="{{ onboard_form.industry.value|default:'' }}" placeholder="e.g. Healthcare, Fintech">
                         </div>
                         <div class="tw-form-group" style="width:100%">
                             <label class="tw-form-label" for="onboardCountry">Country <span class="tw-required">*</span></label>
-                            <select class="tw-select" id="onboardCountry">
-                                <option value="">Select country</option>
-                                <option value="India">India</option>
-                                <option value="United States">United States</option>
-                                <option value="United Kingdom">United Kingdom</option>
-                                <option value="United Arab Emirates">United Arab Emirates</option>
-                                <option value="Singapore">Singapore</option>
-                                <option value="Australia">Australia</option>
-                                <option value="Canada">Canada</option>
-                                <option value="Germany">Germany</option>
-                                <option value="Other">Other</option>
-                            </select>
-                            <span class="tw-field-error" id="onboardCountryError" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
+                            <input class="tw-input{% if onboard_form.country.errors %} tw-input--error{% endif %}" id="onboardCountry" name="country" type="text" value="{{ onboard_form.country.value|default:'' }}" placeholder="e.g. India, United Arab Emirates">
+                            {% if onboard_form.country.errors %}<span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px">{{ onboard_form.country.errors.0 }}</span>{% endif %}
                         </div>
                     </div>
 
                     <div class="tw-form-group">
                         <label class="tw-form-label" for="onboardWebsite">Company Website</label>
-                        <input class="tw-input" id="onboardWebsite" type="url" placeholder="https://">
+                        <input class="tw-input" id="onboardWebsite" name="website" type="url" value="{{ onboard_form.website.value|default:'' }}" placeholder="https://">
                     </div>
 
                     <!-- SECTION 2: Primary Contact -->
@@ -263,61 +193,58 @@
                     <div class="tw-form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--tw-space-4);align-items:start">
                         <div class="tw-form-group" style="width:100%">
                             <label class="tw-form-label" for="onboardContactName">Full Name <span class="tw-required">*</span></label>
-                            <input class="tw-input" id="onboardContactName" type="text" placeholder="Primary contact's full name" autocomplete="name">
-                            <span class="tw-field-error" id="onboardContactNameError" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
+                            <input class="tw-input{% if onboard_form.contact_name.errors %} tw-input--error{% endif %}" id="onboardContactName" name="contact_name" type="text" value="{{ onboard_form.contact_name.value|default:'' }}" placeholder="Primary contact's full name" autocomplete="name">
+                            {% if onboard_form.contact_name.errors %}<span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px">{{ onboard_form.contact_name.errors.0 }}</span>{% endif %}
                         </div>
                         <div class="tw-form-group" style="width:100%">
                             <label class="tw-form-label" for="onboardJobTitle">Job Title</label>
-                            <input class="tw-input" id="onboardJobTitle" type="text" placeholder="e.g. CTO, Project Manager">
+                            <input class="tw-input" id="onboardJobTitle" name="contact_job_title" type="text" value="{{ onboard_form.contact_job_title.value|default:'' }}" placeholder="e.g. CTO, Project Manager">
                         </div>
                     </div>
 
                     <div class="tw-form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--tw-space-4);align-items:start">
                         <div class="tw-form-group" style="width:100%">
                             <label class="tw-form-label" for="onboardEmail">Email Address <span class="tw-required">*</span></label>
-                            <input class="tw-input" id="onboardEmail" type="email" placeholder="contact@company.com" autocomplete="email">
-                            <span class="tw-field-error" id="onboardEmailError" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
+                            <input class="tw-input{% if onboard_form.contact_email.errors %} tw-input--error{% endif %}" id="onboardEmail" name="contact_email" type="email" value="{{ onboard_form.contact_email.value|default:'' }}" placeholder="contact@company.com" autocomplete="email">
+                            {% if onboard_form.contact_email.errors %}<span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px">{{ onboard_form.contact_email.errors.0 }}</span>{% endif %}
                         </div>
                         <div class="tw-form-group" style="width:100%">
                             <label class="tw-form-label" for="onboardPhone">Phone Number</label>
-                            <input class="tw-input" id="onboardPhone" type="tel" placeholder="+91 98765 43210" autocomplete="tel">
+                            <input class="tw-input" id="onboardPhone" name="contact_phone" type="tel" value="{{ onboard_form.contact_phone.value|default:'' }}" placeholder="+91 98765 43210" autocomplete="tel">
                         </div>
                     </div>
 
                     <!-- SECTION 3: Account Setup -->
                     <p class="tw-modal-section-label" style="font-size:var(--tw-text-sm);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--tw-text-secondary);margin-bottom:var(--tw-space-3);margin-top:var(--tw-space-2);display:block">Account Setup</p>
 
+                    <div class="tw-form-group" style="max-width:240px">
+                        <label class="tw-form-label" for="onboardStatus">Initial Status</label>
+                        <select class="tw-select" id="onboardStatus" name="status">
+                            {% with sval=onboard_form.status.value|default:"active" %}
+                            <option value="active" {% if sval == "active" %}selected{% endif %}>Active</option>
+                            <option value="pending" {% if sval == "pending" %}selected{% endif %}>Pending</option>
+                            <option value="inactive" {% if sval == "inactive" %}selected{% endif %}>Inactive</option>
+                            {% endwith %}
+                        </select>
+                    </div>
+
                     <div class="tw-form-group">
                         <label class="tw-form-label" for="onboardNotes">Notes / Special Instructions</label>
-                        <textarea class="tw-comment-textarea" id="onboardNotes" rows="3" placeholder="Any onboarding notes, special requirements, or context for the team."></textarea>
+                        <textarea class="tw-comment-textarea" id="onboardNotes" name="notes" rows="3" placeholder="Any onboarding notes, special requirements, or context for the team.">{{ onboard_form.notes.value|default:'' }}</textarea>
                     </div>
 
-                    <div class="tw-form-group">
-                        <label class="tw-checkbox-label">
-                            <input type="checkbox" id="onboardSendEmail" checked>
-                            <span>Send welcome email to client</span>
-                        </label>
-                    </div>
-
-                    <div class="tw-form-group">
-                        <label class="tw-checkbox-label">
-                            <input type="checkbox" id="onboardGrantAccess" checked>
-                            <span>Grant portal access immediately</span>
-                        </label>
-                    </div>
-
-                </form>
-            </div>
-
-            <div class="tw-modal-footer">
-                <div class="tw-modal-footer-actions">
-                    <button class="tw-btn tw-btn-outline" type="button" onclick="closeOnboardModal()">Cancel</button>
-                    <button class="tw-btn tw-btn-primary" type="button" id="onboardSubmitBtn" onclick="submitOnboardForm()">
-                        <i class="bx bx-plus-circle" aria-hidden="true"></i>
-                        Onboard Client
-                    </button>
                 </div>
-            </div>
+
+                <div class="tw-modal-footer">
+                    <div class="tw-modal-footer-actions">
+                        <button class="tw-btn tw-btn-outline" type="button" onclick="closeOnboardModal()">Cancel</button>
+                        <button class="tw-btn tw-btn-primary" type="submit" id="onboardSubmitBtn">
+                            <i class="bx bx-plus-circle" aria-hidden="true"></i>
+                            Onboard Client
+                        </button>
+                    </div>
+                </div>
+            </form>
 
         </div>
     </div>
@@ -333,10 +260,10 @@
     </button>
 </div>
 
-<!-- Django: {% endblock %} -->
+{% endblock %}
 
 
-<!-- Django: {% block page_js %} -->
+{% block page_js %}
 <script>
     /* ============================================================
      * CLIENT TABLE SEARCH
@@ -345,11 +272,11 @@
     var clientsTable      = document.getElementById('clientsTable');
 
     clientSearchInput.addEventListener('input', function () {
-        const filter = this.value.trim().toLowerCase();
-        const rows   = clientsTable.querySelectorAll('tbody tr');
-
-        rows.forEach(row => {
-            const matches = row.textContent.toLowerCase().includes(filter);
+        var filter = this.value.trim().toLowerCase();
+        var rows   = clientsTable.querySelectorAll('tbody tr');
+        rows.forEach(function (row) {
+            if (row.id === 'clientsEmptyRow') return;
+            var matches = row.textContent.toLowerCase().indexOf(filter) !== -1;
             row.classList.toggle('row-hidden', !matches);
         });
     });
@@ -370,321 +297,124 @@
     function closeOnboardModal() {
         onboardModal.classList.remove('active');
         document.body.style.overflow = '';
-        resetOnboardForm();
     }
 
     onboardBtn.addEventListener('click', openOnboardModal);
     onboardClose.addEventListener('click', closeOnboardModal);
 
-    onboardModal.addEventListener('click', (e) => {
+    onboardModal.addEventListener('click', function (e) {
         if (e.target === onboardModal) closeOnboardModal();
     });
 
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && onboardModal.classList.contains('active')) {
             closeOnboardModal();
         }
     });
 
+    /* Re-open the modal automatically when the server returned validation errors. */
+    {% if open_onboard_modal %}openOnboardModal();{% endif %}
 
-    /* ============================================================
-     * ONBOARD FORM — VALIDATION HELPERS
-     * ============================================================ */
-    function showOnboardError(inputEl, message) {
-        inputEl.classList.add('tw-input--error');
-        var errorEl = document.getElementById(inputEl.id + 'Error');
-        if (errorEl) {
-            errorEl.textContent = message;
-            errorEl.style.display = 'block';
-        }
-    }
-
-    function clearOnboardError(inputEl) {
-        inputEl.classList.remove('tw-input--error');
-        var errorEl = document.getElementById(inputEl.id + 'Error');
-        if (errorEl) {
-            errorEl.textContent = '';
-            errorEl.style.display = 'none';
-        }
-    }
-
-
-    /* ============================================================
-     * ONBOARD FORM — SUBMIT
-     * Django: POST to {% url 'admin_onboard_client' %}
-     *   Creates Organisation + OrganisationContact + CustomUser(role='client')
-     *   onboardSendEmail → queue welcome email Celery task
-     *   onboardGrantAccess → user.is_active = True (default)
-     *   Returns JSON { success: true, client_id: '...' }
-     * ============================================================ */
-    function submitOnboardForm() {
-        var companyNameEl = document.getElementById('onboardCompanyName');
-        var countryEl     = document.getElementById('onboardCountry');
-        var contactNameEl = document.getElementById('onboardContactName');
-        var emailEl       = document.getElementById('onboardEmail');
-
-        clearOnboardError(companyNameEl);
-        clearOnboardError(countryEl);
-        clearOnboardError(contactNameEl);
-        clearOnboardError(emailEl);
-
-        var valid        = true;
-        var firstInvalid = null;
-
-        if (!companyNameEl.value.trim()) {
-            showOnboardError(companyNameEl, 'Company name is required.');
-            if (!firstInvalid) firstInvalid = companyNameEl;
-            valid = false;
-        }
-
-        if (!countryEl.value) {
-            showOnboardError(countryEl, 'Please select a country.');
-            if (!firstInvalid) firstInvalid = countryEl;
-            valid = false;
-        }
-
-        if (!contactNameEl.value.trim()) {
-            showOnboardError(contactNameEl, 'Contact name is required.');
-            if (!firstInvalid) firstInvalid = contactNameEl;
-            valid = false;
-        }
-
-        if (!emailEl.value.trim()) {
-            showOnboardError(emailEl, 'Email address is required.');
-            if (!firstInvalid) firstInvalid = emailEl;
-            valid = false;
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim())) {
-            showOnboardError(emailEl, 'Please enter a valid email address.');
-            if (!firstInvalid) firstInvalid = emailEl;
-            valid = false;
-        }
-
-        if (!valid) {
-            if (firstInvalid) firstInvalid.focus();
-            return;
-        }
-
-        /* Collect form values */
-        var companyName = companyNameEl.value.trim();
-        var country     = countryEl.options[countryEl.selectedIndex].text;
-        var contactName = contactNameEl.value.trim();
-        var email       = emailEl.value.trim();
-        var industry    = document.getElementById('onboardIndustry').value.trim();
-        var website     = document.getElementById('onboardWebsite').value.trim();
-        var jobTitle    = document.getElementById('onboardJobTitle').value.trim();
-        var phone       = document.getElementById('onboardPhone').value.trim();
-        var notes       = document.getElementById('onboardNotes').value.trim();
-        var sendEmail   = document.getElementById('onboardSendEmail').checked;
-        var grantAccess = document.getElementById('onboardGrantAccess').checked;
-
-        /* Django: replace with fetch() POST */
-        console.log('[Onboard] New client:', {
-            company_name: companyName, country: country,
-            industry: industry, website: website,
-            contact_name: contactName, job_title: jobTitle,
-            email: email, phone: phone,
-            notes: notes, send_email: sendEmail, grant_access: grantAccess
+    /* Uppercase the client code as the admin types. */
+    var onboardCode = document.getElementById('onboardCode');
+    if (onboardCode) {
+        onboardCode.addEventListener('input', function () {
+            this.value = this.value.toUpperCase();
         });
-
-        /* Build avatar initials from first two words of company name */
-        var words    = companyName.replace(/[^a-zA-Z\s]/g, '').trim().split(/\s+/);
-        var initials = ((words[0] || '')[0] || '').toUpperCase() +
-                       ((words[1] || '')[0] || '').toUpperCase();
-
-        /* Build and prepend new table row */
-        var newRow = document.createElement('tr');
-        newRow.dataset.status   = 'active';
-        newRow.dataset.clientId = 'NEW';
-        newRow.innerHTML =
-            '<td>' +
-                '<div class="client-name-cell">' +
-                    '<div class="tw-avatar tw-avatar--teal" aria-hidden="true">' + initials + '</div>' +
-                    '<div class="client-info">' +
-                        '<span class="client-company">' + companyName + '</span>' +
-                        '<span class="client-id-label">New Client</span>' +
-                    '</div>' +
-                '</div>' +
-            '</td>' +
-            '<td>' +
-                '<span class="tw-country-tag">' +
-                    '<i class="bx bx-flag" aria-hidden="true"></i> ' + country +
-                '</span>' +
-            '</td>' +
-            '<td>' + (contactName || '—') + '</td>' +
-            '<td>' + email + '</td>' +
-            '<td><span class="tw-status-badge tw-status-badge--active">Active</span></td>' +
-            '<td><span class="tw-count-badge">0</span></td>' +
-            '<td>Just now</td>' +
-            '<td>' +
-                '<div class="clients-actions">' +
-                    '<button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers(\'NEW\')">' +
-                        '<i class=\'bx bx-group\'></i> Manage Users' +
-                    '</button>' +
-                    '<button class="clients-more-btn" onclick="toggleClientMenu(event, this)" aria-label="More options">' +
-                        '<i class=\'bx bx-dots-vertical-rounded\'></i>' +
-                    '</button>' +
-                '</div>' +
-            '</td>';
-
-        var tbody = document.querySelector('#clientsTable tbody');
-        if (tbody) tbody.insertBefore(newRow, tbody.firstChild);
-
-        /* Update client count badge */
-        var countBadge = document.getElementById('clientCount');
-        if (countBadge) countBadge.textContent = parseInt(countBadge.textContent) + 1;
-
-        closeOnboardModal();
-
-        var toastMsg = sendEmail
-            ? 'Client onboarded successfully. Welcome email sent.'
-            : 'Client onboarded successfully.';
-        showClientsToast(toastMsg, 'success');
-    }
-
-
-    /* ============================================================
-     * ONBOARD FORM — RESET
-     * ============================================================ */
-    function resetOnboardForm() {
-        var textIds = ['onboardCompanyName', 'onboardIndustry', 'onboardWebsite',
-                       'onboardContactName', 'onboardJobTitle', 'onboardEmail', 'onboardPhone'];
-
-        textIds.forEach(function(id) {
-            var el = document.getElementById(id);
-            if (el) { el.value = ''; clearOnboardError(el); }
-        });
-
-        var countryEl = document.getElementById('onboardCountry');
-        if (countryEl) { countryEl.selectedIndex = 0; clearOnboardError(countryEl); }
-
-        var notesEl = document.getElementById('onboardNotes');
-        if (notesEl) notesEl.value = '';
-
-        var sendEmailEl = document.getElementById('onboardSendEmail');
-        if (sendEmailEl) sendEmailEl.checked = true;
-
-        var grantAccessEl = document.getElementById('onboardGrantAccess');
-        if (grantAccessEl) grantAccessEl.checked = true;
     }
 
 
     /* ============================================================
      * CLIENTS PAGE TOAST
-     * Local copy — showDashToast is scoped to dashboard.html only
      * ============================================================ */
     function showClientsToast(message, type) {
         type = type || 'success';
         var iconMap = { success: 'bx-check-circle', error: 'bx-error-circle', info: 'bx-info-circle' };
         var toast = document.createElement('div');
         toast.className = 'tw-toast tw-toast--' + type;
-        toast.innerHTML = '<i class=\'bx ' + (iconMap[type] || 'bx-info-circle') +
-            '\'></i><span>' + message + '</span>';
+        toast.innerHTML = '<i class="bx ' + (iconMap[type] || 'bx-info-circle') + '"></i><span></span>';
+        toast.querySelector('span').textContent = message;
         document.body.appendChild(toast);
-        setTimeout(function() { toast.classList.add('show'); }, 10);
-        setTimeout(function() {
+        setTimeout(function () { toast.classList.add('show'); }, 10);
+        setTimeout(function () {
             toast.classList.remove('show');
-            setTimeout(function() { toast.remove(); }, 300);
+            setTimeout(function () { toast.remove(); }, 300);
         }, 3000);
     }
 
 
     /* ============================================================
-     * PLACEHOLDER ACTION HANDLERS — Fix 5: show toast feedback
-     * Django: replace with {% url %} redirects or fetch() calls
+     * PLACEHOLDER ACTION HANDLERS (Manage Users / details / settings
+     * land with the Manage-users page — next admin step).
      * ============================================================ */
-    function manageUsers(clientId) {
-        showClientsToast('Manage Users — coming in the next update', 'info');
+    function manageUsers(clientCode) {
+        showClientsToast('Manage Users for ' + clientCode + ' — coming with the Manage-users page.', 'info');
     }
-
-    function showDetails(clientId) {
-        showClientsToast('Client details view — coming in the next update', 'info');
+    function showDetails(clientCode) {
+        showClientsToast('Client details view — coming in a future update.', 'info');
     }
-
-    function showSettings(clientId) {
-        showClientsToast('Client settings — coming in the next update', 'info');
+    function showSettings(clientCode) {
+        showClientsToast('Client settings — coming in a future update.', 'info');
     }
 
 
     /* ============================================================
      * ⋮ CONTEXT MENU — viewport-fixed single shared element.
-     * JS positions via getBoundingClientRect(), escaping all table
-     * overflow, stacking contexts, and transform layers entirely.
      * ============================================================ */
-    var _activeClientId = null;
+    var _activeClientCode = null;
 
     function toggleClientMenu(e, btn) {
         e.stopPropagation();
         var menu = document.getElementById('clientContextMenu');
-
-        /* If already open for this same button, close it */
         if (menu.classList.contains('open') && menu._sourceBtn === btn) {
             closeClientMenu();
             return;
         }
-
-        /* Read client ID from the row's data attribute */
         var row = btn.closest('tr');
-        _activeClientId = (row && row.dataset.clientId) ? row.dataset.clientId : null;
+        _activeClientCode = (row && row.dataset.clientId) ? row.dataset.clientId : null;
 
-        /* Position menu below-right of the ⋮ button */
         var rect     = btn.getBoundingClientRect();
         var menuLeft = rect.right - 160;
         var menuTop  = rect.bottom + 4;
-
-        /* Keep within viewport bounds */
         if (menuLeft < 8) menuLeft = 8;
-        if (menuTop + 120 > window.innerHeight) {
-            menuTop = rect.top - 120 - 4; /* flip upward if too close to bottom */
-        }
+        if (menuTop + 120 > window.innerHeight) menuTop = rect.top - 120 - 4;
 
-        menu.style.left    = menuLeft + 'px';
-        menu.style.top     = menuTop  + 'px';
-        menu._sourceBtn    = btn;
+        menu.style.left = menuLeft + 'px';
+        menu.style.top  = menuTop  + 'px';
+        menu._sourceBtn = btn;
         menu.classList.add('open');
     }
 
     function closeClientMenu() {
         var menu = document.getElementById('clientContextMenu');
-        if (menu) {
-            menu.classList.remove('open');
-            menu._sourceBtn = null;
-        }
+        if (menu) { menu.classList.remove('open'); menu._sourceBtn = null; }
     }
 
-    /* Wire menu item actions */
-    document.getElementById('ctxViewDetails').addEventListener('click', function() {
+    document.getElementById('ctxViewDetails').addEventListener('click', function () {
         closeClientMenu();
-        showDetails(_activeClientId);
+        showDetails(_activeClientCode);
+    });
+    document.getElementById('ctxViewSettings').addEventListener('click', function () {
+        closeClientMenu();
+        showSettings(_activeClientCode);
     });
 
-    document.getElementById('ctxViewSettings').addEventListener('click', function() {
-        closeClientMenu();
-        showSettings(_activeClientId);
-    });
-
-    /* Close on outside click */
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         var menu = document.getElementById('clientContextMenu');
         if (menu && menu.classList.contains('open')) {
-            if (!e.target.closest('.clients-more-btn') &&
-                !e.target.closest('#clientContextMenu')) {
+            if (!e.target.closest('.clients-more-btn') && !e.target.closest('#clientContextMenu')) {
                 closeClientMenu();
             }
         }
     });
-
-    /* Close on scroll so menu doesn't float away from its button */
-    document.addEventListener('scroll', function() {
-        closeClientMenu();
-    }, true);
+    document.addEventListener('scroll', function () { closeClientMenu(); }, true);
 
 
     /* ============================================================
-     * FIX 4: STATUS FILTER
+     * STATUS FILTER
      * ============================================================ */
     function filterClientsByStatus(status, btn) {
-        /* Update active button styling */
-        document.querySelectorAll('.clients-status-filter .tw-btn').forEach(function(b) {
+        document.querySelectorAll('.clients-status-filter .tw-btn').forEach(function (b) {
             b.classList.remove('tw-btn-primary');
             b.classList.add('tw-btn-outline');
         });
@@ -692,8 +422,8 @@
             btn.classList.remove('tw-btn-outline');
             btn.classList.add('tw-btn-primary');
         }
-        /* Show/hide rows by data-status */
-        document.querySelectorAll('#clientsTable tbody tr').forEach(function(row) {
+        document.querySelectorAll('#clientsTable tbody tr').forEach(function (row) {
+            if (row.id === 'clientsEmptyRow') return;
             if (status === 'all') {
                 row.classList.remove('row-hidden');
             } else {
@@ -702,4 +432,15 @@
         });
     }
 </script>
-<!-- Django: {% endblock %} -->
+
+{% if messages %}
+<script>
+    /* Surface Django flash messages as corner toasts. */
+    document.addEventListener('DOMContentLoaded', function () {
+        {% for message in messages %}
+        showClientsToast("{{ message|escapejs }}", "{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}info{% endif %}");
+        {% endfor %}
+    });
+</script>
+{% endif %}
+{% endblock %}

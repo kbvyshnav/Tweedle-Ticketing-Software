@@ -1172,3 +1172,98 @@ class AdminNotificationBellTests(TestCase):
         self.assertNotContains(resp, 'id="markAllReadBtn"')
         self.assertContains(resp, reverse("notifications_mark_all_read"))
         self.assertContains(resp, "Mark all read")
+
+
+class AdminClientsPageTests(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_user(
+            "admin_c", email="admin_c@tweedle.local", password="pw", role="admin"
+        )
+        self.outsider = User.objects.create_user(
+            "client_c", email="client_c@tweedle.local", password="pw", role="client"
+        )
+        self.org = Client.objects.create(name="Acme Corp", code="ACME")
+        self.list_url = reverse("admin_clients")
+        self.onboard_url = reverse("admin_onboard_client")
+
+    # ── Access ───────────────────────────────────────────────────────────────
+
+    def test_list_requires_admin(self):
+        self.client.force_login(self.outsider)
+        self.assertEqual(self.client.get(self.list_url).status_code, 403)
+
+    def test_list_shows_clients(self):
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.list_url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Acme Corp")
+        self.assertContains(resp, "ACME")
+
+    def test_active_ticket_count_annotated(self):
+        # One open + one closed ticket → active count should be 1.
+        requester = self.outsider
+        requester.client = self.org
+        requester.save()
+        Ticket.objects.create(
+            subject="open", description="d" * 20, requester=requester,
+            client=self.org, status=S.NEW,
+        )
+        Ticket.objects.create(
+            subject="done", description="d" * 20, requester=requester,
+            client=self.org, status=S.CLOSED,
+        )
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.list_url)
+        client_row = [c for c in resp.context["clients"] if c.pk == self.org.pk][0]
+        self.assertEqual(client_row.active_tickets, 1)
+
+    # ── Onboard ──────────────────────────────────────────────────────────────
+
+    def _payload(self, **extra):
+        data = {
+            "name": "Globex Inc",
+            "code": "GLBX",
+            "country": "India",
+            "contact_name": "Jane Doe",
+            "contact_email": "jane@globex.test",
+            "status": "active",
+        }
+        data.update(extra)
+        return data
+
+    def test_onboard_creates_client(self):
+        self.client.force_login(self.admin)
+        resp = self.client.post(self.onboard_url, self._payload())
+        self.assertRedirects(resp, self.list_url)
+        created = Client.objects.get(code="GLBX")
+        self.assertEqual(created.name, "Globex Inc")
+        self.assertEqual(created.contact_email, "jane@globex.test")
+        self.assertEqual(created.status, "active")
+
+    def test_onboard_uppercases_code(self):
+        self.client.force_login(self.admin)
+        self.client.post(self.onboard_url, self._payload(code="glbx"))
+        self.assertTrue(Client.objects.filter(code="GLBX").exists())
+
+    def test_onboard_missing_required_field_reopens_modal(self):
+        self.client.force_login(self.admin)
+        resp = self.client.post(self.onboard_url, self._payload(name=""))
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse(Client.objects.filter(code="GLBX").exists())
+        self.assertTrue(resp.context["open_onboard_modal"])
+
+    def test_onboard_duplicate_code_rejected(self):
+        self.client.force_login(self.admin)
+        resp = self.client.post(self.onboard_url, self._payload(code="ACME"))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(Client.objects.filter(code="ACME").count(), 1)
+
+    def test_onboard_requires_admin(self):
+        self.client.force_login(self.outsider)
+        resp = self.client.post(self.onboard_url, self._payload())
+        self.assertEqual(resp.status_code, 403)
+        self.assertFalse(Client.objects.filter(code="GLBX").exists())
+
+    def test_onboard_get_not_allowed(self):
+        self.client.force_login(self.admin)
+        self.assertEqual(self.client.get(self.onboard_url).status_code, 405)
