@@ -11,7 +11,13 @@ from core.auth import RoleRequiredMixin, role_required
 from tickets.chat import ChatError, post_info_request, post_ticket_message
 from tickets.models import Ticket, TicketEvent
 
-from .forms import ClientOnboardForm, TeamMemberForm
+from .forms import (
+    BrandingSettingsForm,
+    ClientOnboardForm,
+    OrganisationSettingsForm,
+    TeamMemberForm,
+)
+from .models import NOTIFICATION_EVENTS, OrganisationSettings
 from tickets.transitions import (
     InvalidTransition,
     TransitionNotAllowed,
@@ -273,6 +279,73 @@ def admin_reports(request):
         },
     }
     return render(request, "admin_portal/reports.html", ctx)
+
+
+# ── Settings ─────────────────────────────────────────────────────────────────
+
+def _settings_context(settings_obj, org_form=None, branding_form=None):
+    """Shared context for the Settings page (all three section forms)."""
+    return {
+        "active_nav": "settings",
+        "settings": settings_obj,
+        "org_form": org_form or OrganisationSettingsForm(instance=settings_obj),
+        "branding_form": branding_form or BrandingSettingsForm(instance=settings_obj),
+        "notification_rows": settings_obj.notification_rows(),
+    }
+
+
+@role_required("admin")
+def admin_settings(request):
+    """Admin Settings page: organisation, email-notification and branding prefs.
+
+    One singleton `OrganisationSettings` row backs all three sections. Each
+    section is its own POST (hidden `section` field) so saving one never
+    overwrites the others; the page always redirects back to itself with a
+    toast (PRG), or re-renders with a bound form when validation fails.
+    """
+    settings_obj = OrganisationSettings.load()
+
+    if request.method == "POST":
+        section = request.POST.get("section")
+
+        if section == "org":
+            form = OrganisationSettingsForm(request.POST, instance=settings_obj)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Organisation settings saved.")
+                return redirect("admin_settings")
+            messages.error(request, "Please correct the highlighted fields and try again.")
+            return render(
+                request, "admin_portal/settings.html",
+                _settings_context(settings_obj, org_form=form),
+            )
+
+        if section == "notifications":
+            prefs = {}
+            for key, _label in NOTIFICATION_EVENTS:
+                prefs[f"{key}_admin"] = bool(request.POST.get(f"{key}_admin"))
+                prefs[f"{key}_assignee"] = bool(request.POST.get(f"{key}_assignee"))
+            settings_obj.notification_prefs = prefs
+            settings_obj.save(update_fields=["notification_prefs", "updated_at"])
+            messages.success(request, "Notification settings saved.")
+            return redirect("admin_settings")
+
+        if section == "branding":
+            form = BrandingSettingsForm(request.POST, request.FILES, instance=settings_obj)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Branding settings saved.")
+                return redirect("admin_settings")
+            messages.error(request, "Please correct the highlighted fields and try again.")
+            return render(
+                request, "admin_portal/settings.html",
+                _settings_context(settings_obj, branding_form=form),
+            )
+
+        messages.error(request, "Unknown settings section.")
+        return redirect("admin_settings")
+
+    return render(request, "admin_portal/settings.html", _settings_context(settings_obj))
 
 
 @require_POST

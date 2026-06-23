@@ -5,6 +5,8 @@ from django.contrib.auth import get_user_model
 
 from accounts.models import Client
 
+from .models import OrganisationSettings
+
 User = get_user_model()
 
 
@@ -91,3 +93,37 @@ class TeamMemberForm(forms.Form):
             last_name=last,
             is_active=data.get("is_active", False),
         )
+
+
+class OrganisationSettingsForm(forms.ModelForm):
+    """Organisation section of the admin Settings page."""
+
+    class Meta:
+        model = OrganisationSettings
+        fields = ["org_name", "industry", "timezone", "default_priority"]
+
+    def clean_org_name(self):
+        name = (self.cleaned_data.get("org_name") or "").strip()
+        if not name:
+            raise forms.ValidationError("Organisation name is required.")
+        return name
+
+
+class BrandingSettingsForm(forms.ModelForm):
+    """Portal Branding section — logo upload + the 'Powered by Tweedle' toggle."""
+
+    class Meta:
+        model = OrganisationSettings
+        fields = ["logo", "powered_by_tweedle"]
+
+    def clean_logo(self):
+        logo = self.cleaned_data.get("logo")
+        # Only validate a freshly uploaded file (an unchanged FieldFile has no
+        # content_type / size attributes worth re-checking).
+        if logo and hasattr(logo, "size"):
+            if logo.size > 2 * 1024 * 1024:
+                raise forms.ValidationError("Logo must be 2MB or smaller.")
+            name = (getattr(logo, "name", "") or "").lower()
+            if not name.endswith((".png", ".svg", ".jpg", ".jpeg", ".gif", ".webp")):
+                raise forms.ValidationError("Logo must be an image (PNG, SVG, JPG, GIF or WEBP).")
+        return logo

@@ -1497,3 +1497,91 @@ class AdminReportsPageTests(TestCase):
         resp = self.client.get(self.url)
         self.assertEqual(resp.context["pending"], 0)
         self.assertIsNotNone(resp.context["rows"][0]["tat"])
+
+
+class AdminSettingsTests(TestCase):
+    def setUp(self):
+        self.url = reverse("admin_settings")
+        self.admin = User.objects.create_user(
+            "admin_s", email="admin_s@tweedle.local", password="pw", role="admin"
+        )
+        self.dev = User.objects.create_user(
+            "dev_s", email="dev_s@tweedle.local", password="pw", role="developer"
+        )
+
+    def test_admin_gets_200_and_uses_templates(self):
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, "admin_portal/settings.html")
+        self.assertTemplateUsed(resp, "base.html")
+
+    def test_non_admin_forbidden(self):
+        self.client.force_login(self.dev)
+        self.assertEqual(self.client.get(self.url).status_code, 403)
+
+    def test_get_creates_singleton_with_defaults(self):
+        from admin_portal.models import OrganisationSettings
+
+        self.assertEqual(OrganisationSettings.objects.count(), 0)
+        self.client.force_login(self.admin)
+        self.client.get(self.url)
+        self.assertEqual(OrganisationSettings.objects.count(), 1)
+        obj = OrganisationSettings.load()
+        self.assertEqual(obj.pk, 1)
+        self.assertTrue(obj.powered_by_tweedle)
+
+    def test_save_org_section_persists(self):
+        from admin_portal.models import OrganisationSettings
+
+        self.client.force_login(self.admin)
+        resp = self.client.post(self.url, {
+            "section": "org", "org_name": "Acme Corp", "industry": "Fintech",
+            "timezone": "UTC", "default_priority": "high",
+        })
+        self.assertRedirects(resp, self.url)
+        obj = OrganisationSettings.load()
+        self.assertEqual(obj.org_name, "Acme Corp")
+        self.assertEqual(obj.default_priority, "high")
+        self.assertEqual(obj.timezone, "UTC")
+
+    def test_save_org_blank_name_rejected(self):
+        from admin_portal.models import OrganisationSettings
+
+        self.client.force_login(self.admin)
+        resp = self.client.post(self.url, {
+            "section": "org", "org_name": "   ", "timezone": "UTC",
+            "default_priority": "medium",
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Organisation name is required.")
+        # Unchanged default name kept.
+        self.assertEqual(OrganisationSettings.load().org_name, "Tweedle Demo Org")
+
+    def test_save_notifications_unchecked_becomes_false(self):
+        from admin_portal.models import OrganisationSettings
+
+        self.client.force_login(self.admin)
+        # Post with only one toggle checked; the rest must persist as False.
+        resp = self.client.post(self.url, {
+            "section": "notifications", "new_ticket_admin": "on",
+        })
+        self.assertRedirects(resp, self.url)
+        prefs = OrganisationSettings.load().notification_prefs
+        self.assertTrue(prefs["new_ticket_admin"])
+        self.assertFalse(prefs["new_ticket_assignee"])
+        self.assertFalse(prefs["closed_admin"])
+
+    def test_save_branding_toggle_off(self):
+        from admin_portal.models import OrganisationSettings
+
+        self.client.force_login(self.admin)
+        resp = self.client.post(self.url, {"section": "branding"})
+        self.assertRedirects(resp, self.url)
+        # Unchecked checkbox -> False.
+        self.assertFalse(OrganisationSettings.load().powered_by_tweedle)
+
+    def test_unknown_section_redirects(self):
+        self.client.force_login(self.admin)
+        resp = self.client.post(self.url, {"section": "bogus"})
+        self.assertRedirects(resp, self.url)
