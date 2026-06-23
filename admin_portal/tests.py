@@ -1696,3 +1696,63 @@ class AdminClientActionsTests(TestCase):
     def test_toggle_rejects_non_client_user(self):
         url = reverse("admin_toggle_client_user", args=[self.dev.pk])
         self.assertEqual(self.client.post(url).status_code, 404)
+
+
+class AdminSearchTests(TestCase):
+    def setUp(self):
+        self.url = reverse("admin_search")
+        self.admin = User.objects.create_user(
+            "admin_se", email="admin_se@tweedle.local", password="pw", role="admin"
+        )
+        self.dev = User.objects.create_user(
+            "dev_se", email="dev_se@tweedle.local", password="pw", role="developer"
+        )
+        self.client_org = Client.objects.create(name="Globex", code="GLBX")
+        self.requester = User.objects.create_user(
+            "glbx_user", email="user@globex.test", password="pw",
+            role="client", client=self.client_org,
+        )
+        self.ticket = Ticket.objects.create(
+            subject="Login page is broken", description="cannot sign in",
+            category="bug", priority="high", requester=self.requester,
+            client=self.client_org, status=S.NEW,
+        )
+        self.client.force_login(self.admin)
+
+    def test_non_admin_forbidden(self):
+        self.client.force_login(self.dev)
+        self.assertEqual(self.client.get(self.url, {"q": "login"}).status_code, 403)
+
+    def test_empty_query_shows_prompt(self):
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, "admin_portal/search.html")
+        self.assertEqual(resp.context["result_count"], 0)
+        self.assertEqual(resp.context["query"], "")
+
+    def test_search_by_subject(self):
+        resp = self.client.get(self.url, {"q": "broken"})
+        self.assertEqual(resp.context["result_count"], 1)
+        self.assertContains(resp, self.ticket.reference)
+
+    def test_search_by_reference(self):
+        resp = self.client.get(self.url, {"q": self.ticket.reference})
+        self.assertEqual(resp.context["result_count"], 1)
+
+    def test_search_by_client_code(self):
+        resp = self.client.get(self.url, {"q": "glbx"})
+        self.assertEqual(resp.context["result_count"], 1)
+
+    def test_search_by_requester_username(self):
+        resp = self.client.get(self.url, {"q": "glbx_user"})
+        self.assertEqual(resp.context["result_count"], 1)
+
+    def test_no_match_returns_empty(self):
+        resp = self.client.get(self.url, {"q": "zzzznotfound"})
+        self.assertEqual(resp.context["result_count"], 0)
+        self.assertContains(resp, "No tickets match")
+
+    def test_result_carries_tab_and_deeplink(self):
+        resp = self.client.get(self.url, {"q": "broken"})
+        self.assertEqual(resp.context["results"][0]["tab"], "inbox")
+        self.assertContains(resp, "open=" + self.ticket.reference)

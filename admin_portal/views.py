@@ -443,6 +443,58 @@ def admin_settings(request):
     return render(request, "admin_portal/settings.html", _settings_context(settings_obj))
 
 
+# ── Global search ────────────────────────────────────────────────────────────
+
+# Reverse of TAB_STATUS: a ticket's status -> the dashboard tab that lists it,
+# so a search result can deep-link to the dashboard (?open=<ref>&tab=<tab>) and
+# auto-open its detail modal (the same mechanism notifications use).
+STATUS_TO_TAB = {status: tab for tab, status in TAB_STATUS.items()}
+
+SEARCH_RESULT_LIMIT = 50
+
+
+@role_required("admin")
+def admin_search(request):
+    """Topbar global ticket search (admin-only).
+
+    A plain GET over `q` matching ticket reference / subject / description and
+    the client + requester identity. Results deep-link to the dashboard, which
+    opens the ticket's detail modal on the right tab.
+    """
+    q = (request.GET.get("q") or "").strip()
+    results = []
+    if q:
+        tickets = (
+            Ticket.objects.select_related("requester", "client", "assigned_developer")
+            .filter(
+                Q(reference__icontains=q)
+                | Q(subject__icontains=q)
+                | Q(description__icontains=q)
+                | Q(client__name__icontains=q)
+                | Q(client__code__icontains=q)
+                | Q(requester__username__icontains=q)
+                | Q(requester__first_name__icontains=q)
+                | Q(requester__last_name__icontains=q)
+            )
+            .order_by("-created_at")[:SEARCH_RESULT_LIMIT]
+        )
+        results = [
+            {"ticket": t, "tab": STATUS_TO_TAB.get(t.status, "inbox")} for t in tickets
+        ]
+
+    return render(
+        request,
+        "admin_portal/search.html",
+        {
+            "active_nav": "",
+            "query": q,
+            "results": results,
+            "result_count": len(results),
+            "result_limit": SEARCH_RESULT_LIMIT,
+        },
+    )
+
+
 @require_POST
 @role_required("admin")
 def ticket_transition(request, pk):

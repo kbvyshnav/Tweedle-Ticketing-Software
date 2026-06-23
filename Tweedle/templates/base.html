@@ -179,16 +179,16 @@
         <!-- Sidebar collapse / expand toggle -->
         <i class="bx bx-menu" id="hamburger-btn" role="button" aria-label="Toggle sidebar"></i>
 
-        <!-- Global ticket search -->
-        <!-- TODO 4.0b: wire form action to the admin global-search URL (GET) -->
-        <form action="#" class="topbar-search-form" id="topbarSearchForm">
+        <!-- Global ticket search (admin) — GET to the search results page -->
+        <form action="{% url 'admin_search' %}" method="get" class="topbar-search-form" id="topbarSearchForm">
             <div class="topbar-search">
                 <input
                     type="search"
                     name="q"
                     id="topbarSearchInput"
                     placeholder="Search tickets..."
-                    aria-label="Search tickets">
+                    aria-label="Search tickets"
+                    value="{{ request.GET.q|default:'' }}">
                 <button type="submit" aria-label="Submit search">
                     <i class="bx bx-search"></i>
                 </button>
@@ -453,12 +453,11 @@
        via real URL links; there is no client-side fetch routing. */
 
 
-    /* === TOPBAR SEARCH (standalone stub) === */
+    /* === TOPBAR SEARCH === submits a normal GET to the search page;
+       block only an empty query so we don't navigate to a bare results page. */
     document.getElementById('topbarSearchForm') && document.getElementById('topbarSearchForm').addEventListener('submit', function(e) {
-        e.preventDefault();
         var q = document.getElementById('topbarSearchInput').value.trim();
-        if (q) console.log('[Topbar search stub] Query:', q);
-        // TODO 4.0b: fetch the admin global-search endpoint with ?q=
+        if (!q) e.preventDefault();
     });
 </script>
 

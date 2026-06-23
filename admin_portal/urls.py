@@ -23,6 +23,7 @@ urlpatterns = [
     ),
     path("reports/", views.admin_reports, name="admin_reports"),
     path("settings/", views.admin_settings, name="admin_settings"),
+    path("search/", views.admin_search, name="admin_search"),
     path(
         "ticket/<int:pk>/transition/",
         views.ticket_transition,

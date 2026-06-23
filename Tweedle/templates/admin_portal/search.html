@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load ticket_labels %}
+
+{% block title %}Search — Tweedle{% endblock %}
+
+{% block content %}
+
+    <!-- === PAGE HEADER ======================================= -->
+    <div class="tw-page-header">
+        <h1>Search</h1>
+        {% if query %}
+        <p style="font-size:var(--tw-text-sm);color:var(--tw-text-muted);margin-top:4px">
+            {{ result_count }} result{{ result_count|pluralize }} for “<strong>{{ query }}</strong>”{% if result_count == result_limit %} (showing the first {{ result_limit }}){% endif %}
+        </p>
+        {% endif %}
+    </div>
+
+
+    {% if not query %}
+    <!-- No query yet -->
+    <div class="tw-table-card" style="text-align:center;padding:var(--tw-space-8);color:var(--tw-text-muted)">
+        <i class="bx bx-search" style="font-size:40px;opacity:0.4;display:block;margin-bottom:var(--tw-space-2)"></i>
+        <p style="margin:0">Type a ticket reference, subject, client, or person in the search box above.</p>
+    </div>
+
+    {% elif not results %}
+    <!-- Query, no matches -->
+    <div class="tw-table-card" style="text-align:center;padding:var(--tw-space-8);color:var(--tw-text-muted)">
+        <i class="bx bx-file" style="font-size:40px;opacity:0.4;display:block;margin-bottom:var(--tw-space-2)"></i>
+        <p style="margin:0">No tickets match “<strong>{{ query }}</strong>”. Try a different reference, subject, or client.</p>
+    </div>
+
+    {% else %}
+    <!-- Results table -->
+    <div class="tw-table-card">
+        <div class="table-scroll-wrapper">
+        <table class="tw-table" id="searchResultsTable">
+            <thead>
+                <tr>
+                    <th scope="col">Ticket ID</th>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Client</th>
+                    <th scope="col">Requester</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Priority</th>
+                    <th scope="col">Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in results %}
+                <tr onclick="window.location.href='{% url 'admin_dashboard' %}?open={{ r.ticket.reference|urlencode }}&tab={{ r.tab }}'">
+                    <td>
+                        <a href="{% url 'admin_dashboard' %}?open={{ r.ticket.reference|urlencode }}&tab={{ r.tab }}" onclick="event.stopPropagation()" style="color:var(--tw-primary-text);font-weight:var(--tw-weight-medium);text-decoration:none">{{ r.ticket.reference }}</a>
+                    </td>
+                    <td><span style="display:block;max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="{{ r.ticket.subject }}">{{ r.ticket.subject }}</span></td>
+                    <td>{{ r.ticket.client.code|default:"—" }}</td>
+                    <td>{{ r.ticket.requester.get_full_name|default:r.ticket.requester.username }}</td>
+                    <td>{% role_ticket_badge r.ticket "admin" %}</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--{{ r.ticket.priority }}">{{ r.ticket.get_priority_display }}</span></td>
+                    <td>{{ r.ticket.created_at|tw_datetime }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+    {% endif %}
+
+{% endblock %}
