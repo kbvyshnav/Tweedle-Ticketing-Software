@@ -13,7 +13,7 @@ from django.urls import reverse
 
 from accounts.models import Client
 from tickets.chat import ChatError, post_ticket_message
-from tickets.models import Ticket
+from tickets.models import Ticket, TicketMessage
 
 User = get_user_model()
 S = Ticket.Status
@@ -193,3 +193,56 @@ class ChatEndpointTests(TestCase):
         self.client.force_login(self.admin)
         resp = self.client.get(reverse("admin_ticket_chat", args=[self.t_client.pk]))
         self.assertContains(resp, "cross portal hi")
+
+
+class RequestInfoChatTests(TestCase):
+    """Admin `request_info` must surface its question as a highlighted chat message
+    visible to the client/sub-user (bug: previously only the status changed)."""
+
+    def setUp(self):
+        self.org = Client.objects.create(name="Globomantics", code="GMEC")
+        self.admin = User.objects.create_user("admin_ri", role="admin")
+        self.client_user = User.objects.create_user("client_ri", role="client", client=self.org)
+        self.subuser = User.objects.create_user("subuser_ri", role="subuser", client=self.org)
+        self.developer = User.objects.create_user("dev_ri", role="developer")
+
+    def _ticket(self, requester):
+        return Ticket.objects.create(
+            subject="needs info", requester=requester, client=self.org,
+            assigned_developer=self.developer,
+            status=S.IN_PROGRESS, sub_status=SS.DEVELOPMENT,
+        )
+
+    def _request_info(self, ticket, msg):
+        self.client.force_login(self.admin)
+        return self.client.post(
+            reverse("ticket_transition", args=[ticket.pk]),
+            {"action": "request_info", "message": msg},
+        )
+
+    def test_request_info_creates_highlighted_info_message(self):
+        t = self._ticket(self.client_user)
+        resp = self._request_info(t, "Which browser and OS are you on?")
+        self.assertEqual(resp.status_code, 302)
+        t.refresh_from_db()
+        self.assertEqual(t.status, S.AWAITING_CLIENT)
+        m = t.messages.filter(kind=TicketMessage.Kind.INFO_REQUEST).first()
+        self.assertIsNotNone(m)
+        self.assertEqual(m.body, "Which browser and OS are you on?")
+        self.assertEqual(m.author, self.admin)
+
+    def test_client_sees_info_request_in_detail(self):
+        t = self._ticket(self.client_user)
+        self._request_info(t, "Please attach the error log.")
+        self.client.force_login(self.client_user)
+        resp = self.client.get(reverse("client_ticket_detail", args=[t.pk]))
+        self.assertContains(resp, "Please attach the error log.")
+        self.assertContains(resp, "What support needs from you")
+
+    def test_subuser_sees_info_request_in_detail(self):
+        t = self._ticket(self.subuser)
+        self._request_info(t, "Which account is affected?")
+        self.client.force_login(self.subuser)
+        resp = self.client.get(reverse("subuser:ticket_detail", args=[t.pk]))
+        self.assertContains(resp, "Which account is affected?")
+        self.assertContains(resp, "What support needs from you")

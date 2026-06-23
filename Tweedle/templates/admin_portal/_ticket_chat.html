@@ -12,7 +12,8 @@
             {{ m.author.username }}
             <span class="tw-role-pill tw-role-pill--{{ m.author.role }}">{{ m.author.get_role_display }}</span>
         </div>
-        <div class="tw-message-bubble">
+        <div class="tw-message-bubble"{% if m.kind == 'info_request' %} style="border:1.5px solid var(--tw-warning)"{% endif %}>
+            {% if m.kind == 'info_request' %}<div style="font-size:var(--tw-text-xs);font-weight:700;color:var(--tw-warning);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px"><i class="bx bx-help-circle" aria-hidden="true"></i> Information requested</div>{% endif %}
             <div class="tw-message-text">{{ m.body|linebreaksbr }}</div>
             <div class="tw-message-time">{{ m.created_at|tw_datetime }}</div>
         </div>

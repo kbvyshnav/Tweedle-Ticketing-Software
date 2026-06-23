@@ -169,7 +169,16 @@ class TicketEvent(models.Model):
 
 
 class TicketMessage(models.Model):
-    """Chat message on a ticket (stub for Phase 2)."""
+    """Chat message on a ticket.
+
+    `kind` distinguishes an ordinary chat reply from an admin **information
+    request** (the message attached to a `request_info` transition), so portals
+    can highlight the latter prominently for the client/sub-user.
+    """
+
+    class Kind(models.TextChoices):
+        MESSAGE = "message", "Message"
+        INFO_REQUEST = "info_request", "Information Request"
 
     ticket = models.ForeignKey(
         Ticket, on_delete=models.CASCADE, related_name="messages"
@@ -178,6 +187,9 @@ class TicketMessage(models.Model):
         User, on_delete=models.CASCADE, related_name="ticket_messages"
     )
     body = models.TextField()
+    kind = models.CharField(
+        max_length=20, choices=Kind.choices, default=Kind.MESSAGE
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

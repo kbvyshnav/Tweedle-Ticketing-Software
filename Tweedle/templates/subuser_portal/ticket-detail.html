@@ -162,9 +162,21 @@
                     Our support team has a question about this ticket and is awaiting your response.
                     Please reply using the chat below.
                 </p>
+                {% if info_request %}
+                <div style="margin:0 0 14px;padding:12px 14px;border-left:3px solid var(--tw-warning);
+                            background:var(--tw-status-forwarded-bg);border-radius:8px">
+                    <div style="font-size:var(--tw-text-xs);font-weight:700;color:var(--tw-warning);
+                                text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">
+                        <i class="bx bx-help-circle" aria-hidden="true"></i> What support needs from you
+                    </div>
+                    <div style="font-size:var(--tw-text-md);color:var(--tw-text-primary);white-space:pre-wrap">{{ info_request.body }}</div>
+                    <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:6px">
+                        Requested {{ info_request.created_at|tw_datetime }}
+                    </div>
+                </div>
+                {% endif %}
                 <div class="tw-action-card__buttons">
-                    <button type="button" class="tw-btn tw-btn-outline" disabled
-                            title="Chat sending will be wired in a later phase">
+                    <button type="button" class="tw-btn tw-btn-outline" onclick="focusSubuserChatInput()">
                         <i class="bx bx-chat" aria-hidden="true"></i>
                         Reply in Chat (below)
                     </button>
@@ -280,7 +292,10 @@
                         {{ msg.author.get_full_name|default:msg.author.username }}
                         <span class="tw-role-pill tw-role-pill--admin">Admin</span>
                     </div>
-                    <div class="tw-client-message__bubble">{{ msg.body }}</div>
+                    <div class="tw-client-message__bubble"{% if msg.kind == 'info_request' %} style="border:1.5px solid var(--tw-warning);background:var(--tw-status-forwarded-bg)"{% endif %}>
+                        {% if msg.kind == 'info_request' %}<div style="font-size:var(--tw-text-xs);font-weight:700;color:var(--tw-warning);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px"><i class="bx bx-help-circle" aria-hidden="true"></i> Information requested</div>{% endif %}
+                        {{ msg.body }}
+                    </div>
                     <div class="tw-client-message__time">{{ msg.created_at|tw_datetime }}</div>
                 </div>
                 {% endif %}
@@ -527,6 +542,13 @@
                 if (textarea) textarea.focus();
             }
         }
+    }
+
+    function focusSubuserChatInput() {
+        var input = document.getElementById('subuserChatInput');
+        if (!input) return;
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        input.focus();
     }
 
 </script>

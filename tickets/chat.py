@@ -31,3 +31,21 @@ def post_ticket_message(ticket, author, body):
     if ticket.status in CHAT_LOCKED_STATUSES:
         raise ChatError("This ticket is closed — no new messages can be posted.")
     return TicketMessage.objects.create(ticket=ticket, author=author, body=body)
+
+
+def post_info_request(ticket, author, body):
+    """Record an admin `request_info` message as a highlighted chat message.
+
+    Called after a successful `request_info` transition so the client/sub-user can
+    actually SEE what information the admin asked for (the transition alone only
+    flips status + writes the audit note). Returns None for an empty body.
+    """
+    body = (body or "").strip()
+    if not body:
+        return None
+    return TicketMessage.objects.create(
+        ticket=ticket,
+        author=author,
+        body=body,
+        kind=TicketMessage.Kind.INFO_REQUEST,
+    )

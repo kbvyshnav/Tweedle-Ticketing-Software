@@ -112,6 +112,19 @@
                         Our support team has requested additional information. Please respond using
                         the Activity &amp; Messages section below so we can continue working on your ticket.
                     </p>
+                    {% if info_request %}
+                    <div style="margin:0 0 14px;padding:12px 14px;border-left:3px solid var(--tw-warning);
+                                background:var(--tw-status-forwarded-bg);border-radius:8px">
+                        <div style="font-size:var(--tw-text-xs);font-weight:700;color:var(--tw-warning);
+                                    text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">
+                            <i class="bx bx-help-circle" aria-hidden="true"></i> What support needs from you
+                        </div>
+                        <div style="font-size:var(--tw-text-md);color:var(--tw-text-primary);white-space:pre-wrap">{{ info_request.body }}</div>
+                        <div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:6px">
+                            Requested {{ info_request.created_at|tw_datetime }}
+                        </div>
+                    </div>
+                    {% endif %}
                     <div class="tw-action-card__buttons">
                         <button type="button" class="tw-btn tw-btn-primary" onclick="focusChatInput()">
                             <i class="bx bx-send" aria-hidden="true"></i>
@@ -319,7 +332,8 @@
                         <span class="tw-client-message__sender">
                             {% if message.author == request.user %}You{% else %}Support Team{% endif %}
                         </span>
-                        <div class="tw-client-message__bubble">
+                        <div class="tw-client-message__bubble"{% if message.kind == 'info_request' %} style="border:1.5px solid var(--tw-warning);background:var(--tw-status-forwarded-bg)"{% endif %}>
+                            {% if message.kind == 'info_request' %}<div style="font-size:var(--tw-text-xs);font-weight:700;color:var(--tw-warning);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px"><i class="bx bx-help-circle" aria-hidden="true"></i> Information requested</div>{% endif %}
                             {{ message.body|linebreaksbr }}
                         </div>
                         <span class="tw-client-message__time">{{ message.created_at|tw_datetime }}</span>

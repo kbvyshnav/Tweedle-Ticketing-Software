@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from core.auth import RoleRequiredMixin, role_required
 from tickets.chat import ChatError, post_ticket_message
-from tickets.models import Ticket
+from tickets.models import Ticket, TicketMessage
 from tickets.transitions import (
     REOPEN_WINDOW_DAYS,
     InvalidTransition,
@@ -69,6 +69,14 @@ def client_ticket_detail(request, pk):
     if ticket.status == S.REJECTED:
         reject_event = ticket.events.filter(action="reject").first()
 
+    info_request = None
+    if ticket.status == S.AWAITING_CLIENT:
+        info_request = (
+            ticket.messages.filter(kind=TicketMessage.Kind.INFO_REQUEST)
+            .select_related("author")
+            .last()
+        )
+
     return render(
         request,
         "client_portal/ticket-detail.html",
@@ -80,6 +88,7 @@ def client_ticket_detail(request, pk):
             ),
             "reopen_available": reopen_available,
             "reject_event": reject_event,
+            "info_request": info_request,
             "active_nav": "dashboard",
         },
     )

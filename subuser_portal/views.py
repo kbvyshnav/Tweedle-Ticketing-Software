@@ -5,7 +5,7 @@ from django.views.generic import TemplateView
 
 from core.auth import RoleRequiredMixin, role_required
 from tickets.chat import ChatError, post_ticket_message
-from tickets.models import Ticket
+from tickets.models import Ticket, TicketMessage
 from tickets.transitions import (
     InvalidTransition,
     TransitionNotAllowed,
@@ -80,6 +80,14 @@ def subuser_ticket_detail(request, pk):
         pk=pk,
         requester=request.user,
     )
+    info_request = None
+    if ticket.status == S.AWAITING_CLIENT:
+        info_request = (
+            ticket.messages.filter(kind=TicketMessage.Kind.INFO_REQUEST)
+            .select_related("author")
+            .last()
+        )
+
     return render(
         request,
         "subuser_portal/ticket-detail.html",
@@ -89,6 +97,7 @@ def subuser_ticket_detail(request, pk):
             "chat_messages": ticket.messages.select_related("author").order_by(
                 "created_at", "id"
             ),
+            "info_request": info_request,
             "active_nav": "dashboard",
         },
     )

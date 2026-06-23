@@ -6,7 +6,7 @@ from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 
 from core.auth import RoleRequiredMixin, role_required
-from tickets.chat import ChatError, post_ticket_message
+from tickets.chat import ChatError, post_info_request, post_ticket_message
 from tickets.models import Ticket
 from tickets.transitions import (
     InvalidTransition,
@@ -106,6 +106,10 @@ def ticket_transition(request, pk):
     except (TransitionNotAllowed, InvalidTransition, TransitionValidationError) as exc:
         messages.error(request, f"Couldn't update ticket {ticket.reference}: {exc}")
     else:
+        # Surface the admin's request_info question to the requester as a
+        # highlighted chat message (the transition alone only logs the note).
+        if action == "request_info":
+            post_info_request(ticket, request.user, data.get("message", ""))
         messages.success(request, _success_message(action, ticket, data))
     return redirect("admin_dashboard")
 
