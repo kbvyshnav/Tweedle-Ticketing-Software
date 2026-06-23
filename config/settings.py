@@ -192,6 +192,12 @@ STATIC_URL = 'static/'
 # Serve the existing static-frontend assets (css/images/js) during dev.
 STATICFILES_DIRS = [BASE_DIR / 'Tweedle' / 'static']
 
+# Media files (user uploads — e.g. ticket attachments).
+# In production these must be served by the web server / object storage; the
+# DEBUG-only urlpattern in config/urls.py handles local dev. (See P0 deploy item.)
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

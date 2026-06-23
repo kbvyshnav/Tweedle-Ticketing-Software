@@ -54,7 +54,7 @@
     </div>
 
     <!-- FORM -->
-    <form method="post" action="{% url 'client_submit_ticket' %}">
+    <form method="post" action="{% url 'client_submit_ticket' %}" enctype="multipart/form-data">
     {% csrf_token %}
 
     <div class="tw-submit-card">
@@ -170,7 +170,7 @@
                 Attachments
                 <span style="font-weight:400;color:var(--tw-text-muted);font-size:var(--tw-text-sm)">(optional)</span>
             </label>
-            <input type="file" id="fileInput" style="display:none" multiple
+            <input type="file" id="fileInput" name="attachments" style="display:none" multiple
                    accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
                    aria-label="Attach files (optional)"
                    onchange="addSelectedFiles(this)">
@@ -189,6 +189,12 @@
             </div>
             <div class="tw-upload-hint" id="uploadHint">Up to 3 files allowed</div>
             <div id="fileChipsList" class="tw-file-chips-list"></div>
+            {% if form.attachments.errors %}
+            <span class="tw-error-text" aria-live="polite"
+                  style="font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px;display:block">
+                {{ form.attachments.errors.0 }}
+            </span>
+            {% endif %}
         </div>
 
         <hr class="tw-submit-divider">
@@ -339,6 +345,22 @@ function addSelectedFiles(input) {
     updateUploadAreaState();
 }
 
+/* Push the JS-managed file list back onto the real <input> so the files
+ * actually POST. Drag-drop and the native picker both funnel through
+ * selectedFiles, and DataTransfer is the only way to set input.files. */
+function syncFilesToInput() {
+    var input = document.getElementById('fileInput');
+    if (!input) return;
+    try {
+        var dt = new DataTransfer();
+        selectedFiles.forEach(function (f) { dt.items.add(f); });
+        input.files = dt.files;
+    } catch (e) {
+        /* Very old browser without DataTransfer — native picker files still
+         * submit; drag-drop just won't. Acceptable graceful degradation. */
+    }
+}
+
 function renderFileChips() {
     var list = document.getElementById('fileChipsList');
     list.innerHTML = '';
@@ -360,6 +382,7 @@ function renderFileChips() {
             '</button>';
         list.appendChild(chip);
     });
+    syncFilesToInput();
 }
 
 function removeFileAt(index) {

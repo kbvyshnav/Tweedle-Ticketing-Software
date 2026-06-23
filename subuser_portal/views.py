@@ -4,6 +4,7 @@ from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 
 from core.auth import RoleRequiredMixin, role_required
+from tickets.attachments import save_attachments
 from tickets.chat import ChatError, post_ticket_message
 from tickets.models import Ticket, TicketMessage
 from tickets.transitions import (
@@ -48,9 +49,9 @@ class SubuserDashboardView(RoleRequiredMixin, TemplateView):
 @role_required("subuser")
 def subuser_submit_ticket(request):
     if request.method == "POST":
-        form = SubuserTicketSubmitForm(request.POST)
+        form = SubuserTicketSubmitForm(request.POST, request.FILES)
         if form.is_valid():
-            Ticket.objects.create(
+            ticket = Ticket.objects.create(
                 subject=form.cleaned_data["subject"],
                 description=form.cleaned_data["description"],
                 category=form.cleaned_data["category"],
@@ -59,6 +60,7 @@ def subuser_submit_ticket(request):
                 client=request.user.client,
                 status=S.NEW,
             )
+            save_attachments(ticket, form.cleaned_data["attachments"], request.user)
             messages.success(request, "Ticket submitted successfully.")
             return redirect("subuser:dashboard")
     else:

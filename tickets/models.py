@@ -1,3 +1,5 @@
+import os
+
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
@@ -207,3 +209,8 @@ class TicketAttachment(models.Model):
     )
     file = models.FileField(upload_to="ticket_attachments/")
     created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def filename(self):
+        """Just the file's base name (no upload path) for display/download."""
+        return os.path.basename(self.file.name) if self.file else ""

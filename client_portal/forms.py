@@ -1,5 +1,6 @@
 from django import forms
 
+from tickets.attachments import AttachmentsField
 from tickets.models import Ticket
 
 CATEGORY_CHOICES = [
@@ -57,6 +58,8 @@ class TicketSubmitForm(forms.Form):
             "class": "tw-select",
         }),
     )
+
+    attachments = AttachmentsField()
 
     def clean_category(self):
         val = self.cleaned_data.get("category", "")

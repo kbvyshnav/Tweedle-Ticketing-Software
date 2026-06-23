@@ -32,7 +32,7 @@
     <span class="tw-tip-pill"><i class="bx bx-check" aria-hidden="true"></i>Mention the browser or device if relevant</span>
 </div>
 
-<form method="post" action="{% url 'subuser:submit_ticket' %}" novalidate>
+<form method="post" action="{% url 'subuser:submit_ticket' %}" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
 
     <div class="tw-submit-card">
@@ -91,6 +91,25 @@
 
         <hr class="tw-submit-divider">
 
+        <!-- Attachments (optional) -->
+        <div class="tw-submit-section">
+            <label for="subFileInput" class="tw-submit-label">
+                Attachments
+                <span style="font-weight:400;color:var(--tw-text-muted);font-size:var(--tw-text-sm)">(optional)</span>
+            </label>
+            <span class="tw-submit-sublabel">Up to 3 files — PDF, DOC, DOCX, PNG, JPG. Max 10 MB each.</span>
+            <input type="file" id="subFileInput" name="attachments" multiple
+                   class="tw-input"
+                   accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                   aria-label="Attach files (optional)">
+            {% if form.attachments.errors %}
+            <p style="color:var(--tw-danger);font-size:var(--tw-text-xs);margin-top:4px">{{ form.attachments.errors.0 }}</p>
+            {% endif %}
+            <div id="subFileChips" class="tw-file-chips-list" style="margin-top:var(--tw-space-2)"></div>
+        </div>
+
+        <hr class="tw-submit-divider">
+
         <!-- Submit row -->
         <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--tw-space-4)">
             <a href="{% url 'subuser:dashboard' %}" class="tw-submit-cancel">Cancel</a>
@@ -130,6 +149,32 @@
             }
             descTextarea.addEventListener('input', updateDescCounter);
             updateDescCounter();
+        }
+
+        /* Attachments: show the chosen files as read-only chips. The native
+         * multiple input carries the files straight to the server on submit. */
+        var subFileInput = document.getElementById('subFileInput');
+        var subFileChips = document.getElementById('subFileChips');
+        if (subFileInput && subFileChips) {
+            function iconForExt(ext) {
+                if (ext === 'pdf') return 'bxs-file-pdf';
+                if (ext === 'png' || ext === 'jpg' || ext === 'jpeg') return 'bxs-image';
+                if (ext === 'doc' || ext === 'docx') return 'bxs-file-doc';
+                return 'bx-file';
+            }
+            subFileInput.addEventListener('change', function () {
+                subFileChips.innerHTML = '';
+                Array.prototype.slice.call(subFileInput.files).forEach(function (file) {
+                    var ext = (file.name.split('.').pop() || '').toLowerCase();
+                    var chip = document.createElement('div');
+                    chip.className = 'tw-file-chip-multi';
+                    chip.innerHTML =
+                        '<i class="bx ' + iconForExt(ext) + '" aria-hidden="true"></i>' +
+                        '<span class="tw-file-chip-multi-name"></span>';
+                    chip.querySelector('.tw-file-chip-multi-name').textContent = file.name;
+                    subFileChips.appendChild(chip);
+                });
+            });
         }
     })();
 </script>

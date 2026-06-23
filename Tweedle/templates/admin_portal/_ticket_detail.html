@@ -108,6 +108,27 @@
         <div class="tw-description-box">{{ ticket.description|default:"—"|linebreaksbr }}</div>
     </div>
 
+    {% if ticket.attachments.all %}
+    <div class="tw-modal-section">
+        <h3 class="section-title">Attachments</h3>
+        {% for att in ticket.attachments.all %}
+        <div class="tw-attachment-item">
+            <div class="tw-file-icon tw-file-icon--doc" aria-hidden="true">
+                <i class="bx bx-file"></i>
+            </div>
+            <div class="tw-attachment-info">
+                <span class="tw-attachment-name">{{ att.filename }}</span>
+                <span class="tw-attachment-meta">{{ att.created_at|tw_datetime }}</span>
+            </div>
+            <a href="{{ att.file.url }}" class="tw-btn tw-btn-outline tw-btn--sm"
+               download target="_blank" rel="noopener" style="margin-left:auto">
+                <i class="bx bx-download" aria-hidden="true"></i> Download
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     {# Admin actions — visibility mirrors the transition engine (Issues 1+4 + disclosure redesign). #}
     {% if ticket.status == 'new' or ticket.status == 'in_progress' or ticket.status == 'awaiting_client' or ticket.status == 'uat' or ticket.status == 'resolved' or ticket.status == 'closed' or ticket.status == 'rejected' %}
     <div class="tw-modal-section" id="adminActions">

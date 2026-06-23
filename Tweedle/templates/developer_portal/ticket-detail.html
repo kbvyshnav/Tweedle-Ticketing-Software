@@ -221,9 +221,13 @@
                         <i class="bx bx-file"></i>
                     </div>
                     <div class="tw-attachment-info">
-                        <span class="tw-attachment-name">{{ att.file.name|cut:"ticket_attachments/" }}</span>
+                        <span class="tw-attachment-name">{{ att.filename }}</span>
                         <span class="tw-attachment-meta">{{ att.created_at|tw_datetime }}</span>
                     </div>
+                    <a href="{{ att.file.url }}" class="tw-btn tw-btn-outline tw-btn--sm"
+                       download target="_blank" rel="noopener" style="margin-left:auto">
+                        <i class="bx bx-download" aria-hidden="true"></i> Download
+                    </a>
                 </div>
                 {% empty %}
                 <p style="padding:var(--tw-space-4) var(--tw-space-5);color:var(--tw-text-muted);

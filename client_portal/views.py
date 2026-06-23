@@ -7,6 +7,7 @@ from django.views.generic import TemplateView
 from django.utils import timezone
 
 from core.auth import RoleRequiredMixin, role_required
+from tickets.attachments import save_attachments
 from tickets.chat import ChatError, post_ticket_message
 from tickets.models import Ticket, TicketMessage
 from tickets.transitions import (
@@ -97,9 +98,9 @@ def client_ticket_detail(request, pk):
 @role_required("client")
 def client_submit_ticket(request):
     if request.method == "POST":
-        form = TicketSubmitForm(request.POST)
+        form = TicketSubmitForm(request.POST, request.FILES)
         if form.is_valid():
-            Ticket.objects.create(
+            ticket = Ticket.objects.create(
                 subject=form.cleaned_data["subject"],
                 description=form.cleaned_data["description"],
                 category=form.cleaned_data["category"],
@@ -108,6 +109,7 @@ def client_submit_ticket(request):
                 client=request.user.client,
                 status=S.NEW,
             )
+            save_attachments(ticket, form.cleaned_data["attachments"], request.user)
             messages.success(request, "Ticket submitted successfully.")
             return redirect("client_dashboard")
     else:
