@@ -1,0 +1,117 @@
+{% extends base_template %}
+
+{% block title %}My Profile — Tweedle{% endblock %}
+
+{% block content %}
+
+<div class="tw-profile-page" style="max-width:760px">
+
+    <div class="tw-page-header">
+        <h1>My Profile</h1>
+    </div>
+
+    {% if messages %}
+    {% for m in messages %}
+    <div role="alert" style="padding:12px 16px;border-radius:var(--tw-radius-md);margin-bottom:var(--tw-space-4);font-size:var(--tw-text-sm);{% if m.tags == 'error' %}background:var(--tw-danger-light);color:var(--tw-danger);border-left:4px solid var(--tw-danger){% else %}background:var(--tw-success-light);color:var(--tw-success-dark);border-left:4px solid var(--tw-success){% endif %}">{{ m }}</div>
+    {% endfor %}
+    {% endif %}
+
+
+    <!-- ===== ACCOUNT / IDENTITY ===== -->
+    <div class="tw-table-card" style="margin-bottom:var(--tw-space-6)">
+
+        <div style="font-size:var(--tw-text-xl);font-weight:600;color:var(--tw-text-primary);margin-bottom:var(--tw-space-2)">Account</div>
+        <div style="font-size:var(--tw-text-base);color:var(--tw-text-secondary);margin-bottom:var(--tw-space-5)">Your sign-in identity and contact details.</div>
+
+        <!-- Read-only identity -->
+        <div style="display:flex;flex-wrap:wrap;gap:var(--tw-space-6);margin-bottom:var(--tw-space-5)">
+            <div>
+                <div style="font-size:var(--tw-text-xs);font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--tw-text-muted)">Username</div>
+                <div style="font-size:var(--tw-text-base);color:var(--tw-text-primary)">{{ request.user.username }}</div>
+            </div>
+            <div>
+                <div style="font-size:var(--tw-text-xs);font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--tw-text-muted)">Role</div>
+                <div style="font-size:var(--tw-text-base);color:var(--tw-text-primary)">{{ request.user.get_role_display }}</div>
+            </div>
+            {% if request.user.client %}
+            <div>
+                <div style="font-size:var(--tw-text-xs);font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--tw-text-muted)">Organisation</div>
+                <div style="font-size:var(--tw-text-base);color:var(--tw-text-primary)">{{ request.user.client.name }} ({{ request.user.client.code }})</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <form method="post" action="{% url 'profile' %}" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="section" value="profile">
+
+            <div class="tw-form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--tw-space-4);align-items:start">
+                <div class="tw-form-group" style="width:100%">
+                    <label class="tw-form-label" for="firstName">First Name</label>
+                    <input class="tw-input" id="firstName" name="first_name" type="text" value="{{ profile_form.first_name.value|default:'' }}" autocomplete="given-name">
+                </div>
+                <div class="tw-form-group" style="width:100%">
+                    <label class="tw-form-label" for="lastName">Last Name</label>
+                    <input class="tw-input" id="lastName" name="last_name" type="text" value="{{ profile_form.last_name.value|default:'' }}" autocomplete="family-name">
+                </div>
+            </div>
+
+            <div class="tw-form-group">
+                <label class="tw-form-label" for="profileEmail">Email Address</label>
+                <input class="tw-input{% if profile_form.email.errors %} tw-input--error{% endif %}" id="profileEmail" name="email" type="email" value="{{ profile_form.email.value|default:'' }}" autocomplete="email">
+                {% if profile_form.email.errors %}<span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px">{{ profile_form.email.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;margin-top:var(--tw-space-4)">
+                <button type="submit" class="tw-btn tw-btn-primary">Save Profile</button>
+            </div>
+        </form>
+
+    </div>
+
+
+    <!-- ===== CHANGE PASSWORD ===== -->
+    <div class="tw-table-card" id="password">
+
+        <div style="font-size:var(--tw-text-xl);font-weight:600;color:var(--tw-text-primary);margin-bottom:var(--tw-space-2)">Change Password</div>
+        <div style="font-size:var(--tw-text-base);color:var(--tw-text-secondary);margin-bottom:var(--tw-space-5)">Choose a strong new password. You'll stay signed in after changing it.</div>
+
+        <form method="post" action="{% url 'profile' %}#password" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="section" value="password">
+
+            {% if password_form.non_field_errors %}
+            <div class="tw-form-group">
+                <span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger)">{{ password_form.non_field_errors.0 }}</span>
+            </div>
+            {% endif %}
+
+            <div class="tw-form-group">
+                <label class="tw-form-label" for="oldPassword">Current Password</label>
+                <input class="tw-input{% if password_form.old_password.errors %} tw-input--error{% endif %}" id="oldPassword" name="old_password" type="password" autocomplete="current-password">
+                {% if password_form.old_password.errors %}<span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px">{{ password_form.old_password.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div class="tw-form-group">
+                <label class="tw-form-label" for="newPassword1">New Password</label>
+                <input class="tw-input{% if password_form.new_password1.errors %} tw-input--error{% endif %}" id="newPassword1" name="new_password1" type="password" autocomplete="new-password">
+                {% if password_form.new_password1.errors %}<span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px">{{ password_form.new_password1.errors.0 }}</span>{% endif %}
+                {% if password_form.new_password1.help_text %}<div style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin-top:6px">{{ password_form.new_password1.help_text|safe }}</div>{% endif %}
+            </div>
+
+            <div class="tw-form-group">
+                <label class="tw-form-label" for="newPassword2">Confirm New Password</label>
+                <input class="tw-input{% if password_form.new_password2.errors %} tw-input--error{% endif %}" id="newPassword2" name="new_password2" type="password" autocomplete="new-password">
+                {% if password_form.new_password2.errors %}<span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px">{{ password_form.new_password2.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;margin-top:var(--tw-space-4)">
+                <button type="submit" class="tw-btn tw-btn-primary">Change Password</button>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

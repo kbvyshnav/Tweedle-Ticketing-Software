@@ -17,6 +17,9 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('portal/', core_views.post_login_redirect, name='post_login_redirect'),
 
+    # Self-service profile + password change (shared across all five portals).
+    path('profile/', include('accounts.urls')),
+
     # Per-portal landing pages (Phase 3a placeholders).
     path('admin-portal/', include('admin_portal.urls')),
     path('client/', include('client_portal.urls')),

@@ -273,14 +273,14 @@
                 <div class="tw-profile-divider"></div>
 
                 <!-- Menu items -->
-                <div class="tw-profile-menu-item" role="menuitem" onclick="closeProfileDropdown(); showProfileToast('Profile page coming in a future update.')">
+                <a href="{% url 'profile' %}" class="tw-profile-menu-item" role="menuitem" style="text-decoration:none">
                     <i class="bx bx-user" aria-hidden="true"></i>
-                    <span>View Profile</span>
-                </div>
-                <div class="tw-profile-menu-item" role="menuitem" onclick="closeProfileDropdown(); showProfileToast('Password settings coming in a future update.')">
+                    <span>My Profile</span>
+                </a>
+                <a href="{% url 'profile' %}#password" class="tw-profile-menu-item" role="menuitem" style="text-decoration:none">
                     <i class="bx bx-lock-alt" aria-hidden="true"></i>
                     <span>Change Password</span>
-                </div>
+                </a>
                 <div class="tw-profile-menu-item" role="menuitem" onclick="closeProfileDropdown(); showProfileToast('Notification preferences coming in a future update.')">
                     <i class="bx bx-bell" aria-hidden="true"></i>
                     <span>Notification Preferences</span>

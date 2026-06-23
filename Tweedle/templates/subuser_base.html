@@ -161,6 +161,15 @@
 
                 <div class="tw-profile-divider"></div>
 
+                <a href="{% url 'profile' %}" class="tw-profile-menu-item" role="menuitem" style="text-decoration:none">
+                    <i class="bx bx-user" aria-hidden="true"></i><span>My Profile</span>
+                </a>
+                <a href="{% url 'profile' %}#password" class="tw-profile-menu-item" role="menuitem" style="text-decoration:none">
+                    <i class="bx bx-lock-alt" aria-hidden="true"></i><span>Change Password</span>
+                </a>
+
+                <div class="tw-profile-divider"></div>
+
                 <form method="post" action="{% url 'account_logout' %}" id="subuserLogoutForm" style="display:none">
                     {% csrf_token %}
                 </form>
