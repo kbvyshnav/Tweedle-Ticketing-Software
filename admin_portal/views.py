@@ -1,14 +1,15 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.db.models import Count, Q
+from django.db.models import Count, OuterRef, Q, Subquery
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 
 from accounts.models import Client
 from core.auth import RoleRequiredMixin, role_required
 from tickets.chat import ChatError, post_info_request, post_ticket_message
-from tickets.models import Ticket
+from tickets.models import Ticket, TicketEvent
 
 from .forms import ClientOnboardForm, TeamMemberForm
 from tickets.transitions import (
@@ -178,6 +179,100 @@ def admin_toggle_team_member(request, pk):
         request, f"{name} {'enabled' if member.is_active else 'disabled'}."
     )
     return redirect("admin_team")
+
+
+# ── Reports ──────────────────────────────────────────────────────────────────
+
+# Turnaround targets (days) by priority. No SLA model exists yet (P3), so this
+# is a documented reporting convention used to flag a ticket's TAT met/missed.
+TAT_TARGET_DAYS = {"high": 3, "medium": 5, "low": 7}
+
+# Ticket status -> the compact report status-tag colour class.
+STATUS_TAG_CSS = {
+    S.NEW: "tw-status-inbox",
+    S.IN_PROGRESS: "tw-status-progress",
+    S.AWAITING_CLIENT: "tw-status-forwarded",
+    S.UAT: "tw-status-uat",
+    S.RESOLVED: "tw-status-closed",
+    S.CLOSED: "tw-status-closed",
+    S.REJECTED: "tw-status-closed",
+    S.CANCELLED: "tw-status-closed",
+}
+
+
+@role_required("admin")
+def admin_reports(request):
+    """Ticket activity report: GET-filterable list + TAT/throughput summary."""
+    # Resolution timestamp = the first event that moved the ticket to
+    # resolved/closed (turnaround end). Falls back to closed_at for any legacy
+    # ticket closed before the event trail existed.
+    resolved_event = (
+        TicketEvent.objects.filter(
+            ticket=OuterRef("pk"), to_status__in=[S.RESOLVED, S.CLOSED]
+        )
+        .order_by("created_at")
+        .values("created_at")[:1]
+    )
+    tickets = (
+        Ticket.objects.select_related("client", "assigned_developer")
+        .annotate(resolved_event_at=Subquery(resolved_event))
+        .order_by("-created_at")
+    )
+
+    f_from = (request.GET.get("from") or "").strip()
+    f_to = (request.GET.get("to") or "").strip()
+    f_status = request.GET.get("status") or "all"
+    f_dev = request.GET.get("developer") or "all"
+    f_client = request.GET.get("client") or "all"
+
+    if f_from:
+        tickets = tickets.filter(created_at__date__gte=f_from)
+    if f_to:
+        tickets = tickets.filter(created_at__date__lte=f_to)
+    if f_status != "all":
+        tickets = tickets.filter(status=f_status)
+    if f_dev != "all":
+        tickets = tickets.filter(assigned_developer_id=f_dev)
+    if f_client != "all":
+        tickets = tickets.filter(client_id=f_client)
+
+    rows = []
+    tat_met = tat_missed = pending = 0
+    for t in tickets:
+        target = TAT_TARGET_DAYS.get(t.priority, 5)
+        resolved_at = t.resolved_event_at or t.closed_at
+        if resolved_at:
+            days = (resolved_at - t.created_at).days
+            met = days <= target
+            tat_met += 1 if met else 0
+            tat_missed += 0 if met else 1
+            tat = {"text": f"{days} / {target}", "css": "met" if met else "missed"}
+        else:
+            pending += 1
+            tat = None
+        rows.append({
+            "ticket": t,
+            "resolved_at": resolved_at,
+            "tat": tat,
+            "status_css": STATUS_TAG_CSS.get(t.status, "tw-status-closed"),
+        })
+
+    ctx = {
+        "active_nav": "reports",
+        "rows": rows,
+        "total": len(rows),
+        "tat_met": tat_met,
+        "tat_missed": tat_missed,
+        "pending": pending,
+        "developers": User.objects.filter(role="developer").order_by("username"),
+        "clients": Client.objects.order_by("name"),
+        "status_choices": Ticket.Status.choices,
+        "filters": {
+            "from": f_from, "to": f_to, "status": f_status,
+            "developer": f_dev, "client": f_client,
+        },
+    }
+    return render(request, "admin_portal/reports.html", ctx)
 
 
 @require_POST

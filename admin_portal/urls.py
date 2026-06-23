@@ -16,6 +16,7 @@ urlpatterns = [
         views.admin_toggle_team_member,
         name="admin_toggle_team_member",
     ),
+    path("reports/", views.admin_reports, name="admin_reports"),
     path(
         "ticket/<int:pk>/transition/",
         views.ticket_transition,

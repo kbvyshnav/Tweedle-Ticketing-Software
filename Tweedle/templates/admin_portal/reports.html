@@ -1,18 +1,13 @@
-<!--
-  File: templates/admin_portal/reports.html
-  Moved from: cAdmin/admin_reports.html (Phase 6 restructure)
-  Phase 9: converted to Django partial template (Task 1)
-  Django template: extends 'base.html'
-  Django view: admin_portal.views.reports
-  Django url:  admin:reports
--->
-<!-- Django: {% extends 'base.html' %} -->
+{% extends 'base.html' %}
+{% load static %}
 
-<!-- Django: {% block page_css %}
+{% block title %}Reports — Tweedle{% endblock %}
+
+{% block page_css %}
 <link rel="stylesheet" href="{% static 'css/pages/reports.css' %}">
-{% endblock %} -->
+{% endblock %}
 
-<!-- Django: {% block content %} -->
+{% block content %}
 
     <!-- === PAGE HEADER ======================================= -->
     <div class="tw-page-header">
@@ -21,67 +16,57 @@
     </div>
 
 
-    <!-- === FILTER CARD =======================================
-         Django: <form action="{% url 'admin_reports' %}" method="GET">
-         ======================================================= -->
+    <!-- === FILTER CARD ======================================= -->
     <div class="tw-filter-card">
-        <form action="#" method="GET">
+        <form action="{% url 'admin_reports' %}" method="GET">
             <div class="filter-controls">
 
                 <div class="tw-filter-group">
                     <label for="fromDate">From Date</label>
-                    <!-- Django: value="{{ request.GET.from|default:'' }}" -->
-                    <input type="date" class="tw-input" id="fromDate" name="from" value="2025-10-13">
+                    <input type="date" class="tw-input" id="fromDate" name="from" value="{{ filters.from }}">
                 </div>
 
                 <div class="tw-filter-group">
                     <label for="toDate">To Date</label>
-                    <!-- Django: value="{{ request.GET.to|default:'' }}" -->
-                    <input type="date" class="tw-input" id="toDate" name="to" value="2025-11-22">
+                    <input type="date" class="tw-input" id="toDate" name="to" value="{{ filters.to }}">
                 </div>
 
                 <div class="tw-filter-group">
                     <label for="statusFilter">Status</label>
                     <select class="tw-select" id="statusFilter" name="status">
-                        <option value="all">All Tickets</option>
-                        <option value="inprogress">In Progress</option>
-                        <option value="inbox" selected>Inbox</option>
-                        <option value="forwarded">Awaiting Client</option>
-                        <option value="resolved">Resolved</option>
-                        <option value="closed">Closed Tickets</option>
-                        <option value="rejected">Rejected</option>
+                        <option value="all" {% if filters.status == 'all' %}selected{% endif %}>All Tickets</option>
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
                 <div class="tw-filter-group">
                     <label for="developerFilter">Developer</label>
-                    <!-- Django: {% for dev in developers %}<option value="{{ dev.id }}">{{ dev.name }}</option>{% endfor %} -->
                     <select class="tw-select" id="developerFilter" name="developer">
-                        <option value="all">All Developers</option>
-                        <option value="vyshnav" selected>Vyshnav (DEV)</option>
-                        <option value="anurag">Anurag (QA)</option>
-                        <option value="jinoy">Jinoy (DEV)</option>
+                        <option value="all" {% if filters.developer == 'all' %}selected{% endif %}>All Developers</option>
+                        {% for dev in developers %}
+                        <option value="{{ dev.pk }}" {% if filters.developer == dev.pk|stringformat:'s' %}selected{% endif %}>{{ dev.get_full_name|default:dev.username }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
                 <div class="tw-filter-group">
                     <label for="clientFilter">Client</label>
-                    <!-- Django: {% for client in clients %}<option>{{ client.name }}</option>{% endfor %} -->
                     <select class="tw-select" id="clientFilter" name="client">
-                        <option value="all">All Clients</option>
-                        <option value="gmec" selected>GMEC</option>
-                        <option value="bgex">BGEX</option>
+                        <option value="all" {% if filters.client == 'all' %}selected{% endif %}>All Clients</option>
+                        {% for c in clients %}
+                        <option value="{{ c.pk }}" {% if filters.client == c.pk|stringformat:'s' %}selected{% endif %}>{{ c.code }} — {{ c.name }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
                 <div class="tw-filter-group filter-btn-group">
-                    <button type="button" class="tw-btn tw-btn-primary" onclick="generateReport()">
+                    <button type="submit" class="tw-btn tw-btn-primary">
                         <i class="bx bx-search" aria-hidden="true"></i>
                         Show Report
                     </button>
-                    <button type="button" class="tw-btn tw-btn-outline" onclick="clearReportFilters()">
-                        Clear Filters
-                    </button>
+                    <a href="{% url 'admin_reports' %}" class="tw-btn tw-btn-outline">Clear Filters</a>
                 </div>
 
             </div>
@@ -91,38 +76,32 @@
 
 
     <!-- === REPORT SUMMARY BANNER ============================= -->
-    <div class="report-summary-banner" id="reportSummary" aria-live="polite">
-        <!-- JS populates this on load -->
+    <div class="report-summary-banner" aria-live="polite">
+        Total Tickets: <strong>{{ total }}</strong> &nbsp;|&nbsp;
+        TAT Met: <strong>{{ tat_met }}</strong> &nbsp;|&nbsp;
+        TAT Missed: <strong>{{ tat_missed }}</strong> &nbsp;|&nbsp;
+        Pending: <strong>{{ pending }}</strong>
     </div>
 
 
     <!-- === REPORT TABLE CARD ================================= -->
     <div class="tw-table-card">
 
-        <!-- Table header: title (left), download buttons (right) -->
         <div class="tw-table-head-row">
             <h3 class="report-table-title">Detailed Report</h3>
 
             <div class="download-buttons">
-                <button
-                    class="tw-btn tw-btn-outline btn-download--pdf"
-                    onclick="downloadReport('pdf')"
-                    aria-label="Download report as PDF">
+                <button class="tw-btn tw-btn-outline btn-download--pdf" onclick="downloadReport('pdf')" aria-label="Download report as PDF">
                     <i class="bx bxs-file-pdf" aria-hidden="true"></i>
                     Download as PDF
                 </button>
-                <button
-                    class="tw-btn tw-btn-outline btn-download--excel"
-                    onclick="downloadReport('excel')"
-                    aria-label="Download report as Excel">
+                <button class="tw-btn tw-btn-outline btn-download--excel" onclick="downloadReport('excel')" aria-label="Download report as Excel">
                     <i class="bx bxs-file-excel" aria-hidden="true"></i>
                     Download as Excel
                 </button>
             </div>
         </div>
 
-        <!-- Report table -->
-        <!-- Django: {% for report in reports %} -->
         <div class="table-scroll-wrapper">
         <table class="tw-table" id="reportsTable">
             <thead>
@@ -141,241 +120,88 @@
             </thead>
             <tbody>
 
-                <!-- Row 1 (Inbox) -->
+                {% for row in rows %}
                 <tr>
-                    <td>TWD-1005</td>
-                    <td>GMEC</td>
-                    <td>Failed transactions due to API timeout</td>
-                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
-                    <td><span class="tw-badge tw-status-tag tw-status-inbox">INBOX</span></td>
-                    <td>2025-11-17</td>
-                    <td>N/A</td>
-                    <td>Jinoy</td>
-                    <td>N/A</td>
-                    <td class="tw-tat-col"><span class="tw-tat-empty">—</span></td>
-                </tr>
-
-                <!-- Row 2 (In Progress) -->
-                <tr>
-                    <td>TWD-1004</td>
-                    <td>BGEX</td>
-                    <td>Incorrect exchange rate calculation</td>
-                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
-                    <td><span class="tw-badge tw-status-tag tw-status-progress">IN PROGRESS</span></td>
-                    <td>2025-11-08</td>
-                    <td>2025-11-08</td>
-                    <td>Vyshnav</td>
-                    <td>N/A</td>
+                    <td>{{ row.ticket.reference }}</td>
+                    <td>{% if row.ticket.client %}{{ row.ticket.client.code }}{% else %}—{% endif %}</td>
+                    <td>{{ row.ticket.subject }}</td>
+                    <td><span class="tw-priority-badge tw-priority-badge--{{ row.ticket.priority }}">{{ row.ticket.get_priority_display }}</span></td>
+                    <td><span class="tw-badge tw-status-tag {{ row.status_css }}">{{ row.ticket.get_status_display|upper }}</span></td>
+                    <td>{{ row.ticket.created_at|date:"d M Y" }}</td>
+                    <td>{% if row.ticket.accepted_at %}{{ row.ticket.accepted_at|date:"d M Y" }}{% else %}—{% endif %}</td>
+                    <td>{% if row.ticket.assigned_developer %}{{ row.ticket.assigned_developer.get_full_name|default:row.ticket.assigned_developer.username }}{% else %}—{% endif %}</td>
+                    <td>{% if row.resolved_at %}{{ row.resolved_at|date:"d M Y" }}{% else %}—{% endif %}</td>
                     <td class="tw-tat-col">
-                        <span class="tw-tat-badge tw-tat-badge--met">3 / 5</span>
+                        {% if row.tat %}
+                        <span class="tw-tat-badge tw-tat-badge--{{ row.tat.css }}">{{ row.tat.text }}</span>
+                        {% else %}
+                        <span class="tw-tat-empty">—</span>
+                        {% endif %}
                     </td>
                 </tr>
-
-                <!-- Row 3 (Forwarded) -->
-                <tr>
-                    <td>TWD-1003</td>
-                    <td>GMEC</td>
-                    <td>Authentication failure for new users</td>
-                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
-                    <td><span class="tw-badge tw-status-tag tw-status-forwarded">FORWARDED</span></td>
-                    <td>2025-11-01</td>
-                    <td>2025-11-01</td>
-                    <td>Anurag</td>
-                    <td>N/A</td>
-                    <td class="tw-tat-col">
-                        <span class="tw-tat-badge tw-tat-badge--missed">13 / 5</span>
-                    </td>
-                </tr>
-
-                <!-- Row 4 (Closed — TAT met) -->
-                <tr>
-                    <td>TWD-1002</td>
-                    <td>BGEX</td>
-                    <td>UI bug on mobile login screen</td>
-                    <td><span class="tw-priority-badge tw-priority-badge--low">Low</span></td>
-                    <td><span class="tw-badge tw-status-tag tw-status-closed">CLOSED</span></td>
-                    <td>2025-10-25</td>
-                    <td>2025-10-25</td>
-                    <td>Vyshnav</td>
-                    <td>2025-10-27</td>
-                    <td class="tw-tat-col">
-                        <span class="tw-tat-badge tw-tat-badge--met">2 / 5</span>
-                    </td>
-                </tr>
-
-                <!-- Row 5 (Closed — TAT missed) -->
-                <tr>
-                    <td>TWD-1001</td>
-                    <td>GMEC</td>
-                    <td>Server latency investigation</td>
-                    <td><span class="tw-priority-badge tw-priority-badge--medium">Medium</span></td>
-                    <td><span class="tw-badge tw-status-tag tw-status-closed">CLOSED</span></td>
-                    <td>2025-10-15</td>
-                    <td>2025-10-16</td>
-                    <td>Vyshnav</td>
-                    <td>2025-10-23</td>
-                    <td class="tw-tat-col">
-                        <span class="tw-tat-badge tw-tat-badge--missed">7 / 5</span>
-                    </td>
-                </tr>
-
-                <!-- Row 6 -->
-                <tr>
-                    <td>TWD-1006</td>
-                    <td>GMEC</td>
-                    <td>Federal bank API failure</td>
-                    <td><span class="tw-priority-badge tw-priority-badge--high">High</span></td>
-                    <td><span class="tw-badge tw-status-tag tw-status-inbox">INBOX</span></td>
-                    <td>2025-12-10</td>
-                    <td>—</td>
-                    <td>—</td>
-                    <td>—</td>
-                    <td class="tw-tat-col"><span class="tw-tat-empty">—</span></td>
-                </tr>
-
-                <!-- Empty state — shown by generateReport() when no rows exist -->
+                {% empty %}
                 <tr id="reportEmptyState">
                     <td colspan="10">
                         <i class="bx bx-file" aria-hidden="true"></i>
-                        <p>Apply filters above and click Show Report to view results.</p>
+                        <p>No tickets match these filters. Adjust the filters above and click Show Report.</p>
                     </td>
                 </tr>
+                {% endfor %}
 
             </tbody>
         </table>
         </div>
-        <!-- Django: {% endfor %} -->
 
     </div>
     <!-- END REPORT TABLE CARD -->
 
 
-    <!-- === REPORT DETAIL MODAL =============================== -->
+    <!-- === REPORT EXPORT MODAL ============================== -->
     <div class="tw-modal-overlay" id="reportDetailModal" role="dialog" aria-modal="true" aria-labelledby="reportModalTitle">
         <div class="tw-modal tw-modal--sm">
-
             <div class="tw-modal-header tw-header-gradient">
-                <div>
-                    <h2 id="reportModalTitle">Request Acknowledged</h2>
-                </div>
+                <div><h2 id="reportModalTitle">Export</h2></div>
                 <button class="tw-btn-close" onclick="closeReportModal()" aria-label="Close">
                     <i class="bx bx-x" aria-hidden="true"></i>
                 </button>
             </div>
-
             <div class="tw-modal-body report-modal-body">
-                <p class="report-modal-message" id="reportModalMessage">
-                    Please wait while your report is being generated.
-                </p>
+                <p class="report-modal-message" id="reportModalMessage"></p>
                 <button class="tw-btn tw-btn-primary" onclick="closeReportModal()">OK</button>
             </div>
-
         </div>
     </div>
-    <!-- END REPORT DETAIL MODAL -->
+    <!-- END EXPORT MODAL -->
 
-<!-- Django: {% endblock %} -->
+{% endblock %}
 
 
-<!-- Django: {% block page_js %} -->
+{% block page_js %}
 <script>
-    /* ============================================================
-     * REPORT GENERATION
-     * ============================================================ */
-    function generateReport() {
-        const fromInput  = document.getElementById('fromDate');
-        const toInput    = document.getElementById('toDate');
-        const statusSel  = document.getElementById('statusFilter');
-        const devSel     = document.getElementById('developerFilter');
-        const clientSel  = document.getElementById('clientFilter');
-        const banner     = document.getElementById('reportSummary');
-
-        /* Count data rows only — exclude the empty-state row */
-        const allRows      = document.querySelectorAll('#reportsTable tbody tr:not(#reportEmptyState)');
-        const totalTickets = allRows.length || 0;
-
-        const fmt = (dateStr) => dateStr
-            ? new Date(dateStr).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-            : '—';
-
-        const selectedStatus = statusSel.options[statusSel.selectedIndex].text.toUpperCase();
-        const selectedDev    = devSel.options[devSel.selectedIndex].text.split('(')[0].trim();
-        const selectedClient = clientSel.options[clientSel.selectedIndex].text;
-
-        banner.innerHTML = `
-            Reports from <strong>${fmt(fromInput.value)}</strong> to
-            <strong>${fmt(toInput.value)}</strong> &nbsp;|&nbsp;
-            Status: <strong>${selectedStatus}</strong> &nbsp;|&nbsp;
-            Developer: <strong>${selectedDev}</strong> &nbsp;|&nbsp;
-            Client: <strong>${selectedClient}</strong> &nbsp;|&nbsp;
-            Total Tickets: <strong>${totalTickets}</strong>
-        `;
-
-        /* Show empty state when no data rows exist */
-        const emptyState = document.getElementById('reportEmptyState');
-        if (emptyState) {
-            emptyState.style.display = totalTickets === 0 ? '' : 'none';
-        }
-    }
-
-    /* Call immediately — 'load' event has already fired when router injects this */
-    generateReport();
-
-
-    /* ============================================================
-     * CLEAR FILTERS
-     * Resets all filter fields to default values and refreshes banner.
-     * ============================================================ */
-    function clearReportFilters() {
-        document.getElementById('fromDate').value    = '';
-        document.getElementById('toDate').value      = '';
-        document.getElementById('statusFilter').value    = 'all';
-        document.getElementById('developerFilter').value = 'all';
-        document.getElementById('clientFilter').value    = 'all';
-        generateReport();
-    }
-
-
-    /* ============================================================
-     * REPORT DETAIL MODAL
-     * ============================================================ */
+    /* Export is not wired yet (needs a PDF/Excel generator — deferred). */
     function showModal(message, title) {
-        const modal   = document.getElementById('reportDetailModal');
-        const titleEl = document.getElementById('reportModalTitle');
-        const msgEl   = document.getElementById('reportModalMessage');
-
-        titleEl.textContent = title;
-        msgEl.textContent   = message;
-        modal.classList.add('active');
+        document.getElementById('reportModalTitle').textContent = title;
+        document.getElementById('reportModalMessage').textContent = message;
+        document.getElementById('reportDetailModal').classList.add('active');
         document.body.style.overflow = 'hidden';
     }
-
     function closeReportModal() {
         document.getElementById('reportDetailModal').classList.remove('active');
         document.body.style.overflow = '';
     }
-
     document.getElementById('reportDetailModal').addEventListener('click', function (e) {
         if (e.target === this) closeReportModal();
     });
-
-    document.addEventListener('keydown', (e) => {
-        const modal = document.getElementById('reportDetailModal');
-        if (e.key === 'Escape' && modal.classList.contains('active')) {
-            closeReportModal();
-        }
+    document.addEventListener('keydown', function (e) {
+        var modal = document.getElementById('reportDetailModal');
+        if (e.key === 'Escape' && modal.classList.contains('active')) closeReportModal();
     });
 
-
-    /* ============================================================
-     * DOWNLOAD REPORT HANDLERS
-     * Django: replace with fetch() to {% url 'admin_report_download' %}
-     * ============================================================ */
     function downloadReport(format) {
         showModal(
-            'PDF and Excel export will be available once the backend is connected. This feature is coming in a future update.',
+            'PDF and Excel export is coming in a future update. The filtered report above reflects live data.',
             'Export Not Yet Available'
         );
     }
 </script>
-<!-- Django: {% endblock %} -->
+{% endblock %}

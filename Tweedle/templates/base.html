@@ -139,10 +139,9 @@
         </li>
 
         <!-- Reports -->
-        {# TODO 4.0b: href="{% url 'admin_reports' %}" — page not built yet #}
-        <li class="nav-item">
-            <a href="{% url 'admin_dashboard' %}"
-               class="nav-link"
+        <li class="nav-item{% if active_nav == 'reports' %} active-item{% endif %}">
+            <a href="{% url 'admin_reports' %}"
+               class="nav-link{% if active_nav == 'reports' %} active{% endif %}"
                title="Reports">
                 <i class="bx bx-bar-chart-alt-2"></i>
                 <span class="nav-label">Reports</span>

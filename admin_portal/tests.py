@@ -1,7 +1,10 @@
+from datetime import timedelta
+
 from django.contrib.auth import get_user_model
 from django.test import Client as DjangoTestClient
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from accounts.models import Client
 from notifications.models import Notification
@@ -1400,3 +1403,97 @@ class AdminTeamPageTests(TestCase):
         self.client.force_login(self.outsider)
         url = reverse("admin_toggle_team_member", args=[self.dev.pk])
         self.assertEqual(self.client.post(url).status_code, 403)
+
+
+class AdminReportsPageTests(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_user(
+            "admin_rp", email="admin_rp@tweedle.local", password="pw", role="admin"
+        )
+        self.outsider = User.objects.create_user(
+            "client_rp", email="client_rp@tweedle.local", password="pw", role="client"
+        )
+        self.dev = User.objects.create_user(
+            "dev_rp", email="dev_rp@tweedle.local", password="pw", role="developer"
+        )
+        self.gmec = Client.objects.create(name="GMEC Co", code="GMEC")
+        self.bgex = Client.objects.create(name="BGEX Co", code="BGEX")
+        self.outsider.client = self.gmec
+        self.outsider.save()
+        self.url = reverse("admin_reports")
+
+    def _ticket(self, status=S.NEW, client=None, dev=None, sub_status=None,
+                created_offset_days=0, closed_at=None):
+        t = Ticket.objects.create(
+            subject="T", description="d" * 20, requester=self.outsider,
+            client=client or self.gmec, status=status, sub_status=sub_status,
+            assigned_developer=dev, closed_at=closed_at,
+        )
+        if created_offset_days:
+            Ticket.objects.filter(pk=t.pk).update(
+                created_at=timezone.now() - timedelta(days=created_offset_days)
+            )
+        return t
+
+    # ── Access ───────────────────────────────────────────────────────────────
+
+    def test_requires_admin(self):
+        self.client.force_login(self.outsider)
+        self.assertEqual(self.client.get(self.url).status_code, 403)
+
+    def test_lists_all_tickets_by_default(self):
+        self._ticket()
+        self._ticket(client=self.bgex)
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.context["total"], 2)
+
+    # ── Filters ──────────────────────────────────────────────────────────────
+
+    def test_client_filter_narrows(self):
+        self._ticket(client=self.gmec)
+        self._ticket(client=self.bgex)
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.url, {"client": self.gmec.pk})
+        self.assertEqual(resp.context["total"], 1)
+        self.assertEqual(resp.context["rows"][0]["ticket"].client, self.gmec)
+
+    def test_status_filter_narrows(self):
+        self._ticket(status=S.NEW)
+        self._ticket(status=S.CLOSED, closed_at=timezone.now())
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.url, {"status": S.CLOSED})
+        self.assertEqual(resp.context["total"], 1)
+
+    def test_developer_filter_narrows(self):
+        self._ticket(dev=self.dev)
+        self._ticket()
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.url, {"developer": self.dev.pk})
+        self.assertEqual(resp.context["total"], 1)
+
+    # ── TAT summary ──────────────────────────────────────────────────────────
+
+    def test_tat_met_missed_pending_counts(self):
+        now = timezone.now()
+        # Met: closed 2 days after creation (target medium = 5).
+        self._ticket(status=S.CLOSED, closed_at=now, created_offset_days=2)
+        # Missed: closed 10 days after creation.
+        self._ticket(status=S.CLOSED, closed_at=now, created_offset_days=10)
+        # Pending: still open.
+        self._ticket(status=S.NEW)
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.context["tat_met"], 1)
+        self.assertEqual(resp.context["tat_missed"], 1)
+        self.assertEqual(resp.context["pending"], 1)
+
+    def test_resolution_falls_back_to_closed_at(self):
+        # A closed ticket with no resolved/closed event still reports a TAT
+        # (via the closed_at fallback) rather than counting as pending.
+        self._ticket(status=S.CLOSED, closed_at=timezone.now(), created_offset_days=1)
+        self.client.force_login(self.admin)
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.context["pending"], 0)
+        self.assertIsNotNone(resp.context["rows"][0]["tat"])
