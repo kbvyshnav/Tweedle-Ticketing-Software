@@ -1,0 +1,108 @@
+{% load static %}
+<div class="tw-modal-header tw-header-gradient">
+    <div>
+        <h2><i class="bx bx-cog" aria-hidden="true"></i> Edit {{ client.name }}</h2>
+    </div>
+    <button class="tw-btn-close" type="button" onclick="closeClientSettingsModal()" aria-label="Close">
+        <i class="bx bx-x" aria-hidden="true"></i>
+    </button>
+</div>
+
+<form method="post" action="{% url 'admin_client_settings' client.code %}" novalidate>
+    {% csrf_token %}
+    <div class="tw-modal-body">
+
+        {% if form.non_field_errors %}
+        <div class="tw-form-group">
+            <span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger)">{{ form.non_field_errors.0 }}</span>
+        </div>
+        {% endif %}
+
+        <!-- SECTION 1: Company Details -->
+        <p class="tw-modal-section-label" style="font-size:var(--tw-text-sm);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--tw-text-secondary);margin-bottom:var(--tw-space-3);margin-top:var(--tw-space-2);display:block">Company Details</p>
+
+        <div class="tw-form-group" style="display:grid;grid-template-columns:2fr 1fr;gap:var(--tw-space-4);align-items:start">
+            <div class="tw-form-group" style="width:100%">
+                <label class="tw-form-label" for="editCompanyName">Company Name <span class="tw-required">*</span></label>
+                <input class="tw-input{% if form.name.errors %} tw-input--error{% endif %}" id="editCompanyName" name="name" type="text" value="{{ form.name.value|default:'' }}" autocomplete="organization">
+                {% if form.name.errors %}<span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px">{{ form.name.errors.0 }}</span>{% endif %}
+            </div>
+            <div class="tw-form-group" style="width:100%">
+                <label class="tw-form-label" for="editCode">Client Code <span class="tw-required">*</span></label>
+                <input class="tw-input{% if form.code.errors %} tw-input--error{% endif %}" id="editCode" name="code" type="text" value="{{ form.code.value|default:'' }}" maxlength="10" style="text-transform:uppercase">
+                {% if form.code.errors %}<span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px">{{ form.code.errors.0 }}</span>{% endif %}
+            </div>
+        </div>
+
+        <div class="tw-form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--tw-space-4);align-items:start">
+            <div class="tw-form-group" style="width:100%">
+                <label class="tw-form-label" for="editIndustry">Industry / Sector</label>
+                <input class="tw-input" id="editIndustry" name="industry" type="text" value="{{ form.industry.value|default:'' }}" placeholder="e.g. Healthcare, Fintech">
+            </div>
+            <div class="tw-form-group" style="width:100%">
+                <label class="tw-form-label" for="editCountry">Country <span class="tw-required">*</span></label>
+                <input class="tw-input{% if form.country.errors %} tw-input--error{% endif %}" id="editCountry" name="country" type="text" value="{{ form.country.value|default:'' }}">
+                {% if form.country.errors %}<span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px">{{ form.country.errors.0 }}</span>{% endif %}
+            </div>
+        </div>
+
+        <div class="tw-form-group">
+            <label class="tw-form-label" for="editWebsite">Company Website</label>
+            <input class="tw-input" id="editWebsite" name="website" type="url" value="{{ form.website.value|default:'' }}" placeholder="https://">
+        </div>
+
+        <!-- SECTION 2: Primary Contact -->
+        <p class="tw-modal-section-label" style="font-size:var(--tw-text-sm);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--tw-text-secondary);margin-bottom:var(--tw-space-3);margin-top:var(--tw-space-2);display:block">Primary Contact</p>
+
+        <div class="tw-form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--tw-space-4);align-items:start">
+            <div class="tw-form-group" style="width:100%">
+                <label class="tw-form-label" for="editContactName">Full Name <span class="tw-required">*</span></label>
+                <input class="tw-input{% if form.contact_name.errors %} tw-input--error{% endif %}" id="editContactName" name="contact_name" type="text" value="{{ form.contact_name.value|default:'' }}" autocomplete="name">
+                {% if form.contact_name.errors %}<span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px">{{ form.contact_name.errors.0 }}</span>{% endif %}
+            </div>
+            <div class="tw-form-group" style="width:100%">
+                <label class="tw-form-label" for="editJobTitle">Job Title</label>
+                <input class="tw-input" id="editJobTitle" name="contact_job_title" type="text" value="{{ form.contact_job_title.value|default:'' }}" placeholder="e.g. CTO, Project Manager">
+            </div>
+        </div>
+
+        <div class="tw-form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--tw-space-4);align-items:start">
+            <div class="tw-form-group" style="width:100%">
+                <label class="tw-form-label" for="editEmail">Email Address <span class="tw-required">*</span></label>
+                <input class="tw-input{% if form.contact_email.errors %} tw-input--error{% endif %}" id="editEmail" name="contact_email" type="email" value="{{ form.contact_email.value|default:'' }}" autocomplete="email">
+                {% if form.contact_email.errors %}<span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px">{{ form.contact_email.errors.0 }}</span>{% endif %}
+            </div>
+            <div class="tw-form-group" style="width:100%">
+                <label class="tw-form-label" for="editPhone">Phone Number</label>
+                <input class="tw-input" id="editPhone" name="contact_phone" type="tel" value="{{ form.contact_phone.value|default:'' }}" autocomplete="tel">
+            </div>
+        </div>
+
+        <!-- SECTION 3: Account Setup -->
+        <p class="tw-modal-section-label" style="font-size:var(--tw-text-sm);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--tw-text-secondary);margin-bottom:var(--tw-space-3);margin-top:var(--tw-space-2);display:block">Account Setup</p>
+
+        <div class="tw-form-group" style="max-width:240px">
+            <label class="tw-form-label" for="editStatus">Status</label>
+            {% with sval=form.status.value|default:"active" %}
+            <select class="tw-select" id="editStatus" name="status">
+                <option value="active" {% if sval == "active" %}selected{% endif %}>Active</option>
+                <option value="pending" {% if sval == "pending" %}selected{% endif %}>Pending</option>
+                <option value="inactive" {% if sval == "inactive" %}selected{% endif %}>Inactive</option>
+            </select>
+            {% endwith %}
+        </div>
+
+        <div class="tw-form-group">
+            <label class="tw-form-label" for="editNotes">Notes / Special Instructions</label>
+            <textarea class="tw-comment-textarea" id="editNotes" name="notes" rows="3">{{ form.notes.value|default:'' }}</textarea>
+        </div>
+
+    </div>
+
+    <div class="tw-modal-footer">
+        <div class="tw-modal-footer-actions">
+            <button class="tw-btn tw-btn-outline" type="button" onclick="closeClientSettingsModal()">Cancel</button>
+            <button class="tw-btn tw-btn-primary" type="submit"><i class="bx bx-save" aria-hidden="true"></i> Save Changes</button>
+        </div>
+    </div>
+</form>

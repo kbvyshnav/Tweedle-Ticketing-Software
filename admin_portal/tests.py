@@ -1585,3 +1585,114 @@ class AdminSettingsTests(TestCase):
         self.client.force_login(self.admin)
         resp = self.client.post(self.url, {"section": "bogus"})
         self.assertRedirects(resp, self.url)
+
+
+class AdminClientActionsTests(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_user(
+            "admin_ca", email="admin_ca@tweedle.local", password="pw", role="admin"
+        )
+        self.dev = User.objects.create_user(
+            "dev_ca", email="dev_ca@tweedle.local", password="pw", role="developer"
+        )
+        self.client_org = Client.objects.create(name="Acme Corp", code="ACME")
+        self.primary = User.objects.create_user(
+            "acme_primary", email="primary@acme.test", password="pw",
+            role="client", client=self.client_org,
+        )
+        self.client.force_login(self.admin)
+
+    # ── View Details ─────────────────────────────────────────
+    def test_detail_partial_renders_client_info(self):
+        url = reverse("admin_client_detail", args=[self.client_org.code])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, "admin_portal/_client_detail.html")
+        self.assertContains(resp, "Acme Corp")
+        self.assertContains(resp, "ACME")
+
+    def test_detail_non_admin_forbidden(self):
+        self.client.force_login(self.dev)
+        url = reverse("admin_client_detail", args=[self.client_org.code])
+        self.assertEqual(self.client.get(url).status_code, 403)
+
+    def test_detail_unknown_code_404(self):
+        self.assertEqual(
+            self.client.get(reverse("admin_client_detail", args=["NOPE"])).status_code, 404
+        )
+
+    # ── View Settings (edit) ─────────────────────────────────
+    def test_settings_get_returns_edit_form(self):
+        url = reverse("admin_client_settings", args=[self.client_org.code])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, "admin_portal/_client_form.html")
+        self.assertContains(resp, 'name="name"')
+
+    def test_settings_post_updates_client(self):
+        url = reverse("admin_client_settings", args=[self.client_org.code])
+        resp = self.client.post(url, {
+            "name": "Acme Renamed", "code": "ACME", "country": "India",
+            "contact_name": "Jo", "contact_email": "jo@acme.test", "status": "active",
+        })
+        self.assertRedirects(resp, reverse("admin_clients"))
+        self.client_org.refresh_from_db()
+        self.assertEqual(self.client_org.name, "Acme Renamed")
+
+    def test_settings_post_invalid_reopens_modal(self):
+        url = reverse("admin_client_settings", args=[self.client_org.code])
+        resp = self.client.post(url, {
+            "name": "", "code": "ACME", "country": "India",
+            "contact_name": "Jo", "contact_email": "jo@acme.test", "status": "active",
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, "admin_portal/clients.html")
+        self.assertTrue(resp.context["open_settings_modal"])
+        self.client_org.refresh_from_db()
+        self.assertEqual(self.client_org.name, "Acme Corp")  # unchanged
+
+    # ── Manage Users ─────────────────────────────────────────
+    def test_users_page_lists_client_logins(self):
+        url = reverse("admin_client_users", args=[self.client_org.code])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, "admin_portal/manage-users.html")
+        self.assertContains(resp, "acme_primary")
+
+    def test_users_page_non_admin_forbidden(self):
+        self.client.force_login(self.dev)
+        url = reverse("admin_client_users", args=[self.client_org.code])
+        self.assertEqual(self.client.get(url).status_code, 403)
+
+    def test_add_client_user_creates_login(self):
+        url = reverse("admin_add_client_user", args=[self.client_org.code])
+        resp = self.client.post(url, {
+            "full_name": "Sam Patel", "email": "sam@acme.test",
+            "role": "subuser", "password": "temppass123", "is_active": "on",
+        })
+        self.assertRedirects(resp, reverse("admin_client_users", args=[self.client_org.code]))
+        created = User.objects.get(email="sam@acme.test")
+        self.assertEqual(created.role, "subuser")
+        self.assertEqual(created.client_id, self.client_org.pk)
+        self.assertTrue(created.is_active)
+
+    def test_add_client_user_duplicate_email_reopens_modal(self):
+        url = reverse("admin_add_client_user", args=[self.client_org.code])
+        resp = self.client.post(url, {
+            "full_name": "Dupe", "email": "primary@acme.test",
+            "role": "client", "password": "temppass123",
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.context["open_user_modal"])
+
+    def test_toggle_client_user_flips_active(self):
+        self.assertTrue(self.primary.is_active)
+        url = reverse("admin_toggle_client_user", args=[self.primary.pk])
+        resp = self.client.post(url)
+        self.assertRedirects(resp, reverse("admin_client_users", args=[self.client_org.code]))
+        self.primary.refresh_from_db()
+        self.assertFalse(self.primary.is_active)
+
+    def test_toggle_rejects_non_client_user(self):
+        url = reverse("admin_toggle_client_user", args=[self.dev.pk])
+        self.assertEqual(self.client.post(url).status_code, 404)

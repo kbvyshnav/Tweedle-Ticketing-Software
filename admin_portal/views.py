@@ -14,6 +14,7 @@ from tickets.models import Ticket, TicketEvent
 from .forms import (
     BrandingSettingsForm,
     ClientOnboardForm,
+    ClientUserForm,
     OrganisationSettingsForm,
     TeamMemberForm,
 )
@@ -117,6 +118,100 @@ def admin_onboard_client(request):
     ctx = _clients_context(form)
     ctx["open_onboard_modal"] = True
     return render(request, "admin_portal/clients.html", ctx)
+
+
+# ── Client detail / settings / users ─────────────────────────────────────────
+
+@role_required("admin")
+def admin_client_detail(request, code):
+    """Read-only client info partial, fetched into the Clients-page modal."""
+    client = get_object_or_404(Client, code=code)
+    return render(request, "admin_portal/_client_detail.html", {"client": client})
+
+
+@role_required("admin")
+def admin_client_settings(request, code):
+    """Edit a client organisation.
+
+    GET returns the prefilled edit-form partial (fetched into the modal); POST
+    validates and saves, redirecting to the Clients list on success or
+    re-rendering the list with the modal reopened (bound form) on error.
+    """
+    client = get_object_or_404(Client, code=code)
+    if request.method == "POST":
+        form = ClientOnboardForm(request.POST, instance=client)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"{client.name} updated.")
+            return redirect("admin_clients")
+        messages.error(request, "Please correct the highlighted fields and try again.")
+        ctx = _clients_context()
+        ctx["settings_form"] = form
+        ctx["settings_client"] = client
+        ctx["open_settings_modal"] = True
+        return render(request, "admin_portal/clients.html", ctx)
+
+    form = ClientOnboardForm(instance=client)
+    return render(
+        request, "admin_portal/_client_form.html", {"client": client, "form": form}
+    )
+
+
+def _client_users_context(client, form=None):
+    """Shared context for the per-client Manage Users page."""
+    users = client.users.order_by("role", "username")
+    return {
+        "active_nav": "clients",
+        "client": client,
+        "client_users": users,
+        "client_user_form": form if form is not None else ClientUserForm(),
+    }
+
+
+@role_required("admin")
+def admin_client_users(request, code):
+    """Manage Users page for one client: its client + sub-user logins."""
+    client = get_object_or_404(Client, code=code)
+    return render(
+        request, "admin_portal/manage-users.html", _client_users_context(client)
+    )
+
+
+@require_POST
+@role_required("admin")
+def admin_add_client_user(request, code):
+    """Create a client/sub-user login that belongs to this client organisation."""
+    client = get_object_or_404(Client, code=code)
+    form = ClientUserForm(request.POST)
+    if form.is_valid():
+        member = form.save(client)
+        name = member.get_full_name() or member.username
+        messages.success(
+            request,
+            f"{name} added as {member.get_role_display()} (username: {member.username}).",
+        )
+        return redirect("admin_client_users", code=client.code)
+
+    messages.error(request, "Please correct the highlighted fields and try again.")
+    ctx = _client_users_context(client, form)
+    ctx["open_user_modal"] = True
+    return render(request, "admin_portal/manage-users.html", ctx)
+
+
+@require_POST
+@role_required("admin")
+def admin_toggle_client_user(request, pk):
+    """Enable/disable a client/sub-user login (flips is_active)."""
+    member = get_object_or_404(
+        User, pk=pk, role__in=[User.Role.CLIENT, User.Role.SUBUSER]
+    )
+    member.is_active = not member.is_active
+    member.save(update_fields=["is_active"])
+    name = member.get_full_name() or member.username
+    messages.success(request, f"{name} {'enabled' if member.is_active else 'disabled'}.")
+    if member.client_id:
+        return redirect("admin_client_users", code=member.client.code)
+    return redirect("admin_clients")
 
 
 # ── Team (developers / testers) ──────────────────────────────────────────────

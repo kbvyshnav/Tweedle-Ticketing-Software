@@ -126,6 +126,34 @@ body > main {
 }
 
 
+/* === REPORT TABLE LAYOUT ====================================
+ * Ten columns including a free-text Subject. Without a floor width the
+ * Subject column stretches and squeezes the rest until cell contents
+ * visually collide. Keep every cell on a single line and give the table a
+ * comfortable minimum width; the .table-scroll-wrapper scrolls horizontally
+ * on narrower viewports. The Subject itself is capped + ellipsised below.
+ * ============================================================ */
+#reportsTable {
+    min-width: 1180px;
+}
+
+#reportsTable th,
+#reportsTable td {
+    white-space: nowrap;
+}
+
+/* Subject can be arbitrarily long — truncate inside the cell with an ellipsis;
+   the full text stays available via the title tooltip. A block wrapper is used
+   because text-overflow on a <td> is unreliable in auto table-layout. */
+.report-subject {
+    display: block;
+    max-width: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
 /* === TAT COLUMN =============================================
  * TAT (Turnaround Time) column is center-aligned.
  * ============================================================ */

@@ -103,9 +103,9 @@
                     <td>{{ client.created_at|date:"M Y" }}</td>
                     <td>
                         <div class="clients-actions">
-                            <button class="tw-btn tw-btn-primary tw-btn--sm" onclick="manageUsers('{{ client.code }}')">
+                            <a href="{% url 'admin_client_users' client.code %}" class="tw-btn tw-btn-primary tw-btn--sm">
                                 <i class='bx bx-group'></i> Manage Users
-                            </button>
+                            </a>
                             <button class="clients-more-btn" onclick="toggleClientMenu(event, this)" aria-label="More options for {{ client.name }}">
                                 <i class='bx bx-dots-vertical-rounded'></i>
                             </button>
@@ -260,6 +260,20 @@
     </button>
 </div>
 
+
+<!-- === VIEW DETAILS MODAL (read-only; content fetched) ====== -->
+<div class="tw-modal-overlay" id="clientDetailModal" role="dialog" aria-modal="true" aria-label="Client details">
+    <div class="tw-modal tw-modal--lg" id="clientDetailCard"></div>
+</div>
+
+
+<!-- === VIEW SETTINGS MODAL (edit form; fetched, or server-rendered on error) === -->
+<div class="tw-modal-overlay" id="clientSettingsModal" role="dialog" aria-modal="true" aria-label="Edit client">
+    <div class="tw-modal tw-modal--lg" id="clientSettingsCard">
+        {% if settings_form %}{% include 'admin_portal/_client_form.html' with client=settings_client form=settings_form %}{% endif %}
+    </div>
+</div>
+
 {% endblock %}
 
 
@@ -344,18 +358,47 @@
 
 
     /* ============================================================
-     * PLACEHOLDER ACTION HANDLERS (Manage Users / details / settings
-     * land with the Manage-users page — next admin step).
+     * VIEW DETAILS / VIEW SETTINGS — fetch a partial into a modal.
+     * Base path comes from the resolved Clients URL so it survives a
+     * mount-point change (the app may not live at /admin-portal/).
      * ============================================================ */
-    function manageUsers(clientCode) {
-        showClientsToast('Manage Users for ' + clientCode + ' — coming with the Manage-users page.', 'info');
+    var CLIENTS_BASE        = "{% url 'admin_clients' %}";
+    var clientDetailModal   = document.getElementById('clientDetailModal');
+    var clientDetailCard    = document.getElementById('clientDetailCard');
+    var clientSettingsModal = document.getElementById('clientSettingsModal');
+    var clientSettingsCard  = document.getElementById('clientSettingsCard');
+
+    function openOverlay(el)  { el.classList.add('active'); document.body.style.overflow = 'hidden'; }
+    function closeOverlay(el) { el.classList.remove('active'); document.body.style.overflow = ''; }
+    function closeClientDetailModal()   { closeOverlay(clientDetailModal); }
+    function closeClientSettingsModal() { closeOverlay(clientSettingsModal); }
+
+    function showDetails(code) {
+        if (!code) return;
+        fetch(CLIENTS_BASE + encodeURIComponent(code) + '/detail/', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function (r) { if (!r.ok) throw new Error(); return r.text(); })
+            .then(function (html) { clientDetailCard.innerHTML = html; openOverlay(clientDetailModal); })
+            .catch(function () { showClientsToast('Could not load client details.', 'error'); });
     }
-    function showDetails(clientCode) {
-        showClientsToast('Client details view — coming in a future update.', 'info');
+
+    function showSettings(code) {
+        if (!code) return;
+        fetch(CLIENTS_BASE + encodeURIComponent(code) + '/settings/', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function (r) { if (!r.ok) throw new Error(); return r.text(); })
+            .then(function (html) { clientSettingsCard.innerHTML = html; openOverlay(clientSettingsModal); })
+            .catch(function () { showClientsToast('Could not load client settings.', 'error'); });
     }
-    function showSettings(clientCode) {
-        showClientsToast('Client settings — coming in a future update.', 'info');
-    }
+
+    clientDetailModal.addEventListener('click', function (e) { if (e.target === clientDetailModal) closeClientDetailModal(); });
+    clientSettingsModal.addEventListener('click', function (e) { if (e.target === clientSettingsModal) closeClientSettingsModal(); });
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        if (clientDetailModal.classList.contains('active'))   closeClientDetailModal();
+        if (clientSettingsModal.classList.contains('active')) closeClientSettingsModal();
+    });
+
+    /* Re-open the settings modal automatically when the server returned validation errors. */
+    {% if open_settings_modal %}openOverlay(clientSettingsModal);{% endif %}
 
 
     /* ============================================================

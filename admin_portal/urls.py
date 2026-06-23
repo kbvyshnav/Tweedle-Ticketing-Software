@@ -9,6 +9,11 @@ urlpatterns = [
     path("", AdminDashboardView.as_view(), name="admin_dashboard"),
     path("clients/", views.admin_clients, name="admin_clients"),
     path("clients/onboard/", views.admin_onboard_client, name="admin_onboard_client"),
+    path("clients/<str:code>/detail/", views.admin_client_detail, name="admin_client_detail"),
+    path("clients/<str:code>/settings/", views.admin_client_settings, name="admin_client_settings"),
+    path("clients/<str:code>/users/", views.admin_client_users, name="admin_client_users"),
+    path("clients/<str:code>/users/add/", views.admin_add_client_user, name="admin_add_client_user"),
+    path("client-user/<int:pk>/toggle/", views.admin_toggle_client_user, name="admin_toggle_client_user"),
     path("team/", views.admin_team, name="admin_team"),
     path("team/add/", views.admin_add_team_member, name="admin_add_team_member"),
     path(

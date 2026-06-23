@@ -992,11 +992,42 @@
     flex-wrap: wrap;
 }
 
+/* A <form> wrapping the modal body + footer must itself be the flex column,
+   otherwise the body's overflow-y:auto has no bounded height and the whole
+   form overflows the clipped .tw-modal — leaving tall forms (Onboard Client,
+   Add Developer/Tester) cut off with no way to scroll. */
+.tw-modal > form {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
 /* Modal scrollable body */
 .tw-modal-body {
     padding: var(--tw-space-4) var(--tw-space-8);
     overflow-y: auto;
-    flex: 1;
+    flex: 1 1 auto;
+    min-height: 0;   /* allow the scroll area to shrink within the flex column */
+}
+
+/* Generic modal footer — kept pinned below the scrolling body. The ticket
+   detail page overrides these via ticket-details.css; the standalone modal
+   forms (clients/team) rely on this base since that file isn't loaded there. */
+.tw-modal-footer {
+    flex-shrink: 0;
+    padding: var(--tw-space-4) var(--tw-space-8);
+    border-top: 1px solid var(--tw-border);
+    background: var(--tw-bg-body);
+    border-radius: 0 0 var(--tw-radius-xl) var(--tw-radius-xl);
+}
+
+.tw-modal-footer-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--tw-space-3);
 }
 
 /* Info grid (metadata cards inside modal) */

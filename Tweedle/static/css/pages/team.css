@@ -58,6 +58,22 @@ body > main {
     color: #e91e63;
 }
 
+/* Client / sub-user variants — used on the per-client Manage Users page. */
+.tw-role-badge--client {
+    background: var(--tw-primary-light);
+    color: var(--tw-primary-text);
+}
+
+.tw-role-badge--subuser {
+    background: #ede7f6;
+    color: #673ab7;
+}
+
+/* Avatar identity colours for the same two roles (components.css only
+   defines admin/developer/tester). */
+.tw-avatar--client  { background: var(--tw-primary); }
+.tw-avatar--subuser { background: #673ab7; }
+
 
 /* === MEMBER NAME CELL ======================================= */
 .member-name-cell {

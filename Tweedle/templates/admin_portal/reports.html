@@ -124,7 +124,7 @@
                 <tr>
                     <td>{{ row.ticket.reference }}</td>
                     <td>{% if row.ticket.client %}{{ row.ticket.client.code }}{% else %}—{% endif %}</td>
-                    <td>{{ row.ticket.subject }}</td>
+                    <td><span class="report-subject" title="{{ row.ticket.subject }}">{{ row.ticket.subject }}</span></td>
                     <td><span class="tw-priority-badge tw-priority-badge--{{ row.ticket.priority }}">{{ row.ticket.get_priority_display }}</span></td>
                     <td><span class="tw-badge tw-status-tag {{ row.status_css }}">{{ row.ticket.get_status_display|upper }}</span></td>
                     <td>{{ row.ticket.created_at|date:"d M Y" }}</td>

@@ -1,225 +1,107 @@
-<!--
-  File: templates/admin_portal/manage-users.html
-  Django template: extends 'base.html'
-  Django view: admin_portal.views.manage_users
-  Django url:  admin_manage_users (requires client_id URL param)
-  Linked from: admin_portal/clients.html row action — "Manage Users"
--->
-<!-- Django: {% extends 'base.html' %} -->
+{% extends 'base.html' %}
+{% load static %}
 
-<!-- Django: {% block page_css %}{% endblock %} -->
+{% block title %}Manage Users — {{ client.name }} — Tweedle{% endblock %}
 
-<!-- Django: {% block content %} -->
-<!-- Django: client = get_object_or_404(Client, pk=client_id) -->
+{% block page_css %}
+<link rel="stylesheet" href="{% static 'css/pages/team.css' %}">
+{% endblock %}
+
+{% block content %}
 
     <!-- === PAGE HEADER ======================================= -->
     <div class="tw-page-header">
-
-        <!-- Back link -->
-        <!-- Django: href="{% url 'admin_clients' %}" -->
         <div>
-            <a href="#clients"
+            <a href="{% url 'admin_clients' %}"
                class="tw-btn tw-btn-outline tw-btn--sm"
-               style="margin-bottom:var(--tw-space-3);display:inline-flex;align-items:center;gap:var(--tw-space-1)"
-               onclick="loadPage('admin_portal/clients.html')">
+               style="margin-bottom:var(--tw-space-3);display:inline-flex;align-items:center;gap:var(--tw-space-1)">
                 <i class="bx bx-arrow-back" aria-hidden="true"></i>
                 Back to Clients
             </a>
-            <!-- Django: {{ client.company_name }} — e.g. "Manage Users — GlobalTech Solutions" -->
-            <h1>Manage Users — <span id="clientNameHeading">GlobalTech Solutions</span></h1>
+            <h1>Manage Users — {{ client.name }}</h1>
             <p style="font-size:var(--tw-text-sm);color:var(--tw-text-muted);margin-top:4px">
-                <!-- Django: Client code: {{ client.company_code }} -->
-                Client code: <strong>GMEC</strong>
+                Client code: <strong>{{ client.code }}</strong>
                 &nbsp;·&nbsp;
-                <!-- Django: {{ client_users|length }} sub-users -->
-                <span id="subuserCountText">4 sub-users</span>
+                <span>{{ client_users|length }} user{{ client_users|length|pluralize }}</span>
             </p>
         </div>
 
-        <!-- Add Sub-user button -->
-        <!-- Django: opens {% url 'admin_add_subuser' client.id %} or modal -->
         <button
             class="tw-btn tw-btn-primary"
-            id="addSubuserBtn"
+            id="addUserBtn"
             aria-haspopup="dialog"
-            aria-controls="addSubuserModal">
+            aria-controls="addUserModal">
             <i class="bx bx-user-plus" aria-hidden="true"></i>
-            Add Sub-user
+            Add User
         </button>
-
     </div>
 
 
-    <!-- === SUB-USER TABLE CARD =============================== -->
+    <!-- === USER TABLE CARD =================================== -->
     <div class="tw-table-card">
 
-        <!-- Card header -->
         <div class="tw-table-head-row">
             <div class="tw-table-head-left">
                 <h3 class="tw-table-title">
-                    Sub-users
-                    <span class="tw-count-badge" id="subuserCount">4</span>
+                    Users
+                    <span class="tw-count-badge" id="userCount">{{ client_users|length }}</span>
                 </h3>
                 <div class="tw-table-search">
                     <i class="bx bx-search search-icon" aria-hidden="true"></i>
                     <input
                         type="text"
-                        id="subuserSearchInput"
-                        placeholder="Search by name or email..."
-                        aria-label="Search sub-users">
-                </div>
-            </div>
-            <div class="tw-table-head-right">
-                <!-- Status filter -->
-                <div style="display:flex;gap:var(--tw-space-2)">
-                    <button class="tw-btn tw-btn-primary tw-btn--sm" data-status-filter="all"      onclick="filterSubusersByStatus('all', this)">All</button>
-                    <button class="tw-btn tw-btn-outline tw-btn--sm" data-status-filter="active"   onclick="filterSubusersByStatus('active', this)">Active</button>
-                    <button class="tw-btn tw-btn-outline tw-btn--sm" data-status-filter="inactive" onclick="filterSubusersByStatus('inactive', this)">Inactive</button>
+                        id="userSearchInput"
+                        placeholder="Search by name, username, or email..."
+                        aria-label="Search users">
                 </div>
             </div>
         </div>
 
-        <!-- Table -->
         <div class="table-scroll-wrapper">
-        <table class="tw-table" id="subuserTable">
+        <table class="tw-table" id="usersTable">
             <thead>
                 <tr>
                     <th scope="col">Name</th>
-                    <th scope="col">Email</th>
+                    <th scope="col">Username</th>
                     <th scope="col">Role</th>
+                    <th scope="col">Email</th>
                     <th scope="col">Status</th>
-                    <th scope="col">Last Login</th>
-                    <th scope="col">Actions</th>
                 </tr>
             </thead>
             <tbody>
 
-                <!-- Django: {% for user in client_users %} -->
-
-                <!-- Row 1: Sarah Johnson — Primary Contact (Active) -->
-                <tr data-username="sarah_gmec" data-status="active">
+                {% for u in client_users %}
+                <tr data-username="{{ u.username }}">
                     <td>
                         <div class="member-name-cell">
-                            <div class="tw-avatar tw-avatar--sarah" style="background:var(--tw-primary);color:#fff;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0" aria-hidden="true">SJ</div>
-                            <!-- Django: {{ user.get_full_name }} -->
-                            <span class="member-name">Sarah Johnson</span>
+                            <div class="tw-avatar tw-avatar--{{ u.role }}" aria-hidden="true">{{ u.get_full_name|default:u.username|slice:":1"|upper }}</div>
+                            <span class="member-name">{{ u.get_full_name|default:u.username }}</span>
                         </div>
                     </td>
-                    <!-- Django: {{ user.email }} -->
-                    <td>sarah.johnson@globaltech.com</td>
+                    <td>{{ u.username }}</td>
+                    <td><span class="tw-role-badge tw-role-badge--{{ u.role }}">{{ u.get_role_display }}</span></td>
+                    <td>{{ u.email|default:"—" }}</td>
                     <td>
-                        <!-- Django: {{ user.contact_role }} -->
-                        <span class="tw-role-badge" style="background:var(--tw-primary-light);color:var(--tw-primary)">Primary Contact</span>
-                    </td>
-                    <td>
-                        <!-- Django: {{ user.is_active }} -->
-                        <span class="tw-status-badge tw-status-badge--closed">Active</span>
-                    </td>
-                    <!-- Django: {{ user.last_login|timesince }} ago -->
-                    <td>2 hours ago</td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <!-- Django: {% url 'admin_edit_subuser' user.id %} -->
-                            <button class="tw-btn tw-btn-outline tw-btn--sm" onclick="openEditModal('sarah_gmec', 'Sarah Johnson', 'sarah.johnson@globaltech.com', 'Primary Contact')">
-                                <i class="bx bx-edit-alt" aria-hidden="true"></i> Edit
-                            </button>
-                            <!-- Django: POST {% url 'admin_deactivate_subuser' user.id %} -->
-                            <button class="tw-btn tw-btn-outline tw-btn--sm" onclick="openDeactivateConfirm('sarah_gmec', 'Sarah Johnson', true)">
-                                <i class="bx bx-pause-circle" aria-hidden="true"></i> Deactivate
-                            </button>
-                        </div>
+                        <form method="post" action="{% url 'admin_toggle_client_user' u.pk %}" style="margin:0">
+                            {% csrf_token %}
+                            <label class="tw-status-toggle">
+                                <input
+                                    type="checkbox"
+                                    {% if u.is_active %}checked{% endif %}
+                                    onchange="this.form.submit()"
+                                    aria-label="Toggle status for {{ u.username }}">
+                                <span class="toggle-label{% if not u.is_active %} toggle-label--disabled{% endif %}">{% if u.is_active %}Enabled{% else %}Disabled{% endif %}</span>
+                            </label>
+                        </form>
                     </td>
                 </tr>
-
-                <!-- Row 2: Michael Chen — Manager (Active) -->
-                <tr data-username="mchen_gmec" data-status="active">
-                    <td>
-                        <div class="member-name-cell">
-                            <div class="tw-avatar tw-avatar--mchen" style="background:var(--tw-status-progress-text);color:#fff;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0" aria-hidden="true">MC</div>
-                            <span class="member-name">Michael Chen</span>
-                        </div>
-                    </td>
-                    <td>m.chen@globaltech.com</td>
-                    <td>
-                        <span class="tw-role-badge" style="background:var(--tw-status-progress-bg);color:var(--tw-status-progress-text)">Manager</span>
-                    </td>
-                    <td>
-                        <span class="tw-status-badge tw-status-badge--closed">Active</span>
-                    </td>
-                    <td>Yesterday</td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <button class="tw-btn tw-btn-outline tw-btn--sm" onclick="openEditModal('mchen_gmec', 'Michael Chen', 'm.chen@globaltech.com', 'Manager')">
-                                <i class="bx bx-edit-alt" aria-hidden="true"></i> Edit
-                            </button>
-                            <button class="tw-btn tw-btn-outline tw-btn--sm" onclick="openDeactivateConfirm('mchen_gmec', 'Michael Chen', true)">
-                                <i class="bx bx-pause-circle" aria-hidden="true"></i> Deactivate
-                            </button>
-                        </div>
+                {% empty %}
+                <tr id="usersEmptyRow">
+                    <td colspan="5" style="text-align:center;padding:var(--tw-space-6);color:var(--tw-text-muted)">
+                        No users for this client yet. Click <strong>Add User</strong> to create the first login.
                     </td>
                 </tr>
-
-                <!-- Row 3: Priya Sharma — Team Member (Active) -->
-                <tr data-username="priya_gmec" data-status="active">
-                    <td>
-                        <div class="member-name-cell">
-                            <div class="tw-avatar tw-avatar--priya" style="background:var(--tw-status-uat-text);color:#fff;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0" aria-hidden="true">PS</div>
-                            <span class="member-name">Priya Sharma</span>
-                        </div>
-                    </td>
-                    <td>priya.sharma@globaltech.com</td>
-                    <td>
-                        <span class="tw-role-badge" style="background:var(--tw-status-uat-bg);color:var(--tw-status-uat-text)">Team Member</span>
-                    </td>
-                    <td>
-                        <span class="tw-status-badge tw-status-badge--closed">Active</span>
-                    </td>
-                    <td>3 days ago</td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <button class="tw-btn tw-btn-outline tw-btn--sm" onclick="openEditModal('priya_gmec', 'Priya Sharma', 'priya.sharma@globaltech.com', 'Team Member')">
-                                <i class="bx bx-edit-alt" aria-hidden="true"></i> Edit
-                            </button>
-                            <button class="tw-btn tw-btn-outline tw-btn--sm" onclick="openDeactivateConfirm('priya_gmec', 'Priya Sharma', true)">
-                                <i class="bx bx-pause-circle" aria-hidden="true"></i> Deactivate
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Row 4: David Williams — Viewer (Inactive) -->
-                <tr data-username="dwilliams_gmec" data-status="inactive">
-                    <td>
-                        <div class="member-name-cell">
-                            <div class="tw-avatar" style="background:var(--tw-border);color:var(--tw-text-muted);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0" aria-hidden="true">DW</div>
-                            <span class="member-name" style="color:var(--tw-text-muted)">David Williams</span>
-                        </div>
-                    </td>
-                    <td style="color:var(--tw-text-muted)">d.williams@globaltech.com</td>
-                    <td>
-                        <span class="tw-role-badge" style="background:var(--tw-bg-body);color:var(--tw-text-muted)">Viewer</span>
-                    </td>
-                    <td>
-                        <span class="tw-status-badge" style="background:var(--tw-bg-body);color:var(--tw-text-muted)">Inactive</span>
-                    </td>
-                    <td style="color:var(--tw-text-muted)">2 weeks ago</td>
-                    <td>
-                        <div class="tw-row-actions">
-                            <button class="tw-btn tw-btn-outline tw-btn--sm" onclick="openEditModal('dwilliams_gmec', 'David Williams', 'd.williams@globaltech.com', 'Viewer')">
-                                <i class="bx bx-edit-alt" aria-hidden="true"></i> Edit
-                            </button>
-                            <!-- Activate instead of Deactivate when inactive -->
-                            <button class="tw-btn tw-btn-outline tw-btn--sm" onclick="openDeactivateConfirm('dwilliams_gmec', 'David Williams', false)">
-                                <i class="bx bx-play-circle" aria-hidden="true"></i> Activate
-                            </button>
-                            <button class="tw-btn tw-btn-danger tw-btn--sm" onclick="openRemoveConfirm('dwilliams_gmec', 'David Williams')">
-                                <i class="bx bx-trash" aria-hidden="true"></i> Remove
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Django: {% endfor %} -->
+                {% endfor %}
 
             </tbody>
         </table>
@@ -229,432 +111,158 @@
     <!-- END TABLE CARD -->
 
 
-    <!-- === ADD SUB-USER MODAL ================================ -->
-    <!-- Django: form action="{% url 'admin_add_subuser' client.id %}" method="POST" {% csrf_token %} -->
-    <div class="tw-modal-overlay" id="addSubuserModal" role="dialog" aria-modal="true" aria-labelledby="addSubuserModalTitle">
+    <!-- === ADD USER MODAL =================================== -->
+    <div class="tw-modal-overlay" id="addUserModal" role="dialog" aria-modal="true" aria-labelledby="addUserModalTitle">
         <div class="tw-modal tw-modal--lg">
 
             <div class="tw-modal-header tw-header-gradient">
                 <div>
-                    <h2 id="addSubuserModalTitle">
+                    <h2 id="addUserModalTitle">
                         <i class="bx bx-user-plus" aria-hidden="true"></i>
-                        Add Sub-user
+                        Add User
                     </h2>
-                    <p style="font-size:var(--tw-text-sm);color:rgba(255,255,255,0.8);margin-top:2px">Adding to <strong id="addModalClientName">GlobalTech Solutions</strong></p>
+                    <p style="font-size:var(--tw-text-sm);color:rgba(255,255,255,0.85);margin-top:2px">Adding to <strong>{{ client.name }}</strong></p>
                 </div>
-                <button class="tw-btn-close" id="addSubuserModalClose" aria-label="Close modal">
+                <button class="tw-btn-close" id="addUserModalClose" type="button" aria-label="Close modal">
                     <i class="bx bx-x" aria-hidden="true"></i>
                 </button>
             </div>
 
-            <div class="tw-modal-body">
-                <form id="addSubuserForm" novalidate>
+            <form id="addUserForm" method="post" action="{% url 'admin_add_client_user' client.code %}" novalidate>
+                {% csrf_token %}
+                <div class="tw-modal-body">
 
-                    <div class="tw-form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--tw-space-4);align-items:start">
-                        <div class="tw-form-group" style="width:100%">
-                            <label class="tw-form-label" for="newSubuserName">Full Name <span class="tw-required">*</span></label>
-                            <input class="tw-input" id="newSubuserName" type="text" placeholder="e.g. Alex Jordan" autocomplete="name">
-                            <span class="tw-field-error" id="newSubuserNameError" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
-                        </div>
-                        <div class="tw-form-group" style="width:100%">
-                            <label class="tw-form-label" for="newSubuserRole">Role</label>
-                            <select class="tw-select" id="newSubuserRole">
-                                <!-- Django: {% for role in subuser_role_choices %} -->
-                                <option value="primary">Primary Contact</option>
-                                <option value="manager">Manager</option>
-                                <option value="member" selected>Team Member</option>
-                                <option value="viewer">Viewer</option>
-                                <!-- Django: {% endfor %} -->
-                            </select>
-                        </div>
+                    {% if client_user_form.non_field_errors %}
+                    <div class="tw-form-group">
+                        <span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger)">{{ client_user_form.non_field_errors.0 }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="tw-form-group">
+                        <label class="tw-form-label" for="userFullName">Full Name <span class="tw-required">*</span></label>
+                        <input class="tw-input{% if client_user_form.full_name.errors %} tw-input--error{% endif %}" id="userFullName" name="full_name" type="text" value="{{ client_user_form.full_name.value|default:'' }}" placeholder="e.g. Alex Jordan" autocomplete="name">
+                        {% if client_user_form.full_name.errors %}<span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px">{{ client_user_form.full_name.errors.0 }}</span>{% endif %}
                     </div>
 
                     <div class="tw-form-group">
-                        <label class="tw-form-label" for="newSubuserEmail">Email Address <span class="tw-required">*</span></label>
-                        <input class="tw-input" id="newSubuserEmail" type="email" placeholder="user@company.com" autocomplete="email">
-                        <span class="tw-field-error" id="newSubuserEmailError" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
+                        <label class="tw-form-label" for="userEmail">Email Address <span class="tw-required">*</span></label>
+                        <input class="tw-input{% if client_user_form.email.errors %} tw-input--error{% endif %}" id="userEmail" name="email" type="email" value="{{ client_user_form.email.value|default:'' }}" placeholder="user@company.com" autocomplete="email">
+                        {% if client_user_form.email.errors %}<span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px">{{ client_user_form.email.errors.0 }}</span>{% endif %}
+                    </div>
+
+                    <div class="tw-form-group">
+                        <label class="tw-form-label">Role</label>
+                        {% with rval=client_user_form.role.value|default:"client" %}
+                        <div class="tw-toggle-group">
+                            <button type="button" class="tw-toggle-btn{% if rval != 'subuser' %} active{% endif %}" onclick="setUserRole('client', this)">Client (primary)</button>
+                            <button type="button" class="tw-toggle-btn{% if rval == 'subuser' %} active{% endif %}" onclick="setUserRole('subuser', this)">Sub-user</button>
+                        </div>
+                        <input type="hidden" id="userRole" name="role" value="{{ rval }}">
+                        {% endwith %}
+                        <p style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin:4px 0 0 0">A <strong>Client</strong> is the org's primary login; <strong>Sub-users</strong> submit under it.</p>
+                    </div>
+
+                    <div class="tw-form-group">
+                        <label class="tw-form-label" for="userPassword">Temporary Password <span class="tw-required">*</span></label>
+                        <input class="tw-input{% if client_user_form.password.errors %} tw-input--error{% endif %}" id="userPassword" name="password" type="text" placeholder="At least 8 characters" autocomplete="new-password">
+                        {% if client_user_form.password.errors %}<span class="tw-field-error" style="display:block;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px">{{ client_user_form.password.errors.0 }}</span>{% endif %}
+                        <p style="font-size:var(--tw-text-xs);color:var(--tw-text-muted);margin:4px 0 0 0">Share this with the user. They can change it after first login. (Invite emails arrive once email delivery is configured.)</p>
                     </div>
 
                     <div class="tw-form-group">
                         <label class="tw-checkbox-label">
-                            <input type="checkbox" id="sendSubuserInvite" checked>
-                            <span>Send invitation email with login instructions</span>
-                        </label>
-                    </div>
-
-                    <div class="tw-form-group">
-                        <label class="tw-checkbox-label">
-                            <input type="checkbox" id="activateSubuserNow" checked>
+                            <input type="checkbox" id="userActiveNow" name="is_active" checked>
                             <span>Activate account immediately</span>
                         </label>
                     </div>
 
-                </form>
-            </div>
-
-            <div class="tw-modal-footer">
-                <div class="tw-modal-footer-actions">
-                    <button class="tw-btn tw-btn-outline" type="button" onclick="closeAddSubuserModal()">Cancel</button>
-                    <!-- Django: POST to {% url 'admin_add_subuser' client.id %} -->
-                    <button class="tw-btn tw-btn-primary" type="button" id="addSubuserSubmitBtn" onclick="submitAddSubuser()">
-                        <i class="bx bx-user-plus" aria-hidden="true"></i>
-                        Add Sub-user
-                    </button>
                 </div>
-            </div>
+
+                <div class="tw-modal-footer">
+                    <div class="tw-modal-footer-actions">
+                        <button class="tw-btn tw-btn-outline" type="button" onclick="closeAddUserModal()">Cancel</button>
+                        <button class="tw-btn tw-btn-primary" type="submit">
+                            <i class="bx bx-user-plus" aria-hidden="true"></i>
+                            Add User
+                        </button>
+                    </div>
+                </div>
+            </form>
 
         </div>
     </div>
-    <!-- END ADD SUB-USER MODAL -->
+    <!-- END ADD USER MODAL -->
+
+{% endblock %}
 
 
-    <!-- === EDIT SUB-USER MODAL =============================== -->
-    <!-- Django: form action="{% url 'admin_edit_subuser' user.id %}" method="POST" {% csrf_token %} -->
-    <div class="tw-modal-overlay" id="editSubuserModal" role="dialog" aria-modal="true" aria-labelledby="editSubuserModalTitle">
-        <div class="tw-modal">
-
-            <div class="tw-modal-header tw-header-gradient">
-                <div>
-                    <h2 id="editSubuserModalTitle">
-                        <i class="bx bx-edit-alt" aria-hidden="true"></i>
-                        Edit Sub-user
-                    </h2>
-                </div>
-                <button class="tw-btn-close" onclick="closeEditModal()" aria-label="Close modal">
-                    <i class="bx bx-x" aria-hidden="true"></i>
-                </button>
-            </div>
-
-            <div class="tw-modal-body">
-                <form id="editSubuserForm" novalidate>
-
-                    <input type="hidden" id="editSubuserUsername">
-
-                    <div class="tw-form-group">
-                        <label class="tw-form-label" for="editSubuserName">Full Name <span class="tw-required">*</span></label>
-                        <input class="tw-input" id="editSubuserName" type="text">
-                        <span class="tw-field-error" id="editSubuserNameError" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
-                    </div>
-
-                    <div class="tw-form-group">
-                        <label class="tw-form-label" for="editSubuserEmail">Email Address <span class="tw-required">*</span></label>
-                        <input class="tw-input" id="editSubuserEmail" type="email">
-                        <span class="tw-field-error" id="editSubuserEmailError" style="display:none;font-size:var(--tw-text-xs);color:var(--tw-danger);margin-top:4px"></span>
-                    </div>
-
-                    <div class="tw-form-group">
-                        <label class="tw-form-label" for="editSubuserRoleSelect">Role</label>
-                        <select class="tw-select" id="editSubuserRoleSelect">
-                            <option value="primary">Primary Contact</option>
-                            <option value="manager">Manager</option>
-                            <option value="member">Team Member</option>
-                            <option value="viewer">Viewer</option>
-                        </select>
-                    </div>
-
-                </form>
-            </div>
-
-            <div class="tw-modal-footer">
-                <div class="tw-modal-footer-actions">
-                    <button class="tw-btn tw-btn-outline" type="button" onclick="closeEditModal()">Cancel</button>
-                    <!-- Django: POST {% url 'admin_edit_subuser' user.id %} -->
-                    <button class="tw-btn tw-btn-primary" type="button" onclick="submitEditSubuser()">
-                        <i class="bx bx-save" aria-hidden="true"></i>
-                        Save Changes
-                    </button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-    <!-- END EDIT SUB-USER MODAL -->
-
-
-    <!-- === CONFIRM MODAL (shared — deactivate / remove) ===== -->
-    <div class="tw-modal-overlay" id="confirmSubuserModal" role="dialog" aria-modal="true" aria-labelledby="confirmSubuserTitle">
-        <div class="tw-modal">
-            <div class="tw-modal-header">
-                <h2 id="confirmSubuserTitle" style="display:flex;align-items:center;gap:var(--tw-space-2)">Confirm Action</h2>
-                <button class="tw-btn-close" onclick="closeConfirmModal()" aria-label="Close modal">
-                    <i class="bx bx-x" aria-hidden="true"></i>
-                </button>
-            </div>
-            <div class="tw-modal-body">
-                <p id="confirmSubuserMsg" style="font-size:var(--tw-text-base);color:var(--tw-text-secondary)"></p>
-            </div>
-            <div class="tw-modal-footer">
-                <div class="tw-modal-footer-actions">
-                    <button class="tw-btn tw-btn-outline" type="button" onclick="closeConfirmModal()">Cancel</button>
-                    <button class="tw-btn tw-btn-danger" type="button" id="confirmSubuserActionBtn" onclick="executeConfirmAction()">Confirm</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- END CONFIRM MODAL -->
-
-<!-- Django: {% endblock %} -->
-
-
-<!-- Django: {% block page_js %} -->
+{% block page_js %}
 <script>
-    /* Pending confirm action callback */
-    var _subuserConfirmCallback = null;
-
     /* ============================================================
-     * ADD SUB-USER MODAL
+     * USER TABLE SEARCH
      * ============================================================ */
-    var addSubuserModal = document.getElementById('addSubuserModal');
-    var addSubuserBtn   = document.getElementById('addSubuserBtn');
+    var userSearchInput = document.getElementById('userSearchInput');
+    var usersTable      = document.getElementById('usersTable');
 
-    addSubuserBtn.addEventListener('click', function () {
-        addSubuserModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    });
-
-    document.getElementById('addSubuserModalClose').addEventListener('click', closeAddSubuserModal);
-
-    addSubuserModal.addEventListener('click', function (e) {
-        if (e.target === addSubuserModal) closeAddSubuserModal();
-    });
-
-    function closeAddSubuserModal() {
-        addSubuserModal.classList.remove('active');
-        document.body.style.overflow = '';
-        document.getElementById('addSubuserForm').reset();
-        clearSubuserError(document.getElementById('newSubuserName'), document.getElementById('newSubuserNameError'));
-        clearSubuserError(document.getElementById('newSubuserEmail'), document.getElementById('newSubuserEmailError'));
-    }
-
-    /*
-     * submitAddSubuser()
-     * Django: POST to {% url 'admin_add_subuser' client.id %}
-     *   Creates CustomUser(role='subuser', client=client)
-     *   Returns JSON { success: true, user: {...} }
-     */
-    function submitAddSubuser() {
-        var nameEl  = document.getElementById('newSubuserName');
-        var emailEl = document.getElementById('newSubuserEmail');
-        var valid   = true;
-
-        clearSubuserError(nameEl,  document.getElementById('newSubuserNameError'));
-        clearSubuserError(emailEl, document.getElementById('newSubuserEmailError'));
-
-        if (!nameEl.value.trim()) {
-            showSubuserError(nameEl, document.getElementById('newSubuserNameError'), 'Full name is required.');
-            valid = false;
-        }
-        if (!emailEl.value.trim() || !emailEl.value.includes('@')) {
-            showSubuserError(emailEl, document.getElementById('newSubuserEmailError'), 'A valid email address is required.');
-            valid = false;
-        }
-        if (!valid) return;
-
-        var btn = document.getElementById('addSubuserSubmitBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Adding…';
-
-        console.log('[Manage Users] Add sub-user stub:', {
-            name:   nameEl.value.trim(),
-            email:  emailEl.value.trim(),
-            role:   document.getElementById('newSubuserRole').value,
-            invite: document.getElementById('sendSubuserInvite').checked
-        });
-
-        setTimeout(function () {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="bx bx-user-plus"></i> Add Sub-user';
-            closeAddSubuserModal();
-            showManageUsersToast('Sub-user added successfully.', 'success');
-        }, 800);
-    }
-
-
-    /* ============================================================
-     * EDIT SUB-USER MODAL
-     * ============================================================ */
-    function openEditModal(username, name, email, role) {
-        document.getElementById('editSubuserUsername').value = username;
-        document.getElementById('editSubuserName').value     = name;
-        document.getElementById('editSubuserEmail').value    = email;
-        var roleSel = document.getElementById('editSubuserRoleSelect');
-        for (var i = 0; i < roleSel.options.length; i++) {
-            if (roleSel.options[i].text.toLowerCase().replace(/\s+/g, '') === role.toLowerCase().replace(/\s+/g, '')) {
-                roleSel.selectedIndex = i;
-                break;
-            }
-        }
-        document.getElementById('editSubuserModal').classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeEditModal() {
-        document.getElementById('editSubuserModal').classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    /*
-     * submitEditSubuser()
-     * Django: POST to {% url 'admin_edit_subuser' user.id %}
-     */
-    function submitEditSubuser() {
-        var nameEl  = document.getElementById('editSubuserName');
-        var emailEl = document.getElementById('editSubuserEmail');
-        var valid   = true;
-
-        clearSubuserError(nameEl,  document.getElementById('editSubuserNameError'));
-        clearSubuserError(emailEl, document.getElementById('editSubuserEmailError'));
-
-        if (!nameEl.value.trim()) {
-            showSubuserError(nameEl, document.getElementById('editSubuserNameError'), 'Full name is required.');
-            valid = false;
-        }
-        if (!emailEl.value.trim() || !emailEl.value.includes('@')) {
-            showSubuserError(emailEl, document.getElementById('editSubuserEmailError'), 'A valid email address is required.');
-            valid = false;
-        }
-        if (!valid) return;
-
-        console.log('[Manage Users] Edit sub-user stub:', {
-            username: document.getElementById('editSubuserUsername').value,
-            name:     nameEl.value.trim(),
-            email:    emailEl.value.trim(),
-            role:     document.getElementById('editSubuserRoleSelect').value
-        });
-
-        closeEditModal();
-        showManageUsersToast('Sub-user details updated.', 'success');
-    }
-
-
-    /* ============================================================
-     * CONFIRM MODAL — Deactivate / Activate / Remove
-     * ============================================================ */
-    function openDeactivateConfirm(username, name, isActive) {
-        var action = isActive ? 'deactivate' : 'activate';
-        var msg    = isActive
-            ? 'Are you sure you want to <strong>deactivate ' + escapeHtml(name) + '</strong>? They will no longer be able to log in or submit tickets.'
-            : 'Are you sure you want to <strong>reactivate ' + escapeHtml(name) + '</strong>? They will regain full portal access.';
-        var btnLabel = isActive ? 'Deactivate' : 'Activate';
-
-        document.getElementById('confirmSubuserTitle').textContent  = isActive ? 'Deactivate Sub-user' : 'Activate Sub-user';
-        document.getElementById('confirmSubuserMsg').innerHTML       = msg;
-        document.getElementById('confirmSubuserActionBtn').textContent = btnLabel;
-        document.getElementById('confirmSubuserActionBtn').className = isActive
-            ? 'tw-btn tw-btn-danger'
-            : 'tw-btn tw-btn-primary';
-
-        _subuserConfirmCallback = function () {
-            /* Django: POST {% url 'admin_deactivate_subuser' user.id %} or activate */
-            console.log('[Manage Users] Toggle status stub:', { username: username, action: action });
-            closeConfirmModal();
-            showManageUsersToast('Sub-user ' + (isActive ? 'deactivated' : 'activated') + '.', 'success');
-        };
-
-        document.getElementById('confirmSubuserModal').classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function openRemoveConfirm(username, name) {
-        document.getElementById('confirmSubuserTitle').textContent  = 'Remove Sub-user';
-        document.getElementById('confirmSubuserMsg').innerHTML       = 'Are you sure you want to <strong>permanently remove ' + escapeHtml(name) + '</strong>? This cannot be undone.';
-        document.getElementById('confirmSubuserActionBtn').textContent = 'Remove';
-        document.getElementById('confirmSubuserActionBtn').className = 'tw-btn tw-btn-danger';
-
-        _subuserConfirmCallback = function () {
-            /* Django: DELETE {% url 'admin_remove_subuser' user.id %} */
-            console.log('[Manage Users] Remove sub-user stub:', { username: username });
-            var row = document.querySelector('tr[data-username="' + username + '"]');
-            if (row) row.remove();
-            closeConfirmModal();
-            showManageUsersToast('Sub-user removed.', 'success');
-        };
-
-        document.getElementById('confirmSubuserModal').classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeConfirmModal() {
-        document.getElementById('confirmSubuserModal').classList.remove('active');
-        document.body.style.overflow = '';
-        _subuserConfirmCallback = null;
-    }
-
-    function executeConfirmAction() {
-        if (typeof _subuserConfirmCallback === 'function') _subuserConfirmCallback();
-    }
-
-
-    /* ============================================================
-     * TABLE SEARCH
-     * ============================================================ */
-    var subuserSearchInput = document.getElementById('subuserSearchInput');
-
-    subuserSearchInput.addEventListener('input', function () {
+    userSearchInput.addEventListener('input', function () {
         var filter = this.value.trim().toLowerCase();
-        var rows   = document.querySelectorAll('#subuserTable tbody tr');
-        rows.forEach(function (row) {
-            row.classList.toggle('row-hidden', !row.textContent.toLowerCase().includes(filter));
+        usersTable.querySelectorAll('tbody tr').forEach(function (row) {
+            if (row.id === 'usersEmptyRow') return;
+            row.classList.toggle('row-hidden', filter.length > 0 && row.textContent.toLowerCase().indexOf(filter) === -1);
         });
     });
 
 
     /* ============================================================
-     * STATUS FILTER
+     * ADD USER MODAL
      * ============================================================ */
-    function filterSubusersByStatus(status, btn) {
-        document.querySelectorAll('[data-status-filter]').forEach(function (b) {
-            b.classList.remove('tw-btn-primary');
-            b.classList.add('tw-btn-outline');
-        });
-        btn.classList.remove('tw-btn-outline');
-        btn.classList.add('tw-btn-primary');
+    var addUserModal = document.getElementById('addUserModal');
+    var addUserBtn   = document.getElementById('addUserBtn');
 
-        document.querySelectorAll('#subuserTable tbody tr').forEach(function (row) {
-            row.classList.toggle('row-hidden', status !== 'all' && row.dataset.status !== status);
-        });
+    function openAddUserModal() {
+        addUserModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeAddUserModal() {
+        addUserModal.classList.remove('active');
+        document.body.style.overflow = '';
     }
 
-
-    /* ============================================================
-     * ESCAPE / KEYBOARD
-     * ============================================================ */
+    addUserBtn.addEventListener('click', openAddUserModal);
+    document.getElementById('addUserModalClose').addEventListener('click', closeAddUserModal);
+    addUserModal.addEventListener('click', function (e) {
+        if (e.target === addUserModal) closeAddUserModal();
+    });
     document.addEventListener('keydown', function (e) {
-        if (e.key !== 'Escape') return;
-        if (document.getElementById('addSubuserModal').classList.contains('active'))  closeAddSubuserModal();
-        if (document.getElementById('editSubuserModal').classList.contains('active')) closeEditModal();
-        if (document.getElementById('confirmSubuserModal').classList.contains('active')) closeConfirmModal();
+        if (e.key === 'Escape' && addUserModal.classList.contains('active')) closeAddUserModal();
     });
 
+    /* Re-open the modal automatically when the server returned validation errors. */
+    {% if open_user_modal %}openAddUserModal();{% endif %}
+
 
     /* ============================================================
-     * VALIDATION HELPERS
+     * ROLE TOGGLE
      * ============================================================ */
-    function showSubuserError(inputEl, errorEl, message) {
-        inputEl.classList.add('tw-input--error');
-        if (errorEl) { errorEl.textContent = message; errorEl.style.display = 'block'; }
-    }
-
-    function clearSubuserError(inputEl, errorEl) {
-        inputEl.classList.remove('tw-input--error');
-        if (errorEl) { errorEl.textContent = ''; errorEl.style.display = 'none'; }
-    }
-
-    function escapeHtml(str) {
-        return String(str)
-            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    function setUserRole(role, btn) {
+        document.getElementById('userRole').value = role;
+        document.querySelectorAll('#addUserModal .tw-toggle-btn').forEach(function (b) {
+            b.classList.remove('active');
+        });
+        btn.classList.add('active');
     }
 
 
     /* ============================================================
-     * TOAST
+     * MANAGE USERS TOAST
      * ============================================================ */
     function showManageUsersToast(message, type) {
         type = type || 'success';
         var iconMap = { success: 'bx-check-circle', error: 'bx-error-circle', info: 'bx-info-circle' };
         var toast = document.createElement('div');
         toast.className = 'tw-toast tw-toast--' + type;
-        toast.innerHTML = '<i class=\'bx ' + (iconMap[type] || 'bx-info-circle') + '\'></i><span>' + message + '</span>';
+        toast.innerHTML = '<i class="bx ' + (iconMap[type] || 'bx-info-circle') + '"></i><span></span>';
+        toast.querySelector('span').textContent = message;
         document.body.appendChild(toast);
         setTimeout(function () { toast.classList.add('show'); }, 10);
         setTimeout(function () {
@@ -663,4 +271,14 @@
         }, 3000);
     }
 </script>
-<!-- Django: {% endblock %} -->
+
+{% if messages %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        {% for message in messages %}
+        showManageUsersToast("{{ message|escapejs }}", "{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}info{% endif %}");
+        {% endfor %}
+    });
+</script>
+{% endif %}
+{% endblock %}

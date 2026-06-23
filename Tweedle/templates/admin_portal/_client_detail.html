@@ -1,0 +1,75 @@
+{% load static %}
+<div class="tw-modal-header tw-header-gradient">
+    <div>
+        <h2><i class="bx bx-buildings" aria-hidden="true"></i> {{ client.name }}</h2>
+    </div>
+    <button class="tw-btn-close" type="button" onclick="closeClientDetailModal()" aria-label="Close">
+        <i class="bx bx-x" aria-hidden="true"></i>
+    </button>
+</div>
+
+<div class="tw-modal-body">
+
+    <p class="tw-modal-section-label" style="font-size:var(--tw-text-sm);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--tw-text-secondary);margin:0 0 var(--tw-space-3)">Company Details</p>
+
+    <div class="client-detail-grid">
+        <div class="client-detail-item">
+            <span class="client-detail-label">Client Code</span>
+            <span class="client-detail-value">{{ client.code }}</span>
+        </div>
+        <div class="client-detail-item">
+            <span class="client-detail-label">Status</span>
+            <span class="client-detail-value"><span class="tw-status-badge tw-status-badge--{{ client.status }}">{{ client.get_status_display }}</span></span>
+        </div>
+        <div class="client-detail-item">
+            <span class="client-detail-label">Country</span>
+            <span class="client-detail-value">{{ client.country|default:"—" }}</span>
+        </div>
+        <div class="client-detail-item">
+            <span class="client-detail-label">Industry / Sector</span>
+            <span class="client-detail-value">{{ client.industry|default:"—" }}</span>
+        </div>
+        <div class="client-detail-item">
+            <span class="client-detail-label">Website</span>
+            <span class="client-detail-value">{% if client.website %}<a href="{{ client.website }}" target="_blank" rel="noopener">{{ client.website }}</a>{% else %}—{% endif %}</span>
+        </div>
+        <div class="client-detail-item">
+            <span class="client-detail-label">Client Since</span>
+            <span class="client-detail-value">{{ client.created_at|date:"d M Y" }}</span>
+        </div>
+    </div>
+
+    <p class="tw-modal-section-label" style="font-size:var(--tw-text-sm);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--tw-text-secondary);margin:var(--tw-space-5) 0 var(--tw-space-3)">Primary Contact</p>
+
+    <div class="client-detail-grid">
+        <div class="client-detail-item">
+            <span class="client-detail-label">Full Name</span>
+            <span class="client-detail-value">{{ client.contact_name|default:"—" }}</span>
+        </div>
+        <div class="client-detail-item">
+            <span class="client-detail-label">Job Title</span>
+            <span class="client-detail-value">{{ client.contact_job_title|default:"—" }}</span>
+        </div>
+        <div class="client-detail-item">
+            <span class="client-detail-label">Email</span>
+            <span class="client-detail-value">{% if client.contact_email %}<a href="mailto:{{ client.contact_email }}">{{ client.contact_email }}</a>{% else %}—{% endif %}</span>
+        </div>
+        <div class="client-detail-item">
+            <span class="client-detail-label">Phone</span>
+            <span class="client-detail-value">{{ client.contact_phone|default:"—" }}</span>
+        </div>
+    </div>
+
+    {% if client.notes %}
+    <p class="tw-modal-section-label" style="font-size:var(--tw-text-sm);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--tw-text-secondary);margin:var(--tw-space-5) 0 var(--tw-space-3)">Notes</p>
+    <p style="color:var(--tw-text-secondary);font-size:var(--tw-text-base);white-space:pre-wrap;margin:0">{{ client.notes }}</p>
+    {% endif %}
+
+</div>
+
+<div class="tw-modal-footer">
+    <div class="tw-modal-footer-actions">
+        <a href="{% url 'admin_client_users' client.code %}" class="tw-btn tw-btn-outline"><i class="bx bx-group" aria-hidden="true"></i> Manage Users</a>
+        <button type="button" class="tw-btn tw-btn-primary" onclick="closeClientDetailModal(); showSettings('{{ client.code }}')"><i class="bx bx-cog" aria-hidden="true"></i> Edit Client</button>
+    </div>
+</div>

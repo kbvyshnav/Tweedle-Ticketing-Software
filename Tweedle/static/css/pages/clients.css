@@ -166,6 +166,37 @@ body > main {
 }
 
 
+/* === VIEW DETAILS MODAL =====================================
+ * Read-only client info grid (label above value).
+ * ============================================================ */
+.client-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--tw-space-4);
+}
+
+.client-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.client-detail-label {
+    font-size: var(--tw-text-xs);
+    font-weight: var(--tw-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--tw-text-muted);
+}
+
+.client-detail-value {
+    font-size: var(--tw-text-base);
+    color: var(--tw-text-primary);
+    word-break: break-word;
+}
+
+
 /* === RESPONSIVE ============================================ */
 
 @media screen and (max-width: 1024px) {
