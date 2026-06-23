@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tweedle — Ticket Activity Report</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            color: #1a1a1a;
+            margin: 24px;
+            font-size: 12px;
+        }
+        h1 { font-size: 20px; margin: 0 0 4px; }
+        .meta { color: #555; font-size: 12px; margin: 0 0 12px; }
+        .summary {
+            border: 1px solid #ddd; border-left: 4px solid #3C91E6;
+            border-radius: 6px; padding: 8px 12px; margin-bottom: 16px;
+            font-size: 12px;
+        }
+        .summary strong { font-weight: 700; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td {
+            border: 1px solid #ddd; padding: 6px 8px; text-align: left;
+            vertical-align: top;
+        }
+        th { background: #f2f6fb; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
+        td.subject { max-width: 280px; }
+        .tat-met { color: #1a7f4b; font-weight: 600; }
+        .tat-missed { color: #c0392b; font-weight: 600; }
+        .muted { color: #888; }
+        .toolbar { margin-bottom: 16px; }
+        .toolbar button {
+            font: inherit; cursor: pointer; border: 1px solid #3C91E6;
+            background: #3C91E6; color: #fff; padding: 8px 14px; border-radius: 6px;
+        }
+        .toolbar button.secondary { background: #fff; color: #3C91E6; }
+        .empty { padding: 24px; text-align: center; color: #888; }
+
+        @page { margin: 1.2cm; }
+        @media print {
+            body { margin: 0; }
+            .no-print { display: none !important; }
+            th { background: #f2f6fb !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body onload="window.print()">
+
+    <div class="toolbar no-print">
+        <button type="button" onclick="window.print()">Print / Save as PDF</button>
+        <button type="button" class="secondary" onclick="window.close()">Close</button>
+    </div>
+
+    <h1>Ticket Activity Report</h1>
+    <p class="meta">Generated {{ generated_at|date:"d M Y, g:i A" }} · {{ total }} ticket{{ total|pluralize }}</p>
+
+    <div class="summary">
+        Total Tickets: <strong>{{ total }}</strong> &nbsp;|&nbsp;
+        TAT Met: <strong>{{ tat_met }}</strong> &nbsp;|&nbsp;
+        TAT Missed: <strong>{{ tat_missed }}</strong> &nbsp;|&nbsp;
+        Pending: <strong>{{ pending }}</strong>
+    </div>
+
+    {% if rows %}
+    <table>
+        <thead>
+            <tr>
+                <th>Ticket ID</th>
+                <th>Client</th>
+                <th>Subject</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Issue Date</th>
+                <th>Assigned Date</th>
+                <th>Developer</th>
+                <th>Resolved Date</th>
+                <th>TAT (Days)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td>{{ row.ticket.reference }}</td>
+                <td>{% if row.ticket.client %}{{ row.ticket.client.code }}{% else %}—{% endif %}</td>
+                <td class="subject">{{ row.ticket.subject }}</td>
+                <td>{{ row.ticket.get_priority_display }}</td>
+                <td>{{ row.ticket.get_status_display }}</td>
+                <td>{{ row.ticket.created_at|date:"d M Y" }}</td>
+                <td>{% if row.ticket.accepted_at %}{{ row.ticket.accepted_at|date:"d M Y" }}{% else %}—{% endif %}</td>
+                <td>{% if row.ticket.assigned_developer %}{{ row.ticket.assigned_developer.get_full_name|default:row.ticket.assigned_developer.username }}{% else %}—{% endif %}</td>
+                <td>{% if row.resolved_at %}{{ row.resolved_at|date:"d M Y" }}{% else %}—{% endif %}</td>
+                <td>{% if row.tat %}<span class="tat-{{ row.tat.css }}">{{ row.tat.days }} / {{ row.tat.target }}</span>{% else %}<span class="muted">Pending</span>{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty">No tickets match the selected filters.</div>
+    {% endif %}
+
+</body>
+</html>

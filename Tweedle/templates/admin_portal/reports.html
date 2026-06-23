@@ -156,52 +156,23 @@
     <!-- END REPORT TABLE CARD -->
 
 
-    <!-- === REPORT EXPORT MODAL ============================== -->
-    <div class="tw-modal-overlay" id="reportDetailModal" role="dialog" aria-modal="true" aria-labelledby="reportModalTitle">
-        <div class="tw-modal tw-modal--sm">
-            <div class="tw-modal-header tw-header-gradient">
-                <div><h2 id="reportModalTitle">Export</h2></div>
-                <button class="tw-btn-close" onclick="closeReportModal()" aria-label="Close">
-                    <i class="bx bx-x" aria-hidden="true"></i>
-                </button>
-            </div>
-            <div class="tw-modal-body report-modal-body">
-                <p class="report-modal-message" id="reportModalMessage"></p>
-                <button class="tw-btn tw-btn-primary" onclick="closeReportModal()">OK</button>
-            </div>
-        </div>
-    </div>
-    <!-- END EXPORT MODAL -->
-
 {% endblock %}
 
 
 {% block page_js %}
 <script>
-    /* Export is not wired yet (needs a PDF/Excel generator — deferred). */
-    function showModal(message, title) {
-        document.getElementById('reportModalTitle').textContent = title;
-        document.getElementById('reportModalMessage').textContent = message;
-        document.getElementById('reportDetailModal').classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-    function closeReportModal() {
-        document.getElementById('reportDetailModal').classList.remove('active');
-        document.body.style.overflow = '';
-    }
-    document.getElementById('reportDetailModal').addEventListener('click', function (e) {
-        if (e.target === this) closeReportModal();
-    });
-    document.addEventListener('keydown', function (e) {
-        var modal = document.getElementById('reportDetailModal');
-        if (e.key === 'Escape' && modal.classList.contains('active')) closeReportModal();
-    });
-
+    /* Export the report honouring the current filters: append export=<format>
+       to the live querystring. CSV downloads in place; PDF opens a
+       print-optimised page in a new tab (browser → Save as PDF). */
     function downloadReport(format) {
-        showModal(
-            'PDF and Excel export is coming in a future update. The filtered report above reflects live data.',
-            'Export Not Yet Available'
-        );
+        var params = new URLSearchParams(window.location.search);
+        params.set('export', format);
+        var url = window.location.pathname + '?' + params.toString();
+        if (format === 'pdf') {
+            window.open(url, '_blank');
+        } else {
+            window.location.href = url;
+        }
     }
 </script>
 {% endblock %}

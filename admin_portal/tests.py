@@ -1756,3 +1756,72 @@ class AdminSearchTests(TestCase):
         resp = self.client.get(self.url, {"q": "broken"})
         self.assertEqual(resp.context["results"][0]["tab"], "inbox")
         self.assertContains(resp, "open=" + self.ticket.reference)
+
+
+class AdminReportExportTests(TestCase):
+    def setUp(self):
+        self.url = reverse("admin_reports")
+        self.admin = User.objects.create_user(
+            "admin_rx", email="admin_rx@tweedle.local", password="pw", role="admin"
+        )
+        self.dev = User.objects.create_user(
+            "dev_rx", email="dev_rx@tweedle.local", password="pw", role="developer"
+        )
+        self.client_org = Client.objects.create(name="Initech", code="INIT")
+        self.requester = User.objects.create_user(
+            "init_user", email="user@initech.test", password="pw",
+            role="client", client=self.client_org,
+        )
+        self.ticket = Ticket.objects.create(
+            subject="Dashboard crash", description="it crashes", category="bug",
+            priority="high", requester=self.requester, client=self.client_org, status=S.NEW,
+        )
+        # A subject crafted to trigger spreadsheet formula injection.
+        self.evil = Ticket.objects.create(
+            subject="=HYPERLINK(1)", description="x", category="bug",
+            priority="low", requester=self.requester, client=self.client_org, status=S.NEW,
+        )
+        self.client.force_login(self.admin)
+
+    def test_csv_export_downloads(self):
+        resp = self.client.get(self.url, {"export": "csv"})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp["Content-Type"], "text/csv")
+        self.assertIn("attachment", resp["Content-Disposition"])
+        self.assertIn(".csv", resp["Content-Disposition"])
+        body = resp.content.decode()
+        self.assertIn("Ticket ID", body)            # header row
+        self.assertIn(self.ticket.reference, body)  # a data row
+
+    def test_excel_alias_is_csv(self):
+        resp = self.client.get(self.url, {"export": "excel"})
+        self.assertEqual(resp["Content-Type"], "text/csv")
+
+    def test_csv_formula_injection_neutralised(self):
+        body = self.client.get(self.url, {"export": "csv"}).content.decode()
+        # The dangerous subject must be quote-prefixed, not left as a live formula.
+        self.assertIn("'=HYPERLINK(1)", body)
+        self.assertNotIn(",=HYPERLINK(1)", body)
+
+    def test_csv_respects_filters(self):
+        # Filter to CLOSED only — neither seeded ticket is closed, so no data rows.
+        resp = self.client.get(self.url, {"export": "csv", "status": S.CLOSED})
+        body = resp.content.decode()
+        self.assertIn("Ticket ID", body)
+        self.assertNotIn(self.ticket.reference, body)
+
+    def test_pdf_export_renders_print_page(self):
+        resp = self.client.get(self.url, {"export": "pdf"})
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, "admin_portal/report_print.html")
+        self.assertContains(resp, self.ticket.reference)
+        self.assertContains(resp, "window.print()")
+
+    def test_export_non_admin_forbidden(self):
+        self.client.force_login(self.dev)
+        self.assertEqual(self.client.get(self.url, {"export": "csv"}).status_code, 403)
+
+    def test_plain_report_still_renders(self):
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, "admin_portal/reports.html")

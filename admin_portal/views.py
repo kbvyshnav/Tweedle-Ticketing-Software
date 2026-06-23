@@ -1,6 +1,9 @@
+import csv
+
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.db.models import Count, OuterRef, Q, Subquery
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -301,9 +304,12 @@ STATUS_TAG_CSS = {
 }
 
 
-@role_required("admin")
-def admin_reports(request):
-    """Ticket activity report: GET-filterable list + TAT/throughput summary."""
+def _build_report(request):
+    """Filter tickets by the GET params and compute rows + TAT/throughput.
+
+    Shared by the HTML report page and the CSV/PDF exports, so a download always
+    matches exactly what the current filters show on screen.
+    """
     # Resolution timestamp = the first event that moved the ticket to
     # resolved/closed (turnaround end). Falls back to closed_at for any legacy
     # ticket closed before the event trail existed.
@@ -347,7 +353,10 @@ def admin_reports(request):
             met = days <= target
             tat_met += 1 if met else 0
             tat_missed += 0 if met else 1
-            tat = {"text": f"{days} / {target}", "css": "met" if met else "missed"}
+            tat = {
+                "text": f"{days} / {target}", "css": "met" if met else "missed",
+                "days": days, "target": target, "met": met,
+            }
         else:
             pending += 1
             tat = None
@@ -358,22 +367,98 @@ def admin_reports(request):
             "status_css": STATUS_TAG_CSS.get(t.status, "tw-status-closed"),
         })
 
-    ctx = {
-        "active_nav": "reports",
+    return {
         "rows": rows,
         "total": len(rows),
         "tat_met": tat_met,
         "tat_missed": tat_missed,
         "pending": pending,
-        "developers": User.objects.filter(role="developer").order_by("username"),
-        "clients": Client.objects.order_by("name"),
-        "status_choices": Ticket.Status.choices,
         "filters": {
             "from": f_from, "to": f_to, "status": f_status,
             "developer": f_dev, "client": f_client,
         },
     }
+
+
+@role_required("admin")
+def admin_reports(request):
+    """Ticket activity report: GET-filterable list + TAT/throughput summary.
+
+    `?export=csv` streams the filtered rows as a spreadsheet (opens in Excel);
+    `?export=pdf` opens a print-optimised page (browser → Save as PDF). Both
+    honour the current filters.
+    """
+    export = request.GET.get("export")
+    if export in ("csv", "excel"):
+        return _export_report_csv(request)
+    if export == "pdf":
+        return _export_report_pdf(request)
+
+    report = _build_report(request)
+    ctx = {
+        "active_nav": "reports",
+        **report,
+        "developers": User.objects.filter(role="developer").order_by("username"),
+        "clients": Client.objects.order_by("name"),
+        "status_choices": Ticket.Status.choices,
+    }
     return render(request, "admin_portal/reports.html", ctx)
+
+
+def _csv_safe(value):
+    """Neutralise spreadsheet formula injection in free-text cells.
+
+    A subject like ``=cmd|...`` would otherwise be run as a formula when the CSV
+    is opened in Excel; prefixing a quote forces it to be read as plain text.
+    """
+    text = "" if value is None else str(value)
+    if text[:1] in ("=", "+", "-", "@"):
+        return "'" + text
+    return text
+
+
+def _export_report_csv(request):
+    """The filtered report as a CSV download (opens directly in Excel)."""
+    report = _build_report(request)
+    response = HttpResponse(content_type="text/csv")
+    stamp = timezone.now().strftime("%Y%m%d")
+    response["Content-Disposition"] = f'attachment; filename="tweedle-report-{stamp}.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow([
+        "Ticket ID", "Client", "Subject", "Priority", "Status",
+        "Issue Date", "Assigned Date", "Developer", "Resolved Date",
+        "TAT (days)", "TAT Target (days)", "TAT Met",
+    ])
+    for r in report["rows"]:
+        t = r["ticket"]
+        tat = r["tat"]
+        dev = t.assigned_developer
+        writer.writerow([
+            t.reference,
+            t.client.code if t.client else "",
+            _csv_safe(t.subject),
+            t.get_priority_display(),
+            t.get_status_display(),
+            t.created_at.strftime("%Y-%m-%d") if t.created_at else "",
+            t.accepted_at.strftime("%Y-%m-%d") if t.accepted_at else "",
+            _csv_safe((dev.get_full_name() or dev.username)) if dev else "",
+            r["resolved_at"].strftime("%Y-%m-%d") if r["resolved_at"] else "",
+            tat["days"] if tat else "",
+            tat["target"] if tat else "",
+            ("Yes" if tat["met"] else "No") if tat else "Pending",
+        ])
+    return response
+
+
+def _export_report_pdf(request):
+    """A print-optimised report page; the browser's print dialog saves it as PDF."""
+    report = _build_report(request)
+    return render(
+        request,
+        "admin_portal/report_print.html",
+        {**report, "generated_at": timezone.now()},
+    )
 
 
 # ── Settings ─────────────────────────────────────────────────────────────────
