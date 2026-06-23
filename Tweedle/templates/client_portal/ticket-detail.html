@@ -73,15 +73,13 @@
                         Your ticket has been received and is currently being reviewed by our support team.
                         We'll assign it to the right developer shortly. No action is required from you at this time.
                     </p>
-                    <form method="post" action="{% url 'client_ticket_transition' ticket.pk %}" style="margin-top:12px">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="cancel">
-                        <button type="submit" class="tw-btn tw-btn-outline tw-btn--sm"
-                                onclick="return confirm('Cancel this ticket?')">
+                    <div style="margin-top:12px">
+                        <button type="button" class="tw-btn tw-btn-outline tw-btn--sm"
+                                onclick="openCancelConfirm()">
                             <i class="bx bx-x" aria-hidden="true"></i>
                             Cancel Ticket
                         </button>
-                    </form>
+                    </div>
                 </div>
             </div>
             {% endif %}
@@ -477,6 +475,33 @@
     <!-- END 2-COLUMN LAYOUT -->
 
 
+    {% if ticket.status == 'new' %}
+    <!-- CANCEL CONFIRM OVERLAY -->
+    <div class="tw-client-confirm-overlay" id="cancelConfirmOverlay"
+         role="dialog" aria-modal="true" aria-labelledby="cancelConfirmTitle">
+        <div class="tw-client-confirm-box">
+            <div class="tw-client-confirm-icon tw-client-confirm-icon--danger" aria-hidden="true">
+                <i class="bx bx-x-circle"></i>
+            </div>
+            <div class="tw-client-confirm-title" id="cancelConfirmTitle">Cancel this ticket?</div>
+            <div class="tw-client-confirm-message">
+                This will withdraw your ticket and stop any further work. This action
+                cannot be undone.
+            </div>
+            <div class="tw-client-confirm-buttons">
+                <button type="button" class="tw-btn tw-btn-outline" onclick="closeCancelConfirm()">Keep Ticket</button>
+                <form method="post" action="{% url 'client_ticket_transition' ticket.pk %}" style="display:inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="cancel">
+                    <button type="submit" class="tw-btn tw-btn-danger">
+                        <i class="bx bx-x" aria-hidden="true"></i> Yes, Cancel
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     {% if ticket.status == 'uat' %}
     <!-- UAT APPROVE CONFIRM OVERLAY -->
     <div class="tw-client-confirm-overlay" id="approveConfirmOverlay"
@@ -520,6 +545,18 @@ function focusChatInput() {
     input.scrollIntoView({ behavior: 'smooth', block: 'center' });
     input.focus();
 }
+
+{% if ticket.status == 'new' %}
+function openCancelConfirm() {
+    var overlay = document.getElementById('cancelConfirmOverlay');
+    if (overlay) overlay.classList.add('active');
+}
+
+function closeCancelConfirm() {
+    var overlay = document.getElementById('cancelConfirmOverlay');
+    if (overlay) overlay.classList.remove('active');
+}
+{% endif %}
 
 {% if ticket.status == 'uat' %}
 function openApproveConfirm() {

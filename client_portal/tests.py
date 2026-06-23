@@ -58,6 +58,16 @@ class ClientPortalTests(TestCase):
         self.assertIn(own.pk, ids)
         self.assertNotIn(other.pk, ids)
 
+    def test_cancel_uses_confirm_overlay_not_native_confirm(self):
+        # Confirm-UX standardization: the new-ticket Cancel routes through the
+        # styled overlay, not the browser-native confirm().
+        t = self._make_ticket(S.NEW)
+        resp = self.client.get(reverse("client_ticket_detail", args=[t.pk]))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "cancelConfirmOverlay")
+        self.assertContains(resp, "openCancelConfirm(")
+        self.assertNotContains(resp, "confirm('Cancel this ticket?')")
+
     # ── Detail ───────────────────────────────────────────────────────────────
 
     def test_detail_404_for_other_org_ticket(self):

@@ -11,9 +11,7 @@
             {{ ev.created_at|tw_datetime }} · {{ ev.actor.username|default:"system" }}
         </div>
         <div class="tw-tl-panel-meta">
-            {{ ev.from_status }}{% if ev.from_sub_status %}/{{ ev.from_sub_status }}{% endif %}
-            &rarr;
-            {{ ev.to_status }}{% if ev.to_sub_status %}/{{ ev.to_sub_status }}{% endif %}
+            {% if ev.from_status %}{{ ev.from_status|status_label }}{% if ev.from_sub_status %} / {{ ev.from_sub_status|sub_status_label }}{% endif %} &rarr; {% endif %}{{ ev.to_status|status_label }}{% if ev.to_sub_status %} / {{ ev.to_sub_status|sub_status_label }}{% endif %}
         </div>
         {% if ev.note %}<div class="tw-tl-panel-meta">{{ ev.note }}</div>{% endif %}
     </div>

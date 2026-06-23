@@ -471,6 +471,17 @@ class AdminTicketDrawerTests(TestCase):
         self.assertContains(resp, "assign")          # the event action
         self.assertContains(resp, self.admin.username)
 
+    def test_timeline_meta_uses_friendly_status_labels(self):
+        # S9: the from→to meta line must show friendly labels, not raw codes.
+        t = self._make()
+        transition(t, "assign", self.admin, developer=self.developer)
+        resp = self.client.get(reverse("admin_ticket_timeline", args=[t.pk]))
+        # assign: new → in_progress / development
+        self.assertContains(resp, "In Progress")
+        self.assertContains(resp, "Development")
+        # the raw code must not appear in the from→to meta line
+        self.assertNotContains(resp, "in_progress / development")
+
     def test_chat_drawer_renders_real_messages_readonly(self):
         t = self._make()
         TicketMessage.objects.create(ticket=t, author=self.requester, body="Any update?")

@@ -17,6 +17,7 @@ from django.template.defaultfilters import date as _date
 from django.utils.html import format_html
 
 from tickets.labels import resolve_ticket_label
+from tickets.models import Ticket
 from tickets.templatetags.shared_ticket_extras import (
     event_dot_cls as _event_dot_cls,
     event_icon as _event_icon,
@@ -30,6 +31,27 @@ register = template.Library()
 register.filter("event_label", _event_label)
 register.filter("event_dot_cls", _event_dot_cls)
 register.filter("event_icon", _event_icon)
+
+# Raw status/sub_status code → human label, for the timeline from→to meta line
+# (ADMIN_FE_REVIEW S9: stop printing raw `new` / `in_progress/development` codes).
+_STATUS_LABELS = dict(Ticket.Status.choices)
+_SUB_STATUS_LABELS = dict(Ticket.SubStatus.choices)
+
+
+@register.filter
+def status_label(value):
+    """'in_progress' → 'In Progress'. Empty/unknown values pass through cleanly."""
+    if not value:
+        return ""
+    return _STATUS_LABELS.get(value, value.replace("_", " ").title())
+
+
+@register.filter
+def sub_status_label(value):
+    """'ready_for_uat' → 'Ready for UAT'. Empty/unknown values pass through cleanly."""
+    if not value:
+        return ""
+    return _SUB_STATUS_LABELS.get(value, value.replace("_", " ").title())
 
 # The ONE date/time format for ticket timestamps everywhere (Issue 3 / S5):
 # "20 Jun 2026, 2:00 PM". Delegates to Django's built-in date filter so timezone

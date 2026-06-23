@@ -87,7 +87,7 @@ so users instantly recognise their workspace.
 - PostgreSQL — primary database (SQLite fallback for local dev)
 - django-allauth — authentication (signup closed; admin-provisioned)
 - Guarded transition engine — every ticket state change flows through one audited `transition()` service
-- All five portals wired end-to-end; admin ticket lifecycle complete; per-ticket chat posting in every portal (302 tests green)
+- All five portals wired end-to-end; admin ticket lifecycle complete; per-ticket chat posting in every portal (305 tests green)
 - Django REST Framework — not built (deferred; server-rendered form-POST is the target)
 - django-otp — two-factor authentication (Phase 3b — deferred)
 
