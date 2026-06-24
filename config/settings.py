@@ -174,7 +174,23 @@ ACCOUNT_ADAPTER = 'core.adapters.NoSignupAccountAdapter'
 # Let the login page's "Keep me signed in" checkbox control session length.
 ACCOUNT_SESSION_REMEMBER = None
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Email: real SMTP when DJANGO_EMAIL_HOST is set, otherwise the console backend
+# (prints emails to the terminal) so local dev needs no mail server. In-app
+# notifications also trigger emails via notifications/signals.py.
+if os.getenv('DJANGO_EMAIL_HOST'):
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.getenv('DJANGO_EMAIL_HOST')
+    EMAIL_PORT = int(os.getenv('DJANGO_EMAIL_PORT', '587'))
+    EMAIL_HOST_USER = os.getenv('DJANGO_EMAIL_HOST_USER', '')
+    EMAIL_HOST_PASSWORD = os.getenv('DJANGO_EMAIL_HOST_PASSWORD', '')
+    EMAIL_USE_TLS = _env_bool('DJANGO_EMAIL_USE_TLS', True)
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+DEFAULT_FROM_EMAIL = os.getenv('DJANGO_DEFAULT_FROM_EMAIL', 'Tweedle <no-reply@tweedle.local>')
+
+# Absolute base URL used to build links in outgoing emails (no trailing slash).
+BASE_URL = os.getenv('DJANGO_BASE_URL', '').rstrip('/')
 
 LOGIN_URL = 'account_login'
 LOGIN_REDIRECT_URL = 'post_login_redirect'

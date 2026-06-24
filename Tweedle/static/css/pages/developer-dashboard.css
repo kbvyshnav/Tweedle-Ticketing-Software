@@ -147,6 +147,20 @@
     animation: dev-pulse-border 2s ease-in-out infinite;
 }
 
+/* Inline "Overdue" pill on a table row whose resolution SLA has been breached. */
+.dev-overdue-pill {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 7px;
+    border-radius: 10px;
+    font-size: var(--tw-text-xs);
+    font-weight: 600;
+    line-height: 1.5;
+    background: var(--tw-priority-high-bg);
+    color: var(--tw-priority-high-text);
+    vertical-align: middle;
+}
+
 /* Card 3 — Resolved This Month (green) */
 .dev-stat-card--resolved-month {
     border-left-color: var(--tw-status-closed-text);

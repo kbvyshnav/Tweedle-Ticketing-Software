@@ -91,6 +91,13 @@ class Ticket(models.Model):
         related_name="accepted_tickets",
     )
     closed_at = models.DateTimeField(null=True, blank=True)
+
+    # Resolution-time SLA (see tickets/sla.py). `sla_due_at` is the deadline,
+    # pushed forward by any time the clock spends paused (awaiting_client/uat);
+    # `sla_paused_at` records when the current pause began (null when running).
+    sla_due_at = models.DateTimeField(null=True, blank=True)
+    sla_paused_at = models.DateTimeField(null=True, blank=True)
+
     linked_from = models.ForeignKey(
         "self",
         null=True,
@@ -119,9 +126,21 @@ class Ticket(models.Model):
         return f"{self.reference or '(unsaved)'} — {self.subject}"
 
     def save(self, *args, **kwargs):
+        is_new = self._state.adding
         if not self.reference:
             self.reference = self._generate_reference()
+        if is_new and self.sla_due_at is None:
+            # Start the resolution SLA clock at creation; pauses/resets are
+            # applied later by the transition() engine (see tickets/sla.py).
+            from . import sla
+            self.sla_due_at = timezone.now() + sla.target_delta(self.priority)
         super().save(*args, **kwargs)
+
+    @property
+    def is_overdue(self):
+        """Resolution SLA breached and the clock is still running (tickets/sla.py)."""
+        from . import sla
+        return sla.is_overdue(self)
 
     def _generate_reference(self):
         """Build <CLIENT_CODE><YY><MM><NNNN>, sequence per client per month.

@@ -32,7 +32,10 @@ class DeveloperDashboardView(RoleRequiredMixin, TemplateView):
         ).count()
         ctx["forwarded_count"] = qs.filter(status=S.AWAITING_CLIENT).count()
         ctx["uat_count"] = qs.filter(status=S.UAT).count()
-        ctx["overdue_count"] = 0
+        # Overdue is a pause-aware Python property (tickets/sla.py), not a DB
+        # field — evaluate the already-loaded queryset once. The same property
+        # backs each row's data-overdue flag in the template.
+        ctx["overdue_count"] = sum(1 for t in qs if t.is_overdue)
         ctx["resolved_closed_count"] = qs.filter(
             status__in=[S.RESOLVED, S.CLOSED]
         ).count()

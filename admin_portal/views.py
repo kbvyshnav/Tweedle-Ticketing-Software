@@ -13,6 +13,7 @@ from accounts.models import Client
 from core.auth import RoleRequiredMixin, role_required
 from tickets.chat import ChatError, post_info_request, post_ticket_message
 from tickets.models import Ticket, TicketEvent
+from tickets.sla import RESOLUTION_TARGET_DAYS
 
 from .forms import (
     BrandingSettingsForm,
@@ -287,9 +288,10 @@ def admin_toggle_team_member(request, pk):
 
 # ── Reports ──────────────────────────────────────────────────────────────────
 
-# Turnaround targets (days) by priority. No SLA model exists yet (P3), so this
-# is a documented reporting convention used to flag a ticket's TAT met/missed.
-TAT_TARGET_DAYS = {"high": 3, "medium": 5, "low": 7}
+# Turnaround targets (days) by priority — the single source of truth lives in
+# tickets/sla.py (also drives the live overdue clock), so Reports and the SLA
+# engine never drift. Used here to flag a ticket's TAT met/missed.
+TAT_TARGET_DAYS = RESOLUTION_TARGET_DAYS
 
 # Ticket status -> the compact report status-tag colour class.
 STATUS_TAG_CSS = {

@@ -1114,6 +1114,9 @@ class AdminNotificationBellTests(TestCase):
             client=self.org,
             status=S.NEW,
         )
+        # Creating a NEW ticket now notifies admins (the new_ticket signal); these
+        # tests assert on a controlled set they build via _notif, so start clean.
+        Notification.objects.all().delete()
 
     def _notif(self, recipient, message, is_read=False):
         return Notification.objects.create(

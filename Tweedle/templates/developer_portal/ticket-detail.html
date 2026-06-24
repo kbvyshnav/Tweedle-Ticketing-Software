@@ -55,6 +55,15 @@
                 <span class="dev-ticket-header-date-label">Issue Date</span>
                 <span class="dev-ticket-header-date-val">{{ ticket.created_at|tw_datetime }}</span>
             </div>
+            {% if ticket.sla_due_at %}
+            <div class="dev-ticket-header-date-item">
+                <span class="dev-ticket-header-date-label">Resolution Due</span>
+                <span class="dev-ticket-header-date-val">
+                    {{ ticket.sla_due_at|tw_datetime }}
+                    {% if ticket.is_overdue %}<span class="dev-overdue-pill" title="Past its resolution due date">Overdue</span>{% endif %}
+                </span>
+            </div>
+            {% endif %}
         </div>
     </div>
 

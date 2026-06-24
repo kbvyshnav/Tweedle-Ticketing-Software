@@ -181,7 +181,7 @@
                 <tr data-status="{{ ticket.status }}"
                     data-sub-status="{% if ticket.status == 'in_progress' %}{{ ticket.sub_status }}{% elif ticket.status == 'awaiting_client' %}awaiting_client{% else %}{{ ticket.status }}{% endif %}"
                     data-priority="{{ ticket.priority }}"
-                    data-overdue="false"
+                    data-overdue="{{ ticket.is_overdue|yesno:'true,false' }}"
                     data-id="{{ ticket.reference|lower }}"
                     data-subject="{{ ticket.subject|lower }}"
                     data-issue-date="{{ ticket.created_at|date:'Y-m-d' }}"
@@ -201,7 +201,10 @@
                         <div title="{{ ticket.subject }}">{{ ticket.subject }}</div>
                     </td>
                     <td>{{ ticket.client.code|default:"—" }}</td>
-                    <td>{{ ticket.created_at|tw_datetime }}</td>
+                    <td>
+                        {{ ticket.created_at|tw_datetime }}
+                        {% if ticket.is_overdue %}<span class="dev-overdue-pill" title="Past its resolution due date">Overdue</span>{% endif %}
+                    </td>
                     <td>
                         <span class="tw-priority-badge tw-priority-badge--{{ ticket.priority }}">
                             {{ ticket.get_priority_display }}

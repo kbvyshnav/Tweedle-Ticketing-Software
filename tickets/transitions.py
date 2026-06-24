@@ -19,6 +19,7 @@ from django.utils import timezone
 
 from notifications.models import Notification
 
+from . import sla
 from .models import Ticket, TicketEvent
 
 User = get_user_model()
@@ -519,6 +520,8 @@ def transition(ticket, action, actor, **data):
         # CheckConstraint never sees an inconsistent intermediate row.
         ticket.status = new_status
         ticket.sub_status = new_sub
+        # Pause/resume/reset the resolution SLA clock for this status change.
+        sla.apply_clock(ticket, from_status, new_status)
         if rule.effects:
             rule.effects(ticket, actor, data, from_status, from_sub)
         ticket.save()
