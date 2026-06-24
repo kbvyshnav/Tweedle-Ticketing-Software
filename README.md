@@ -82,14 +82,18 @@ so users instantly recognise their workspace.
 - Boxicons — icon library
 - Google Fonts — Poppins (primary) + Lato (secondary)
 
-### Backend (Built — through Phase 4.18)
+### Backend (Built — through Phase 4.26)
 - Python Django 5.2 LTS — web framework (server-rendered; DRF not used)
 - PostgreSQL — primary database (SQLite fallback for local dev)
 - django-allauth — authentication (signup closed; admin-provisioned)
 - Guarded transition engine — every ticket state change flows through one audited `transition()` service
-- All five portals wired end-to-end; admin ticket lifecycle complete; per-ticket chat posting + in-app notification feed (bells, mark-as-read, feed page) in every portal (318 tests green)
+- All five portals wired end-to-end; admin ticket lifecycle complete; per-ticket chat + in-app notification feed (bells, mark-as-read, feed page) in every portal
+- All admin management pages live — Clients (+ row actions, per-client Manage Users), Team, Reports (+ CSV/PDF export), Settings, and topbar global search
+- Shared profile + password-change page across all portals; ticket attachments (upload + download)
+- **400 tests green** (verified 2026-06-24)
 - Django REST Framework — not built (deferred; server-rendered form-POST is the target)
 - django-otp — two-factor authentication (Phase 3b — deferred)
+- Production hardening (env-driven `SECRET_KEY`/`DEBUG`/`ALLOWED_HOSTS`) — pending, only needed before deployment
 
 ---
 
