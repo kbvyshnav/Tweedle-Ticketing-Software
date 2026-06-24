@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,16 +24,39 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
 
 
+def _env_bool(name, default=False):
+    """Read a boolean from the environment (1/true/yes/on → True)."""
+    return os.getenv(name, str(default)).strip().lower() in ('1', 'true', 'yes', 'on')
+
+
+def _env_list(name):
+    """Read a comma-separated list from the environment (blank → [])."""
+    return [item.strip() for item in os.getenv(name, '').split(',') if item.strip()]
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-p-vf__8)9)f2=qph!8&xo4+-f&*1!m92%v0psqz&+#!ys59i+#'
+# SECRET_KEY: read from the environment in every real deployment. The
+# clearly-insecure fallback only keeps local dev running out of the box and must
+# never be used when DEBUG is off (see the production-hardening block below).
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY') or (
+    'django-insecure-p-vf__8)9)f2=qph!8&xo4+-f&*1!m92%v0psqz&+#!ys59i+#'
+)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG defaults to True for local dev convenience; set DJANGO_DEBUG=False in any
+# non-local environment.
+DEBUG = _env_bool('DJANGO_DEBUG', True)
 
-ALLOWED_HOSTS = []
+# Comma-separated hosts via DJANGO_ALLOWED_HOSTS. When DEBUG is on and none are
+# given, fall back to the usual loopback names so runserver works out of the box.
+ALLOWED_HOSTS = _env_list('DJANGO_ALLOWED_HOSTS')
+if DEBUG and not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
+
+# Origins trusted for CSRF (scheme required, e.g. https://tweedle.example.com).
+# Required once the app is served over HTTPS behind a domain.
+CSRF_TRUSTED_ORIGINS = _env_list('DJANGO_CSRF_TRUSTED_ORIGINS')
 
 
 # Application definition
@@ -192,6 +216,10 @@ STATIC_URL = 'static/'
 # Serve the existing static-frontend assets (css/images/js) during dev.
 STATICFILES_DIRS = [BASE_DIR / 'Tweedle' / 'static']
 
+# Destination for `python manage.py collectstatic` — the directory a production
+# web server / CDN (or WhiteNoise) serves from. Gitignored. Not used in DEBUG.
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 # Media files (user uploads — e.g. ticket attachments).
 # In production these must be served by the web server / object storage; the
 # DEBUG-only urlpattern in config/urls.py handles local dev. (See P0 deploy item.)
@@ -202,6 +230,37 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# ── Production security hardening ───────────────────────────────────────────
+# Only applied when DEBUG is off, so local HTTP development is unaffected. These
+# assume the app is served over HTTPS (directly or behind a TLS-terminating
+# reverse proxy / load balancer). See the deployment checklist:
+# https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+if not DEBUG:
+    # Refuse to boot with the throwaway dev secret in a real environment.
+    if SECRET_KEY.startswith('django-insecure-'):
+        raise ImproperlyConfigured(
+            'DJANGO_SECRET_KEY must be set (the insecure dev fallback cannot be '
+            'used when DEBUG is off).'
+        )
+
+    # Redirect HTTP → HTTPS and trust the proxy's X-Forwarded-Proto header so the
+    # redirect/secure-cookie logic works behind a TLS-terminating proxy.
+    SECURE_SSL_REDIRECT = _env_bool('DJANGO_SECURE_SSL_REDIRECT', True)
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+    # Only send session/CSRF cookies over HTTPS.
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+    # HTTP Strict Transport Security (default 1 year; override via env).
+    SECURE_HSTS_SECONDS = int(os.getenv('DJANGO_SECURE_HSTS_SECONDS', '31536000'))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+    # Misc hardening.
+    SECURE_CONTENT_TYPE_NOSNIFF = True
 
 
 # ── Tweedle domain constants ────────────────────────────────────────────────
