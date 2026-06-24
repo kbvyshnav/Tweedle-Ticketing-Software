@@ -92,6 +92,10 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # WhiteNoise serves collected static files in production. Must sit directly
+    # below SecurityMiddleware and above everything else. No-op in local dev
+    # (runserver still serves static itself).
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -216,9 +220,24 @@ STATIC_URL = 'static/'
 # Serve the existing static-frontend assets (css/images/js) during dev.
 STATICFILES_DIRS = [BASE_DIR / 'Tweedle' / 'static']
 
-# Destination for `python manage.py collectstatic` — the directory a production
-# web server / CDN (or WhiteNoise) serves from. Gitignored. Not used in DEBUG.
+# Destination for `python manage.py collectstatic` — the directory WhiteNoise
+# (or a web server / CDN) serves from. Gitignored. Not used in DEBUG.
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Static-files storage: WhiteNoise's compression backend gzips/brotlis the
+# collected assets at `collectstatic` time. We use the *non-manifest* variant
+# (no hashed filenames) so `{% static %}` resolves without a manifest — which
+# keeps the test suite green and collectstatic resilient to the legacy
+# frontend's asset references. Upgrade to CompressedManifestStaticFilesStorage
+# at deploy time (cache-busting hashes) once collectstatic runs clean.
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
+    },
+}
 
 # Media files (user uploads — e.g. ticket attachments).
 # In production these must be served by the web server / object storage; the

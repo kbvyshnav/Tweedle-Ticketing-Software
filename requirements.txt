@@ -14,3 +14,7 @@ python-dotenv>=1.0
 
 # Authentication (local username/email + password; social/MFA deferred).
 django-allauth>=65,<66
+
+# Serves static files in production (compressed) directly from Django, so no
+# separate web server / CDN is strictly required. Passive in local dev.
+whitenoise>=6.6,<7
