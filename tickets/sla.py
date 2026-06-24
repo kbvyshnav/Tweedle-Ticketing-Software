@@ -76,9 +76,11 @@ def apply_clock(ticket, from_status, to_status, *, now=None):
     if from_status in TERMINAL_STATUSES and to_status in RUNNING_STATUSES:
         ticket.sla_due_at = now + target_delta(ticket.priority)
         ticket.sla_paused_at = None
+        ticket.overdue_notified = False  # fresh deadline -> may warn again
     elif from_status in RUNNING_STATUSES and to_status in PAUSED_STATUSES:
         ticket.sla_paused_at = now
     elif from_status in PAUSED_STATUSES and to_status in RUNNING_STATUSES:
         if ticket.sla_paused_at:
             ticket.sla_due_at = (ticket.sla_due_at or now) + (now - ticket.sla_paused_at)
         ticket.sla_paused_at = None
+        ticket.overdue_notified = False  # deadline extended -> may warn again

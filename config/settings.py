@@ -302,3 +302,7 @@ if not DEBUG:
 # After this many days a closed ticket can no longer be reopened by the client
 # (admins may reopen anytime). See TARGET_TICKET_FLOW.md §4 (T11).
 REOPEN_WINDOW_DAYS = 14
+
+# A resolved ticket with no client action is auto-closed after this many days by
+# the `close_stale_resolved` management command (run on a schedule). TARGET §9.
+AUTO_CLOSE_DAYS = 7

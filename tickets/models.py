@@ -97,6 +97,9 @@ class Ticket(models.Model):
     # `sla_paused_at` records when the current pause began (null when running).
     sla_due_at = models.DateTimeField(null=True, blank=True)
     sla_paused_at = models.DateTimeField(null=True, blank=True)
+    # True once an overdue warning has been sent for the current deadline; reset
+    # whenever the clock is extended/reset so a re-breach warns again.
+    overdue_notified = models.BooleanField(default=False)
 
     linked_from = models.ForeignKey(
         "self",
