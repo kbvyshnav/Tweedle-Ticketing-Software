@@ -230,20 +230,21 @@ class SubuserPortalTests(TestCase):
         ticket.refresh_from_db()
         self.assertEqual(ticket.status, S.UAT)
 
-    def test_request_changes_non_requester_blocked_by_engine(self):
+    def test_request_changes_non_requester_blocked_at_view(self):
         """
         subuser2 is a same-org user who is NOT the requester.
-        The transition endpoint finds the ticket (org-level lookup),
-        but guard_request_changes / _require_requester_or_admin raises
-        TransitionNotAllowed before any status change occurs.
-        Non-empty feedback is supplied so required_fields validation passes first.
+        The transition endpoint is requester-scoped (matching the detail/message
+        views), so the ticket is not found for subuser2 -> 404, and no status
+        change occurs. (The engine's ownership guard remains a second line of
+        defence.)
         """
         ticket = self._make_ticket(S.UAT, requester=self.subuser)
         self.client.force_login(self.subuser2)
-        self.client.post(
+        resp = self.client.post(
             reverse("subuser:ticket_transition", args=[ticket.pk]),
             {"action": "request_changes", "feedback": "Still broken after the latest release."},
         )
+        self.assertEqual(resp.status_code, 404)
         ticket.refresh_from_db()
         self.assertEqual(ticket.status, S.UAT)
 

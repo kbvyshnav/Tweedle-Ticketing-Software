@@ -108,7 +108,11 @@ def subuser_ticket_detail(request, pk):
 @require_POST
 @role_required("subuser")
 def subuser_ticket_transition(request, pk):
-    ticket = get_object_or_404(Ticket, pk=pk, client=request.user.client)
+    # Scope to the sub-user's own tickets, matching the detail + message views
+    # (requester-scoped). The engine re-checks ownership regardless, but keeping
+    # the view-level scope consistent avoids a same-org non-requester reaching
+    # the engine at all.
+    ticket = get_object_or_404(Ticket, pk=pk, requester=request.user)
     action = request.POST.get("action", "")
 
     if action not in ALLOWED_ACTIONS:
