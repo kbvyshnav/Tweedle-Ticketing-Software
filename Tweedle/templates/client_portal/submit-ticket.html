@@ -53,9 +53,21 @@
         <span class="tw-tip-pill"><i class="bx bx-group" aria-hidden="true"></i>Name affected users</span>
     </div>
 
+    <!-- Related-ticket banner (follow-up after the reopen window) -->
+    {% if related_ticket %}
+    <div class="tw-status-banner tw-status-banner--closed" style="margin-bottom:16px">
+        <i class="bx bx-link" aria-hidden="true"></i>
+        <div class="tw-status-banner__text">
+            <span class="tw-status-banner__title">Related to {{ related_ticket.reference }}</span>
+            This will be submitted as a follow-up to “{{ related_ticket.subject }}”.
+        </div>
+    </div>
+    {% endif %}
+
     <!-- FORM -->
     <form method="post" action="{% url 'client_submit_ticket' %}" enctype="multipart/form-data">
     {% csrf_token %}
+    {% if related_ticket %}<input type="hidden" name="related" value="{{ related_ticket.pk }}">{% endif %}
 
     <div class="tw-submit-card">
 

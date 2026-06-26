@@ -54,7 +54,8 @@ class ClientDashboardView(RoleRequiredMixin, TemplateView):
 def client_ticket_detail(request, pk):
     ticket = get_object_or_404(
         Ticket.objects.select_related(
-            "requester", "client", "assigned_developer", "assigned_tester", "accepted_by"
+            "requester", "client", "assigned_developer", "assigned_tester",
+            "accepted_by", "linked_from",
         ),
         pk=pk,
         client=request.user.client,
@@ -95,10 +96,22 @@ def client_ticket_detail(request, pk):
     )
 
 
+def _related_ticket(request, raw):
+    """Resolve a `related` ticket id to one of the client's own tickets, or None.
+
+    Scoping to `client=request.user.client` means a tampered/foreign id simply
+    yields None (the new ticket is created unlinked) — no cross-org leak.
+    """
+    if not raw:
+        return None
+    return Ticket.objects.filter(pk=raw, client=request.user.client).first()
+
+
 @role_required("client")
 def client_submit_ticket(request):
     if request.method == "POST":
         form = TicketSubmitForm(request.POST, request.FILES)
+        related_ticket = _related_ticket(request, request.POST.get("related"))
         if form.is_valid():
             ticket = Ticket.objects.create(
                 subject=form.cleaned_data["subject"],
@@ -108,17 +121,28 @@ def client_submit_ticket(request):
                 requester=request.user,
                 client=request.user.client,
                 status=S.NEW,
+                linked_from=related_ticket,
             )
             save_attachments(ticket, form.cleaned_data["attachments"], request.user)
-            messages.success(request, "Ticket submitted successfully.")
+            if related_ticket:
+                messages.success(
+                    request,
+                    f"Ticket submitted — linked to {related_ticket.reference}.",
+                )
+            else:
+                messages.success(request, "Ticket submitted successfully.")
             return redirect("client_dashboard")
     else:
-        form = TicketSubmitForm()
+        related_ticket = _related_ticket(request, request.GET.get("related"))
+        initial = {}
+        if related_ticket:
+            initial["subject"] = f"Follow-up: {related_ticket.subject}"[:255]
+        form = TicketSubmitForm(initial=initial)
 
     return render(
         request,
         "client_portal/submit-ticket.html",
-        {"form": form, "active_nav": "submit"},
+        {"form": form, "active_nav": "submit", "related_ticket": related_ticket},
     )
 
 

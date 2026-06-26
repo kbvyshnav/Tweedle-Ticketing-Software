@@ -237,7 +237,7 @@
                     <span class="tw-status-banner__title">Ticket Closed Successfully</span>
                     This ticket has been closed. Thank you for using our support service.
                     The 14-day reopen window has passed.
-                    <a href="{% url 'client_submit_ticket' %}" style="color:inherit;text-decoration:underline">
+                    <a href="{% url 'client_submit_ticket' %}?related={{ ticket.pk }}" style="color:inherit;text-decoration:underline">
                         Submit a related ticket
                     </a> if you need further assistance.
                 </div>
@@ -313,6 +313,33 @@
                     <p class="tw-description-text">{{ ticket.description|linebreaksbr|default:"No description provided." }}</p>
                 </div>
             </div>
+
+
+            <!-- RELATED TICKETS -->
+            {% if ticket.linked_from or ticket.linked_tickets.all %}
+            <div class="tw-detail-card">
+                <div class="tw-detail-card__header">
+                    <i class="bx bx-link" aria-hidden="true"></i>
+                    <h3 class="tw-detail-card__title">Related tickets</h3>
+                </div>
+                <div class="tw-detail-card__body">
+                    {% if ticket.linked_from %}
+                    <p style="margin:0 0 8px">
+                        Follow-up to
+                        <a href="{% url 'client_ticket_detail' ticket.linked_from.pk %}">
+                            {{ ticket.linked_from.reference }}</a> — {{ ticket.linked_from.subject }}
+                    </p>
+                    {% endif %}
+                    {% for f in ticket.linked_tickets.all %}
+                    <p style="margin:0 0 8px">
+                        Follow-up ticket:
+                        <a href="{% url 'client_ticket_detail' f.pk %}">{{ f.reference }}</a>
+                        — {{ f.subject }}
+                    </p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
 
 
             <!-- ATTACHMENTS -->
